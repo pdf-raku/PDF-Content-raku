@@ -3,7 +3,7 @@ use v6;
 use PDF::Writer;
 use PDF::DAO::Util :from-ast;
 
-role PDF::Graphics {
+role PDF::Graphics:ver<0.0.2> {
 
     has &.callback is rw;
 

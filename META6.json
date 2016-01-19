@@ -1,13 +1,17 @@
 {
     "perl"        : "6.c",
     "name"        : "PDF::Graphics",
-    "version"     : "0.0.1",
+    "version"     : "0.0.2",
     "description" : "PDF Graphical Operators and Content",
     "depends"     : [ "PDF", "PDF::Grammar" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
 
         "PDF::Graphics" : "lib/PDF/Graphics.pm",
+
+        "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",
+        "PDF::Graphics::Font::Encodings" : "lib/PDF/Graphics/Font/Encodings.pm",
+
         "PDF::Graphics::Util::TransformMatrix" : "lib/PDF/Graphics/Util/TransformMatrix.pm",
         "PDF::Graphics::Text::Atom" : "lib/PDF/Graphics/Text/Atom.pm",
         "PDF::Graphics::Text::Block" : "lib/PDF/Graphics/Text/Block.pm",
