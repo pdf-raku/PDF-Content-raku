@@ -3,7 +3,7 @@
     "name"        : "PDF::Graphics",
     "version"     : "0.0.2",
     "description" : "PDF Graphics, including text, images and general content",
-    "depends"     : [ "PDF", "PDF::Grammar" ],
+    "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
 
