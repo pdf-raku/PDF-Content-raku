@@ -1,10 +1,10 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Graphics :OpNames;
+use PDF::Graphics;
+use PDF::Graphics::Ops :OpNames;
 
-class T does PDF::Graphics {};
-my $g = T.new;
+my $g = PDF::Graphics.new;
 
 $g.op(Save);
 
@@ -67,7 +67,7 @@ is $g.TextLeading, 0, '$g.TextLeading - restored';
 
 lives-ok {$g.content}, 'content with matching BT ... ET  q ... Q - lives';
 
-$g = T.new;
+$g = PDF::Graphics.new;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 is-json-equiv $g.ops, [:m[:int(175), :int(720)],
@@ -98,7 +98,17 @@ is-json-equiv $g.ops[*-3], {:BI[:dict{:BPC(:int(8)),
 is-json-equiv $g.ops[*-2], {:ID[:encoded("J1/gKA>.]AN\&J?]-<HW]aRVcg*bb.\\eKAdVV\%/PcZ\n\%…Omitted data…\n\%R.s(4KE3\&d\&7hb*7[\%Ct2HCqC~>")]}, 'Image ID';
 is-json-equiv $g.ops[*-1], (:EI[]), 'Image EI';
 
-BEGIN our $compile-time = PDF::Graphics.parse("BT/F1 16 Tf\n(Hi)Tj ET");
+my @inline-images = $g.inline-images;
+
+is-json-equiv @inline-images, [{:BPC(8), :CS<RGB>, :F<A85 LZW>, :H(17), :W(17),
+                                :Length(86), :Subtype<Image>, :Type<XObject> },], 'inline-images';
+is @inline-images[0].encoded.lines, q:to"EI".lines, 'image data';
+J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
+%…Omitted data…
+%R.s(4KE3&d&7hb*7[%Ct2HCqC~>
+EI
+
+BEGIN our $compile-time = PDF::Graphics::Ops.parse("BT/F1 16 Tf\n(Hi)Tj ET");
 is-json-equiv $compile-time[*-1], (:ET[]), 'compile time ops parse';
 $g.ops( $compile-time);
 is-json-equiv [ $g.ops[*-4..*] ], [ :BT[],

@@ -1,10 +1,12 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Graphics :OpNames;
+use PDF::Graphics::Ops :OpNames;
 plan 6;
 
-my $gfx = PDF::Graphics.new;
+class Graphics does PDF::Graphics::Ops {};
+
+my $gfx = Graphics.new;
 
 $gfx.Save;
 lives-ok {$gfx.op(BeginText)}, 'basic op';
