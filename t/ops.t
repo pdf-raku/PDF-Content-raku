@@ -100,9 +100,9 @@ is-json-equiv $g.ops[*-1], (:EI[]), 'Image EI';
 
 my @inline-images = $g.inline-images;
 
-is-json-equiv @inline-images, [{:BPC(8), :CS<RGB>, :F<A85 LZW>, :H(17), :W(17),
+is-json-equiv @inline-images, [{:BitsPerComponent(8), :ColorSpace<RGB>, :Filter<A85 LZW>, :Height(17), :Width(17),
                                 :Length(86), :Subtype<Image>, :Type<XObject> },], 'inline-images';
-is @inline-images[0].encoded.lines, q:to"EI".lines, 'image data';
+is-deeply @inline-images[0].encoded.lines, q:to"EI".lines, 'image data';
 J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
 %…Omitted data…
 %R.s(4KE3&d&7hb*7[%Ct2HCqC~>

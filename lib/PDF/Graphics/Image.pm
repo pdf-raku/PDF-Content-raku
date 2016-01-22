@@ -89,5 +89,33 @@ role PDF::Graphics::Image {
              !! "unable to determine image-type: {$fh.path.basename}");
     }
 
+    method inline-to-xobject(Hash $inline-dict) {
+
+        my constant %Abbreviations = %(
+            # [PDF 1.7 TABLE 4.43 Entries in an inline image object]
+            :BPC<BitsPerComponent>,
+            :CS<ColorSpace>,
+            :D<Decode>,
+            :DP<DecodeParms>,
+            :F<Filter>,
+            :H<Height>,
+            :IM<ImageMask>,
+            :I<Interpolate>,
+            :W<Width>,
+            # [PDF 1.7 TABLE 4.44 Additional abbreviations in an inline image object]
+            :G<DeviceGray>,
+            :RGB<DeviceRGB>,
+            :CMYK<DeviceCMYK>,
+            # Notes:
+            # 1. Ambiguous 'Indexed' entry seems to be a typo in the spec
+            # 2. filter abbreviations are handled in PDF::Storage::Filter
+            );
+
+        my %xobject-dict = $inline-dict.pairs.map: {
+            (%Abbreviations{.key} // .key) => .value
+        }
+
+        %xobject-dict;
+    }
 
 }
