@@ -1,5 +1,5 @@
 use v6;
-use PDF::Graphics::Ops :OpNames;
+use PDF::Graphics::Ops :OpNames, :GraphicsContext;
 
 class PDF::Graphics:ver<0.0.2>
     does PDF::Graphics::Ops {
@@ -7,6 +7,7 @@ class PDF::Graphics:ver<0.0.2>
     use PDF::DAO;
     use PDF::DAO::Stream;
     use PDF::Graphics::Image;
+    use PDF::Graphics::Text::Block;
 
     method block( &do-stuff! ) {
         $.op(Save);
@@ -139,6 +140,54 @@ class PDF::Graphics:ver<0.0.2>
 		$.op(XObject, $key);
 	    }
         };
+    }
+
+    #! output text leave the text position at the end of the current line
+    multi method print(Str $text,
+		       Bool :$stage = False,
+		       :$font is copy,
+		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
+        ) {
+	# detect and use the current text-state font
+	my Numeric $font-size = $.FontSize || 16;
+	my Numeric $word-spacing = $.WordSpacing;
+	my Numeric $horiz-scaling = $.HorizScaling;
+	my Numeric $char-spacing = $.CharSpacing;
+
+        my $text-block = PDF::Graphics::Text::Block.new( :$text, :$font, :$font-size,
+                                                         :$word-spacing, :$horiz-scaling, :$char-spacing,
+                                                         |c );
+
+	$.print( $text-block, |c)
+	    unless $stage;
+
+	$text-block;
+    }
+
+    multi method print(PDF::Graphics::Text::Block $text-block,
+		       Bool :$nl = False,
+	) {
+
+	my $font-size = $text-block.font-size;
+	my $font-key = $text-block.font-key;
+
+	my Bool $in-text = $.context == GraphicsContext::Text;
+	$.op(BeginText) unless $in-text;
+
+	$.op(SetFont, $font-key, $font-size)
+	    unless $.FontKey
+	    && $font-key eq $.FontKey
+	    && $font-size == $.FontSize;
+	$.ops( $text-block.content(:$nl) );
+
+	$.op(EndText) unless $in-text;
+
+        $text-block;
+    }
+
+    #! output text move the  text position down one line
+    method say($text, |c) {
+        $.print($text, :nl, |c);
     }
 
 }
