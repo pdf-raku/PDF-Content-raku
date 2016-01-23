@@ -89,7 +89,7 @@ role PDF::Graphics::Image {
              !! "unable to determine image-type: {$fh.path.basename}");
     }
 
-    method inline-to-xobject(Hash $inline-dict) {
+    method inline-to-xobject(Hash $inline-dict, Bool :$invert) {
 
         my constant %Abbreviations = %(
             # [PDF 1.7 TABLE 4.43 Entries in an inline image object]
@@ -111,8 +111,10 @@ role PDF::Graphics::Image {
             # 2. filter abbreviations are handled in PDF::Storage::Filter
             );
 
+        my $alias = $invert ?? %Abbreviations.invert.Hash !! %Abbreviations;
+
         my %xobject-dict = $inline-dict.pairs.map: {
-            (%Abbreviations{.key} // .key) => .value
+            ($alias{.key} // .key) => .value
         }
 
         %xobject-dict;
