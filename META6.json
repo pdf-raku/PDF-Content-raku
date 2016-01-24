@@ -2,7 +2,7 @@
     "perl"        : "6.c",
     "name"        : "PDF::Graphics",
     "version"     : "0.0.2",
-    "description" : "PDF Graphics, including text, images and general content",
+    "description" : "PDF Graphics utilities, for handling text, images and general content",
     "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
@@ -11,6 +11,7 @@
         "PDF::Graphics::Ops" : "lib/PDF/Graphics/Ops.pm",
 
         "PDF::Graphics::Image" : "lib/PDF/Graphics/Image.pm",
+        "PDF::Graphics::Image::JPEG" : "lib/PDF/Graphics/Image/JPEG.pm",
 
         "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",
         "PDF::Graphics::Font::Encodings" : "lib/PDF/Graphics/Font/Encodings.pm",
