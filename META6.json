@@ -11,6 +11,7 @@
         "PDF::Graphics::Ops" : "lib/PDF/Graphics/Ops.pm",
 
         "PDF::Graphics::Image" : "lib/PDF/Graphics/Image.pm",
+        "PDF::Graphics::Image::GIF" : "lib/PDF/Graphics/Image/GIF.pm",
         "PDF::Graphics::Image::JPEG" : "lib/PDF/Graphics/Image/JPEG.pm",
 
         "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",

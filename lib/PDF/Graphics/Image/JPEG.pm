@@ -1,5 +1,8 @@
 use v6;
 use PDF::Graphics::Image;
+use PDF::DAO;
+
+# adapted from Perl 5's PDF::API::Resource::XObject::Image::JPEG
 
 class PDF::Graphics::Image::JPEG
     is PDF::Graphics::Image {
@@ -12,7 +15,6 @@ class PDF::Graphics::Image::JPEG
         $fh.seek(0, SeekFromBeginning);
         $buf = $fh.read(2);
         my $soi = $.unpack($buf, uint8, uint8);
-        warn { 0 => $soi[0], 1 => $soi[1], :$soi, }.perl;
         die "{$fh.path} image doesn't have a JPEG header: {$buf.decode('latin-1').perl}"
             unless $soi[0] == 0xFF and $soi[1] == 0xD8;
 

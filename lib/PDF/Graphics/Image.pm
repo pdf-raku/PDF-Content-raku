@@ -6,7 +6,7 @@ role PDF::Graphics::Image {
     method network-endian { True }
 
     #| lightweight replacement for deprecated $buf.unpack
-    method unpack(buf8 $buf, *@templ ) {
+    method unpack(Buf $buf, *@templ ) {
 	my @bytes = $buf.list;
         my Bool $nw = $.network-endian;
         my UInt $off = 0;
@@ -36,6 +36,7 @@ role PDF::Graphics::Image {
     multi method read(IO::Handle $fh!) {
         my Str $type = do given $fh.path.extension {
             when m:i/^ jpe?g $/ { 'JPEG' }
+            when m:i/^ gif $/   { 'GIF' }
             default {
                 die ($_
                      ?? "can't yet handle files of type: $_"
