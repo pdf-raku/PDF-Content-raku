@@ -62,7 +62,7 @@ class PDF::Graphics::Image::GIF
                 $next-code++;
             }
         }
-        warn { :len($out.codes), :$out}.perl;
+
         $out;
     }
 
@@ -108,9 +108,9 @@ class PDF::Graphics::Image::GIF
 
     method read(IO::Handle $fh!, Bool :$trans = True) {
 
-        my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> ), :Filter( :name<FlateDecode> );
+        my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
         my Bool $interlaced = False;
-        my Str $encoded = '';
+        my Str $decoded = '';
 
         my $buf = $fh.read: 6; # signature
         die "{$fh.path} unknown image signature {$buf.decode('latin-1').perl} -- not a gif."
@@ -148,8 +148,8 @@ class PDF::Graphics::Image::GIF
                         ($len,) = $.unpack($fh.read(1), uint8);
                     }
 
-                    $encoded = self!de-compress($sep+1, $stream);
-                    $encoded = self!de-interlace($encoded, %dict<Width>, %dict<Height> )
+                    $decoded = self!de-compress($sep+1, $stream);
+                    $decoded = self!de-interlace($decoded, %dict<Width>, %dict<Height> )
                         if $interlaced;
                     last;
                 }
@@ -190,7 +190,7 @@ class PDF::Graphics::Image::GIF
         }
         $fh.close;
 
-        PDF::DAO.coerce( :%dict, :$encoded );
+        PDF::DAO.coerce( :%dict, :$decoded );
     }
 
 }
