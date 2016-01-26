@@ -19,28 +19,23 @@ class PDF::Graphics::Image::GIF
     }
 
     sub vec(buf8 $buf, UInt $off) {
-        ($buf[ $off div 8] +> ($off % 8)) % 2
+        ($buf[ $off div 8] +> ($off mod 8)) mod 2
     }
 
     method !de-compress(UInt $ibits, buf8 $stream) {
         my UInt $bits = $ibits;
-        my UInt $reset-code = 1 +< ($ibits-1);
+        my UInt $reset-code = 1 +< ($ibits - 1);
         my UInt $end-code   = $reset-code + 1;
-        my UInt $next-code  = $end-code+1;
+        my UInt $next-code  = $end-code + 1;
         my UInt $ptr = 0;
         my UInt $maxptr = 8 * +$stream;
-        my UInt $tag;
         my Str $out = '';
         my UInt $outptr = 0;
 
         my Str @d = (0 ..^ $reset-code).map: *.chr;
 
         while ($ptr + $bits) <= $maxptr {
-            $tag = 0;
-            for (reverse 0 ..^ $bits) -> $off {
-                $tag +<= 1;
-                $tag +|= vec($stream, $ptr + $off);
-            }
+            my UInt $tag = [+] (0 ..^ $bits).map: { vec($stream, $ptr + $_) +< $_ };
             $ptr += $bits;
             $bits++
                 if $next-code == 1 +< $bits and $bits < 12;
@@ -52,14 +47,11 @@ class PDF::Graphics::Image::GIF
             } elsif $tag == $end-code {
                 last;
             } elsif $tag < $reset-code {
-                @d[$next-code] = @d[$tag];
-                $out ~= @d[$next-code];
-                $next-code++;
+                $out ~= @d[$next-code++] = @d[$tag];
             } elsif $tag > $end-code {
                 @d[$next-code] = @d[$tag];
-                @d[$next-code] ~= substr(@d[$tag + 1], 0, 1);
-                $out ~= @d[$next-code];
-                $next-code++;
+                @d[$next-code] ~= @d[$tag + 1].substr( 0, 1);
+                $out ~= @d[$next-code++];
             }
         }
 
@@ -110,7 +102,7 @@ class PDF::Graphics::Image::GIF
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
         my Bool $interlaced = False;
-        my Str $decoded = '';
+        my Str $encoded = '';
 
         my $buf = $fh.read: 6; # signature
         die "{$fh.path} unknown image signature {$buf.decode('latin-1').perl} -- not a gif."
@@ -148,9 +140,11 @@ class PDF::Graphics::Image::GIF
                         ($len,) = $.unpack($fh.read(1), uint8);
                     }
 
-                    $decoded = self!de-compress($sep+1, $stream);
-                    $decoded = self!de-interlace($decoded, %dict<Width>, %dict<Height> )
+                    $encoded = self!de-compress($sep+1, $stream);
+                    $encoded = self!de-interlace($encoded, %dict<Width>, %dict<Height> )
                         if $interlaced;
+
+                    %dict<Length> = $encoded.codes;
                     last;
                 }
 
@@ -176,6 +170,7 @@ class PDF::Graphics::Image::GIF
                         %dict<Mask> = [$transIndex, $transIndex];
                     }
                 }
+
                 default {
                     # misc extension
                     my ($tag, $len) = $.unpack( $fh.read(1), uint8, uint8);
@@ -190,7 +185,7 @@ class PDF::Graphics::Image::GIF
         }
         $fh.close;
 
-        PDF::DAO.coerce( :%dict, :$decoded );
+        PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
 
 }

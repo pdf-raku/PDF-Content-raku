@@ -57,6 +57,6 @@ class PDF::Graphics::Image::JPEG
         my $encoded = $fh.slurp-rest;
         $fh.close;
 
-        PDF::DAO.coerce( :%dict, :$encoded );
+        PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
 }
