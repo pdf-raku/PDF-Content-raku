@@ -29,13 +29,18 @@ class PDF::Graphics::Image::PNG
         my Buf $crc;
         my Buf $buf;
         my $stream = buf8.new;
-        $fh.seek(8, SeekFromBeginning);
+
+        constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
+        my $header = $fh.read(8).decode('latin-1');
+
+        die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :$fh )
+            unless $header eq PNG-Header;
 
         while !$fh.eof {
             my ($l) = $.unpack( $fh.read(4), uint32 );
-            my $hdr = $fh.read(4).decode('latin-1');
+            my $blk = $fh.read(4).decode('latin-1');
 
-            given $hdr {
+            given $blk {
 
                 when 'IHDR' {
                     $buf = $fh.read($l);

@@ -13,10 +13,9 @@ class PDF::Graphics::Image::JPEG
         my Bool $is-dct;
 
         $fh.seek(0, SeekFromBeginning);
-        $buf = $fh.read(2);
-        my $soi = $.unpack($buf, uint8, uint8);
-        die "{$fh.path} image doesn't have a JPEG header: {$buf.decode('latin-1').perl}"
-            unless $soi[0] == 0xFF and $soi[1] == 0xD8;
+        my $header = $fh.read(2).decode: 'latin-1';
+        die X::PDF::Image::WrongHeader.new( :type<JPEG>, :$header, :$fh )
+            unless $header ~~ "\xFF\xD8";
 
         loop {
             $buf = $fh.read: 4;

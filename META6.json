@@ -11,15 +11,16 @@
         "PDF::Graphics::Ops" : "lib/PDF/Graphics/Ops.pm",
 
         "PDF::Graphics::Image" : "lib/PDF/Graphics/Image.pm",
-        "PDF::Graphics::Image::GIF" : "lib/PDF/Graphics/Image/GIF.pm",
+        "PDF::Graphics::Image::GIF"  : "lib/PDF/Graphics/Image/GIF.pm",
         "PDF::Graphics::Image::JPEG" : "lib/PDF/Graphics/Image/JPEG.pm",
+        "PDF::Graphics::Image::PNG"  : "lib/PDF/Graphics/Image/PNG.pm",
 
         "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",
         "PDF::Graphics::Font::Encodings" : "lib/PDF/Graphics/Font/Encodings.pm",
 
-        "PDF::Graphics::Text::Atom" : "lib/PDF/Graphics/Text/Atom.pm",
+        "PDF::Graphics::Text::Atom"  : "lib/PDF/Graphics/Text/Atom.pm",
         "PDF::Graphics::Text::Block" : "lib/PDF/Graphics/Text/Block.pm",
-        "PDF::Graphics::Text::Line" : "lib/PDF/Graphics/Text/Line.pm",
+        "PDF::Graphics::Text::Line"  : "lib/PDF/Graphics/Text/Line.pm",
 
         "PDF::Graphics::Util::TransformMatrix" : "lib/PDF/Graphics/Util/TransformMatrix.pm"
      }

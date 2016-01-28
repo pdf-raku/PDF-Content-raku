@@ -104,11 +104,11 @@ class PDF::Graphics::Image::GIF
         my Bool $interlaced = False;
         my Str $encoded = '';
 
-        my $buf = $fh.read: 6; # signature
-        die "{$fh.path} unknown image signature {$buf.decode('latin-1').perl} -- not a gif."
-            unless $buf.decode('latin-1') ~~ /^GIF <[0..9]>**2 [a|b]/;
+        my $header = $fh.read(6).decode: 'latin-1';
+        die X::PDF::Image::WrongHeader.new( :type<GIF>, :$header, :$fh )
+            unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
-        $buf = $fh.read: 7; # logical descr.
+        my $buf = $fh.read: 7; # logical descr.
         my ($wg, $hg, $flags, $bgColorIndex, $aspect) = $.unpack($buf, uint16, uint16, uint8, uint8, uint8);
 
         self!read-colorspace($fh, $flags, %dict)
