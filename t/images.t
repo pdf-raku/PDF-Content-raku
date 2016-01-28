@@ -28,4 +28,23 @@ is-json-equiv $gif<ColorSpace>, ['Indexed', 'DeviceRGB', 31, "\xFF\xFF\xFF\xFF\x
 ok $gif<Length>, 'gif dict length';
 is $gif.encoded.codes, $gif<Length>, 'gif encoded length';
 
+my $png;
+lives-ok {$png = PDF::Graphics::Image.open: "t/images/basn0g01.png";}, "open png - lives";
+isa-ok $png, ::('PDF::DAO::Stream'), 'png object';
+is $png<Type>, 'XObject', 'png-gray type';
+is $png<Subtype>, 'Image', 'png-gray subtype';
+is $png<Width>, 32, 'png-gray width';
+is $png<Height>, 32, 'png-gray height';
+is $png<Filter>, 'FlateDecode', 'png-gray filter';
+is $png<ColorSpace>, 'DeviceGray', 'png-gray cs';
+
+my $decode = $png<DecodeParms>;
+is $decode<BitsPerComponent>, 1, 'png-gray decode bpc';
+is $decode<Colors>, 1, 'png-gray decode colors';
+is $decode<Columns>, 32, 'png-gray decode columns';
+is $decode<Predictor>, 15, 'png-gray decode predictor';
+
+ok $png<Length>, 'png-gray dict length';
+is $png.encoded.codes, $png<Length>, 'png-gray encoded length';
+
 done-testing;

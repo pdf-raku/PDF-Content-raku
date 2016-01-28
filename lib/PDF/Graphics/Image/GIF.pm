@@ -175,9 +175,9 @@ class PDF::Graphics::Image::GIF
                     # misc extension
                     my ($tag, $len) = $.unpack( $fh.read(1), uint8, uint8);
 
-                    # flush it
+                    # skip ahead
                     while $len {
-                        $fh.read: $len;
+                        $fh.seek($len, SeekFromCurrent);
                         ($len,) = $.unpack($fh.read(1), uint8);
                     }
                 }

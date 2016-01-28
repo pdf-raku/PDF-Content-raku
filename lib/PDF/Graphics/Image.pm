@@ -37,6 +37,7 @@ role PDF::Graphics::Image {
         my Str $type = do given $fh.path.extension {
             when m:i/^ jpe?g $/ { 'JPEG' }
             when m:i/^ gif $/   { 'GIF' }
+            when m:i/^ png $/   { 'PNG' }
             default {
                 die ($_
                      ?? "can't yet handle files of type: $_"
