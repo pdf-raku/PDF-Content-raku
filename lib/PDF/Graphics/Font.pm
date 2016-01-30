@@ -110,7 +110,7 @@ module PDF::Graphics::Font {
 	    $text-in.comb.grep({ $!glyphs{$_}:exists }).join: '';
 	}
 
-	#| map ourselves to a PDF::Doc object
+	#| map ourselves to a PDF::Graphics object
         method to-dict {
             my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
             my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
