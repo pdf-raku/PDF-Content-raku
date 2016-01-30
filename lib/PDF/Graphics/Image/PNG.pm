@@ -75,9 +75,6 @@ class PDF::Graphics::Image::PNG
 
         given $cs {
             when 0 {     # greyscale
-                die "16-bits of greylevel in png not supported."
-                    if $bpc > 8;
-
                 %dict<Filter> = :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceGray>;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
@@ -88,9 +85,6 @@ class PDF::Graphics::Image::PNG
                 }
             }
             when 2 {  # rgb 8/16 bits
-                die "16-bits of rgb in png not supported."
-                    if $bpc > 8;
-
                 %dict<Filter> = :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceRGB>;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };

@@ -28,23 +28,41 @@ is-json-equiv $gif<ColorSpace>, ['Indexed', 'DeviceRGB', 31, "\xFF\xFF\xFF\xFF\x
 ok $gif<Length>, 'gif dict length';
 is $gif.encoded.codes, $gif<Length>, 'gif encoded length';
 
-my $png;
-lives-ok {$png = PDF::Graphics::Image.open: "t/images/basn0g01.png";}, "open png - lives";
-isa-ok $png, ::('PDF::DAO::Stream'), 'png object';
-is $png<Type>, 'XObject', 'png-gray type';
-is $png<Subtype>, 'Image', 'png-gray subtype';
-is $png<Width>, 32, 'png-gray width';
-is $png<Height>, 32, 'png-gray height';
-is $png<Filter>, 'FlateDecode', 'png-gray filter';
-is $png<ColorSpace>, 'DeviceGray', 'png-gray cs';
+for (
+    'png-1bit-gray' => {
+        :file<t/images/basn0g01.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceGray>, :BitsPerComponent(1),
+        :Colors(1), :Columns(32), :Predictor(15), },
+    'png-8bit-rgb' => {
+        :file<t/images/basn2c08.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(8),
+        :Colors(3), :Columns(32), :Predictor(15), },
+    'png-16bit-rgb' => {
+        :file<t/images/basn2c16.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(16),
+        :Colors(3), :Columns(32), :Predictor(15), },
+    )  {
+    my $desc = .key;
+    my $test = .value;
 
-my $decode = $png<DecodeParms>;
-is $decode<BitsPerComponent>, 1, 'png-gray decode bpc';
-is $decode<Colors>, 1, 'png-gray decode colors';
-is $decode<Columns>, 32, 'png-gray decode columns';
-is $decode<Predictor>, 15, 'png-gray decode predictor';
+    my $png;
+    lives-ok {$png = PDF::Graphics::Image.open: $test<file>;}, "open $desc - lives";
+    isa-ok $png, ::('PDF::DAO::Stream'), "$desc object";
+    is $png<Type>, 'XObject', "$desc type";
+    is $png<Subtype>, 'Image', "$desc subtype";
+    is $png<Width>, $test<Width>, "$desc width";
+    is $png<Height>,$test<Height>, "$desc height";
+    is $png<Filter>, $test<Filter>, "$desc filter";
+    is $png<ColorSpace>, $test<ColorSpace>, "$desc color-space";
 
-ok $png<Length>, 'png-gray dict length';
-is $png.encoded.codes, $png<Length>, 'png-gray encoded length';
+    my $decode = $png<DecodeParms>;
+    is $decode<BitsPerComponent>, $test<BitsPerComponent>, "$desc decode bpc";
+    is $decode<Colors>, $test<Colors>, "$desc decode colors";
+    is $decode<Columns>,$test<Columns>, "$desc decode columns";
+    is $decode<Predictor>, $test<Predictor>, "$desc decode predictor";
+
+    ok $png<Length>, 'png-gray dict length';
+    is $png.encoded.codes, $png<Length>, 'png-gray encoded length';
+}
 
 done-testing;
