@@ -61,8 +61,8 @@ for (
     is $decode<Columns>,$test<Columns>, "$desc decode columns";
     is $decode<Predictor>, $test<Predictor>, "$desc decode predictor";
 
-    ok $png<Length>, 'png-gray dict length';
-    is $png.encoded.codes, $png<Length>, 'png-gray encoded length';
+    ok $png<Length>, "$desc dict length";
+    is $png.encoded.codes, $png<Length>, "$desc encoded length";
 }
 
 done-testing;

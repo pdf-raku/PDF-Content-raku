@@ -1,13 +1,36 @@
 use v6;
 use PDF::Graphics::Ops :OpNames, :GraphicsContext;
 
-class PDF::Graphics:ver<0.0.2>
+role PDF::Graphics:ver<0.0.3>
     does PDF::Graphics::Ops {
 
     use PDF::DAO;
     use PDF::DAO::Stream;
     use PDF::Graphics::Image;
     use PDF::Graphics::Text::Block;
+
+    has $.parent;
+
+    method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
+			Numeric :$opacity,
+			*%settings,
+	) {
+
+	$gs.transparancy = 1 - $opacity
+	    if $opacity.defined;
+
+	for %settings.keys.sort {
+	    if $gs.can($_) {
+		$gs."$_"() = %settings{$_}
+	    }
+	    else {
+		warn "ignoring graphics state option: $_";
+	    }
+	}
+
+	my $gs-entry = self.parent.use-resource($gs, :eqv);
+	self.SetGraphicsState($gs-entry.key);
+    }
 
     method block( &do-stuff! ) {
         $.op(Save);
@@ -77,7 +100,7 @@ class PDF::Graphics:ver<0.0.2>
     method do(PDF::DAO::Stream $obj! where .<Type> eq 'XObject',
               Numeric $x = 0,
               Numeric $y = 0,
-              Str     :$key!,
+              Str     :$key = $.parent.use-resource($obj).key,
               Numeric :$width is copy,
               Numeric :$height is copy,
               Align   :$align  = 'left',
@@ -145,7 +168,7 @@ class PDF::Graphics:ver<0.0.2>
     #! output text leave the text position at the end of the current line
     multi method print(Str $text,
 		       Bool :$stage = False,
-		       :$font is copy,
+		       :$font = self!get-font,
 		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
         ) {
 	# detect and use the current text-state font
@@ -188,6 +211,24 @@ class PDF::Graphics:ver<0.0.2>
     #! output text move the  text position down one line
     method say($text, |c) {
         $.print($text, :nl, |c);
+    }
+
+    #| thin wrapper to $.op(SetFont, ...)
+    method set-font( $font-entry!, Numeric $size = 16) {
+        my Str $font-key = $font-entry.can('key')
+	    ?? $font-entry.key
+	    !! $font-entry;
+        $.op(SetFont, $font-key, $size);
+    }
+
+    method !get-font {
+       my $font = $.parent.resource-entry('Font', $.FontKey)
+           if $.FontKey;
+       $font // $!parent.core-font('Courier');
+    }
+
+    multi method print(Str $text, :$font = self!get-font, |c) {
+        nextwith( $text, :$font, |c);
     }
 
 }
