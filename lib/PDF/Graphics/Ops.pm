@@ -503,9 +503,9 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 	$.TextLeading = $TL
     }
     multi method track-graphics('Tf', Str $Tf!, Numeric $Tfs!) {
-        if self.can('parent') {
+        if my $parent = self.?parent {
             die "unknown font key: /$Tf"
-                unless self.parent.resource-entry('Font', $Tf);
+                unless $parent.resource-entry('Font', $Tf);
         }
         $.FontKey = $Tf;     #| e.g. 'F2'
         $.FontSize = $Tfs;   #| e.g. 16
