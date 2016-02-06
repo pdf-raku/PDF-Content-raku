@@ -1,6 +1,8 @@
 use v6;
 
-role PDF::Graphics::PageTree {
+use PDF::DAO::Dict;
+
+role PDF::Graphics::PageTree[$page-class = PDF::DAO::Dict] {
 
     use PDF::Graphics::Paged;
     use PDF::DAO;
@@ -19,7 +21,7 @@ role PDF::Graphics::PageTree {
 	    }
 	}
 	else {
-	    $page = PDF::DAO.coerce: { :Type( :name<Page> ) };
+	    $page = $page-class.new: :dict{ :Type( :name<Page> ) };
 	}
 
         if $sub-pages && $sub-pages.can('add-page') {

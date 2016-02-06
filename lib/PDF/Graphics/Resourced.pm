@@ -2,8 +2,7 @@ use v6;
 
 use PDF::DAO::Tie::Hash;
 
-role PDF::Graphics::Resourced
-    does PDF::DAO::Tie::Hash {
+role PDF::Graphics::Resourced {
 
     method core-font(|c) {
 	(self.Resources //= {}).core-font(|c);
