@@ -1,7 +1,5 @@
 use v6;
 
-use PDF::DAO::Tie::Hash;
-
 role PDF::Graphics::Resourced {
 
     method core-font(|c) {

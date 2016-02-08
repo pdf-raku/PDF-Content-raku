@@ -1,8 +1,6 @@
 use v6;
 
-use PDF::DAO::Dict;
-
-role PDF::Graphics::PageTree[$page-class = PDF::DAO::Dict] {
+role PDF::Graphics::PageTree {
 
     use PDF::Graphics::Paged;
     use PDF::DAO;
@@ -21,14 +19,15 @@ role PDF::Graphics::PageTree[$page-class = PDF::DAO::Dict] {
 	    }
 	}
 	else {
-	    $page = $page-class.new: :dict{ :Type( :name<Page> ) };
+	    $page = PDF::DAO.coerce: { :Type( :name<Page> ) };
 	}
 
         if $sub-pages && $sub-pages.can('add-page') {
-            $sub-pages.add-page( $page )
+            $page = $sub-pages.add-page( $page )
         }
         else {
             self.Kids.push: $page;
+	    $page = self.Kids[*-1];
 	    $page<Parent> = self.link;
         }
 
