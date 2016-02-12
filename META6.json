@@ -8,11 +8,13 @@
     "provides"    : {
 
         "PDF::Graphics" : "lib/PDF/Graphics.pm",
+        "PDF::Graphics::Doc" : "lib/PDF/Graphics/Doc.pm",
 
         "PDF::Graphics::Contents" : "lib/PDF/Graphics/Contents.pm",
         "PDF::Graphics::Paged" : "lib/PDF/Graphics/Paged.pm",
         "PDF::Graphics::PageTree" : "lib/PDF/Graphics/PageTree.pm",
         "PDF::Graphics::Resourced" : "lib/PDF/Graphics/Resourced.pm",
+        "PDF::Graphics::ResourceDict" : "lib/PDF/Graphics/ResourceDict.pm",
 
         "PDF::Graphics::Ops" : "lib/PDF/Graphics/Ops.pm",
 
