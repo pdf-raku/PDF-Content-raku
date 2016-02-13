@@ -3,30 +3,40 @@ use v6;
 role PDF::Graphics::ResourceDict {
 
     use PDF::DAO;
+    use PDF::DAO::Name;
 
     my role ResourceEntry {
 	has Str $.key is rw;
     }
 
-    method !base-name( PDF::DAO $object ) is default {
-        my Str $type = $object.?type
-            // die "not a resource object: {$object.WHAT}";
+    method !type( PDF::DAO $object ) is default {
 
-        do given $type {
-	    when 'ColorSpace' {'CS'}
-            when 'ExtGState'  {'GS'}
-            when 'Font'       {'F'}
-            when 'Pattern'    {'Pt'}
-	    when 'Shading'    {'Sh'}
-            when 'XObject' {
-                given $object.Subtype {
-                    when 'Form'  {'Fm'}
-                    when 'Image' {'Im'}
-		    default { warn "unknown XObject subtype: $_"; 'Obj' }
+        my Str:_ $type = do given $object {
+	    when Hash {
+		when .<Type>:exists {
+		    given .<Type> {
+			when 'ExtGState' | 'Font' | 'XObject' { $_ }
+		    }
 		}
-            }
-            default { warn "unknown object type: $_"; 'Obj' }
-        }
+		when .<PatternType>:exists { 'Pattern' }
+		when .<ShadingType>:exists { 'Shading' }
+		when .<Subtype>:exists && .<Subtype> ~~ 'Form' | 'Image' | 'PS' {
+		    # XObject /Type with /Type defaulted
+		    'XObject'
+		}
+	    }
+	    when Array && .[0] ~~ PDF::DAO::Name {
+		# e.g. [ /CalRGB << /WhitePoint [ 1.0 1.0 1.0 ] >> ]
+		'ColorSpace'
+	    }
+        };
+	
+	unless $type {
+	    warn "unrecognised graphics object: {$object.perl}";
+	    $type = 'Other'
+	}
+	
+	$type;
     }
 
     method !find-resource( &match, Str :$type! ) {
@@ -50,13 +60,20 @@ role PDF::Graphics::ResourceDict {
     #| ensure that the object is registered as a page resource. Return a unique
     #| name for it.
     method !register-resource(PDF::DAO $object,
-                             Str :$base-name = self!base-name($object),
-                             :$type = $object.?type) {
+                             Str :$type = self!type($object),
+	) {
 
-	die "unable to register this resource - uknown type"
-	    unless $type.defined;
+	my constant %Prefix = %(
+	    :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>, :Shading<Sh>,
+	    :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
+	    :Other<Obj>,
+	);
 
-        my Str $key = (1..*).map({$base-name ~ $_}).first({ self{$type}{$_}:!exists });
+	my $prefix = $type eq 'XObject'
+	    ?? %Prefix{$type}{ $object<Subtype> }
+	    !! %Prefix{$type};
+
+        my Str $key = (1..*).map({$prefix ~ $_}).first({ self{$type}{$_}:!exists });
         self{$type}{$key} = $object;
 
         my $entry = $object but ResourceEntry;
@@ -65,7 +82,7 @@ role PDF::Graphics::ResourceDict {
     }
 
     method resource(PDF::DAO $object, Bool :$eqv=False ) {
-        my Str $type = $object.?type
+        my Str $type = self!type($object)
             // die "not a resource object: {$object.WHAT}";
 
 	my &match = $eqv

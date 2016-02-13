@@ -2,6 +2,7 @@ use v6;
 
 use PDF::DAO::Doc;
 
+#| A minimal class for manipulating PDF graphical content
 class PDF::Graphics::Doc
     is PDF::DAO::Doc {
 
@@ -14,12 +15,22 @@ class PDF::Graphics::Doc
     use PDF::Graphics::Paged;
     use PDF::Graphics::PageTree;
     use PDF::Graphics::Resourced;
+    use PDF::Graphics::ResourceDict;
+
+    role Resources
+	does PDF::DAO::Tie::Hash
+	does PDF::Graphics::ResourceDict {
+	    has PDF::Graphics::Image @.Image is entry;
+    }
 
     role Page
 	does PDF::DAO::Tie::Hash
 	does PDF::Graphics::Contents
 	does PDF::Graphics::Paged
 	does PDF::Graphics::Resourced {
+
+	has Resources $.Resources is entry(:inherit);
+
 	my subset StreamOrArray of Any where PDF::DAO::Stream | Array;
 	has StreamOrArray $.Contents is entry;
     }
@@ -29,6 +40,8 @@ class PDF::Graphics::Doc
 	does PDF::Graphics::Paged
 	does PDF::Graphics::Resourced
 	does PDF::Graphics::PageTree {
+
+	has Resources $.Resources is entry(:inherit);
 
 	has PDF::Graphics::Paged @.Kids is entry(:required, :indirect);
         has UInt $.Count is entry(:required);
