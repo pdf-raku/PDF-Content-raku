@@ -64,7 +64,7 @@ class PDF::Graphics::Doc
     }
 
     method cb-init {
-	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], :Parent(self) } };
+	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], } };
     }
 
 }
