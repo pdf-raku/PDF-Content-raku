@@ -11,11 +11,11 @@ role PDF::Graphics::ResourceDict {
 
     method !type( PDF::DAO $object ) is default {
 
-        my Str:_ $type = do given $object {
+        my $type = do given $object {
 	    when Hash {
 		when .<Type>:exists {
 		    given .<Type> {
-			when 'ExtGState' | 'Font' | 'XObject' { $_ }
+			when 'ExtGState' | 'Font' | 'XObject' | 'Pattern' { $_ }
 		    }
 		}
 		when .<PatternType>:exists { 'Pattern' }

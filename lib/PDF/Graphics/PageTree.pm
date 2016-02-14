@@ -1,12 +1,15 @@
 use v6;
 
-role PDF::Graphics::PageTree {
+use PDF::Graphics::Resourced;
 
-    use PDF::Graphics::Paged;
+role PDF::Graphics::PageTree
+    does PDF::Graphics::Resourced {
+
+    use PDF::Graphics::PageNode;
     use PDF::DAO;
 
     #| add new last page
-    method add-page( PDF::Graphics::Paged $page? is copy ) {
+    method add-page( $page? is copy ) {
         my $sub-pages = self.Kids[*-1]
             if self.Kids;
 
@@ -19,7 +22,7 @@ role PDF::Graphics::PageTree {
 	    }
 	}
 	else {
-	    $page = PDF::DAO.coerce: { :Type( :name<Page> ) };
+	    $page = PDF::DAO.coerce: :dict{ :Type( :name<Page> ) };
 	}
 
         if $sub-pages && $sub-pages.can('add-page') {
@@ -36,7 +39,7 @@ role PDF::Graphics::PageTree {
     }
 
     #| append page subtree
-    method add-pages( PDF::Graphics::Paged $pages ) {
+    method add-pages( PDF::Graphics::PageNode $pages ) {
 	self<Count> += $pages<Count>;
 	self<Kids>.push: $pages;
 	$pages<Parent> = self;
@@ -45,7 +48,7 @@ role PDF::Graphics::PageTree {
 
     #| $.page(0) or $.page(-1) adds a new page
     multi method page(Int $page-num where $page-num == 0|-1
-	--> PDF::Graphics::Paged) {
+	--> PDF::Graphics::PageNode) {
         self.add-page;
     }
 
@@ -82,7 +85,7 @@ role PDF::Graphics::PageTree {
 
     #| delete page from page tree
     multi method delete-page(Int $page-num where { $page-num > 0 && $page-num <= self<Count>},
-	--> PDF::Graphics::Paged) {
+	--> PDF::Graphics::PageNode) {
         my $page-count = 0;
 
         for self.Kids.keys -> $i {

@@ -1,7 +1,7 @@
 {
     "perl"        : "6.c",
     "name"        : "PDF::Graphics",
-    "version"     : "0.0.3",
+    "version"     : "0.0.4",
     "description" : "PDF base utilities for text, images, fonts and general content",
     "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
@@ -11,7 +11,8 @@
         "PDF::Graphics::Doc" : "lib/PDF/Graphics/Doc.pm",
 
         "PDF::Graphics::Contents" : "lib/PDF/Graphics/Contents.pm",
-        "PDF::Graphics::Paged" : "lib/PDF/Graphics/Paged.pm",
+        "PDF::Graphics::Page" : "lib/PDF/Graphics/Page.pm",
+        "PDF::Graphics::PageNode" : "lib/PDF/Graphics/PageNode.pm",
         "PDF::Graphics::PageTree" : "lib/PDF/Graphics/PageTree.pm",
         "PDF::Graphics::Resourced" : "lib/PDF/Graphics/Resourced.pm",
         "PDF::Graphics::ResourceDict" : "lib/PDF/Graphics/ResourceDict.pm",
