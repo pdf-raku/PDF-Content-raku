@@ -13,17 +13,56 @@
 
 3 0 obj <<
   /Type /Page
+  /Contents 4 0 R
+  /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
   /Resources <<
+    /Font <<
+      /F1 5 0 R
+    >>
     /XObject <<
-      /Im1 4 0 R
+      /Im1 6 0 R
     >>
   >>
 >> endobj
 
 4 0 obj <<
+  /Length 300
+>> stream
+BT
+  1 0 0 1 200 200 Tm
+  /F1 18 Tf
+  19.8 TL
+  [ (Lorem ipsum dolor sit amet,) ] TJ
+  T*
+  [ (consectetur adipiscing elit,) ] TJ
+  T*
+  [ (sed do eiusmod tempor) ] TJ
+  T*
+  [ (incididunt ut labore et dolore) ] TJ
+  T*
+  [ (magna aliqua) ] TJ
+  T*
+ET
+q
+  q
+    32 0 0 32 100 100 cm
+    /Im1 Do
+  Q
+Q
+endstream endobj
+
+5 0 obj <<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica-Bold
+  /Encoding /WinAnsiEncoding
+>> endobj
+
+6 0 obj <<
   /Type /XObject
   /Subtype /Image
+  /BitsPerComponent 1
   /ColorSpace /DeviceGray
   /DecodeParms <<
     /BitsPerComponent 1
@@ -41,18 +80,20 @@ aEQñàŠ/ªêÒ¤„lÎ©%SçS4Wâ²!¿K&=Bs%%^‹Ú²žojÊ0i.)anéo0eð¿‡I/
 endstream endobj
 
 xref
-0 5
+0 7
 0000000000 65535 f 
 0000000014 00000 n 
 0000000068 00000 n 
 0000000134 00000 n 
-0000000247 00000 n 
+0000000329 00000 n 
+0000000683 00000 n 
+0000000794 00000 n 
 trailer
 <<
-  /ID [ <045e4a00c57c5579662d4d8346183099> <045e4a00c57c5579662d4d8346183099> ]
+  /ID [ <e81d9acce0687bf49311a9eee93a81f6> <e81d9acce0687bf49311a9eee93a81f6> ]
   /Root 1 0 R
-  /Size 5
+  /Size 7
 >>
 startxref
-595
+1164
 %%EOF

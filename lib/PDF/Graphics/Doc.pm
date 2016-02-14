@@ -12,6 +12,7 @@ class PDF::Graphics::Doc
     use PDF::DAO::Stream;
 
     use PDF::Graphics::Contents;
+    use PDF::Graphics::Font;
     use PDF::Graphics::Page;
     use PDF::Graphics::PageNode;
     use PDF::Graphics::PageTree;
@@ -20,7 +21,8 @@ class PDF::Graphics::Doc
     role Resources
 	does PDF::DAO::Tie::Hash
 	does PDF::Graphics::ResourceDict {
-	    has PDF::Graphics::Image @.Image is entry;
+	    has PDF::DAO::Stream @.XObject is entry;
+            has PDF::Graphics::Font %.Font is entry;
     }
 
     role Page

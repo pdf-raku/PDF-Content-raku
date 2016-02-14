@@ -51,4 +51,5 @@ role PDF::Graphics::Resourced {
 	@images.append: self.gfx.inline-images
 	    if $inline;
     }
+
 }

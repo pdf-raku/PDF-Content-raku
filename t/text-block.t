@@ -3,11 +3,11 @@ use Test;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Graphics;
 use PDF::Graphics::Text::Block;
-use PDF::Graphics::Font;
+use PDF::Graphics::Util::Font;
 
 plan 1;
 
-my $font = PDF::Graphics::Font::core-font( :family<helvetica>, :weight<bold> );
+my $font = PDF::Graphics::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
 my $text = "Hello. Ting, ting, ting. Attention! … ATTENTION!";
 my $text-block = PDF::Graphics::Text::Block.new( :$text, :$font, :font-key<Ft1>, :$font-size );

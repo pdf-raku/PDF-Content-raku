@@ -77,6 +77,7 @@ class PDF::Graphics::Image::PNG
             when 0 {     # greyscale
                 %dict<Filter> = :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceGray>;
+		%dict<BitsPerComponent> = $bpc;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
 
                 if $trans && $trns && +$trns {
@@ -87,6 +88,7 @@ class PDF::Graphics::Image::PNG
             when 2 {  # rgb 8/16 bits
                 %dict<Filter> = :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceRGB>;
+		%dict<BitsPerComponent> = $bpc;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
 
                 if $trans && $trns && +$trns {
@@ -104,6 +106,7 @@ class PDF::Graphics::Image::PNG
                     if $bpc > 8;
 
                 %dict<Filter> = :name<FlateDecode>;
+		%dict<BitsPerComponent> = $bpc;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
                 my $encoded = $palette.encode('latin-1');
                 my $color-stream = PDF::DAO.coerce: :stream{ :$encoded };
@@ -140,6 +143,7 @@ class PDF::Graphics::Image::PNG
 
                 %dict<Filter> = :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceGray>;
+		%dict<BitsPerComponent> = $bpc;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
 
                 if $trans {
@@ -169,6 +173,7 @@ class PDF::Graphics::Image::PNG
 
                 %dict<Filter> = :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceRGB>;
+		%dict<BitsPerComponent> = $bpc;
                 %dict<DecodeParms> = { :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
                 
                 if $trans {

@@ -11,6 +11,7 @@
         "PDF::Graphics::Doc" : "lib/PDF/Graphics/Doc.pm",
 
         "PDF::Graphics::Contents" : "lib/PDF/Graphics/Contents.pm",
+        "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",
         "PDF::Graphics::Page" : "lib/PDF/Graphics/Page.pm",
         "PDF::Graphics::PageNode" : "lib/PDF/Graphics/PageNode.pm",
         "PDF::Graphics::PageTree" : "lib/PDF/Graphics/PageTree.pm",
@@ -31,6 +32,7 @@
         "PDF::Graphics::Text::Block" : "lib/PDF/Graphics/Text/Block.pm",
         "PDF::Graphics::Text::Line"  : "lib/PDF/Graphics/Text/Line.pm",
 
+        "PDF::Graphics::Util::Font" : "lib/PDF/Graphics/Util/Font.pm",
         "PDF::Graphics::Util::TransformMatrix" : "lib/PDF/Graphics/Util/TransformMatrix.pm"
      }
 }
