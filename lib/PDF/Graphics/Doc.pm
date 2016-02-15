@@ -56,6 +56,11 @@ class PDF::Graphics::Doc
     role Catalog
 	does PDF::DAO::Tie::Hash {
 	has Pages $.Pages is entry(:required, :indirect);
+
+	method cb-finish {
+	    self.Pages.?cb-finish;
+	}
+
     }
 
     has Catalog $.Root is entry(:required, :indirect);

@@ -1,6 +1,9 @@
 use v6;
 use Test;
 
+# ensure consistant document ID generation
+srand(123456);
+
 use PDF::Graphics::Doc;
 my $doc = PDF::Graphics::Doc.new;
 my $page = $doc.add-page;
@@ -20,8 +23,6 @@ $page.graphics: -> $_ {
     .do($img, 100, 100);
 }
 
-warn "irksome .cb-finish invocation";
-$page.cb-finish;
 lives-ok { $doc.save-as("t/doc.pdf") }, 'save-as';
 
 done-testing;
