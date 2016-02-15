@@ -2,10 +2,17 @@ use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
 
+# ensure consistant document ID generation
+srand(123456);
+
 use PDF::Graphics::Image;
+use PDF::Graphics::Doc;
+
+my Pair @images;
 
 my $jpeg;
 lives-ok {$jpeg = PDF::Graphics::Image.open: "t/images/jpeg.jpg";}, "open jpeg - lives";
+@images.push: 'JPEG - Basic' => $jpeg;
 isa-ok $jpeg, ::('PDF::DAO::Stream'), 'jpeg object';
 is $jpeg<Type>, 'XObject', 'jpeg type';
 is $jpeg<Subtype>, 'Image', 'jpeg subtype';
@@ -18,6 +25,7 @@ is $jpeg.encoded.codes, $jpeg<Length>, 'jpeg encoded length';
 
 my $gif;
 lives-ok {$gif = PDF::Graphics::Image.open: "t/images/lightbulb.gif";}, "open gif - lives";
+@images.push: 'GIF - Basic' => $gif;
 isa-ok $gif, ::('PDF::DAO::Stream'), 'gif object';
 is $gif<Type>, 'XObject', 'gif type';
 is $gif<Subtype>, 'Image', 'gif subtype';
@@ -48,6 +56,8 @@ for (
     my $png;
     lives-ok {$png = PDF::Graphics::Image.open: $test<file>;}, "open $desc - lives";
     isa-ok $png, ::('PDF::DAO::Stream'), "$desc object";
+    @images.push: $desc => $png;
+    
     is $png<Type>, 'XObject', "$desc type";
     is $png<Subtype>, 'Image', "$desc subtype";
     is $png<Width>, $test<Width>, "$desc width";
@@ -64,5 +74,31 @@ for (
     ok $png<Length>, "$desc dict length";
     is $png.encoded.codes, $png<Length>, "$desc encoded length";
 }
+
+sub save-images(@images) {
+    use PDF::Graphics::Doc;
+    my $doc = PDF::Graphics::Doc.new;
+    my $page = $doc.add-page;
+    my $y = 650;
+
+    $page.graphics: -> $gfx {
+	my $font = $page.core-font( :family<Times-Roman>, :weight<bold>);
+	$gfx.say( "PDF::Graphics [t/images.t] - assorted images",
+		  :$font, :font-size(16), :position[30, 750] );
+
+	$font = $page.core-font( :family<Times-Roman>);
+    
+	for @images {
+	    my ($desc, $img) = .kv;
+	    $gfx.do($img, 50, $y, :height(60));
+	    $gfx.say($desc, :$font, :font-size(12), :position[120, $y + 25]);
+	    $y -= 100;
+	}
+    }
+    
+    $doc.save-as: "t/images.pdf";
+}
+
+lives-ok { save-images(@images) }, 'save-images - lives';
 
 done-testing;

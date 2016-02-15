@@ -188,6 +188,7 @@ role PDF::Graphics:ver<0.0.3>
     }
 
     multi method print(PDF::Graphics::Text::Block $text-block,
+		       :$position,
 		       Bool :$nl = False,
 	) {
 
@@ -195,15 +196,18 @@ role PDF::Graphics:ver<0.0.3>
 	my $font-key = $text-block.font-key;
 
 	my Bool $in-text = $.context == GraphicsContext::Text;
-	$.op(BeginText) unless $in-text;
+	self.op(BeginText) unless $in-text;
 
-	$.op(SetFont, $font-key, $font-size)
+	self.text-position = $position
+	    if $position;
+
+	self.op(SetFont, $font-key, $font-size)
 	    unless $.FontKey
 	    && $font-key eq $.FontKey
 	    && $font-size == $.FontSize;
-	$.ops( $text-block.content(:$nl) );
+	self.ops( $text-block.content(:$nl) );
 
-	$.op(EndText) unless $in-text;
+	self.op(EndText) unless $in-text;
 
         $text-block;
     }
