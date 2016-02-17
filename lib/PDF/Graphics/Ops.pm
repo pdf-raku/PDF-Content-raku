@@ -151,6 +151,37 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
     has Numeric @!Tm  = [ 1, 0, 0, 1, 0, 0, ];      #| text matrix
     has Numeric @!CTM = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
 
+    # Extended Graphics States (Resource /ExtGState entries)
+    # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
+    my enum ExtGState is export(:ExtGState) «
+	:line-width<LW>
+	:line-cap<LC>
+	:line-join-style<LJ>
+	:miter-limit<ML>
+	:dash-pattern<D>
+	:rendering-intent<RI>
+	:over-print-paint<OP>
+	:over-print-stroke<op>
+	:over-print-mode<OPM>
+	:fonts<Font>
+	:black-generation-old<BG>
+	:black-generation<BG2>
+	:under-cover-removal-function-old<UCR>
+	:under-cover-removal-function<UCR2>
+	:transfer-function-old<TR>
+	:transfer-function<TR2>
+	:halftone<HT>
+	:flatness-tolerance<FT>
+	:smoothness-tolerance<ST>
+        :stroke-adjust<SA>
+        :blend-mode<BM>
+        :soft-mask<SMask>
+	:stroke-alpha<CA>
+	:fill-alpha<ca>
+	:alpha-source<AIS>
+	:text-knockout<TK>
+    »;
+
     has @!gsave;
     has @!tags;
 

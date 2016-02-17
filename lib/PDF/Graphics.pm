@@ -1,5 +1,5 @@
 use v6;
-use PDF::Graphics::Ops :OpNames, :GraphicsContext;
+use PDF::Graphics::Ops :OpNames, :GraphicsContext, :ExtGState;
 
 role PDF::Graphics:ver<0.0.3>
     does PDF::Graphics::Ops {
@@ -13,15 +13,29 @@ role PDF::Graphics:ver<0.0.3>
 
     method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
 			Numeric :$opacity,
+			Numeric :$transparency is copy,
 			*%settings,
 	) {
 
-	$gs.transparancy = 1 - $opacity
+	my constant %Entries = %( ExtGState.enums.invert );
+
+	$transparency = 1 - $opacity
 	    if $opacity.defined;
+
+	if $transparency.defined {
+	    %settings<fill-alpha> //= $transparency;
+	    %settings<stroke-alpha> //= $transparency;
+	}
 
 	for %settings.keys.sort {
 	    if $gs.can($_) {
 		$gs."$_"() = %settings{$_}
+	    }
+	    elsif %Entries{$_}:exists {
+		$gs{ $_ } = %settings{$_};
+	    }
+	    elsif ExtGState.enums{$_}:exists {
+		$gs{ ExtGState.enums{$_} } = %settings{$_};
 	    }
 	    else {
 		warn "ignoring graphics state option: $_";
@@ -54,7 +68,9 @@ role PDF::Graphics:ver<0.0.3>
 	    my $v = $.ops[$i];
 	    next unless $v.key eq 'BI';
 
-	    my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> ), PDF::Graphics::Image.inline-to-xobject($v.value[0]<dict>);
+	    my %dict = ( :Type( :name<XObject> ), :Subtype( :name<Image> ),
+			 PDF::Graphics::Image.inline-to-xobject($v.value[0]<dict>),
+		);
 	    my $v1 = $.ops[$i+1];
 	    die "BI not followed by ID image in content stream"
 		unless $v1 && $v1.key eq 'ID';
