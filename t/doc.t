@@ -25,4 +25,6 @@ $page.graphics: -> $_ {
 
 lives-ok { $doc.save-as("t/doc.pdf") }, 'save-as';
 
+throws-like { $doc.unknown-method }, X::Method::NotFound, '$doc unknown method';
+
 done-testing;
