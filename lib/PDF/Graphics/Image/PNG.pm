@@ -101,19 +101,20 @@ class PDF::Graphics::Image::PNG
                     %dict<Mask> = [ @rgb.map: { (*.min, *.max) } ];
                 }
             }
-            when 3 {  # palette
+            when 3 {  # rgb + palette
                 die "bits>8 of palette in png not supported."
                     if $bpc > 8;
 
                 %dict<Filter> = :name<FlateDecode>;
 		%dict<BitsPerComponent> = $bpc;
                 %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
-                my $encoded = $palette.encode('latin-1');
+                my $encoded = $palette.decode('latin-1');
                 my $color-stream = PDF::DAO.coerce: :stream{ :$encoded };
-                %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>; +$palette div 3,  $color-stream ];
-                $palette = buf8.new;
+		my $hival = +$palette div 3  -  1;
+                %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, $hival, $color-stream, ];
+
+		if defined $trns && $trans {
                 ...
-##                    if(defined $trns && $trans) {
 ##                        $trns.="\xFF" x 256;
 ##                        $dict=PDFDict();
 ##                        $pdf->new_obj($dict);
@@ -135,7 +136,7 @@ class PDF::Graphics::Image::PNG
 ##                        }
 ##                        # print STDERR "\n";
 ##                    }
-##                }
+                }
             }
             when 4 {        # greyscale+alpha
                 die "16-bits of greylevel+alpha in png not supported."
@@ -156,9 +157,9 @@ class PDF::Graphics::Image::PNG
                                     :BitsPerComponent( $bpc ),
                         );
                 }
-                ...
-##                    my $scanline=1+ceil($bpc*2*$w/8);
-##                    my $bpp=ceil($bpc*2/8);
+
+                    my $scanline = 1 + ceiling($bpc * 2 * $w / 8);
+                    my $bpp = ceiling($bpc * 2 / 8);
 ##                    my $clearstream=unprocess($bpc,$bpp,2,$w,$h,$scanline,\$self->{' stream'});
 ##                    delete $self->{' nofilt'};
 ##                    delete $self->{' stream'};
