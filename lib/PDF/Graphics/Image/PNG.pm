@@ -13,8 +13,6 @@ class PDF::Graphics::Image::PNG
 
     method network-endian { True }
 
-    sub vec($a,$b,$c) { ... }
-
     use Compress::Zlib;
 
     # min/max of network ordered 2-byte words
@@ -156,6 +154,7 @@ class PDF::Graphics::Image::PNG
                 %dict<Filter> = PDF::DAO.coerce: :name<FlateDecode>;
                 %dict<ColorSpace> = :name<DeviceGray>;
                 %dict<DecodeParms> = { :Predictor(15), :Colors(1), :Columns($w) };
+		%dict<BitsPerComponent> = $bpc;
 
 		%dict<DecodeParms><BitsPerComponent> = 2 * $bpc;
 		$stream = PDF::Storage::Filter.decode( $stream, :%dict );
@@ -227,69 +226,6 @@ class PDF::Graphics::Image::PNG
 
     }
 
-    sub PaethPredictor($a, $b, $c) {
-        my $p = $a + $b - $c;
-        my $pa = abs($p - $a);
-        my $pb = abs($p - $b);
-        my $pc = abs($p - $c);
-        if ($pa <= $pb) && ($pa <= $pc) {
-            return $a;
-        } elsif($pb <= $pc) {
-            return $b;
-        } else {
-            return $c;
-        }
-    }
-
-    sub unprocess($bpc,$bpp,$comp,$width,$height,$scanline,$sstream) {
-        ...
-        my $stream=uncompress($sstream);
-        my $prev='';
-        my $clearstream='';
-        for 0 ..^ $height -> $n {
-            # print STDERR "line $n:";
-            my $line=substr($stream,$n*$scanline,$scanline);
-            my $filter=vec($line,0,8);
-            my $clear='';
-            $line=substr($line,1);
-            # print STDERR " filter=$filter";
-            given $filter {
-                when 0 {
-                $clear=$line;
-                }
-                when 1 {
-                    for 0 ..^ +$line -> $x {
-                        ...
-                        vec($clear,$x,8)=(vec($line,$x,8)+vec($clear,$x-$bpp,8))%256;
-                    }
-                }
-                when 2 {
-                    for 0 ..^ +$line -> $x {
-                        ...
-                        vec($clear,$x,8)=(vec($line,$x,8)+vec($prev,$x,8))%256;
-                    }
-                }
-                when 3 {
-                    for 0 ..^ +$line -> $x {
-                        ...
-                        vec($clear,$x,8)=(vec($line,$x,8)+floor((vec($clear,$x-$bpp,8)+vec($prev,$x,8))/2))%256;
-                    }
-                }
-                when 4 {
-                    for 0 ..^ +$line -> $x {
-                        ...
-                        vec($clear,$x,8)=(vec($line,$x,8)+PaethPredictor(vec($clear,$x-$bpp,8),vec($prev,$x,8),vec($prev,$x-$bpp,8)))%256;
-                    }
-                }
-            }
-            $prev=$clear;
-            for 0 ..^ ($width * $comp  -  1) -> $x {
-                vec($clearstream,($n*$width*$comp)+$x,$bpc)=vec($clear,$x,$bpc);
-            }
-            # print STDERR "\n";
-        }
-        return($clearstream);
-    }
 }
 
 =begin rfc
