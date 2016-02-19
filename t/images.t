@@ -50,11 +50,22 @@ for (
         :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(16),
         :Colors(3), :Columns(32), :Predictor(15), },
     'png-2bit-palatte' => {
-        :file<t/images/basn3p02.png >, :Width(32), :Height(32),
+        :file<t/images/basn3p02.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>,
 	:ColorSpace[ 'Indexed', 'DeviceRGB', 3, { :Length(12) } ],
 	:BitsPerComponent(2),
         :Colors(1), :Columns(32), :Predictor(15), },
+    'png-8bit-gray+alpha' => {
+        :file<t/images/basn4a08.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>,
+	:ColorSpace<DeviceGray>,
+	:BitsPerComponent(8),
+	:SMask{
+	    :Type<XObject>, :Subtype<Image>,
+	    :BitsPerComponent(8), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
+	    :Width(32), :Height(32),
+	},
+	:Colors(1), :Columns(32), :Predictor(15), },
     )  {
     my $desc = .key;
     my $test = .value;
@@ -70,15 +81,14 @@ for (
     is $png<Height>,$test<Height>, "$desc height";
     is $png<Filter>, $test<Filter>, "$desc filter";
     is $png<ColorSpace>, $test<ColorSpace>, "$desc color-space";
+    is $png<SMask>, $test<SMask>, "$desc SMask"
+	if $test<SMask>:exists;
 
     my $decode = $png<DecodeParms>;
     is $decode<BitsPerComponent>, $test<BitsPerComponent>, "$desc decode bpc";
     is $decode<Colors>, $test<Colors>, "$desc decode colors";
     is $decode<Columns>,$test<Columns>, "$desc decode columns";
     is $decode<Predictor>, $test<Predictor>, "$desc decode predictor";
-
-    ok $png<Length>, "$desc dict length";
-    is $png.encoded.codes, $png<Length>, "$desc encoded length";
 }
 
 sub save-images(@images) {
