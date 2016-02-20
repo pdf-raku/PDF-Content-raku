@@ -66,12 +66,24 @@ for (
 	    :Width(32), :Height(32),
 	},
 	:Colors(1), :Columns(32), :Predictor(15), },
+    'png-16bit-gray+alpha' => {
+        :file<t/images/basn4a16.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>,
+	:ColorSpace<DeviceGray>,
+	:BitsPerComponent(16),
+	:SMask{
+	    :Type<XObject>, :Subtype<Image>,
+	    :BitsPerComponent(16), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
+	    :Width(32), :Height(32),
+	},
+	:Colors(1), :Columns(32), :Predictor(15), },
     )  {
     my $desc = .key;
     my $test = .value;
 
     my $png;
-    lives-ok { $png = PDF::Graphics::Image.open: $test<file>; }, "open $desc - lives";
+##    lives-ok {
+$png = PDF::Graphics::Image.open: $test<file>; ##}, "open $desc - lives";
     isa-ok $png, ::('PDF::DAO::Stream'), "$desc object";
     @images.push: $desc => $png;
     
@@ -95,7 +107,7 @@ sub save-images(@images) {
     use PDF::Graphics::Doc;
     my $doc = PDF::Graphics::Doc.new;
     my $page = $doc.add-page;
-    my $x = 40;
+    my $x = 45;
     my $y = 650;
     my $n = 0;
 
@@ -108,10 +120,10 @@ sub save-images(@images) {
     
 	for @images {
 	    my ($desc, $img) = .kv;
-	    $gfx.do($img, $x, $y, :height(60));
-	    $gfx.say($desc, :$font, :font-size(12), :position[$x + 70, $y + 25]);
+	    $gfx.do($img, $x, $y,);
+	    $gfx.say($desc, :$font, :font-size(12), :position[$x + 60, $y + 20]);
 	    if ++$n %% 3 {
-		$x = 40;
+		$x = 45;
 		$y -= 100;
 	    }
 	    else {

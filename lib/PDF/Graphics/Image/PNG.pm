@@ -22,7 +22,7 @@ class PDF::Graphics::Image::PNG
         }
     }
 
-    method read(IO::Handle $fh!, Bool :$trans=True --> PDF::DAO::Stream) {
+    method read(IO::Handle $fh!, Bool :$mask=True --> PDF::DAO::Stream) {
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
@@ -76,52 +76,86 @@ class PDF::Graphics::Image::PNG
         %dict<Width>  = $w;
         %dict<Height> = $h;
 
-	given $cs {
-            when 0 {     # greyscale
-                %dict<Filter> = :name<FlateDecode>;
-                %dict<ColorSpace> = :name<DeviceGray>;
-		%dict<BitsPerComponent> = $bpc;
-                %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
+	warn { :$cs, :$bpc }.perl;
+	my %opts = :$w, :$h, :%dict, :$stream, :$mask;
+	%opts<trns> = $trns if $trns.defined;
+	%opts<palette> = $palette if $palette.defined;
+	png-to-stream($cs, $bpc, |%opts);
+    }
 
-                if $trans && $trns && +$trns {
-                    my @vals = network-words($trns);
-                    %dict<Mask> = [ @vals.min, @vals.max ]
-                }
-		my $encoded = $stream.decode: 'latin-1';
-		PDF::DAO.coerce: :stream{ :%dict, :$encoded };
-            }
-            when 2 {  # rgb 8/16 bits
-                %dict<Filter> = :name<FlateDecode>;
-                %dict<ColorSpace> = :name<DeviceRGB>;
-		%dict<BitsPerComponent> = $bpc;
-                %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
+    enum PNG-CS « :Gray(0) :RGB(2) Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
 
-                if $trans && $trns && +$trns {
-                    my @vals = network-words($trns);
-                    my @rgb = [], [], [];
+    proto sub png-to-stream(UInt $cs, UInt $bpc, *%o --> PDF::DAO::Stream) {*}
 
-                    @rgb[.key mod 3].push(.val)
-                        for @vals.keys;
+    multi sub png-to-stream(0,  #| Gray
+			    UInt $bpc where 1|2|4|8|16,
+			    UInt :$w!,
+			    UInt :$h!,
+			    :%dict!,
+			    Buf :$stream!,
+			    Buf:_ :$trns,
+			    Bool :$mask,
+	) {
+	%dict<Filter> = :name<FlateDecode>;
+	%dict<ColorSpace> = :name<DeviceGray>;
+	%dict<BitsPerComponent> = $bpc;
+	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
 
-                    %dict<Mask> = [ @rgb.map: { (*.min, *.max) } ];
-                }
-		my $encoded = $stream.decode: 'latin-1';
-		PDF::DAO.coerce: :stream{ :%dict, :$encoded };
-            }
-            when 3 {  # rgb + palette
-                die "bits>8 of palette in png not supported."
-                    if $bpc > 8;
+	if $mask && $trns && +$trns {
+	    my @vals = network-words($trns);
+	    %dict<Mask> = [ @vals.min, @vals.max ]
+	}
+	my $encoded = $stream.decode: 'latin-1';
+	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
+    }
+    
+    multi sub png-to-stream(2,  #| RGB
+			    UInt $bpc where 8|16,
+			    UInt :$w!,
+			    UInt :$h!,
+			    :%dict!,
+			    Buf :$stream!,
+			    Buf :$trns,
+			    Bool :$mask,
+	) {
+	%dict<Filter> = :name<FlateDecode>;
+	%dict<ColorSpace> = :name<DeviceRGB>;
+	%dict<BitsPerComponent> = $bpc;
+	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
 
-                %dict<Filter> = :name<FlateDecode>;
-		%dict<BitsPerComponent> = $bpc;
-                %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
-                my $encoded = $palette.decode('latin-1');
-                my $color-stream = PDF::DAO.coerce: :stream{ :$encoded };
-		my $hival = +$palette div 3  -  1;
-                %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, $hival, $color-stream, ];
+	if $mask && $trns && +$trns {
+	    my @vals = network-words($trns);
+	    my @rgb = [], [], [];
 
-		if defined $trns && $trans {
-                ...
+	    @rgb[.key mod 3].push(.val)
+		for @vals.keys;
+
+	    %dict<Mask> = [ @rgb.map: { (*.min, *.max) } ];
+	}
+	my $encoded = $stream.decode: 'latin-1';
+	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
+    }
+    
+    multi sub png-to-stream(3,  #| RGB + Palette
+			    UInt $bpc is copy where 1|2|4|8,
+			    UInt :$w!,
+			    UInt :$h!,
+			    :%dict!,
+			    Buf :$stream!,
+			    Buf :$trns,
+			    Buf :$palette!,
+			    Bool :$mask,
+	) {
+	%dict<Filter> = :name<FlateDecode>;
+	%dict<BitsPerComponent> = $bpc;
+	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
+	my $encoded = $palette.decode('latin-1');
+	my $color-stream = PDF::DAO.coerce: :stream{ :$encoded };
+	my $hival = +$palette div 3  -  1;
+	%dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, $hival, $color-stream, ];
+
+	if defined $trns && $mask {
+	    ...
 ##                        $trns.="\xFF" x 256;
 ##                        $dict=PDFDict();
 ##                        $pdf->new_obj($dict);
@@ -143,69 +177,82 @@ class PDF::Graphics::Image::PNG
 ##                        }
 ##                        # print STDERR "\n";
 ##                    }
-                }
-		$encoded = $stream.decode: 'latin-1';
-		PDF::DAO.coerce: :stream{ :%dict, :$encoded };
-            }
-            when 4 {        # greyscale+alpha
-                die "16-bits of greylevel+alpha in png not supported."
-                    if $bpc > 8;
+	}
+	$encoded = $stream.decode: 'latin-1';
+	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
+    }
+    
+    multi sub png-to-stream(4,  #| Grayscale + Alpha
+			    UInt $bpc where 8|16,
+			    UInt :$w!,
+			    UInt :$h!,
+			    :%dict!,
+			    :$stream! is copy,
+			    Bool :$mask,
+	) {
 
-                %dict<Filter> = PDF::DAO.coerce: :name<FlateDecode>;
-                %dict<ColorSpace> = :name<DeviceGray>;
-                %dict<DecodeParms> = { :Predictor(15), :Colors(1), :Columns($w) };
-		%dict<BitsPerComponent> = $bpc;
+	%dict<Filter> = PDF::DAO.coerce: :name<FlateDecode>;
+	%dict<ColorSpace> = :name<DeviceGray>;
+	%dict<DecodeParms> = { :Predictor(15), :Colors(1), :Columns($w) };
+	%dict<BitsPerComponent> = $bpc;
 
-		%dict<DecodeParms><BitsPerComponent> = 2 * $bpc;
-		$stream = PDF::Storage::Filter.decode( $stream, :%dict );
-		%dict<DecodeParms><BitsPerComponent> = $bpc;
+	%dict<DecodeParms><BitsPerComponent> = 2 * $bpc;
+	$stream = PDF::Storage::Filter.decode( $stream, :%dict );
+	%dict<DecodeParms><BitsPerComponent> = $bpc;
 
-		my @samples = resample($stream, 8, $bpc).list;
-		$stream = buf8.new;
-		my $trans-stream = buf8.new;
-		for @samples -> $s, $t {
-		    $stream.push: $s;
-		    $trans-stream.push: $t
-			if $trans;
-		}
+	my UInt $n = $bpc div 8;
+	my $i = 0;
 
-                if $trans {
-		    my $decoded = $trans-stream.decode: 'latin-1';
-                    %dict<SMask> = PDF::DAO.coerce: :stream{
-			:dict{:Type( :name<XObject> ),
-			      :Subtype( :name<Image> ),
-			      :Width($w),
-			      :Height($h),
-			      :ColorSpace( :name<DeviceGray> ),
-			      :Filter( :name<FlateDecode> ),
-			      :BitsPerComponent( $bpc ),
-			    },
-			:$decoded,
-		    };
-                }
+	my $image-stream = buf8.new;
+	my $mask-stream = buf8.new;
+	while $i < +$stream {
+	    $image-stream.push( $stream[$i++] ) for 1..$n;
+	    $mask-stream.push( $stream[$i++] ) for 1..$n;
+	}
 
-		my $decoded = $stream.decode: 'latin-1';
-		PDF::DAO.coerce: :stream{ :%dict, :$decoded };
-            }
-            when 6 {  # rgb+alpha
-                die "16-bits of rgb+alpha in png not supported."
-                    if $bpc > 8;
+	if $mask {
+	    my $decoded = $mask-stream.decode: 'latin-1';
+	    %dict<SMask> = PDF::DAO.coerce: :stream{
+		:dict{:Type( :name<XObject> ),
+		      :Subtype( :name<Image> ),
+		      :Width($w),
+		      :Height($h),
+		      :ColorSpace( :name<DeviceGray> ),
+		      :Filter( :name<FlateDecode> ),
+		      :BitsPerComponent( $bpc ),
+		},
+		:$decoded,
+	    };
+	}
 
-                %dict<Filter> = :name<FlateDecode>;
-                %dict<ColorSpace> = :name<DeviceRGB>;
-		%dict<BitsPerComponent> = $bpc;
-                %dict<DecodeParms> = { :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
+	my $decoded = $image-stream.decode: 'latin-1';
+	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
+    }
+    
+    multi sub png-to-stream(6,  #| RGB + Alpha
+			    UInt $bpc where 8|16,
+			    UInt :$w!,
+			    UInt :$h!,
+			    :%dict!,
+			    Buf :$stream!,
+			    Buf:_ :$trns,
+			    Bool :$mask,
+	) {
+	%dict<Filter> = :name<FlateDecode>;
+	%dict<ColorSpace> = :name<DeviceRGB>;
+	%dict<BitsPerComponent> = $bpc;
+	%dict<DecodeParms> = { :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
                 
-                if $trans {
-                    %dict<SMask> = (:Type( :name<XObject> ),
-                                    :Subtype( :name<Image> ),
-                                    :Width($w),
-                                    :Height($h),
-                                    :ColorSpace( :name<DeviceGray> ),
-                                    :Filter( :name<FlateDecode> ),
-                                    :BitsPerComponent( $bpc ),
-                        );
-                }
+	if $mask {
+	    %dict<SMask> = (:Type( :name<XObject> ),
+			    :Subtype( :name<Image> ),
+			    :Width($w),
+			    :Height($h),
+			    :ColorSpace( :name<DeviceGray> ),
+			    :Filter( :name<FlateDecode> ),
+			    :BitsPerComponent( $bpc ),
+		);
+	}
                 ...
 ##                    my $scanline=1+ceil($bpc*4*$w/8);
 ##                    my $bpp=ceil($bpc*4/8);
@@ -218,12 +265,10 @@ class PDF::Graphics::Image::PNG
 ##                        vec($self->{' stream'},($n*3)+1,$bpc)=vec($clearstream,($n*4)+1,$bpc);
 ##                        vec($self->{' stream'},($n*3)+2,$bpc)=vec($clearstream,($n*4)+2,$bpc);
 ##                    }
-            }
-            default {
-                die "unsupported png-type ($_).";
-            }
-        }
-
+    }
+    
+    multi sub png-to-stream(UInt $cs, UInt $bpc) {
+	die "unable to hangle PNG image cs=$cs, bpc=$bpc";
     }
 
 }
