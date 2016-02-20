@@ -93,7 +93,7 @@ class PDF::Graphics::Image::PNG
 			    UInt :$h!,
 			    :%dict!,
 			    Buf :$stream!,
-			    Buf:_ :$trns,
+			    Buf :$trns,
 			    Bool :$mask,
 	) {
 	%dict<Filter> = :name<FlateDecode>;
@@ -203,15 +203,15 @@ class PDF::Graphics::Image::PNG
 	my UInt $n = $bpc div 8;
 	my $i = 0;
 
-	my $image-stream = buf8.new;
-	my $mask-stream = buf8.new;
+	my $pixel-channel = buf8.new;
+	my $alpha-channel = buf8.new;
 	while $i < +$stream {
-	    $image-stream.push( $stream[$i++] ) for 1..$n;
-	    $mask-stream.push( $stream[$i++] ) for 1..$n;
+	    $pixel-channel.push( $stream[$i++] ) for 1..$n;
+	    $alpha-channel.push( $stream[$i++] ) for 1..$n;
 	}
 
 	if $mask {
-	    my $decoded = $mask-stream.decode: 'latin-1';
+	    my $decoded = $alpha-channel.decode: 'latin-1';
 	    %dict<SMask> = PDF::DAO.coerce: :stream{
 		:dict{:Type( :name<XObject> ),
 		      :Subtype( :name<Image> ),
@@ -225,7 +225,7 @@ class PDF::Graphics::Image::PNG
 	    };
 	}
 
-	my $decoded = $image-stream.decode: 'latin-1';
+	my $decoded = $pixel-channel.decode: 'latin-1';
 	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
     
