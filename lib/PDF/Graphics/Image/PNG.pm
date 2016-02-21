@@ -76,7 +76,6 @@ class PDF::Graphics::Image::PNG
         %dict<Width>  = $w;
         %dict<Height> = $h;
 
-	warn { :$cs, :$bpc }.perl;
 	my %opts = :$w, :$h, :%dict, :$stream, :$mask;
 	%opts<trns> = $trns if $trns.defined;
 	%opts<palette> = $palette if $palette.defined;
@@ -193,20 +192,22 @@ class PDF::Graphics::Image::PNG
 
 	%dict<Filter> = PDF::DAO.coerce: :name<FlateDecode>;
 	%dict<ColorSpace> = :name<DeviceGray>;
-	%dict<DecodeParms> = { :Predictor(15), :Colors(1), :Columns($w) };
+	%dict<DecodeParms> = { :Predictor(15), :Colors(2), :Columns($w), :BitsPerComponent($bpc) };
 	%dict<BitsPerComponent> = $bpc;
 
-	%dict<DecodeParms><BitsPerComponent> = 2 * $bpc;
 	$stream = PDF::Storage::Filter.decode( $stream, :%dict );
-	%dict<DecodeParms><BitsPerComponent> = $bpc;
+
+	# Strip alpha (transparency channel)
+	%dict<DecodeParms><Colors>--;
+	%dict<DecodeParms><Predictor>:delete;
 
 	my UInt $n = $bpc div 8;
 	my $i = 0;
 
-	my $pixel-channel = buf8.new;
+	my $gray-channel = buf8.new;
 	my $alpha-channel = buf8.new;
 	while $i < +$stream {
-	    $pixel-channel.push( $stream[$i++] ) for 1..$n;
+	    $gray-channel.push( $stream[$i++] ) for 1..$n;
 	    $alpha-channel.push( $stream[$i++] ) for 1..$n;
 	}
 
@@ -225,7 +226,7 @@ class PDF::Graphics::Image::PNG
 	    };
 	}
 
-	my $decoded = $pixel-channel.decode: 'latin-1';
+	my $decoded = $gray-channel.decode: 'latin-1';
 	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
     
@@ -234,37 +235,48 @@ class PDF::Graphics::Image::PNG
 			    UInt :$w!,
 			    UInt :$h!,
 			    :%dict!,
-			    Buf :$stream!,
-			    Buf:_ :$trns,
+			    :$stream! is copy,
+			    Buf :$trns,
 			    Bool :$mask,
 	) {
-	%dict<Filter> = :name<FlateDecode>;
+	%dict<Filter> = PDF::DAO.coerce: :name<FlateDecode>;
 	%dict<ColorSpace> = :name<DeviceRGB>;
 	%dict<BitsPerComponent> = $bpc;
-	%dict<DecodeParms> = { :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
+	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(4), :Columns($w) };
                 
-	if $mask {
-	    %dict<SMask> = (:Type( :name<XObject> ),
-			    :Subtype( :name<Image> ),
-			    :Width($w),
-			    :Height($h),
-			    :ColorSpace( :name<DeviceGray> ),
-			    :Filter( :name<FlateDecode> ),
-			    :BitsPerComponent( $bpc ),
-		);
+	$stream = PDF::Storage::Filter.decode( $stream, :%dict );
+
+	# Strip alpha (transparency channel)
+	%dict<DecodeParms><Colors>--;
+	%dict<DecodeParms><Predictor>:delete;
+
+	my UInt $n = $bpc div 8;
+	my $i = 0;
+
+	my $rgb-channels = buf8.new;
+	my $alpha-channel = buf8.new;
+	while $i < +$stream {
+	    $rgb-channels.push( $stream[$i++] ) for 1 .. ($n*3);
+	    $alpha-channel.push( $stream[$i++] ) for 1..$n;
 	}
-                ...
-##                    my $scanline=1+ceil($bpc*4*$w/8);
-##                    my $bpp=ceil($bpc*4/8);
-##                    my $clearstream=unprocess($bpc,$bpp,4,$w,$h,$scanline,\$self->{' stream'});
-##                    delete $self->{' nofilt'};
-##                    delete $self->{' stream'};
-##                    foreach my $n (0..($h*$w)-1) {
-##                        vec($dict->{' stream'},$n,$bpc)=vec($clearstream,($n*4)+3,$bpc);
-##                        vec($self->{' stream'},($n*3),$bpc)=vec($clearstream,($n*4),$bpc);
-##                        vec($self->{' stream'},($n*3)+1,$bpc)=vec($clearstream,($n*4)+1,$bpc);
-##                        vec($self->{' stream'},($n*3)+2,$bpc)=vec($clearstream,($n*4)+2,$bpc);
-##                    }
+
+	if $mask {
+	    my $decoded = $alpha-channel.decode: 'latin-1';
+	    %dict<SMask> = PDF::DAO.coerce: :stream{
+		:dict{:Type( :name<XObject> ),
+		      :Subtype( :name<Image> ),
+		      :Width($w),
+		      :Height($h),
+		      :ColorSpace( :name<DeviceGray> ),
+		      :Filter( :name<FlateDecode> ),
+		      :BitsPerComponent( $bpc ),
+		},
+		:$decoded
+	    };
+	}
+
+	my $decoded = $rgb-channels.decode: 'latin-1';
+	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
     
     multi sub png-to-stream(UInt $cs, UInt $bpc) {

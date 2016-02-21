@@ -49,7 +49,7 @@ for (
         :file<t/images/basn2c16.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(16),
         :Colors(3), :Columns(32), :Predictor(15), },
-    'png-2bit-palatte' => {
+    'png-2bit-palette' => {
         :file<t/images/basn3p02.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>,
 	:ColorSpace[ 'Indexed', 'DeviceRGB', 3, { :Length(12) } ],
@@ -65,7 +65,7 @@ for (
 	    :BitsPerComponent(8), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
 	    :Width(32), :Height(32),
 	},
-	:Colors(1), :Columns(32), :Predictor(15), },
+	:Colors(1), :Columns(32), },
     'png-16bit-gray+alpha' => {
         :file<t/images/basn4a16.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>,
@@ -76,14 +76,35 @@ for (
 	    :BitsPerComponent(16), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
 	    :Width(32), :Height(32),
 	},
-	:Colors(1), :Columns(32), :Predictor(15), },
+	:Colors(1), :Columns(32), },
+    'png-8bit-rgb+alpha' => {
+        :file<t/images/basn6a08.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>,
+	:ColorSpace<DeviceRGB>,
+	:BitsPerComponent(8),
+	:SMask{
+	    :Type<XObject>, :Subtype<Image>,
+	    :BitsPerComponent(8), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
+	    :Width(32), :Height(32),
+	},
+	:Colors(3), :Columns(32), },
+    'png-16bit-rgb+alpha' => {
+        :file<t/images/basn6a16.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>,
+	:ColorSpace<DeviceRGB>,
+	:BitsPerComponent(16),
+	:SMask{
+	    :Type<XObject>, :Subtype<Image>,
+	    :BitsPerComponent(16), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
+	    :Width(32), :Height(32),
+	},
+	:Colors(3), :Columns(32), },
     )  {
     my $desc = .key;
     my $test = .value;
 
     my $png;
-##    lives-ok {
-$png = PDF::Graphics::Image.open: $test<file>; ##}, "open $desc - lives";
+    lives-ok { $png = PDF::Graphics::Image.open: $test<file>; }, "open $desc - lives";
     isa-ok $png, ::('PDF::DAO::Stream'), "$desc object";
     @images.push: $desc => $png;
     
@@ -121,7 +142,7 @@ sub save-images(@images) {
 	for @images {
 	    my ($desc, $img) = .kv;
 	    $gfx.do($img, $x, $y,);
-	    $gfx.say($desc, :$font, :font-size(12), :position[$x + 60, $y + 20]);
+	    $gfx.say($desc, :$font, :font-size(12), :position[$x + 45, $y + 15]);
 	    if ++$n %% 3 {
 		$x = 45;
 		$y -= 100;
