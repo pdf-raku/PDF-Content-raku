@@ -199,7 +199,6 @@ class PDF::Graphics::Image::PNG
 
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
-	%dict<DecodeParms><Predictor>:delete;
 
 	my UInt $n = $bpc div 8;
 	my $i = 0;
@@ -248,7 +247,6 @@ class PDF::Graphics::Image::PNG
 
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
-	%dict<DecodeParms><Predictor>:delete;
 
 	my UInt $n = $bpc div 8;
 	my $i = 0;

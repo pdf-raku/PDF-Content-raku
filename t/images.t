@@ -65,7 +65,7 @@ for (
 	    :BitsPerComponent(8), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
 	    :Width(32), :Height(32),
 	},
-	:Colors(1), :Columns(32), },
+	:Colors(1), :Columns(32), :Predictor(15) },
     'png-16bit-gray+alpha' => {
         :file<t/images/basn4a16.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>,
@@ -76,7 +76,7 @@ for (
 	    :BitsPerComponent(16), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
 	    :Width(32), :Height(32),
 	},
-	:Colors(1), :Columns(32), },
+	:Colors(1), :Columns(32), :Predictor(15) },
     'png-8bit-rgb+alpha' => {
         :file<t/images/basn6a08.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>,
@@ -87,7 +87,7 @@ for (
 	    :BitsPerComponent(8), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
 	    :Width(32), :Height(32),
 	},
-	:Colors(3), :Columns(32), },
+	:Colors(3), :Columns(32), :Predictor(15) },
     'png-16bit-rgb+alpha' => {
         :file<t/images/basn6a16.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>,
@@ -98,7 +98,7 @@ for (
 	    :BitsPerComponent(16), :ColorSpace<DeviceGray>, :Filter<FlateDecode>,
 	    :Width(32), :Height(32),
 	},
-	:Colors(3), :Columns(32), },
+	:Colors(3), :Columns(32), :Predictor(15) },
     )  {
     my $desc = .key;
     my $test = .value;
