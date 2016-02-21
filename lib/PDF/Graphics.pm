@@ -193,9 +193,9 @@ role PDF::Graphics:ver<0.0.3>
 	my Numeric $horiz-scaling = $.HorizScaling;
 	my Numeric $char-spacing = $.CharSpacing;
 
-        my $text-block = PDF::Graphics::Text::Block.new( :$text, :$font, :$font-size,
-                                                         :$word-spacing, :$horiz-scaling, :$char-spacing,
-                                                         |c );
+        my PDF::Graphics::Text::Block $text-block .= new( :$text, :$font, :$font-size,
+							  :$word-spacing, :$horiz-scaling, :$char-spacing,
+							  |c );
 
 	$.print( $text-block, |c)
 	    unless $stage;

@@ -59,7 +59,7 @@ class PDF::Graphics::Text::Block {
             my Bool $followed-by-ws = ?(@chunks && @chunks[0] ~~ BREAKING-WS);
             my Bool $kerning = %atom<space> < 0;
 
-            my $atom = PDF::Graphics::Text::Atom.new( |%atom );
+            my PDF::Graphics::Text::Atom $atom .= new( |%atom );
             if $kerning {
                 $atom.sticky = True;
             }

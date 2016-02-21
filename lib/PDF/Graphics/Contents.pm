@@ -16,7 +16,7 @@ role PDF::Graphics::Contents {
     method gfx(|c) {
 	$!gfx //= do {
 	    my Pair @ops = self.contents-parse;
-	    my $gfx = PDF::Graphics.new( :parent(self), |c );
+	    my PDF::Graphics $gfx .= new( :parent(self), |c );
 	    if @ops && ! (@ops[0].key eq OpNames::Save && @ops[*-1].key eq OpNames::Restore) {
 		@ops.unshift: OpNames::Save => [];
 		@ops.push: OpNames::Restore => [];

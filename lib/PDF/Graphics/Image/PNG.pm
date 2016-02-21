@@ -31,7 +31,7 @@ class PDF::Graphics::Image::PNG
         my Buf $trns;
         my Buf $crc;
         my Buf $buf;
-        my $stream = buf8.new;
+        my buf8 $stream .= new;
 
         constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
         my $header = $fh.read(8).decode('latin-1');
@@ -203,8 +203,8 @@ class PDF::Graphics::Image::PNG
 	my UInt $n = $bpc div 8;
 	my $i = 0;
 
-	my $gray-channel = buf8.new;
-	my $alpha-channel = buf8.new;
+	my buf8 $gray-channel .= new;
+	my buf8 $alpha-channel .= new;
 	while $i < +$stream {
 	    $gray-channel.push( $stream[$i++] ) for 1..$n;
 	    $alpha-channel.push( $stream[$i++] ) for 1..$n;
@@ -251,8 +251,8 @@ class PDF::Graphics::Image::PNG
 	my UInt $n = $bpc div 8;
 	my $i = 0;
 
-	my $rgb-channels = buf8.new;
-	my $alpha-channel = buf8.new;
+	my buf8 $rgb-channels .= new;
+	my buf8 $alpha-channel .= new;
 	while $i < +$stream {
 	    $rgb-channels.push( $stream[$i++] ) for 1 .. ($n*3);
 	    $alpha-channel.push( $stream[$i++] ) for 1..$n;
