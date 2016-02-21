@@ -41,6 +41,18 @@ for (
         :file<t/images/basn0g01.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>, :ColorSpace<DeviceGray>, :BitsPerComponent(1),
         :Colors(1), :Columns(32), :Predictor(15), },
+    'png-4bit-gray' => {
+        :file<t/images/basn0g04.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceGray>, :BitsPerComponent(4),
+        :Colors(1), :Columns(32), :Predictor(15), },
+    'png-8bit-gray' => {
+        :file<t/images/basn0g08.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceGray>, :BitsPerComponent(8),
+        :Colors(1), :Columns(32), :Predictor(15), },
+    'png-16bit-gray' => {
+        :file<t/images/basn0g16.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceGray>, :BitsPerComponent(16),
+        :Colors(1), :Columns(32), :Predictor(15), },
     'png-8bit-rgb' => {
         :file<t/images/basn2c08.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(8),
@@ -48,6 +60,10 @@ for (
     'png-16bit-rgb' => {
         :file<t/images/basn2c16.png>, :Width(32), :Height(32),
         :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(16),
+        :Colors(3), :Columns(32), :Predictor(15), },
+    'png-8bit-rgb+alpha' => {
+        :file<t/images/g03n2c08.png>, :Width(32), :Height(32),
+        :Filter<FlateDecode>, :ColorSpace<DeviceRGB>, :BitsPerComponent(8),
         :Colors(3), :Columns(32), :Predictor(15), },
     'png-2bit-palette' => {
         :file<t/images/basn3p02.png>, :Width(32), :Height(32),
@@ -145,7 +161,7 @@ sub save-images(@images) {
 	    $gfx.say($desc, :$font, :font-size(12), :position[$x + 45, $y + 15]);
 	    if ++$n %% 3 {
 		$x = 45;
-		$y -= 100;
+		$y -= 75;
 	    }
 	    else {
 		$x += 200;
