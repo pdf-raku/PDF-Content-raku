@@ -117,6 +117,8 @@ role PDF::Graphics::PageTree
         die "unable to locate page: $page-num";
     }
 
+    method page-count returns UInt { self.Count }
+
     # allow array indexing of pages $pages[9] :== $.pages.page(10);
     method AT-POS($pos) is rw {
         self.page($pos + 1)

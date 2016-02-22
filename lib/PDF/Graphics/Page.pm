@@ -8,6 +8,7 @@ role  PDF::Graphics::Page
     does PDF::Graphics::Contents {
 
     use PDF::DAO;
+    use PDF::DAO::Tie;
     use PDF::DAO::Stream;
 
     my Array enum PageSizes is export(:PageSizes) «
@@ -45,20 +46,24 @@ role  PDF::Graphics::Page
     }
 
     #| produce an XObject form for this page
-    method to-xobject(Array :$bbox = self.trim-box) {
+    method to-xobject($from = self, :$coerce, Array :$bbox = $from.trim-box) {
 
         my %dict = (
 	    Type => :name<XObject>,
 	    Subtype => :name<Form>,
-	    Resources => self.Resources.clone,
+	    Resources => $from.Resources.clone,
 	    BBox => $bbox.clone,
 	    );
 
-        my $xobject = PDF::DAO.coerce: :stream{ :%dict };
-        $xobject.pre-gfx.ops(self.pre-gfx.ops);
-        $xobject.gfx.ops(self.gfx.ops);
+        my $xobject = PDF::DAO.coerce( :stream{ :%dict });
+	PDF::DAO.coerce($xobject, $coerce) if $coerce ~~ PDF::DAO::Tie;
 
-	my Array $content-streams = $.content-streams;
+	# copy unflushed graphics
+        $xobject.pre-gfx.ops($from.pre-gfx.ops);
+        $xobject.gfx.ops($from.gfx.ops);
+
+	# copy content streams
+	my Array $content-streams = $from.content-streams;
         $xobject.edit-stream: :append( [~] $content-streams.map: *.decoded );
         if +$content-streams {
             # inherit compression from the first stream segment

@@ -24,8 +24,8 @@ role PDF::Graphics::Resourced {
     multi method resources(Str $type) is default {
 	my %entries;
 	my $resources = self.Resources;
-	my $resource-entries = $resources."$type"()
-	    if $resources;
+	my Hash $resource-entries = $resources{$type}
+	    if $resources && ($resources{$type}:exists);
 	%entries = $resource-entries.keys.map( { $_ => $resource-entries{$_} } )
 	    if $resource-entries;
 	%entries;
@@ -47,7 +47,7 @@ role PDF::Graphics::Resourced {
 
     method images(Bool :$inline = True) {
 	my %forms = self.resources: 'XObject';
-	my @images = %forms.values.grep( *.Subtype eq 'Image');
+	my @images = %forms.values.grep( *.<Subtype> eq 'Image');
 	@images.append: self.gfx.inline-images
 	    if $inline;
     }

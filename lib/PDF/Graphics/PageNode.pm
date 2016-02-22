@@ -4,7 +4,7 @@ use PDF::DAO::Tie::Hash;
 
 role PDF::Graphics::PageNode {
 
-	#| source: http://www.gnu.org/software/gv/
+    #| source: http://www.gnu.org/software/gv/
     my subset Box of Array;# where {.elems == 4}
 
     #| e.g. $.landscape(PagesSizes::A4)

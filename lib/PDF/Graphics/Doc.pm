@@ -16,27 +16,42 @@ class PDF::Graphics::Doc
     use PDF::Graphics::Page;
     use PDF::Graphics::PageNode;
     use PDF::Graphics::PageTree;
-    use PDF::Graphics::ResourceDict;
+    use PDF::Graphics::ResourceDict;    
 
     role Resources
 	does PDF::DAO::Tie::Hash
 	does PDF::Graphics::ResourceDict {
-	    has PDF::DAO::Stream @.XObject is entry;
+	    has PDF::DAO::Stream %.XObject is entry;
             has PDF::Graphics::Font %.Font is entry;
     }
+
+    role XObject-Form
+	does PDF::DAO::Tie::Hash
+	does PDF::Graphics::Resourced
+	does PDF::Graphics::Contents {
+ 	    has Resources $.Resources is entry;
+    }
+    method xf {XObject-Form}
 
     role Page
 	does PDF::DAO::Tie::Hash
 	does PDF::Graphics::Page
 	does PDF::Graphics::PageNode {
 
-	has Resources $.Resources is entry(:inherit);
+ 	has Resources $.Resources is entry(:inherit);
 	#| inheritable page properties
 	has Numeric @.MediaBox is entry(:inherit,:len(4));
 	has Numeric @.CropBox is entry(:inherit,:len(4));
-
+	has Numeric @.BleedBox is entry(:len(4));
+	has Numeric @.TrimBox is entry(:len(4));
+	has Numeric @.ArtBox is entry(:len(4));
+	
 	my subset StreamOrArray of Any where PDF::DAO::Stream | Array;
 	has StreamOrArray $.Contents is entry;
+
+	method to-xobject(|c) {
+	    PDF::Graphics::Page.to-xobject(self, :coerce(XObject-Form), |c);
+	}
     }
 
     role Pages
