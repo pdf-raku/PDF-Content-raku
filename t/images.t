@@ -6,7 +6,7 @@ use PDF::Grammar::Test :is-json-equiv;
 srand(123456);
 
 use PDF::Graphics::Image;
-use PDF::Graphics::Doc;
+use PDF::Graphics::Doc::Lite;
 
 my Pair @images;
 
@@ -141,8 +141,8 @@ for (
 }
 
 sub save-images(@images) {
-    use PDF::Graphics::Doc;
-    my $doc = PDF::Graphics::Doc.new;
+    use PDF::Graphics::Doc::Lite;
+    my $doc = PDF::Graphics::Doc::Lite.new;
     my $page = $doc.add-page;
     my $x = 45;
     my $y = 650;

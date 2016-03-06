@@ -1,26 +1,26 @@
 {
     "perl"        : "6.c",
     "name"        : "PDF::Graphics",
-    "version"     : "0.0.4",
+    "version"     : "0.0.5",
     "description" : "PDF base utilities for text, images, fonts and general content",
     "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
 
         "PDF::Graphics" : "lib/PDF/Graphics.pm",
-        "PDF::Graphics::Doc" : "lib/PDF/Graphics/Doc.pm",
+        "PDF::Graphics::Doc::Lite" : "lib/PDF/Graphics/Doc/Lite.pm",
 
-        "PDF::Graphics::Contents" : "lib/PDF/Graphics/Contents.pm",
-        "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",
-        "PDF::Graphics::Page" : "lib/PDF/Graphics/Page.pm",
-        "PDF::Graphics::PageNode" : "lib/PDF/Graphics/PageNode.pm",
-        "PDF::Graphics::PageTree" : "lib/PDF/Graphics/PageTree.pm",
-        "PDF::Graphics::Resourced" : "lib/PDF/Graphics/Resourced.pm",
+        "PDF::Graphics::Contents"     : "lib/PDF/Graphics/Contents.pm",
+        "PDF::Graphics::Font"         : "lib/PDF/Graphics/Font.pm",
+        "PDF::Graphics::Page"         : "lib/PDF/Graphics/Page.pm",
+        "PDF::Graphics::PageNode"     : "lib/PDF/Graphics/PageNode.pm",
+        "PDF::Graphics::PageTree"     : "lib/PDF/Graphics/PageTree.pm",
+        "PDF::Graphics::Resourced"    : "lib/PDF/Graphics/Resourced.pm",
         "PDF::Graphics::ResourceDict" : "lib/PDF/Graphics/ResourceDict.pm",
 
         "PDF::Graphics::Ops" : "lib/PDF/Graphics/Ops.pm",
 
-        "PDF::Graphics::Image" : "lib/PDF/Graphics/Image.pm",
+        "PDF::Graphics::Image"       : "lib/PDF/Graphics/Image.pm",
         "PDF::Graphics::Image::GIF"  : "lib/PDF/Graphics/Image/GIF.pm",
         "PDF::Graphics::Image::JPEG" : "lib/PDF/Graphics/Image/JPEG.pm",
         "PDF::Graphics::Image::PNG"  : "lib/PDF/Graphics/Image/PNG.pm",

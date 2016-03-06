@@ -1,7 +1,7 @@
 use v6;
 use PDF::Graphics::Ops :OpNames, :GraphicsContext, :ExtGState;
 
-role PDF::Graphics:ver<0.0.3>
+role PDF::Graphics:ver<0.0.5>
     does PDF::Graphics::Ops {
 
     use PDF::DAO;

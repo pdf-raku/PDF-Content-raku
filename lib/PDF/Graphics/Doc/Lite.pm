@@ -3,7 +3,7 @@ use v6;
 use PDF::DAO::Doc;
 
 #| A minimal class for manipulating PDF graphical content
-class PDF::Graphics::Doc
+class PDF::Graphics::Doc::Lite
     is PDF::DAO::Doc {
 
     use PDF::DAO::Tie;
@@ -16,7 +16,8 @@ class PDF::Graphics::Doc
     use PDF::Graphics::Page;
     use PDF::Graphics::PageNode;
     use PDF::Graphics::PageTree;
-    use PDF::Graphics::ResourceDict;    
+    use PDF::Graphics::Resourced;    
+    use PDF::Graphics::ResourceDict;
 
     role Resources
 	does PDF::DAO::Tie::Hash
@@ -24,14 +25,6 @@ class PDF::Graphics::Doc
 	    has PDF::DAO::Stream %.XObject is entry;
             has PDF::Graphics::Font %.Font is entry;
     }
-
-    role XObject-Form
-	does PDF::DAO::Tie::Hash
-	does PDF::Graphics::Resourced
-	does PDF::Graphics::Contents {
- 	    has Resources $.Resources is entry;
-    }
-    method xf {XObject-Form}
 
     role Page
 	does PDF::DAO::Tie::Hash
@@ -50,6 +43,14 @@ class PDF::Graphics::Doc
 	has StreamOrArray $.Contents is entry;
 
 	method to-xobject(|c) {
+
+	    my role XObject-Form
+		does PDF::DAO::Tie::Hash
+		does PDF::Graphics::Resourced
+		does PDF::Graphics::Contents {
+		    has Resources $.Resources is entry;
+	    }
+
 	    PDF::Graphics::Page.to-xobject(self, :coerce(XObject-Form), |c);
 	}
     }
