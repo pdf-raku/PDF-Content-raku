@@ -1,6 +1,6 @@
 use v6;
 
-role PDF::Graphics::Resourced {
+role PDF::Content::Resourced {
 
     method core-font(|c) {
 	(self.Resources //= {}).core-font(|c);

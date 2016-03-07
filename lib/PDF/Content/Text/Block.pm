@@ -1,10 +1,10 @@
 use v6;
 
-use PDF::Graphics::Text::Line;
-use PDF::Graphics::Text::Atom;
-use PDF::Graphics::Ops :OpNames;
+use PDF::Content::Text::Line;
+use PDF::Content::Text::Atom;
+use PDF::Content::Ops :OpNames;
 
-class PDF::Graphics::Text::Block {
+class PDF::Content::Text::Block {
     has Numeric $.line-height;
     has Numeric $.font-height;
     has Numeric $.font-base-height;
@@ -59,7 +59,7 @@ class PDF::Graphics::Text::Block {
             my Bool $followed-by-ws = ?(@chunks && @chunks[0] ~~ BREAKING-WS);
             my Bool $kerning = %atom<space> < 0;
 
-            my PDF::Graphics::Text::Atom $atom .= new( |%atom );
+            my PDF::Content::Text::Atom $atom .= new( |%atom );
             if $kerning {
                 $atom.sticky = True;
             }
@@ -95,7 +95,7 @@ class PDF::Graphics::Text::Block {
                           Str :$!valign = 'text',
         ) is default {
 
-        my PDF::Graphics::Text::Line $line;
+        my PDF::Content::Text::Line $line;
         my Numeric $line-width = 0.0;
 	my Numeric $char-count = 0.0;
 
@@ -129,7 +129,7 @@ class PDF::Graphics::Text::Block {
 
             if !$line || ($!width && $line.atoms && $visual-width > $!width) {
                 last if $!height && (@!lines + 1)  *  $!line-height > $!height;
-                $line = PDF::Graphics::Text::Line.new();
+                $line = PDF::Content::Text::Line.new();
                 $line-width = 0.0;
 		$char-count = 0;
                 @!lines.push: $line;

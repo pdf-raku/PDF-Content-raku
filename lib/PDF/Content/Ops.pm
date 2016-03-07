@@ -3,7 +3,7 @@ use v6;
 use PDF::Writer;
 use PDF::DAO::Util :from-ast;
 
-role PDF::Graphics::Ops {
+role PDF::Content::Ops {
 
     has &.callback is rw;
 
@@ -504,8 +504,8 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 	Restore;
     }
     multi method track-graphics('cm', *@transform) {
-        use PDF::Graphics::Util::TransformMatrix;
-        @!CTM = PDF::Graphics::Util::TransformMatrix::multiply(@!CTM, @transform);
+        use PDF::Content::Util::TransformMatrix;
+        @!CTM = PDF::Content::Util::TransformMatrix::multiply(@!CTM, @transform);
     }
     multi method track-graphics('ET') {
         @!Tm = [ 1, 0, 0, 1, 0, 0, ];

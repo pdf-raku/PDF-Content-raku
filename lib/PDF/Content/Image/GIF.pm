@@ -1,11 +1,11 @@
 use v6;
-use PDF::Graphics::Image;
+use PDF::Content::Image;
 use PDF::DAO;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::GIF
 
-class PDF::Graphics::Image::GIF
-    is PDF::Graphics::Image {
+class PDF::Content::Image::GIF
+    is PDF::Content::Image {
 
     method network-endian { False }
 

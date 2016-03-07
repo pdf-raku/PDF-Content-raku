@@ -1,11 +1,11 @@
 use v6;
 
-use PDF::Graphics::Contents;
-use PDF::Graphics::Resourced;
+use PDF::Content::Graphics;
+use PDF::Content::Resourced;
 
-role  PDF::Graphics::Page
-    does PDF::Graphics::Resourced
-    does PDF::Graphics::Contents {
+role  PDF::Content::Page
+    does PDF::Content::Resourced
+    does PDF::Content::Graphics {
 
     use PDF::DAO;
     use PDF::DAO::Tie;

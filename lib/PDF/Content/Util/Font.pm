@@ -1,8 +1,8 @@
 use v6;
 use Font::AFM;
 
-module PDF::Graphics::Util::Font {
-    use PDF::Graphics::Font::Encodings;
+module PDF::Content::Util::Font {
+    use PDF::Content::Font::Encodings;
     # font aliases adapted from pdf.js/src/fonts.js
     BEGIN constant stdFontMap = {
 
@@ -76,20 +76,20 @@ module PDF::Graphics::Util::Font {
         method set-encoding( Str :$!enc = 'win') {
             given $!enc {
                 when 'mac' {
-                    $!glyphs = $PDF::Graphics::Font::Encodings::mac-glyphs;
-                    $!encoding = $PDF::Graphics::Font::Encodings::mac-encoding;
+                    $!glyphs = $PDF::Content::Font::Encodings::mac-glyphs;
+                    $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
                 }
                 when 'win' {
-                    $!glyphs = $PDF::Graphics::Font::Encodings::win-glyphs;
-                    $!encoding = $PDF::Graphics::Font::Encodings::win-encoding;
+                    $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
+                    $!encoding = $PDF::Content::Font::Encodings::win-encoding;
                 }
                 when 'sym' {
-                    $!glyphs = $PDF::Graphics::Font::Encodings::sym-glyphs;
-                    $!encoding = $PDF::Graphics::Font::Encodings::sym-encoding;
+                    $!glyphs = $PDF::Content::Font::Encodings::sym-glyphs;
+                    $!encoding = $PDF::Content::Font::Encodings::sym-encoding;
                 }
                 when 'zapf' {
-                    $!glyphs = $PDF::Graphics::Font::Encodings::zapf-glyphs;
-                    $!encoding = $PDF::Graphics::Font::Encodings::zapf-encoding;
+                    $!glyphs = $PDF::Content::Font::Encodings::zapf-glyphs;
+                    $!encoding = $PDF::Content::Font::Encodings::zapf-encoding;
                 }
                 default { 
                     die ":enc not 'win', 'mac'. 'sym' or 'zapf': $_";
@@ -110,7 +110,7 @@ module PDF::Graphics::Util::Font {
 	    $text-in.comb.grep({ $!glyphs{$_}:exists }).join: '';
 	}
 
-	#| map ourselves to a PDF::Graphics object
+	#| map ourselves to a PDF::Content object
         method to-dict {
             my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
             my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),

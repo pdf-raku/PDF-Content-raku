@@ -1,38 +1,38 @@
 {
     "perl"        : "6.c",
-    "name"        : "PDF::Graphics",
+    "name"        : "PDF::Content",
     "version"     : "0.0.5",
-    "description" : "PDF base utilities for text, images, fonts and general content",
+    "description" : "general PDF content authoring, including text, images, fonts and graphics",
     "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
 
-        "PDF::Graphics" : "lib/PDF/Graphics.pm",
-        "PDF::Graphics::Doc::Lite" : "lib/PDF/Graphics/Doc/Lite.pm",
+        "PDF::Content" : "lib/PDF/Content.pm",
+        "PDF::Content::Doc::Lite" : "lib/PDF/Content/Doc/Lite.pm",
 
-        "PDF::Graphics::Contents"     : "lib/PDF/Graphics/Contents.pm",
-        "PDF::Graphics::Font"         : "lib/PDF/Graphics/Font.pm",
-        "PDF::Graphics::Page"         : "lib/PDF/Graphics/Page.pm",
-        "PDF::Graphics::PageNode"     : "lib/PDF/Graphics/PageNode.pm",
-        "PDF::Graphics::PageTree"     : "lib/PDF/Graphics/PageTree.pm",
-        "PDF::Graphics::Resourced"    : "lib/PDF/Graphics/Resourced.pm",
-        "PDF::Graphics::ResourceDict" : "lib/PDF/Graphics/ResourceDict.pm",
+        "PDF::Content::Graphics"     : "lib/PDF/Content/Graphics.pm",
+        "PDF::Content::Font"         : "lib/PDF/Content/Font.pm",
+        "PDF::Content::Page"         : "lib/PDF/Content/Page.pm",
+        "PDF::Content::PageNode"     : "lib/PDF/Content/PageNode.pm",
+        "PDF::Content::PageTree"     : "lib/PDF/Content/PageTree.pm",
+        "PDF::Content::Resourced"    : "lib/PDF/Content/Resourced.pm",
+        "PDF::Content::ResourceDict" : "lib/PDF/Content/ResourceDict.pm",
 
-        "PDF::Graphics::Ops" : "lib/PDF/Graphics/Ops.pm",
+        "PDF::Content::Ops" : "lib/PDF/Content/Ops.pm",
 
-        "PDF::Graphics::Image"       : "lib/PDF/Graphics/Image.pm",
-        "PDF::Graphics::Image::GIF"  : "lib/PDF/Graphics/Image/GIF.pm",
-        "PDF::Graphics::Image::JPEG" : "lib/PDF/Graphics/Image/JPEG.pm",
-        "PDF::Graphics::Image::PNG"  : "lib/PDF/Graphics/Image/PNG.pm",
+        "PDF::Content::Image"       : "lib/PDF/Content/Image.pm",
+        "PDF::Content::Image::GIF"  : "lib/PDF/Content/Image/GIF.pm",
+        "PDF::Content::Image::JPEG" : "lib/PDF/Content/Image/JPEG.pm",
+        "PDF::Content::Image::PNG"  : "lib/PDF/Content/Image/PNG.pm",
 
-        "PDF::Graphics::Font" : "lib/PDF/Graphics/Font.pm",
-        "PDF::Graphics::Font::Encodings" : "lib/PDF/Graphics/Font/Encodings.pm",
+        "PDF::Content::Font" : "lib/PDF/Content/Font.pm",
+        "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
 
-        "PDF::Graphics::Text::Atom"  : "lib/PDF/Graphics/Text/Atom.pm",
-        "PDF::Graphics::Text::Block" : "lib/PDF/Graphics/Text/Block.pm",
-        "PDF::Graphics::Text::Line"  : "lib/PDF/Graphics/Text/Line.pm",
+        "PDF::Content::Text::Atom"  : "lib/PDF/Content/Text/Atom.pm",
+        "PDF::Content::Text::Block" : "lib/PDF/Content/Text/Block.pm",
+        "PDF::Content::Text::Line"  : "lib/PDF/Content/Text/Line.pm",
 
-        "PDF::Graphics::Util::Font" : "lib/PDF/Graphics/Util/Font.pm",
-        "PDF::Graphics::Util::TransformMatrix" : "lib/PDF/Graphics/Util/TransformMatrix.pm"
+        "PDF::Content::Util::Font" : "lib/PDF/Content/Util/Font.pm",
+        "PDF::Content::Util::TransformMatrix" : "lib/PDF/Content/Util/TransformMatrix.pm"
      }
 }

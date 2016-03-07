@@ -1,10 +1,10 @@
 use v6;
 
-role PDF::Graphics::ResourceDict {
+role PDF::Content::ResourceDict {
 
     use PDF::DAO;
     use PDF::DAO::Name;
-    use PDF::Graphics::Font;
+    use PDF::Content::Font;
 
     my role ResourceEntry {
 	has Str $.key is rw;
@@ -106,9 +106,9 @@ role PDF::Graphics::ResourceDict {
     }
 
     method core-font(|c) {
-	use PDF::Graphics::Util::Font;
+	use PDF::Content::Util::Font;
 
-        my $font-obj = PDF::Graphics::Util::Font::core-font( |c );
+        my $font-obj = PDF::Content::Util::Font::core-font( |c );
         self!find-resource(sub ($_){  .<Type>:exists
 				   && .<Type> eq 'Font'
 				   && .font-obj === $font-obj},
@@ -116,7 +116,7 @@ role PDF::Graphics::ResourceDict {
             // do {
                 my $dict = $font-obj.to-dict;
                 my $font-dict = PDF::DAO.coerce( :$dict );
-		PDF::DAO.coerce($font-dict, PDF::Graphics::Font);
+		PDF::DAO.coerce($font-dict, PDF::Content::Font);
 		$font-dict.font-obj = $font-obj;
                 self!register-resource( $font-dict );
         };

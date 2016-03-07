@@ -3,7 +3,7 @@ use v6;
 use PDF::DAO::Doc;
 
 #| A minimal class for manipulating PDF graphical content
-class PDF::Graphics::Doc::Lite
+class PDF::Content::Doc::Lite
     is PDF::DAO::Doc {
 
     use PDF::DAO::Tie;
@@ -11,25 +11,25 @@ class PDF::Graphics::Doc::Lite
 
     use PDF::DAO::Stream;
 
-    use PDF::Graphics::Contents;
-    use PDF::Graphics::Font;
-    use PDF::Graphics::Page;
-    use PDF::Graphics::PageNode;
-    use PDF::Graphics::PageTree;
-    use PDF::Graphics::Resourced;    
-    use PDF::Graphics::ResourceDict;
+    use PDF::Content::Graphics;
+    use PDF::Content::Font;
+    use PDF::Content::Page;
+    use PDF::Content::PageNode;
+    use PDF::Content::PageTree;
+    use PDF::Content::Resourced;    
+    use PDF::Content::ResourceDict;
 
     role Resources
 	does PDF::DAO::Tie::Hash
-	does PDF::Graphics::ResourceDict {
+	does PDF::Content::ResourceDict {
 	    has PDF::DAO::Stream %.XObject is entry;
-            has PDF::Graphics::Font %.Font is entry;
+            has PDF::Content::Font %.Font is entry;
     }
 
     role Page
 	does PDF::DAO::Tie::Hash
-	does PDF::Graphics::Page
-	does PDF::Graphics::PageNode {
+	does PDF::Content::Page
+	does PDF::Content::PageNode {
 
  	has Resources $.Resources is entry(:inherit);
 	#| inheritable page properties
@@ -46,19 +46,19 @@ class PDF::Graphics::Doc::Lite
 
 	    my role XObject-Form
 		does PDF::DAO::Tie::Hash
-		does PDF::Graphics::Resourced
-		does PDF::Graphics::Contents {
+		does PDF::Content::Resourced
+		does PDF::Content::Graphics {
 		    has Resources $.Resources is entry;
 	    }
 
-	    PDF::Graphics::Page.to-xobject(self, :coerce(XObject-Form), |c);
+	    PDF::Content::Page.to-xobject(self, :coerce(XObject-Form), |c);
 	}
     }
 
     role Pages
 	does PDF::DAO::Tie::Hash
-	does PDF::Graphics::PageNode
-	does PDF::Graphics::PageTree {
+	does PDF::Content::PageNode
+	does PDF::Content::PageTree {
 
 	has Resources $.Resources is entry(:inherit);
 	#| inheritable page properties

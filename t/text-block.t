@@ -1,18 +1,18 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Graphics;
-use PDF::Graphics::Text::Block;
-use PDF::Graphics::Util::Font;
+use PDF::Content;
+use PDF::Content::Text::Block;
+use PDF::Content::Util::Font;
 
 plan 1;
 
-my $font = PDF::Graphics::Util::Font::core-font( :family<helvetica>, :weight<bold> );
+my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
 my $text = "Hello. Ting, ting, ting. Attention! … ATTENTION!";
-my $text-block = PDF::Graphics::Text::Block.new( :$text, :$font, :font-key<Ft1>, :$font-size );
+my $text-block = PDF::Content::Text::Block.new( :$text, :$font, :font-key<Ft1>, :$font-size );
 
-my $gfx = PDF::Graphics.new;
+my $gfx = PDF::Content.new;
 
 $gfx.print( $text-block );
 
