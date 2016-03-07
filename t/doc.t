@@ -4,8 +4,8 @@ use Test;
 # ensure consistant document ID generation
 srand(123456);
 
-use PDF::Content::Doc::Lite;
-my $doc = PDF::Content::Doc::Lite.new;
+use PDF::Content::Doc;
+my $doc = PDF::Content::Doc.new;
 my $page = $doc.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 

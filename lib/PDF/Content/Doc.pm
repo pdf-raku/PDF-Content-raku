@@ -3,7 +3,7 @@ use v6;
 use PDF::DAO::Doc;
 
 #| A minimal class for manipulating PDF graphical content
-class PDF::Content::Doc::Lite
+class PDF::Content::Doc
     is PDF::DAO::Doc {
 
     use PDF::DAO::Tie;

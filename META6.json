@@ -8,7 +8,7 @@
     "provides"    : {
 
         "PDF::Content" : "lib/PDF/Content.pm",
-        "PDF::Content::Doc::Lite" : "lib/PDF/Content/Doc/Lite.pm",
+        "PDF::Content::Doc" : "lib/PDF/Content/Doc.pm",
 
         "PDF::Content::Graphics"     : "lib/PDF/Content/Graphics.pm",
         "PDF::Content::Font"         : "lib/PDF/Content/Font.pm",
