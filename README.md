@@ -1,6 +1,6 @@
 # perl6-PDF-Content
 
-This module enables basic PDF content production and editing, including text, images, fonts and general graphics.
+This is a Perl 6 module for basic PDF content production and editing, including text, images, fonts and general graphics.
 
 It includes `PDF::Content::Doc` a minimal graphics-centric class for
 creating or editing PDF documents, using only this module, i.e.:

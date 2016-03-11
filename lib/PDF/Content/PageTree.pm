@@ -57,6 +57,10 @@ role PDF::Content::PageTree
         self.Kids[$page-num - 1];
     }
 
+    multi method page(Int $page-num) is default {
+	die "no such page: $page-num";
+    }
+
     #| traverse page tree
     multi method page(Int $page-num where { $page-num > 0 && $page-num <= self<Count> }) {
         my Int $page-count = 0;
@@ -120,7 +124,10 @@ role PDF::Content::PageTree
     method page-count returns UInt { self.Count }
 
     # allow array indexing of pages $pages[9] :== $.pages.page(10);
-    method AT-POS($pos) is rw {
+    method AT-POS(UInt $pos) is rw {
+	# vivify next page
+	self.add-page
+	   if $pos == self<Count>; 
         self.page($pos + 1)
     }
 

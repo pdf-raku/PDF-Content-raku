@@ -82,7 +82,11 @@ class PDF::Content::Doc
     has Catalog $.Root is entry(:required, :indirect);
 
     method cb-init {
-	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], } };
+	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], :Count(0), } };
+    }
+
+    multi method page() {
+	self.?Root.?Pages
     }
 
     multi method FALLBACK(Str $meth where { self.?Root.?Pages.can($meth) }, |c) {
