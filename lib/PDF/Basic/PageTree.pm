@@ -1,11 +1,11 @@
 use v6;
 
-use PDF::Content::Resourced;
+use PDF::Basic::Resourced;
 
-role PDF::Content::PageTree
-    does PDF::Content::Resourced {
+role PDF::Basic::PageTree
+    does PDF::Basic::Resourced {
 
-    use PDF::Content::PageNode;
+    use PDF::Basic::PageNode;
     use PDF::DAO;
 
     #| add new last page
@@ -39,7 +39,7 @@ role PDF::Content::PageTree
     }
 
     #| append page subtree
-    method add-pages( PDF::Content::PageNode $pages ) {
+    method add-pages( PDF::Basic::PageNode $pages ) {
 	self<Count> += $pages<Count>;
 	self<Kids>.push: $pages;
 	$pages<Parent> = self;
@@ -48,7 +48,7 @@ role PDF::Content::PageTree
 
     #| $.page(0) - adds a new page
     multi method page(Int $page-num where $page-num == 0
-	--> PDF::Content::PageNode) {
+	--> PDF::Basic::PageNode) {
         self.add-page;
     }
 
@@ -89,7 +89,7 @@ role PDF::Content::PageTree
 
     #| delete page from page tree
     multi method delete-page(Int $page-num where { $page-num > 0 && $page-num <= self<Count>},
-	--> PDF::Content::PageNode) {
+	--> PDF::Basic::PageNode) {
         my $page-count = 0;
 
         for self.Kids.keys -> $i {

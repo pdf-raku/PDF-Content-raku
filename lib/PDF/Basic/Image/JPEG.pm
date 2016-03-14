@@ -1,11 +1,11 @@
 use v6;
-use PDF::Content::Image;
+use PDF::Basic::Image;
 use PDF::DAO;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::JPEG
 
-class PDF::Content::Image::JPEG
-    is PDF::Content::Image {
+class PDF::Basic::Image::JPEG
+    is PDF::Basic::Image {
 
     method read(IO::Handle $fh!) {
         my Blob $buf;

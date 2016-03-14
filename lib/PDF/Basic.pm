@@ -1,13 +1,13 @@
 use v6;
-use PDF::Content::Ops :OpNames, :GraphicsContext, :ExtGState;
+use PDF::Basic::Ops :OpNames, :GraphicsContext, :ExtGState;
 
-role PDF::Content:ver<0.0.5>
-    does PDF::Content::Ops {
+role PDF::Basic:ver<0.0.5>
+    does PDF::Basic::Ops {
 
     use PDF::DAO;
     use PDF::DAO::Stream;
-    use PDF::Content::Image;
-    use PDF::Content::Text::Block;
+    use PDF::Basic::Image;
+    use PDF::Basic::Text::Block;
 
     has $.parent;
 
@@ -59,7 +59,7 @@ role PDF::Content:ver<0.0.5>
     }
 
     method load-image(Str $spec ) {
-        PDF::Content::Image.open( $spec );
+        PDF::Basic::Image.open( $spec );
     }
 
     method inline-images {
@@ -69,7 +69,7 @@ role PDF::Content:ver<0.0.5>
 	    next unless $v.key eq 'BI';
 
 	    my %dict = ( :Type( :name<XObject> ), :Subtype( :name<Image> ),
-			 PDF::Content::Image.inline-to-xobject($v.value[0]<dict>),
+			 PDF::Basic::Image.inline-to-xobject($v.value[0]<dict>),
 		);
 	    my $v1 = $.ops[$i+1];
 	    die "BI not followed by ID image in content stream"
@@ -81,14 +81,14 @@ role PDF::Content:ver<0.0.5>
 	@images;
     }
 
-    use PDF::Content::Util::TransformMatrix;
+    use PDF::Basic::Util::TransformMatrix;
     method transform( |c ) {
-	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform-matrix( |c );
+	my Numeric @matrix = PDF::Basic::Util::TransformMatrix::transform-matrix( |c );
 	$.ConcatMatrix( @matrix );
     }
 
     method text-transform( |c ) {
-	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform-matrix( |c );
+	my Numeric @matrix = PDF::Basic::Util::TransformMatrix::transform-matrix( |c );
 	$.SetTextMatrix( @matrix );
     }
 
@@ -193,7 +193,7 @@ role PDF::Content:ver<0.0.5>
 	my Numeric $horiz-scaling = $.HorizScaling;
 	my Numeric $char-spacing = $.CharSpacing;
 
-        my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :$font-size,
+        my PDF::Basic::Text::Block $text-block .= new( :$text, :$font, :$font-size,
 							  :$word-spacing, :$horiz-scaling, :$char-spacing,
 							  |c );
 
@@ -203,7 +203,7 @@ role PDF::Content:ver<0.0.5>
 	$text-block;
     }
 
-    multi method print(PDF::Content::Text::Block $text-block,
+    multi method print(PDF::Basic::Text::Block $text-block,
 		       :$position,
 		       Bool :$nl = False,
 	) {

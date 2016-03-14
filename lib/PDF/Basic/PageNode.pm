@@ -2,7 +2,7 @@ use v6;
 
 use PDF::DAO::Tie::Hash;
 
-role PDF::Content::PageNode {
+role PDF::Basic::PageNode {
 
     #| source: http://www.gnu.org/software/gv/
     my subset Box of Array;# where {.elems == 4}

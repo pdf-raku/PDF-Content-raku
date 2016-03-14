@@ -20,7 +20,7 @@ class X::PDF::Image::UnknownType is Exception {
     }
 }
 
-role PDF::Content::Image {
+role PDF::Basic::Image {
 
     use PDF::DAO;
     method network-endian { True }
@@ -64,8 +64,8 @@ role PDF::Content::Image {
             }
         };
 
-        require ::('PDF::Content::Image')::($type);
-        ::('PDF::Content::Image')::($type).read($fh);
+        require ::('PDF::Basic::Image')::($type);
+        ::('PDF::Basic::Image')::($type).read($fh);
     }
 
     method inline-to-xobject(Hash $inline-dict, Bool :$invert) {

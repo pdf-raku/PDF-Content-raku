@@ -1,22 +1,22 @@
 use v6;
 
-use PDF::Content;
+use PDF::Basic;
 
-#| this role is applied to PDF::Content::Type::Page, PDF::Content::Type::Pattern and PDF::Content::Type::XObject::Form
-role PDF::Content::Graphics {
+#| this role is applied to PDF::Basic::Type::Page, PDF::Basic::Type::Pattern and PDF::Basic::Type::XObject::Form
+role PDF::Basic::Graphics {
 
-    use PDF::Content;
-    use PDF::Content::Ops :OpNames;
+    use PDF::Basic;
+    use PDF::Basic::Ops :OpNames;
 
-    has PDF::Content $!pre-gfx; #| prepended graphics
-    method pre-gfx { $!pre-gfx //= PDF::Content.new( :parent(self) ) }
+    has PDF::Basic $!pre-gfx; #| prepended graphics
+    method pre-gfx { $!pre-gfx //= PDF::Basic.new( :parent(self) ) }
     method pre-graphics(&code) { self.pre-gfx.block( &code ) }
 
-    has PDF::Content $!gfx;     #| appended graphics
+    has PDF::Basic $!gfx;     #| appended graphics
     method gfx(|c) {
 	$!gfx //= do {
 	    my Pair @ops = self.contents-parse;
-	    my PDF::Content $gfx .= new( :parent(self), |c );
+	    my PDF::Basic $gfx .= new( :parent(self), |c );
 	    if @ops && ! (@ops[0].key eq OpNames::Save && @ops[*-1].key eq OpNames::Restore) {
 		@ops.unshift: OpNames::Save => [];
 		@ops.push: OpNames::Restore => [];
@@ -29,7 +29,7 @@ role PDF::Content::Graphics {
     method text(&code) { self.gfx.text( &code ) }
 
     method contents-parse(Str $contents = $.contents ) {
-        PDF::Content.parse($contents);
+        PDF::Basic.parse($contents);
     }
 
     method contents returns Str {

@@ -1,10 +1,10 @@
 use v6;
 
 # adapted from Perl 5's PDF::API2::Resource::XObject::Image::PNG
-use PDF::Content::Image;
+use PDF::Basic::Image;
 
-class PDF::Content::Image::PNG
-    is PDF::Content::Image {
+class PDF::Basic::Image::PNG
+    is PDF::Basic::Image {
 
     use PDF::DAO;
     use PDF::DAO::Stream;

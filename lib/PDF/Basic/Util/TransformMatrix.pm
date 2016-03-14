@@ -1,6 +1,6 @@
 use v6;
 
-module PDF::Content::Util::TransformMatrix {
+module PDF::Basic::Util::TransformMatrix {
 
     # Designed to work on PDF text and graphics transformation matrices of the form:
     #

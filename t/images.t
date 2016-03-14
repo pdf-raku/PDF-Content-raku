@@ -5,13 +5,13 @@ use PDF::Grammar::Test :is-json-equiv;
 # ensure consistant document ID generation
 srand(123456);
 
-use PDF::Content::Image;
-use PDF::Content::Doc;
+use PDF::Basic::Image;
+use PDF::Basic::Doc;
 
 my Pair @images;
 
 my $jpeg;
-lives-ok {$jpeg = PDF::Content::Image.open: "t/images/jpeg.jpg";}, "open jpeg - lives";
+lives-ok {$jpeg = PDF::Basic::Image.open: "t/images/jpeg.jpg";}, "open jpeg - lives";
 @images.push: 'JPEG - Basic' => $jpeg;
 isa-ok $jpeg, ::('PDF::DAO::Stream'), 'jpeg object';
 is $jpeg<Type>, 'XObject', 'jpeg type';
@@ -24,7 +24,7 @@ ok $jpeg<Length>, 'jpeg dict length';
 is $jpeg.encoded.codes, $jpeg<Length>, 'jpeg encoded length';
 
 my $gif;
-lives-ok {$gif = PDF::Content::Image.open: "t/images/lightbulb.gif";}, "open gif - lives";
+lives-ok {$gif = PDF::Basic::Image.open: "t/images/lightbulb.gif";}, "open gif - lives";
 @images.push: 'GIF - Basic' => $gif;
 isa-ok $gif, ::('PDF::DAO::Stream'), 'gif object';
 is $gif<Type>, 'XObject', 'gif type';
@@ -120,7 +120,7 @@ for (
     my $test = .value;
 
     my $png;
-    lives-ok { $png = PDF::Content::Image.open: $test<file>; }, "open $desc - lives";
+    lives-ok { $png = PDF::Basic::Image.open: $test<file>; }, "open $desc - lives";
     isa-ok $png, ::('PDF::DAO::Stream'), "$desc object";
     @images.push: $desc => $png;
     
@@ -141,8 +141,8 @@ for (
 }
 
 sub save-images(@images) {
-    use PDF::Content::Doc;
-    my $doc = PDF::Content::Doc.new;
+    use PDF::Basic::Doc;
+    my $doc = PDF::Basic::Doc.new;
     my $page = $doc.add-page;
     my $x = 45;
     my $y = 650;
@@ -150,7 +150,7 @@ sub save-images(@images) {
 
     $page.graphics: -> $gfx {
 	my $font = $page.core-font( :family<Times-Roman>, :weight<bold>);
-	$gfx.say( "PDF::Content [t/images.t] - assorted images",
+	$gfx.say( "PDF::Basic [t/images.t] - assorted images",
 		  :$font, :font-size(16), :position[30, 750] );
 
 	$font = $page.core-font( :family<Times-Roman>);
