@@ -2,7 +2,7 @@ use v6;
 use Font::AFM;
 
 module PDF::Basic::Util::Font {
-    use PDF::Basic::Font::Encodings;
+    use PDF::Basic::Font::AFM;
     # font aliases adapted from pdf.js/src/fonts.js
     BEGIN constant stdFontMap = {
 
@@ -67,78 +67,6 @@ module PDF::Basic::Util::Font {
         :timesnewromanpsmt-italic<times-italic>,
     };
 
-    role Afm2Dom {
-
-        has $.enc;
-        has $!glyphs;
-        has $!encoding;
-
-        method set-encoding( Str :$!enc = 'win') {
-            given $!enc {
-                when 'mac' {
-                    $!glyphs = $PDF::Basic::Font::Encodings::mac-glyphs;
-                    $!encoding = $PDF::Basic::Font::Encodings::mac-encoding;
-                }
-                when 'win' {
-                    $!glyphs = $PDF::Basic::Font::Encodings::win-glyphs;
-                    $!encoding = $PDF::Basic::Font::Encodings::win-encoding;
-                }
-                when 'sym' {
-                    $!glyphs = $PDF::Basic::Font::Encodings::sym-glyphs;
-                    $!encoding = $PDF::Basic::Font::Encodings::sym-encoding;
-                }
-                when 'zapf' {
-                    $!glyphs = $PDF::Basic::Font::Encodings::zapf-glyphs;
-                    $!encoding = $PDF::Basic::Font::Encodings::zapf-encoding;
-                }
-                default { 
-                    die ":enc not 'win', 'mac'. 'sym' or 'zapf': $_";
-                }
-            }
-        }
-
-        #| compute the overall font-height
-        method height($pointsize?, Bool :$from-baseline = False) {
-            my List $bbox = $.FontBBox;
-            my Numeric $height = $bbox[3];
-            $height -= $bbox[1] unless $from-baseline;
-            $pointsize ?? $height * $pointsize / 1000 !! $height;
-        }
-
-	#| reduce string to the displayable characters
-        method filter(Str $text-in) {
-	    $text-in.comb.grep({ $!glyphs{$_}:exists }).join: '';
-	}
-
-	#| map ourselves to a PDF::Basic object
-        method to-dict {
-            my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
-            my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
-			 :BaseFont( :name( self.FontName ) ),
-            };
-
-            if my $name = %enc-name{self.enc} {
-                $dict<Encoding> = :$name;
-            }
-
-            $dict;
-        }
-
-        method stringwidth(Str $str, Numeric $pointsize=0, Bool :$kern=False) {
-            nextwith( $str, $pointsize, :$kern, :$!glyphs);
-        }
-
-        multi method encode(Str $s) {
-            $s.comb\
-                .map({ $!glyphs{$_} })\
-                .grep( *.defined )\
-                .map({ $!encoding{$_} })\
-                .grep( *.defined )\
-		.Slip;
-        }
-
-    }
-
     our proto sub core-font(|c) {*};
 
     multi sub core-font( Str :$family!, Str :$weight?, Str :$style?, :$enc) {
@@ -159,19 +87,20 @@ module PDF::Basic::Util::Font {
         core-font( $font-name, :$enc );
     }
 
-    sub load-font($font-name, :$enc!) {
+    sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
-        my $fnt = (%core-font-cache{$font-name.lc}{$enc} //= (Font::AFM.metrics-class( $font-name ) but Afm2Dom).new(:$enc));
+        my $fnt = (%core-font-cache{$font-name.lc}{$enc} //= (Font::AFM.metrics-class( $font-name )
+							      but PDF::Basic::Font::AFM).new(:$enc));
         $fnt.set-encoding(:$enc);
         $fnt;
     }
 
     multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^ ZapfDingbats $/ }) {
-        load-font( $font-name.lc, :enc<zapf> );
+        load-core-font( $font-name.lc, :enc<zapf> );
     }
 
     multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^ Symbol $/ }) {
-        load-font( $font-name.lc, :enc<sym> );
+        load-core-font( $font-name.lc, :enc<sym> );
     }
 
     multi sub core-font(Str $font-name! where { stdFontMap{$font-name.lc}:exists }, :$enc) {
@@ -180,7 +109,7 @@ module PDF::Basic::Util::Font {
 
     multi sub core-font(Str $font-name!, :$enc is copy) is default {
         $enc //= 'win';
-        load-font( $font-name.lc, :$enc );
+        load-core-font( $font-name.lc, :$enc );
     }
 
 }

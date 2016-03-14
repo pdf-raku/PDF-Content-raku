@@ -26,6 +26,7 @@
         "PDF::Basic::Image::PNG"  : "lib/PDF/Basic/Image/PNG.pm",
 
         "PDF::Basic::Font" : "lib/PDF/Basic/Font.pm",
+        "PDF::Basic::Font::AFM" : "lib/PDF/Basic/Font/AFM.pm",
         "PDF::Basic::Font::Encodings" : "lib/PDF/Basic/Font/Encodings.pm",
 
         "PDF::Basic::Text::Atom"  : "lib/PDF/Basic/Text/Atom.pm",
