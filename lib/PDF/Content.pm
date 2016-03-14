@@ -42,8 +42,8 @@ role PDF::Content:ver<0.0.5>
 	    }
 	}
 
-	my $gs-entry = self.parent.use-resource($gs, :eqv);
-	self.SetGraphicsState($gs-entry.key);
+	my $gs-entry = self.parent.resource-key($gs, :eqv);
+	self.SetGraphicsState($gs-entry);
     }
 
     method block( &do-stuff! ) {
@@ -116,7 +116,6 @@ role PDF::Content:ver<0.0.5>
     method do(PDF::DAO::Stream $obj! where .<Type> eq 'XObject',
               Numeric $x = 0,
               Numeric $y = 0,
-              Str     :$key = $.parent.use-resource($obj).key,
               Numeric :$width is copy,
               Numeric :$height is copy,
               Align   :$align  = 'left',
@@ -124,6 +123,7 @@ role PDF::Content:ver<0.0.5>
               Bool    :$inline = False,
         )  {
 
+        my Str:D $key = $.parent.resource-key($obj),
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
         my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
@@ -209,7 +209,7 @@ role PDF::Content:ver<0.0.5>
 	) {
 
 	my $font-size = $text-block.font-size;
-	my $font-key = $text-block.font-key;
+	my $font-key = $.parent.resource-key($text-block.font);
 
 	my Bool $in-text = $.context == GraphicsContext::Text;
 	self.op(BeginText) unless $in-text;
@@ -234,10 +234,10 @@ role PDF::Content:ver<0.0.5>
     }
 
     #| thin wrapper to $.op(SetFont, ...)
-    method set-font( $font-entry!, Numeric $size = 16) {
-        my Str $font-key = $font-entry.can('key')
-	    ?? $font-entry.key
-	    !! $font-entry;
+    multi method set-font( Hash $font!, Numeric $size = 16) {
+        $.op(SetFont, $!parent.resource-key($font), $size);
+    }
+    multi method set-font( Str $font-key!, Numeric $size = 16) {
         $.op(SetFont, $font-key, $size);
     }
 

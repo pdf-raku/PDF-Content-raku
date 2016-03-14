@@ -6,10 +6,13 @@ role PDF::Content::ResourceDict {
     use PDF::DAO::Name;
     use PDF::Content::Font;
 
-    my role ResourceEntry {
-	has Str $.key is rw;
+    has Str %!resource-key;
+    method resource-key($object is copy, |c --> Str:D) {
+	$object = $.resource($object, |c)
+	    unless %!resource-key{$object.WHICH};
+	%!resource-key{$object.WHICH};
     }
-
+    
     method !type( PDF::DAO $object ) is default {
 
         my $type = do given $object {
@@ -48,8 +51,8 @@ role PDF::Content::ResourceDict {
             for $resources.keys {
                 my $resource = $resources{$_};
                 if &match($resource) {
-                    $entry = $resource but ResourceEntry;
-                    $entry.key = $_;
+		    $entry = $resource;
+		    %!resource-key{$entry.WHICH} = $_;
                     last;
                 }
             }
@@ -77,12 +80,15 @@ role PDF::Content::ResourceDict {
         my Str $key = (1..*).map({$prefix ~ $_}).first({ self{$type}{$_}:!exists });
         self{$type}{$key} = $object;
 
-        my $entry = $object but ResourceEntry;
-        $entry.key = $key;
-        $entry;
+	%!resource-key{$object.WHICH} = $key;
+        $object;
     }
 
-    method resource(PDF::DAO $object, Bool :$eqv=False ) {
+    multi method resource($object where %!resource-key{.WHICH} ) {
+	$object;
+    }
+
+    multi method resource(PDF::DAO $object, Bool :$eqv=False ) is default {
         my Str $type = self!type($object)
             // die "not a resource object: {$object.WHAT}";
 
@@ -93,16 +99,13 @@ role PDF::Content::ResourceDict {
             // self!register-resource( $object );
     }
 
-    method resource-entry(Str $type!, Str $key!) {
+    method resource-entry(Str:D $type!, Str:D $key!) {
         return unless
             (self{$type}:exists)
             && (self{$type}{$key}:exists);
 
         my $object = self{$type}{$key};
-
-        my $entry = $object but ResourceEntry;
-        $entry.key = $key;
-        $entry;
+	$object;
     }
 
     method core-font(|c) {

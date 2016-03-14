@@ -46,8 +46,8 @@ role PDF::Content::PageTree
         $pages;
     }
 
-    #| $.page(0) or $.page(-1) adds a new page
-    multi method page(Int $page-num where $page-num == 0|-1
+    #| $.page(0) - adds a new page
+    multi method page(Int $page-num where $page-num == 0
 	--> PDF::Content::PageNode) {
         self.add-page;
     }
@@ -55,10 +55,6 @@ role PDF::Content::PageTree
     #| terminal page node - no children
     multi method page(Int $page-num where { self.Count == + self.Kids && $_ <= + self.Kids}) {
         self.Kids[$page-num - 1];
-    }
-
-    multi method page(Int $page-num) is default {
-	die "no such page: $page-num";
     }
 
     #| traverse page tree
@@ -85,6 +81,10 @@ role PDF::Content::PageTree
         }
 
         die "unable to locate page: $page-num";
+    }
+
+    multi method page(Int $page-num) is default {
+	die "no such page: $page-num";
     }
 
     #| delete page from page tree

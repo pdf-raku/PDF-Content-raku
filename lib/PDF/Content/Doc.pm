@@ -89,6 +89,10 @@ class PDF::Content::Doc
 	self.?Root.?Pages
     }
 
+    multi method page(|c) is default {
+	self.Root.Pages.page(|c)
+    }
+
     multi method FALLBACK(Str $meth where { self.?Root.?Pages.can($meth) }, |c) {
         self.WHAT.^add_method($meth,  method (|a) { self.Root.Pages."$meth"(|a) } );
         self."$meth"(|c);
