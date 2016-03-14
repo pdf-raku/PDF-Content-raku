@@ -1,9 +1,9 @@
 # perl6-PDF-Basic
 
-Perl 6 module for basic PDF content creatioon and editing, including text, images, fonts and general graphics.
+Perl 6 module for basic PDF content creation and editing, including text, images, fonts and general graphics.
 
-It includes `PDF::Basic::Doc` a minimal graphics-centric class for
-creating or editing PDF documents, using only this module, i.e.:
+It includes `PDF::Basic::Doc` a minimal class for
+creating or editing PDF documents, inclduing:
 - Basic Text (core fonts only)
 - Simple forms and images
 - Low-level graphics and content operators
