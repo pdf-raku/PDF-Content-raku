@@ -188,7 +188,7 @@ role PDF::Basic:ver<0.0.5>
 		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
         ) {
 	# detect and use the current text-state font
-	my Numeric $font-size = $.FontSize || 16;
+	my Numeric $font-size = $.FontSize //= 16;
 	my Numeric $word-spacing = $.WordSpacing;
 	my Numeric $horiz-scaling = $.HorizScaling;
 	my Numeric $char-spacing = $.CharSpacing;
@@ -247,6 +247,20 @@ role PDF::Basic:ver<0.0.5>
        $font // $!parent.core-font('Courier');
     }
 
+    method font is rw returns List {
+	my $obj = self;
+	Proxy.new(
+	    FETCH => method {
+		($obj.FontKey, $obj.FontSize // 16);
+	    },
+	    STORE => method ($v) {
+		my @v = $v.isa(List) ?? @$v !! [ $v, ];
+		$obj.set-font(|@v);
+		@$v;
+	    },
+	    );
+    }
+    
     multi method print(Str $text, :$font = self!get-font, |c) {
         nextwith( $text, :$font, |c);
     }

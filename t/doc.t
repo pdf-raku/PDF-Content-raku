@@ -5,13 +5,13 @@ use Test;
 srand(123456);
 
 use PDF::Basic::Doc;
-my $doc = PDF::Basic::Doc.new;
+my PDF::Basic::Doc $doc .= new;
 my $page = $doc.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
 $page.text: -> $_ {
     .text-position = [200, 200];
-    .set-font($header-font, 18);
+    .font = [$header-font, 18];
     .say(:width(250),
 	"Lorem ipsum dolor sit amet, consectetur adipiscing elit,
          sed do eiusmod tempor incididunt ut labore et dolore

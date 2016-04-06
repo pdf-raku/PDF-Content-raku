@@ -8,6 +8,7 @@ creating or editing PDF documents, including:
 - Simple forms and images
 - Low-level graphics and content operators
 - Basic reuse (Pages and form objects)
+- Simple CSS styling
 ```
 use v6;
 use PDF::Basic::Doc;
@@ -18,7 +19,7 @@ $page.MediaBox = [0, 0, 595, 842];
 my $font = $page.core-font( :family<Helvetica>, :weight<bold>, :style<italic> );
 $page.text: -> $_ {
     .text-position = [100, 150];
-    .set-font: $font;
+    .font = $font;
     .say: 'Hello, world!';
 }
 
@@ -44,7 +45,7 @@ $page.text: -> $txt {
     ut labore et dolore magna aliqua.
     --END--
             
-    $txt.set-font($font, :font-size(12));
+    $txt.font = ($font, 12);
     $txt.say( $para, :width(200), :height(150) :align<right>, :kern);
 }
 ```
@@ -89,7 +90,7 @@ $page.graphics: -> $_ {
 
     $page.text: -> $txt {
 	$txt.text-position = [240, 600];
-	$txt.set-font( $page.core-font('ZapfDingbats'), 24);
+	$txt.font = [ $page.core-font('ZapfDingbats'), 24];
 	$txt.SetWordSpacing(16);
 	my $nbsp = "\c[NO-BREAK SPACE]";
 	$txt.print("♠ ♣$nbsp");
@@ -103,7 +104,7 @@ $page.graphics: -> $_ {
 
     $page.text: -> $_ {
 	 use PDF::Basic::Ops :TextMode;
-	.set-font( $header-font, 12);
+	.font = ( $header-font, 12);
 	.SetTextRender: TextMode::OutlineText;
 	.SetLineWidth: .5;
 	.text-transform( :translate[50, 550], :slant(12) );
