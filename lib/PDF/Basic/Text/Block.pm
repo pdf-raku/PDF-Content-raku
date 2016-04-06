@@ -5,34 +5,33 @@ use PDF::Basic::Text::Atom;
 use PDF::Basic::Ops :OpNames;
 
 class PDF::Basic::Text::Block {
+    subset Percentage of Numeric where 0..100;
+    has Numeric $.font-size is required;
+    has         $.font is required;
+    has Numeric $.font-height = $!font.height( $!font-size );
+    has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
     has Numeric $.line-height;
-    has Numeric $.font-height;
-    has Numeric $.font-base-height;
-    has Numeric $.font-size;
-    has         $.font;
-    has Numeric $.horiz-scaling = 100;
+    has Numeric $!space-width;
+    has Percentage $.horiz-scaling = 100;
     has Numeric $.char-spacing = 0;
     has Numeric $.word-spacing = 0;
-    has Numeric $.space-width;
     has Numeric $!width;
     has Numeric $!height;
     has @.lines;
     has @.overflow is rw;
-    has Str $!align where 'left' | 'center' | 'right' | 'justify';
-    has Str $.valign where 'top' | 'center' | 'bottom' | 'text';
+    has Str $!align where 'left'|'center'|'right'|'justify';
+    has Str $.valign where 'top'|'center'|'bottom'|'text';
 
-    method actual-width(@lines = @!lines)  { @lines.max({ .actual-width }); }
+    method actual-width(@lines = @!lines)  { @lines.max: *.actual-width; }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
 
-    multi submethod BUILD(Str :$text!,
-                          :$!font!,
-			  :$!font-size = 16,
-                          :$kern       = False,
+    multi submethod BUILD(Str  :$text!,
+                               :$!font!,
+			       :$!font-size = 16,
+                          Bool :$kern       = False,
 			  |c) {
 
-	$!font-height = $!font.height( $!font-size );
-	$!font-base-height = $!font.height( $!font-size, :from-baseline );
-        $!space-width = $!font.stringwidth( ' ', $!font-size );
+	$!space-width = $!font.stringwidth( ' ', $!font-size );
 
         my @chunks = flat $text.comb(/ [ <![ - ]> [ \w | <:Punctuation> ] ]+ '-'?
                                 || .
@@ -59,19 +58,20 @@ class PDF::Basic::Text::Block {
             my Bool $kerning = %atom<space> < 0;
 
             my PDF::Basic::Text::Atom $atom .= new( |%atom );
-            if $kerning {
-                $atom.sticky = True;
-            }
-            elsif $atom.content ~~ NO-BREAK-WS {
-                $atom.elastic = True;
-                $atom.sticky = True;
-                @atoms[*-1].sticky = True
-                    if @atoms;
-            }
-            elsif $followed-by-ws {
-                $atom.elastic = True;
-                $atom.space = $!space-width;
-            }
+	    do {
+		when $kerning {
+                    $atom.sticky = True;
+		}
+		when $atom.content ~~ NO-BREAK-WS {
+                    $atom.elastic = True;
+                    $atom.sticky = True;
+                    @atoms[*-1].sticky = ? @atoms;
+		}
+		when $followed-by-ws {
+                    $atom.elastic = True;
+                    $atom.space = $!space-width;
+		}
+	    }
 
             my Str $encoded = [~] $!font.encode( $atom.content );
             $atom.encoded = $encoded
