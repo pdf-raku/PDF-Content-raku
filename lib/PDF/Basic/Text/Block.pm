@@ -160,7 +160,10 @@ class PDF::Basic::Text::Block {
 
     method content(Bool :$nl = False) {
 
-        my @content = :TL[ $!line-height ];
+	my @lines = $.lines.list;
+        my @content = ( OpNames::SetTextLeading => [ $!line-height ], )
+	if $nl || +@lines > 1;
+
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 
         if $!valign ne 'text' {
@@ -175,7 +178,7 @@ class PDF::Basic::Text::Block {
             @content.push: 'Td' => [0, $dy * $.height  -  $!font-base-height]
         }
 
-        for $.lines.list {
+        for @lines {
             @content.push: .content(:$.font-size, :$space-size, :$!word-spacing);
             @content.push: OpNames::TextNextLine;
         }

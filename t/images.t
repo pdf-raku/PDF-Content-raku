@@ -149,16 +149,16 @@ sub save-images(@images) {
     my $n = 0;
 
     $page.graphics: -> $gfx {
-	my $font = $page.core-font( :family<Times-Roman>, :weight<bold>);
-	$gfx.say( "PDF::Basic [t/images.t] - assorted images",
-		  :$font, :font-size(16), :position[30, 750] );
+	$gfx.font = $page.core-font( :family<Times-Roman>, :weight<bold>);
+	$gfx.print( "PDF::Basic [t/images.t] - assorted images",
+		    :position[30, 750] );
 
-	$font = $page.core-font( :family<Times-Roman>);
+	$gfx.font = ($page.core-font( :family<Times-Roman>), 12);
     
 	for @images {
 	    my ($desc, $img) = .kv;
 	    $gfx.do($img, $x, $y,);
-	    $gfx.say($desc, :$font, :font-size(12), :position[$x + 45, $y + 15]);
+	    $gfx.print($desc, :position[$x + 45, $y + 15]);
 	    if ++$n %% 3 {
 		$x = 45;
 		$y -= 75;

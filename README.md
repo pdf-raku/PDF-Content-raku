@@ -50,7 +50,7 @@ $page.text: -> $txt {
 }
 ```
 
-#### Forms and images (`.image` and  `.do` methods):
+#### Forms and images (`.load-image` and  `.do` methods):
 
 The `.image` method can be used to load an image and register it as a page resource.
 The `.do` method can them be used to render it.

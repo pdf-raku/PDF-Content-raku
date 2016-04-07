@@ -34,11 +34,17 @@ my $text-block = PDF::Basic::Text::Block.new( :$text, :$font, :$font-size );
 
 my $gfx = PDF::Basic.new( :$parent );
 
+$gfx.say( $text-block );
 $gfx.print( $text-block );
 
-is-json-equiv [ $gfx.ops ], [ :BT[],
-                              :Tf[:name<Ft1>, :real(16)],
-                              :TL[:real(17.6)],
-                              :TJ[ :array[:literal("Hello. Ting, ting, ting. Attention! \x[85] ATTENTION!")] ],
-                              :ET[],
+is-json-equiv [ $gfx.ops ], [
+    :BT[],
+    :Tf[:name<Ft1>, :real(16)],
+    :TL[:real(17.6)],
+    :TJ[ :array[:literal("Hello. Ting, ting, ting. Attention! \x[85] ATTENTION!")] ],
+    'T*' => [],
+    :ET[],
+    :BT[],
+    :TJ[ :array[:literal("Hello. Ting, ting, ting. Attention! \x[85] ATTENTION!")] ],
+    :ET[],
     ], 'simple text block';
