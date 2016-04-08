@@ -13,9 +13,6 @@ class PDF::Basic::Image::PNG
 
     method network-endian { True }
 
-    use Compress::Zlib;
-
-    # min/max of network ordered 2-byte words
     sub network-words(Buf $buf) {
         $buf.map: -> $hi, $lo {
             $hi +< 0x08  +  $lo;
@@ -82,11 +79,11 @@ class PDF::Basic::Image::PNG
 	png-to-stream($cs, $bpc, |%opts);
     }
 
-    enum PNG-CS « :Gray(0) :RGB(2) Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
+    enum PNG-CS « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
 
     proto sub png-to-stream(UInt $cs, UInt $bpc, *%o --> PDF::DAO::Stream) {*}
 
-    multi sub png-to-stream(0,  #| Gray
+    multi sub png-to-stream($ where PNG-CS::Gray,
 			    UInt $bpc where 1|2|4|8|16,
 			    UInt :$w!,
 			    UInt :$h!,
@@ -108,7 +105,7 @@ class PDF::Basic::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
     
-    multi sub png-to-stream(2,  #| RGB
+    multi sub png-to-stream($ where PNG-CS::RGB,
 			    UInt $bpc where 8|16,
 			    UInt :$w!,
 			    UInt :$h!,
@@ -135,7 +132,7 @@ class PDF::Basic::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
     
-    multi sub png-to-stream(3,  #| RGB + Palette
+    multi sub png-to-stream($ where PNG-CS::RGB-Palette,
 			    UInt $bpc is copy where 1|2|4|8,
 			    UInt :$w!,
 			    UInt :$h!,
@@ -176,7 +173,7 @@ class PDF::Basic::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
     
-    multi sub png-to-stream(4,  #| Grayscale + Alpha
+    multi sub png-to-stream($ where PNG-CS::Gray-Alpha,
 			    UInt $bpc where 8|16,
 			    UInt :$w!,
 			    UInt :$h!,
@@ -224,7 +221,7 @@ class PDF::Basic::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
     
-    multi sub png-to-stream(6,  #| RGB + Alpha
+    multi sub png-to-stream($ where PNG-CS::RGB-Alpha,
 			    UInt $bpc where 8|16,
 			    UInt :$w!,
 			    UInt :$h!,
@@ -272,7 +269,7 @@ class PDF::Basic::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
     
-    multi sub png-to-stream(UInt $cs, UInt $bpc) {
+    multi sub png-to-stream($cs, $bpc) is default {
 	die "unable to hangle PNG image cs=$cs, bpc=$bpc";
     }
 
