@@ -30,11 +30,11 @@ class PDF::Basic::Image::PNG
         my Buf $buf;
         my buf8 $stream .= new;
 
-        constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
-        my $header = $fh.read(8).decode('latin-1');
+        subset PNG-Header of Str where [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
+        my Str $header = $fh.read(8).decode('latin-1');
 
         die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :$fh )
-            unless $header eq PNG-Header;
+            unless $header ~~ PNG-Header;
 
         while !$fh.eof {
             my ($l) = $.unpack( $fh.read(4), uint32 );

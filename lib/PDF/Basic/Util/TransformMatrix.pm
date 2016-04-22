@@ -10,13 +10,12 @@ module PDF::Basic::Util::TransformMatrix {
     #
     # where a b c d e f are stored in a six digit array and the third column is implied.
 
-    my Int enum Abcdefg « :a(0) :b(1) :c(2) :d(3) :e(4) :f(5) »;
-
     sub deg2rad (Numeric $deg) {
         return $deg * pi / 180;
     }
 
     subset TransformMatrix of Array where {.elems == 6}
+    my Int enum TransformMatrixElem « :a(0) :b(1) :c(2) :d(3) :e(4) :f(5) »;
 
     sub identity returns TransformMatrix {
         [1, 0, 0, 1, 0, 0];
@@ -31,7 +30,7 @@ module PDF::Basic::Util::TransformMatrix {
         my Numeric $cos = cos($r);
         my Numeric $sin = sin($r);
 
-        [$cos, $sin,-$sin, $cos, 0, 0];
+        [$cos, $sin, -$sin, $cos, 0, 0];
     }
 
     sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
@@ -57,8 +56,8 @@ module PDF::Basic::Util::TransformMatrix {
     #| Coordinate transfrom of x, y: See [PDF 1.7 Sectiono 4.2.3 Transformation Matrices]
     #|  x' = a.x  + c.y + e; y' = b.x + d.y +f
     our sub transform(TransformMatrix $tm!, Numeric $x, Numeric $y) {
-	($tm[a]*$x + $tm[c]*$y + $tm[e],
-	 $tm[b]*$x + $tm[d]*$y + $tm[f])
+	[ $tm[a]*$x + $tm[c]*$y + $tm[e],
+	  $tm[b]*$x + $tm[d]*$y + $tm[f], ]
     }
 
     #| Compute: $a = $a X $b
@@ -91,12 +90,12 @@ module PDF::Basic::Util::TransformMatrix {
 	--> TransformMatrix
 	) {
 	my TransformMatrix $t = identity();
-	apply($t, skew( 0, $slant) )                   if $slant;
-	apply($t, translate( |@( vect($translate) ) )) if $translate.defined;
-	apply($t, rotate( $rotate ))                   if $rotate.defined;
-	apply($t, scale( |@( vect($scale) ) ))         if $scale.defined;
-	apply($t, skew( |@( vect($skew) ) ))           if $skew.defined;
-	apply($t, $matrix) if $matrix.defined;
+	apply($t, skew( 0, $_) )               with $slant;
+	apply($t, translate( |@( vect($_) ) )) with $translate;
+	apply($t, rotate( $_ ))                with $rotate;
+	apply($t, scale( |@( vect($_) ) ))     with $scale;
+	apply($t, skew( |@( vect($_) ) ))      with $skew;
+	apply($t, $_)                          with $matrix;
 	[ $t.map({ round($_) }) ];
     }
 

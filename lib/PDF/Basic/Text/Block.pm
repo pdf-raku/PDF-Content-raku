@@ -5,7 +5,7 @@ use PDF::Basic::Text::Atom;
 use PDF::Basic::Ops :OpNames;
 
 class PDF::Basic::Text::Block {
-    subset Percentage of Numeric where 0..100;
+    subset Percentage of Numeric where * > 0;
     has Numeric $.font-size is required;
     has         $.font is required;
     has Numeric $.font-height = $!font.height( $!font-size );
