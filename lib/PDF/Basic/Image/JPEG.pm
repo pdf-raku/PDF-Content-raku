@@ -9,7 +9,7 @@ class PDF::Basic::Image::JPEG
 
     method read(IO::Handle $fh!) {
         my Blob $buf;
-        my Int ($bpc, $height, $width, $cs);
+        my uint ($bpc, $height, $width, $cs);
         my Bool $is-dct;
 
         $fh.seek(0, SeekFromBeginning);
@@ -19,7 +19,7 @@ class PDF::Basic::Image::JPEG
 
         loop {
             $buf = $fh.read: 4;
-            my UInt ($ff, $mark, $len) = $.unpack($buf, uint8, uint8, uint16);
+            my uint ($ff, $mark, $len) = $.unpack($buf, uint8, uint8, uint16);
             last if $ff != 0xFF;
             last if $mark == 0xDA | 0xD9;  # SOS/EOI
             last if $len < 2;

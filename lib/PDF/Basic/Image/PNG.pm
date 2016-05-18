@@ -23,7 +23,7 @@ class PDF::Basic::Image::PNG
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
-        my UInt ($l,$w,$h,$bpc,$cs,$cm,$fm,$im);
+        my uint ($l,$w,$h,$bpc,$cs,$cm,$fm,$im);
         my Buf $palette;
         my Buf $trns;
         my Buf $crc;
@@ -37,7 +37,7 @@ class PDF::Basic::Image::PNG
             unless $header ~~ PNG-Header;
 
         while !$fh.eof {
-            my ($l) = $.unpack( $fh.read(4), uint32 );
+            my uint ($l) = $.unpack( $fh.read(4), uint32 );
             my $blk = $fh.read(4).decode('latin-1');
 
             given $blk {
@@ -81,12 +81,12 @@ class PDF::Basic::Image::PNG
 
     enum PNG-CS « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
 
-    proto sub png-to-stream(UInt $cs, UInt $bpc, *%o --> PDF::DAO::Stream) {*}
+    proto sub png-to-stream(uint $cs, uint $bpc, *%o --> PDF::DAO::Stream) {*}
 
     multi sub png-to-stream($ where PNG-CS::Gray,
-			    UInt $bpc where 1|2|4|8|16,
-			    UInt :$w!,
-			    UInt :$h!,
+			    uint $bpc where 1|2|4|8|16,
+			    uint :$w!,
+			    uint :$h!,
 			    :%dict!,
 			    Buf :$stream!,
 			    Buf :$trns,
@@ -106,9 +106,9 @@ class PDF::Basic::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::RGB,
-			    UInt $bpc where 8|16,
-			    UInt :$w!,
-			    UInt :$h!,
+			    uint $bpc where 8|16,
+			    uint :$w!,
+			    uint :$h!,
 			    :%dict!,
 			    Buf :$stream!,
 			    Buf :$trns,
@@ -124,7 +124,7 @@ class PDF::Basic::Image::PNG
 	    my @rgb = [], [], [];
 
 	    @rgb[.key mod 3].push(.val)
-		for @vals.keys;
+		for @vals.pairs;
 
 	    %dict<Mask> = [ @rgb.map: { (*.min, *.max) } ];
 	}
@@ -133,9 +133,9 @@ class PDF::Basic::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::RGB-Palette,
-			    UInt $bpc is copy where 1|2|4|8,
-			    UInt :$w!,
-			    UInt :$h!,
+			    uint $bpc is copy where 1|2|4|8,
+			    uint :$w!,
+			    uint :$h!,
 			    :%dict!,
 			    Buf :$stream!,
 			    Buf :$trns,
@@ -153,7 +153,7 @@ class PDF::Basic::Image::PNG
 
 	if defined $trns && $alpha {
 	    my $decoded = $trns;
-	    my UInt $padding = $w * $h  -  +$decoded;
+	    my uint $padding = $w * $h  -  +$decoded;
 	    $decoded.append( 0xFF xx $padding)
 		if $padding;
 		
@@ -174,9 +174,9 @@ class PDF::Basic::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::Gray-Alpha,
-			    UInt $bpc where 8|16,
-			    UInt :$w!,
-			    UInt :$h!,
+			    uint $bpc where 8|16,
+			    uint :$w!,
+			    uint :$h!,
 			    :%dict!,
 			    :$stream! is copy,
 			    Bool :$alpha,
@@ -192,14 +192,14 @@ class PDF::Basic::Image::PNG
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
 
-	my UInt $n = $bpc div 8;
-	my $i = 0;
+	my uint $n = $bpc div 8;
+	my uint $i = 0;
 
 	my buf8 $gray-channel  .= new;
 	my buf8 $alpha-channel .= new;
 	while $i < +$stream {
-	    $gray-channel.push( $stream[$i++] )  for 1 .. $n;
-	    $alpha-channel.push( $stream[$i++] ) for 1 .. $n;
+	    $gray-channel.push( $stream[$i++] )  xx $n;
+	    $alpha-channel.push( $stream[$i++] ) xx $n;
 	}
 
 	if $alpha {
@@ -222,9 +222,9 @@ class PDF::Basic::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::RGB-Alpha,
-			    UInt $bpc where 8|16,
-			    UInt :$w!,
-			    UInt :$h!,
+			    uint $bpc where 8|16,
+			    uint :$w!,
+			    uint :$h!,
 			    :%dict!,
 			    :$stream! is copy,
 			    Buf :$trns,
@@ -240,14 +240,14 @@ class PDF::Basic::Image::PNG
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
 
-	my UInt $n = $bpc div 8;
-	my $i = 0;
+	my uint $n = $bpc div 8;
+	my uint $i = 0;
 
 	my buf8 $rgb-channels  .= new;
 	my buf8 $alpha-channel .= new;
 	while $i < +$stream {
-	    $rgb-channels.push( $stream[$i++] )  for 1 .. ($n*3);
-	    $alpha-channel.push( $stream[$i++] ) for 1 .. $n;
+	    $rgb-channels.push( $stream[$i++] ) xx ($n*3);
+	    $alpha-channel.push( $stream[$i++] ) xx $n;
 	}
 
 	if $alpha {

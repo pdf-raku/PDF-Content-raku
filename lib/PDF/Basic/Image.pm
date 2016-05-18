@@ -29,12 +29,12 @@ role PDF::Basic::Image {
     method unpack(Buf $buf, *@templ ) {
 	my @bytes = $buf.list;
         my Bool $nw = $.network-endian;
-        my UInt $off = 0;
+        my uint $off = 0;
 
 	@templ.map: {
-	    my UInt $size = .^nativesize div 8;
-	    my UInt $v = 0;
-            my UInt $i = $nw ?? 0 !! $size;
+	    my uint $size = .^nativesize div 8;
+	    my uint $v = 0;
+            my uint $i = $nw ?? 0 !! $size;
             for 1 .. $size {
                 $v +<= 8;
                 $v += @bytes[$off + ($nw ?? $i++ !! --$i)];

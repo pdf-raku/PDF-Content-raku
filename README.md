@@ -114,7 +114,7 @@ $page.graphics: -> $_ {
 
 ```
 
-Note: at this stage, only the PDF core fonts are supported: Courier, Times, Helvetica, ZapfDingbats and Symbol.
+Note: only the PDF core fonts are supported: Courier, Times, Helvetica, ZapfDingbats and Symbol.
 
 #### Low level graphics, colors and drawing
 
