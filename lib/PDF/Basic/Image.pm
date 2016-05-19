@@ -99,4 +99,20 @@ role PDF::Basic::Image {
         %xobject-dict;
     }
 
+    method inline-content {
+
+        # for serialization to content stream ops: BI dict ID data EI
+        use PDF::Basic::Ops :OpNames;
+        use PDF::DAO::Util :to-ast-native;
+        # serialize to content ops
+        my %dict = to-ast-native(self).value.list;
+        %dict<Type Subtype Length>:delete;
+        %dict = self.inline-to-xobject( %dict, :invert );
+
+        [ (BeginImage) => [ :%dict ],
+          (ImageData)  => [ :$.encoded ],
+          (EndImage)   => [],
+        ]
+    }
+
 }

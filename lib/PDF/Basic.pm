@@ -92,7 +92,7 @@ role PDF::Basic:ver<0.0.5>
 	$.SetTextMatrix( @matrix );
     }
 
-    my subset Vector of List where {.elems == 2 && .[0] ~~ Numeric && .[1] ~~ Numeric}
+    my subset Vector of List where {.elems == 2 && all(.[0], .[1]) ~~ Numeric}
     #| set the current text position on the page/form
     method text-position is rw returns Vector {
 	my $gfx = self;
@@ -172,8 +172,8 @@ role PDF::Basic:ver<0.0.5>
         self.block: {
 	    $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
 	    if $inline && $obj.Subtype eq 'Image' {
-		# serialize the image to the content stream, aka: :BI[:$dict], :ID[:$stream], :EI[]
-		$.ops( $obj.content(:inline) );
+		# serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]
+		$.ops( $obj.inline-content );
 	    }
 	    else {
 		$.op(XObject, $key);
