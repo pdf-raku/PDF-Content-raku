@@ -11,14 +11,45 @@ class PDF::Basic::CSS {
     subset LineStyle of Str where 'none'|'hidden'|'dotted'|'dashed'|'solid'|'double'|'groove'|'ridge'|'inset'|'outset';
     subset Points of Numeric;
     class Edges {
-	has Points ($.top = 0, $.left = 0, $.bottom = 0, $.right = 0);
+	has Points ($.top, $.left, $.bottom, $.right);
+        submethod BUILD(:$!top = 0,
+                        :$!right = $!top,
+                        :$!bottom = $!top,
+                        :$!left = $!right) {
+        }
+    }
+
+    use MONKEY-TYPING;
+
+    augment class Hash {
+        method PDF::Basic::CSS::Edges() {
+            Edges.new( |self );
+        }
+    }
+
+    augment class Array {
+        method PDF::Basic::CSS::Edges() {
+            my %box;
+            %box<top>     = $_ with self[0];
+            %box<right>   = $_ with self[1];
+            %box<bottom>  = $_ with self[2];
+            %box<left>    = $_ with self[3];
+            Edges.new( |%box );
+        }
+    }
+
+    augment class Rat {
+        method PDF::Basic::CSS::Edges() {
+            Edges.new( :top(self) );
+        }
     }
 
     has Align     $.align;
     has Color     $.background-color;
     has Color     @.border-color[4];
     has Edges     $.border-spacing;
-    has LineStyle @.border-style[4] = 'solid';
+    has Edges     $.border-width;
+    has LineStyle @.border-style[4] = 'solid' xx 4;
     has Str       $.box-sizing where 'content-box'|'border-box' = 'content-box';
     has Points    $.content-width;
     has Points    $.content-height;
@@ -28,9 +59,12 @@ class PDF::Basic::CSS {
     has Points    $.min-width;
     has Points    $.min-height;
     has Fraction  $.opacity;
-    has LineStyle @.outline-style[4] = 'solid';
+    has LineStyle @.outline-style[4] = 'solid' xx 4;
     has Color     @.outline-color[4];
     has Edges     @.padding[4];
     has VAlign    $.valign;
+
+    submethod BUILD(Edges() :$!border-width) {
+    }
 
 }

@@ -19,12 +19,13 @@ role PDF::Basic:ver<0.0.5>
 
 	my constant %Entries = %( ExtGState.enums.invert );
 
-	$transparency = 1 - $opacity
-	    if $opacity.defined;
+	with $opacity {
+	    $transparency = 1 - $_
+        }
 
-	if $transparency.defined {
-	    %settings<fill-alpha> //= $transparency;
-	    %settings<stroke-alpha> //= $transparency;
+	with $transparency {
+	    %settings<fill-alpha> //= $_;
+	    %settings<stroke-alpha> //= $_;
 	}
 
 	for %settings.keys.sort {
@@ -62,7 +63,8 @@ role PDF::Basic:ver<0.0.5>
         PDF::Basic::Image.open( $spec );
     }
 
-    method inline-images {
+    #| extract any inline images from the content stream. returns an array of XObject Images
+    method inline-images returns Array {
 	my PDF::DAO::Stream @images;
 	for $.ops.keys -> $i {
 	    my $v = $.ops[$i];
@@ -194,8 +196,8 @@ role PDF::Basic:ver<0.0.5>
 	my Numeric $char-spacing = $.CharSpacing;
 
         my PDF::Basic::Text::Block $text-block .= new( :$text, :$font, :$font-size,
-							  :$word-spacing, :$horiz-scaling, :$char-spacing,
-							  |c );
+						       :$word-spacing, :$horiz-scaling, :$char-spacing,
+						       |c );
 
 	$.print( $text-block, |c)
 	    unless $stage;
@@ -256,7 +258,7 @@ role PDF::Basic:ver<0.0.5>
 	    STORE => method ($v) {
 		my @v = $v.isa(List) ?? @$v !! [ $v, ];
 		$obj.set-font(|@v);
-		@$v;
+		@v;
 	    },
 	    );
     }

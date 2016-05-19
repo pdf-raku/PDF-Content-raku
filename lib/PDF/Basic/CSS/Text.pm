@@ -11,7 +11,7 @@ class PDF::Basic::CSS::Text
     # font-weights:
     # 
     # just normal, or bold atm
-    subset FontWeight of Str where 'normal'|'bold'|'bolder'|'100'..'900';
+    subset FontWeight of Str where 'normal'|'bold'|'bolder'|('100'..'900');
     has FontWeight $.font-weight = 'normal';
     has Numeric $.letter-spacing;
     has Numeric $.word-spacing;

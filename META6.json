@@ -8,6 +8,11 @@
     "provides"    : {
 
         "PDF::Basic" : "lib/PDF/Basic.pm",
+
+        "PDF::Basic::CSS" : "lib/PDF/Basic/CSS.pm",
+        "PDF::Basic::CSS::Text" : "lib/PDF/Basic/CSS/Text.pm",
+        "PDF::Basic::CSS::Image" : "lib/PDF/Basic/CSS/Image.pm",
+
         "PDF::Basic::Doc" : "lib/PDF/Basic/Doc.pm",
 
         "PDF::Basic::Graphics"     : "lib/PDF/Basic/Graphics.pm",
@@ -32,6 +37,8 @@
         "PDF::Basic::Text::Atom"  : "lib/PDF/Basic/Text/Atom.pm",
         "PDF::Basic::Text::Block" : "lib/PDF/Basic/Text/Block.pm",
         "PDF::Basic::Text::Line"  : "lib/PDF/Basic/Text/Line.pm",
+
+        "PDF::Basic::Units" : "lib/PDF/Basic/Units.pm",
 
         "PDF::Basic::Util::Font" : "lib/PDF/Basic/Util/Font.pm",
         "PDF::Basic::Util::TransformMatrix" : "lib/PDF/Basic/Util/TransformMatrix.pm"
