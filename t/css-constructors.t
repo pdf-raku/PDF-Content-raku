@@ -6,10 +6,10 @@ use Test;
 
 my $css;
 
-sub to-hash(PDF::Basic::CSS::Edges $edge) {
+sub to-hash(PDF::Basic::CSS::Boxed $box) {
     my %h;
     for <top left bottom right> -> $e {
-        %h{$e} = $_ with $edge."$e"();
+        %h{$e} = $_ with $box."$e"();
     }
     %h;
 }
@@ -33,6 +33,9 @@ for [255, 0, 0], "#f00", "#ff0000", "red", "Red", "rgb(255,0,0)", "RGB(100%,0%, 
     $css = PDF::Basic::CSS.new( :$background-color );
     is-deeply $css.background-color, [255, 0 , 0], "color: {$background-color.perl}";
 }
+
+$css = PDF::Basic::CSS.new( :border-style<dotted dashed> );
+is-deeply to-hash($css.border-style), { :top<dotted>, :left<dashed>, :bottom<dotted>, :right<dashed> }, "Construction from Edge object";
 
 done-testing;
 
