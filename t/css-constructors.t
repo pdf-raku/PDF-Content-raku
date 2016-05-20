@@ -27,7 +27,12 @@ my $border-width = $css.border-width;
 $css = Nil;
 
 $css = PDF::Basic::CSS.new( :$border-width );
-is-deeply to-hash($css.border-width), { :top(2px), :left(3px), :bottom(2px), :right(3px) }, "Construction from Edget object";
+is-deeply to-hash($css.border-width), { :top(2px), :left(3px), :bottom(2px), :right(3px) }, "Construction from Edge object";
+
+for [255, 0, 0], "#f00", "#ff0000", "red", "Red", "rgb(255,0,0)", "RGB(100%,0%, 0)"  -> $background-color {
+    $css = PDF::Basic::CSS.new( :$background-color );
+    is-deeply $css.background-color, [255, 0 , 0], "color: {$background-color.perl}";
+}
 
 done-testing;
 
