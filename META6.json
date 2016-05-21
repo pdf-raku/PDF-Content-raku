@@ -11,8 +11,9 @@
 
         "PDF::Basic::CSS" : "lib/PDF/Basic/CSS.pm",
         "PDF::Basic::CSS::Boxed" : "lib/PDF/Basic/CSS/Boxed.pm",
-        "PDF::Basic::CSS::Text" : "lib/PDF/Basic/CSS/Text.pm",
+        "PDF::Basic::CSS::Color" : "lib/PDF/Basic/CSS/Color.pm",
         "PDF::Basic::CSS::Image" : "lib/PDF/Basic/CSS/Image.pm",
+        "PDF::Basic::CSS::Text" : "lib/PDF/Basic/CSS/Text.pm",
 
         "PDF::Basic::Doc" : "lib/PDF/Basic/Doc.pm",
 

@@ -31,7 +31,7 @@ is-deeply to-hash($css.border-width), { :top(2px), :left(3px), :bottom(2px), :ri
 
 for [255, 0, 0], "#f00", "#ff0000", "red", "Red", "rgb(255,0,0)", "RGB(100%,0%, 0)"  -> $background-color {
     $css = PDF::Basic::CSS.new( :$background-color );
-    is-deeply $css.background-color, [255, 0 , 0], "color: {$background-color.perl}";
+    is-deeply $css.background-color.Array, [255, 0 , 0], "color: {$background-color.perl}";
 }
 
 $css = PDF::Basic::CSS.new( :border-style<dotted dashed> );

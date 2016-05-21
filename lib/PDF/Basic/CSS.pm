@@ -9,49 +9,8 @@ class PDF::Basic::CSS {
     subset VAlign of Str where 'top'|'center'|'bottom';
     # simple RGB colors at the moment - may change
 
-    use CSS::Grammar::AST;
-    subset ColorName of Str where %CSS::Grammar::AST::CSS3-Colors{$_}:exists;
-    subset ColorChannel of Int where 0 .. 0xFF;
-    subset Color of Array where .elems == 3 && all(.list) ~~ ColorChannel;
-    class Colors does PDF::Basic::CSS::Boxed[Color, [0,0,0]] {
-        use MONKEY-TYPING;
-        augment class Str {
-            #| coerce color term to ab rgb value
-            method PDF::Basic::CSS::Color() returns Color {
-                # todo use CSS::Module - which has a better understanding of colors
-                use CSS::Grammar::Actions;
-                use CSS::Grammar::CSS3;
-                my Color $color;
-                state $actions //= CSS::Grammar::Actions.new;
-                my Pair $term;
-
-                my $p = CSS::Grammar::CSS3.parse(self, :rule<term>, :$actions);
-
-                with $p {
-                    $term = $p.ast;
-                }
-                else {
-                    die "unable to parse color: {self.perl}";
-                }
-        
-                given $term.key {
-                    when 'rgb' {
-                        # color function or mask. some examples:
-                        #   rgb(127,0,0) rgb(100%, 10%, 0%)
-                        #   #FF0000 #f00
-                        $color = [ $term.value.map: *.<num> ];
-                    }
-                    when 'ident' { # color name .e.g: 'red'                                                                             
-                        $color = %CSS::Grammar::AST::CSS3-Colors{ $term.value }
-                        // die "unknown color name: {self}";
-                    }
-                    default {
-                        die "unknown color: self";
-                    }
-                }
-                $color;
-            }
-        }
+    use PDF::Basic::CSS::Color;
+    class Colors does PDF::Basic::CSS::Boxed[ PDF::Basic::CSS::Color, [0,0,0]] {
     }
 
     subset Fraction of Numeric where 0.0 .. 1.0;
@@ -67,7 +26,7 @@ class PDF::Basic::CSS {
     .COMPOSE for Colors, LineStyles, Lengths;
 
     has Align      $.align;
-    has Color      $.background-color;
+    has PDF::Basic::CSS::Color      $.background-color;
     has Colors     $.border-color;
     has Lengths    $.border-spacing;
     has Lengths    $.border-width;
@@ -88,7 +47,7 @@ class PDF::Basic::CSS {
 
     submethod BUILD(
         Lengths()    :$!border-width = Nil,
-        Color()      :$!background-color = Nil,
+        PDF::Basic::CSS::Color()      :$!background-color = 'transparent',
         LineStyles() :$!border-style = Nil,
     ) {
     }
