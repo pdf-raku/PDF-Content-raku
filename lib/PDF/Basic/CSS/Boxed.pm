@@ -2,7 +2,7 @@ use v6;
 
 role PDF::Basic::CSS::Boxed[$of-type, $default=0] {
     my subset DuckType of Any where { .defined && $_ ~~  $of-type}
-    has DuckType ($.top, $.left, $.bottom, $.right);
+    has DuckType ($.top, $.left, $.bottom, $.right) is rw;
     submethod BUILD(:$!top = $default,
                     :$!right = $!top,
                     :$!bottom = $!top,
@@ -30,9 +30,12 @@ role PDF::Basic::CSS::Boxed[$of-type, $default=0] {
         });
         given $of-type {
             when Numeric {
+                Int.^add_method( $class.^name, method {
+                                        $class.new( :top(self.Rat) );
+                                   });
                 Rat.^add_method( $class.^name, method {
-                    $class.new( :top(self) );
-                });
+                                       $class.new( :top(self) );
+                                   });
             }
             when Str {
                 Str.^add_method( $class.^name, method {

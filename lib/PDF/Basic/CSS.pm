@@ -25,10 +25,36 @@ class PDF::Basic::CSS {
     # call manually for classes that do the Boxed role
     .COMPOSE for Colors, LineStyles, Lengths;
 
+    #`{{  The CSS Box model in a nut-shell
+
+                           --------------- <-- top
+                             top margin
+                           ---------------
+                             top border
+                           ---------------
+                            top padding
+                           +-------------+ <-- inner top
+|        |        |        |             |         |         |         |
+|--left--|--left--|--left--|-- content --|--right--|--right--|--right--|
+| margin | border | padding|             | padding | border  | margin  |
+|        |        |        |             |         |         |         |
+                           +-------------+ <-- inner bottom
+^                          ^             ^                             ^
+left         left inner edge             right inner edge          right
+outer                                                              outer
+edge                        bottom padding                          edge
+                           ---------------
+                             bottom border
+                           ---------------
+                             bottom margin
+                           --------------- <-- bottom
+
+    #  diagram from https://www.w3.org/TR/2008/REC-CSS1-20080411/
+    #  }}
+
     has Align      $.align;
     has PDF::Basic::CSS::Color      $.background-color;
     has Colors     $.border-color;
-    has Lengths    $.border-spacing;
     has Lengths    $.border-width;
     has LineStyles $.border-style;
     has Lengths    $.margin;
@@ -46,10 +72,26 @@ class PDF::Basic::CSS {
     has VAlign     $.valign;
 
     submethod BUILD(
-        Lengths()    :$!border-width = Nil,
-        PDF::Basic::CSS::Color()      :$!background-color = 'transparent',
-        LineStyles() :$!border-style = Nil,
+        Lengths()                 :$!border-width = 0,
+        PDF::Basic::CSS::Color()  :$!background-color = 'transparent',
+        LineStyles()              :$!border-style = 'none',
+        Lengths()                 :$!margin = 0,
+        Lengths()                 :$!padding = 0,
+        *%other,
     ) {
+        self."{.key}"() = .value
+            for %other.pairs;
     }
+
+    #| e.g. $.border-color-top :== $.border-color.top
+    method FALLBACK($sub-prop where /(.*) '-' (top|right|bottom|left)/, |c)  is rw {
+        my Str $prop = ~$0;
+        my Str $side = ~$1;
+        self.^add_method( $sub-prop, method (|p) is rw {
+                                self."$prop"()."$side"(|p);
+                            } );
+        self."$sub-prop"(|c);
+    }
+
 
 }
