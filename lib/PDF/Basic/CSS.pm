@@ -19,6 +19,13 @@ class PDF::Basic::CSS {
     class LineStyles does PDF::Basic::CSS::Boxed[LineStyle, 'solid'] {}; 
 
     subset Length of Numeric;
+    use MONKEY-TYPING;
+
+    for List, Array {
+        .^add_method( Length.^name, method {
+               self[0];
+            })
+    }
     class Lengths does PDF::Basic::CSS::Boxed[Length,0] {};
 
     # COMPOSE phasers are NYI https://doc.perl6.org/language/phasers#COMPOSE
@@ -53,6 +60,7 @@ edge                        bottom padding                          edge
     #  }}
 
     has Align      $.align;
+    has PDF::Basic::CSS::Color      $.color;
     has PDF::Basic::CSS::Color      $.background-color;
     has Colors     $.border-color;
     has Lengths    $.border-width;
@@ -65,16 +73,49 @@ edge                        bottom padding                          edge
     has Length     $.max-height;
     has Length     $.min-width;
     has Length     $.min-height;
+    has Length     $.line-height;
     has Fraction   $.opacity;
     has LineStyles $.outline-style;
     has Colors     $.outline-color;
     has Lengths    $.padding;
     has VAlign     $.valign;
 
-    submethod BUILD(
+    method !build-term($term is copy) {
+        my role CSSType {
+            has Str $.css-type is rw;
+        }
+        $term = $term.pairs[0] if $term.isa(Hash);
+        my $val = $term.value;
+        $val does CSSType;
+        $val.css-type = $term.key;
+        $val;
+    }
+
+    method !build-property( Str :$ident!, Array :$expr!, Bool :$important ) {
+        my @expr = [ $expr.list.map: { self!build-term($_) } ];
+        my %lhs = :@expr;
+        %lhs<important> = ? $important;
+        $ident => %lhs;
+    }
+
+    multi submethod BUILD( Str :$style! ) {
+        use CSS::Grammar::CSS3;
+        use CSS::Grammar::Actions;
+        state $actions //= CSS::Grammar::Actions.new;
+        CSS::Grammar::CSS3.parse( $style, :rule<declaration-list>, :$actions )
+            or die "unable to parse CSS style declarations: $style";
+
+        my @props = $/.ast.list.map: { self!build-property( |%(.<property>) ) };
+        my %opts = @props.sort({.value<important>}). map: { .key => .value<expr> };
+        self.BUILD( |%opts );
+    }
+
+    multi submethod BUILD(
         Lengths()                 :$!border-width = 0,
         PDF::Basic::CSS::Color()  :$!background-color = 'transparent',
+        PDF::Basic::CSS::Color()  :$!color = 'black',
         LineStyles()              :$!border-style = 'none',
+        Length()                  :$!line-height = 1, # normal
         Lengths()                 :$!margin = 0,
         Lengths()                 :$!padding = 0,
         *%other,
@@ -83,15 +124,19 @@ edge                        bottom padding                          edge
             for %other.pairs;
     }
 
-    #| e.g. $.border-color-top :== $.border-color.top
-    method FALLBACK($sub-prop where /(.*) '-' (top|right|bottom|left)/, |c)  is rw {
+    #| boxed properites e.g. $.border-color-top :== $.border-color.top
+    multi method FALLBACK($box-prop where /(.*) '-' (top|right|bottom|left)/, |c)  is rw {
         my Str $prop = ~$0;
         my Str $side = ~$1;
-        self.^add_method( $sub-prop, method (|p) is rw {
+        die "unknown property/method: $box-prop"
+            unless self.can($prop);
+        self.^add_method( $box-prop, method (|p) is rw {
                                 self."$prop"()."$side"(|p);
                             } );
-        self."$sub-prop"(|c);
+        self."$box-prop"(|c);
     }
-
+    multi method FALLBACK($prop, |c) is default {
+        die "unknown property/method: $prop";
+    }
 
 }

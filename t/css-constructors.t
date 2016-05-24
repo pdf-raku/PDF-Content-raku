@@ -15,8 +15,8 @@ sub to-hash(PDF::Basic::CSS::Boxed $box) {
 }
 
 $css = PDF::Basic::CSS.new;
-is-deeply to-hash($css.border-width), { :top(0px), :left(0px), :bottom(0px), :right(0px) }, "intial length value";
-is-deeply to-hash($css.border-style), { :top<none>, :left<none>, :bottom<none>, :right<none> }, "intial length value";
+is-deeply to-hash($css.border-width), { :top(0px), :left(0px), :bottom(0px), :right(0px) }, "initial length value";
+is-deeply to-hash($css.border-style), { :top<none>, :left<none>, :bottom<none>, :right<none> }, "initial length value";
 
 $css = PDF::Basic::CSS.new( :border-width(2px) );
 is-deeply to-hash($css.border-width), { :top(2px), :left(2px), :bottom(2px), :right(2px) }, "Numeric -> Edge coercement";
@@ -45,6 +45,16 @@ $css = PDF::Basic::CSS.new( :border-width-left(5px) );
 is-deeply to-hash($css.border-width), { :top(0px), :left(5px), :bottom(0px), :right(0px) }, "single side contruction";
 is $css.border-width-left, 5px, 'single side accessor';
 is $css.border-width-right, 0px, 'single side accessor';
+
+# try some coercements from CSS style declarations
+
+for ('color: blue' => {},
+     'line-height: 1.1px' => {},
+     'border: 2px solid blue' => {:todo("border properties")}) {
+    my $style = .key;
+    todo $_ with .value<todo>;
+    lives-ok { $css = PDF::Basic::CSS.new( :$style )}, "css style construction: {.key}";
+}
 
 done-testing;
 

@@ -15,7 +15,9 @@ class PDF::Basic::CSS::Color {
     use MONKEY-TYPING;
     augment class Array {
         method PDF::Basic::CSS::Color() returns PDF::Basic::CSS::Color {
-            PDF::Basic::CSS::Color.new( :rgb(self) );
+            +self == 1
+            ?? PDF::Basic::CSS::Color( self[0] )
+            !! PDF::Basic::CSS::Color.new( :rgb(self) );
         }
     }
     augment class Str {
