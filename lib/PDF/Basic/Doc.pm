@@ -93,13 +93,8 @@ class PDF::Basic::Doc
 	self.Root.Pages.page(|c)
     }
 
-    multi method FALLBACK(Str $meth where { self.?Root.?Pages.can($meth) }, |c) {
-        self.WHAT.^add_method($meth,  method (|a) { self.Root.Pages."$meth"(|a) } );
-        self."$meth"(|c);
-    }
-
-    multi method FALLBACK(Str $method, |c) is default {
-	die X::Method::NotFound.new( :$method, :typename(self.^name) );
+    for <add-page page-count> -> $meth {
+        $?CLASS.^add_method($meth,  method (|a) { self.Root.Pages."$meth"(|a) });
     }
 
 }
