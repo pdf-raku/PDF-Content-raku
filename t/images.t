@@ -8,6 +8,19 @@ srand(123456);
 use PDF::Basic::Image;
 use PDF::Basic::Doc;
 
+use PDF::Basic::Image::GIF;
+use PDF::Basic::Image::PNG;
+my $data = Buf.new: [3,  2, 1,  0, 1, 0, 0, ];
+my ($v1,$v2,$v3) = PDF::Basic::Image::GIF.unpack($data, uint8, uint16, uint32);
+is $v1, 3, "GIF unpacking uint8";
+is $v2, 258, "GIF unpacking uint16";
+is $v3, 256, "GIF unpacking uint32";
+
+($v1,$v2,$v3) = PDF::Basic::Image::PNG.unpack($data, uint8, uint16, uint32);
+is $v1, 3, "PNG unpacking uint8";
+is $v2, 513, "PNG unpacking uint16";
+is $v3, 65536, "PNG unpacking uint32";
+
 my Pair @images;
 
 my $jpeg;
