@@ -1,13 +1,13 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Basic;
-use PDF::Basic::Text::Block;
-use PDF::Basic::Util::Font;
+use PDF::Content;
+use PDF::Content::Text::Block;
+use PDF::Content::Util::Font;
 
 plan 1;
 
-my $font = PDF::Basic::Util::Font::core-font( :family<helvetica>, :weight<bold> );
+my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
 my $text = "Hello. Ting, ting, ting. Attention! … ATTENTION!";
 role Parent {
@@ -30,9 +30,9 @@ role Parent {
     }
 }
 my $parent = {} does Parent;
-my $text-block = PDF::Basic::Text::Block.new( :$text, :$font, :$font-size );
+my $text-block = PDF::Content::Text::Block.new( :$text, :$font, :$font-size );
 
-my $gfx = PDF::Basic.new( :$parent );
+my $gfx = PDF::Content.new( :$parent );
 
 $gfx.say( $text-block );
 $gfx.print( $text-block );

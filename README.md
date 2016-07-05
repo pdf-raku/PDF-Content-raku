@@ -1,18 +1,18 @@
-# perl6-PDF-Basic
+# perl6-PDF-Content
 
 This is a Perl 6 module for basic PDF content creation and editing, including text, images, fonts and general graphics.
 
-It includes `PDF::Basic::Doc` a minimal class for
+It includes `PDF::Content::Doc` a minimal class for
 creating or editing PDF documents, including:
-- Basic Text (core fonts only)
+- Content Text (core fonts only)
 - Simple forms and images (GIF, JPEG & PNG)
 - Low-level graphics and content operators
-- Basic reuse (Pages and form objects)
+- Content reuse (Pages and form objects)
 ```
 use v6;
-use PDF::Basic::Doc;
+use PDF::Content::Doc;
 
-my $pdf = PDF::Basic::Doc.new;
+my $pdf = PDF::Content::Doc.new;
 my $page = $pdf.add-page;
 $page.MediaBox = [0, 0, 595, 842];
 my $font = $page.core-font( :family<Helvetica>, :weight<bold>, :style<italic> );
@@ -33,8 +33,8 @@ $pdf.save-as: "t/example.pdf";
 `.say` and `.print` are simple convenience methods for displaying simple blocks of text with optional line-wrapping, alignment and kerning.
 
 ```
-use PDF::Basic::Doc;
-my $doc = PDF::Basic::Doc.new;
+use PDF::Content::Doc;
+my $doc = PDF::Content::Doc.new;
 my $page = $doc.add-page;
 my $font = $page.core-font( :family<Helvetica> );
 
@@ -55,8 +55,8 @@ The `.image` method can be used to load an image and register it as a page resou
 The `.do` method can them be used to render it.
 
 ```
-use PDF::Basic::Doc;
-my $doc = PDF::Basic::Doc.new;
+use PDF::Content::Doc;
+my $doc = PDF::Content::Doc.new;
 my $page = $doc.add-page;
 
 $page.graphics: -> $gfx {
@@ -74,15 +74,15 @@ $page.graphics: -> $gfx {
 
 Note: at this stage, only the `JPEG`, `GIF` and `PNG` image formats are supported.
 
-For a full table of `.set-graphics` options, please see PDF::Basic::Ops, ExtGState enumeration.
+For a full table of `.set-graphics` options, please see PDF::Content::Ops, ExtGState enumeration.
 
 ### Text effects
 
 To display card suits symbols, using the ZapfDingbats core-font, with diamonds and hearts colored red:
 
 ```
-use PDF::Basic::Doc;
-my $doc = PDF::Basic::Doc.new;
+use PDF::Content::Doc;
+my $doc = PDF::Content::Doc.new;
 my $page = $doc.add-page;
 
 $page.graphics: -> $_ {
@@ -102,7 +102,7 @@ $page.graphics: -> $_ {
     my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
     $page.text: -> $_ {
-	 use PDF::Basic::Ops :TextMode;
+	 use PDF::Content::Ops :TextMode;
 	.font = ( $header-font, 12);
 	.TextRender = TextMode::OutlineText;
 	.SetLineWidth: .5;
@@ -117,18 +117,18 @@ Note: only the PDF core fonts are supported: Courier, Times, Helvetica, ZapfDing
 
 #### Low level graphics, colors and drawing
 
-PDF::Basic::Doc::Contents::Gfx inherits from PDF::Basic, which implements the full range of PDF content operations, plus
+PDF::Content::Doc::Contents::Gfx inherits from PDF::Content, which implements the full range of PDF content operations, plus
 utility methods for handling text, images and graphics coordinates:
 
 ```
-use PDF::Basic::Doc;
-my $doc = PDF::Basic::Doc.new;
+use PDF::Content::Doc;
+my $doc = PDF::Content::Doc.new;
 my $page = $doc.add-page;
 
 # Draw a simple Bézier curve:
 
 # ------------------------
-# Alternative 1: Using operator functions (see PDF::Basic)
+# Alternative 1: Using operator functions (see PDF::Content)
 
 sub draw-curve1($gfx) {
     $gfx.Save;
@@ -177,14 +177,14 @@ draw-curve3($doc.add-page.gfx);
 
 ```
 
-For a full list of operators, please see PDF::Basic::Ops.
+For a full list of operators, please see PDF::Content::Ops.
 
 ### Resources and Reuse
 
 To list all images and forms for each page
 ```
-use PDF::Basic::Doc;
-my $doc = PDF::Basic::Doc.open: "t/images.pdf";
+use PDF::Content::Doc;
+my $doc = PDF::Content::Doc.open: "t/images.pdf";
 for 1 ... $doc.page-count -> $page-no {
     say "page: $page-no";
     my $page = $doc.page: $page-no;
@@ -215,11 +215,11 @@ Whole pages or individual resources may be copied from one PDF to another.
 The `to-xobject` method can be used to convert a page to an XObject Form to lay-up one or more input pages on an output page.
 
 ```
-use PDF::Basic::Doc;
-my $doc-with-images = PDF::Basic::Doc.open: "t/images.pdf";
-my $doc-with-text = PDF::Basic::Doc.open: "t/example.pdf";
+use PDF::Content::Doc;
+my $doc-with-images = PDF::Content::Doc.open: "t/images.pdf";
+my $doc-with-text = PDF::Content::Doc.open: "t/example.pdf";
 
-my $new-doc = PDF::Basic::Doc.new;
+my $new-doc = PDF::Content::Doc.new;
 
 # add a page; layup imported pages and images
 my $page = $new-doc.add-page;

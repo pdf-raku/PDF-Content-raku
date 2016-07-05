@@ -1,48 +1,48 @@
 {
     "perl"        : "6.c",
-    "name"        : "PDF::Basic",
+    "name"        : "PDF::Content",
     "version"     : "0.0.1",
-    "description" : "Basic PDF content authoring, including text, images, fonts and graphics",
+    "description" : "Content PDF content authoring, including text, images, fonts and graphics",
     "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM", "CSS::Grammar" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
 
-        "PDF::Basic" : "lib/PDF/Basic.pm",
+        "PDF::Content" : "lib/PDF/Content.pm",
 
-        "PDF::Basic::CSS" : "lib/PDF/Basic/CSS.pm",
-        "PDF::Basic::CSS::Boxed" : "lib/PDF/Basic/CSS/Boxed.pm",
-        "PDF::Basic::CSS::Color" : "lib/PDF/Basic/CSS/Color.pm",
-        "PDF::Basic::CSS::Image" : "lib/PDF/Basic/CSS/Image.pm",
-        "PDF::Basic::CSS::Text" : "lib/PDF/Basic/CSS/Text.pm",
+        "PDF::Content::CSS" : "lib/PDF/Content/CSS.pm",
+        "PDF::Content::CSS::Boxed" : "lib/PDF/Content/CSS/Boxed.pm",
+        "PDF::Content::CSS::Color" : "lib/PDF/Content/CSS/Color.pm",
+        "PDF::Content::CSS::Image" : "lib/PDF/Content/CSS/Image.pm",
+        "PDF::Content::CSS::Text" : "lib/PDF/Content/CSS/Text.pm",
 
-        "PDF::Basic::Doc" : "lib/PDF/Basic/Doc.pm",
+        "PDF::Content::Doc" : "lib/PDF/Content/Doc.pm",
 
-        "PDF::Basic::Graphics"     : "lib/PDF/Basic/Graphics.pm",
-        "PDF::Basic::Font"         : "lib/PDF/Basic/Font.pm",
-        "PDF::Basic::Page"         : "lib/PDF/Basic/Page.pm",
-        "PDF::Basic::PageNode"     : "lib/PDF/Basic/PageNode.pm",
-        "PDF::Basic::PageTree"     : "lib/PDF/Basic/PageTree.pm",
-        "PDF::Basic::Resourced"    : "lib/PDF/Basic/Resourced.pm",
-        "PDF::Basic::ResourceDict" : "lib/PDF/Basic/ResourceDict.pm",
+        "PDF::Content::Graphics"     : "lib/PDF/Content/Graphics.pm",
+        "PDF::Content::Font"         : "lib/PDF/Content/Font.pm",
+        "PDF::Content::Page"         : "lib/PDF/Content/Page.pm",
+        "PDF::Content::PageNode"     : "lib/PDF/Content/PageNode.pm",
+        "PDF::Content::PageTree"     : "lib/PDF/Content/PageTree.pm",
+        "PDF::Content::Resourced"    : "lib/PDF/Content/Resourced.pm",
+        "PDF::Content::ResourceDict" : "lib/PDF/Content/ResourceDict.pm",
 
-        "PDF::Basic::Ops" : "lib/PDF/Basic/Ops.pm",
+        "PDF::Content::Ops" : "lib/PDF/Content/Ops.pm",
 
-        "PDF::Basic::Image"       : "lib/PDF/Basic/Image.pm",
-        "PDF::Basic::Image::GIF"  : "lib/PDF/Basic/Image/GIF.pm",
-        "PDF::Basic::Image::JPEG" : "lib/PDF/Basic/Image/JPEG.pm",
-        "PDF::Basic::Image::PNG"  : "lib/PDF/Basic/Image/PNG.pm",
+        "PDF::Content::Image"       : "lib/PDF/Content/Image.pm",
+        "PDF::Content::Image::GIF"  : "lib/PDF/Content/Image/GIF.pm",
+        "PDF::Content::Image::JPEG" : "lib/PDF/Content/Image/JPEG.pm",
+        "PDF::Content::Image::PNG"  : "lib/PDF/Content/Image/PNG.pm",
 
-        "PDF::Basic::Font" : "lib/PDF/Basic/Font.pm",
-        "PDF::Basic::Font::AFM" : "lib/PDF/Basic/Font/AFM.pm",
-        "PDF::Basic::Font::Encodings" : "lib/PDF/Basic/Font/Encodings.pm",
+        "PDF::Content::Font" : "lib/PDF/Content/Font.pm",
+        "PDF::Content::Font::AFM" : "lib/PDF/Content/Font/AFM.pm",
+        "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
 
-        "PDF::Basic::Text::Atom"  : "lib/PDF/Basic/Text/Atom.pm",
-        "PDF::Basic::Text::Block" : "lib/PDF/Basic/Text/Block.pm",
-        "PDF::Basic::Text::Line"  : "lib/PDF/Basic/Text/Line.pm",
+        "PDF::Content::Text::Atom"  : "lib/PDF/Content/Text/Atom.pm",
+        "PDF::Content::Text::Block" : "lib/PDF/Content/Text/Block.pm",
+        "PDF::Content::Text::Line"  : "lib/PDF/Content/Text/Line.pm",
 
-        "PDF::Basic::Units" : "lib/PDF/Basic/Units.pm",
+        "PDF::Content::Units" : "lib/PDF/Content/Units.pm",
 
-        "PDF::Basic::Util::Font" : "lib/PDF/Basic/Util/Font.pm",
-        "PDF::Basic::Util::TransformMatrix" : "lib/PDF/Basic/Util/TransformMatrix.pm"
+        "PDF::Content::Util::Font" : "lib/PDF/Content/Util/Font.pm",
+        "PDF::Content::Util::TransformMatrix" : "lib/PDF/Content/Util/TransformMatrix.pm"
      }
 }

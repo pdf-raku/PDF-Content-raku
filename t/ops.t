@@ -1,10 +1,10 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Basic;
-use PDF::Basic::Ops :OpNames;
+use PDF::Content;
+use PDF::Content::Ops :OpNames;
 
-my $g = PDF::Basic.new;
+my $g = PDF::Content.new;
 
 $g.op(Save);
 
@@ -67,7 +67,7 @@ is $g.TextLeading, 0, '$g.TextLeading - restored';
 
 lives-ok {$g.content}, 'content with matching BT ... ET  q ... Q - lives';
 
-$g = PDF::Basic.new;
+$g = PDF::Content.new;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 is-json-equiv $g.ops, [:m[:int(175), :int(720)],
@@ -108,7 +108,7 @@ J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
 %R.s(4KE3&d&7hb*7[%Ct2HCqC~>
 EI
 
-BEGIN our $compile-time = PDF::Basic::Ops.parse("BT/F1 16 Tf\n(Hi)Tj ET");
+BEGIN our $compile-time = PDF::Content::Ops.parse("BT/F1 16 Tf\n(Hi)Tj ET");
 is-json-equiv $compile-time[*-1], (:ET[]), 'compile time ops parse';
 $g.ops( $compile-time);
 is-json-equiv [ $g.ops[*-4..*] ], [ :BT[],
