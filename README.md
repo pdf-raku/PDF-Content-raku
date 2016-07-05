@@ -1,11 +1,11 @@
 # perl6-PDF-Basic
 
-Perl 6 module for basic PDF content creation and editing, including text, images, fonts and general graphics.
+This is a Perl 6 module for basic PDF content creation and editing, including text, images, fonts and general graphics.
 
 It includes `PDF::Basic::Doc` a minimal class for
 creating or editing PDF documents, including:
 - Basic Text (core fonts only)
-- Simple forms and images
+- Simple forms and images (GIF, JPEG & PNG)
 - Low-level graphics and content operators
 - Basic reuse (Pages and form objects)
 ```
@@ -78,7 +78,7 @@ For a full table of `.set-graphics` options, please see PDF::Basic::Ops, ExtGSta
 
 ### Text effects
 
-To display card suits symbols, using the ZapfDingbats core-font. Diamond and hearts colored red:
+To display card suits symbols, using the ZapfDingbats core-font, with diamonds and hearts colored red:
 
 ```
 use PDF::Basic::Doc;
@@ -177,7 +177,7 @@ draw-curve3($doc.add-page.gfx);
 
 ```
 
-For a full list of operators, please see PDF::Basic.
+For a full list of operators, please see PDF::Basic::Ops.
 
 ### Resources and Reuse
 
@@ -206,13 +206,13 @@ for 1 ... $doc.page-count -> $page-no {
 
 ```
 
-Resource types are: ExtGState (graphics state), ColorSpace, Pattern, Shading, XObject (forms and images) and Properties.
+Resource types are: `ExtGState` (graphics state), `ColorSpace`, `Pattern`, `Shading`, `XObject` (forms and images) and `Properties`.
 
-Resources of type Pattern and XObject/Image may have further associated resources.
+Resources of type `Pattern` and `XObject/Image` may have further associated resources.
 
 Whole pages or individual resources may be copied from one PDF to another.
 
-The `to-xobject` method can be used to convert a page to an XObject Form to layup one or more input pages on an output page.
+The `to-xobject` method can be used to convert a page to an XObject Form to lay-up one or more input pages on an output page.
 
 ```
 use PDF::Basic::Doc;
