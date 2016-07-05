@@ -141,13 +141,14 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
     »;
 
     # *** TEXT STATE ***
-    has Numeric $!Tc = 0;   #| character spacing
-    has Numeric $!Tw = 0;   #| word spacing
-    has Numeric $!Th = 100; #| horizontal scaling
-    has Numeric $!Tl = 0;   #| leading
-    has Numeric $!Trise = 0;
-    has Str $!Tf;           #| font entry name, e.g. 'F1'
-    has Numeric $!Tfs;      #| font size
+    has Numeric $!Tc = 0;    #| character spacing
+    has Numeric $!Tw = 0;    #| word spacing
+    has Numeric $!Th = 100;  #| horizontal scaling
+    has Numeric $!Tl = 0;    #| leading
+    has Numeric $!Tmode = 0; #| text rendering mode
+    has Numeric $!Trise = 0; #| text rise
+    has Str $!Tf;            #| font entry name, e.g. 'F1'
+    has Numeric $!Tfs;       #| font size
     has Numeric @!Tm  = [ 1, 0, 0, 1, 0, 0, ];      #| text matrix
     has Numeric @!CTM = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
 
@@ -185,15 +186,24 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
     has @!gsave;
     has @!tags;
 
-    method TextMatrix   is rw { @!Tm }
-    method CharSpacing  is rw { $!Tc  }
-    method WordSpacing  is rw { $!Tw  }
-    method HorizScaling is rw { $!Th  }
-    method TextLeading  is rw { $!Tl  }
-    method FontKey      is rw { $!Tf  }
-    method FontSize     is rw { $!Tfs }
-    method TextRise     is rw { $!Trise }
-    method GraphicsMatrix is rw { @!CTM  }
+    method !proxy(\var, $setter) {
+        Proxy.new(
+            FETCH => sub ($) { var },
+            STORE => sub ($,*@v) {
+                self."$setter"(|@v);
+            });
+    }
+
+    method TextMatrix   is rw { self!proxy(@!Tm, 'SetTextMatrix') }
+    method CharSpacing  is rw { self!proxy($!Tc, 'SetCharSpacing')  }
+    method WordSpacing  is rw { self!proxy($!Tw, 'SetWordSpacing')  }
+    method HorizScaling is rw { self!proxy($!Th, 'SetHorizScaling')  }
+    method TextLeading  is rw { self!proxy($!Tl, 'SetTextLeading')  }
+    method TextRender   is rw { self!proxy($!Tmode, 'SetTextRender') }
+    method TextRise     is rw { self!proxy($!Trise, 'SetTextRise') }
+    method FontKey        { $!Tf  }
+    method FontSize       { $!Tfs }
+    method GraphicsMatrix { @!CTM  }
 
     # States and transitions in [PDF 1.4 FIGURE 4.1 Graphics objects]
     my enum GraphicsContext is export(:GraphicsContext) <Path Text Clipping Page Shading External Image>;
@@ -521,41 +531,34 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 	    unless @!tags && @!tags[*-1] eq 'BMC' | 'BDC';
 	@!tags.pop;
     }
-    multi method track-graphics('Tc', Numeric $Tc!) {
-	$.CharSpacing = $Tc
+    multi method track-graphics('Tc', Numeric $!Tc!) {
     }
-    multi method track-graphics('Tw', Numeric $Tw!) {
-        $.WordSpacing = $Tw;
+    multi method track-graphics('Tw', Numeric $!Tw!) {
     }
-    multi method track-graphics('Tz', Numeric $Th!) {
-        $.HorizScaling = $Th;
+    multi method track-graphics('Tz', Numeric $!Th!) {
     }
-    multi method track-graphics('TL', Numeric $TL!) {
-	$.TextLeading = $TL
+    multi method track-graphics('TL', Numeric $!Tl!) {
     }
-    multi method track-graphics('Tf', Str $Tf!, Numeric $Tfs!) {
-        if my $parent = self.?parent {
-            die "unknown font key: /$Tf"
-                unless $parent.resource-entry('Font', $Tf);
+    multi method track-graphics('Tf', Str $!Tf!, Numeric $!Tfs!) {
+        with self.?parent {
+            die "unknown font key: /$!Tf"
+                unless .resource-entry('Font', $!Tf);
         }
-        $.FontKey = $Tf;     #| e.g. 'F2'
-        $.FontSize = $Tfs;   #| e.g. 16
     }
-    multi method track-graphics('Ts', Numeric $Ts!) {
-	$.TextRise = $Ts
+    multi method track-graphics('Ts', Numeric $!Trise!) {
     }
     multi method track-graphics('Tm', *@!Tm) {
     }
     multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
-        $.TextMatrix[4] += $tx;
-        $.TextMatrix[5] += $ty;
+        @!Tm[4] += $tx;
+        @!Tm[5] += $ty;
     }
     multi method track-graphics('TD', Numeric $tx!, Numeric $ty) {
-        $.TextLeading = - $ty;
+        $!Tl = - $ty;
         $.track-graphics(TextMove, $tx, $ty);
     }
     multi method track-graphics('T*') {
-        $.track-graphics(TextMove, 0, $.TextLeading);
+        $.track-graphics(TextMove, 0, $!Tl);
     }
     multi method track-graphics(*@args) is default {}
 

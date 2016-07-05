@@ -8,7 +8,6 @@ creating or editing PDF documents, including:
 - Simple forms and images
 - Low-level graphics and content operators
 - Basic reuse (Pages and form objects)
-- Simple CSS styling
 ```
 use v6;
 use PDF::Basic::Doc;
@@ -91,7 +90,7 @@ $page.graphics: -> $_ {
     $page.text: -> $txt {
 	$txt.text-position = [240, 600];
 	$txt.font = [ $page.core-font('ZapfDingbats'), 24];
-	$txt.SetWordSpacing(16);
+	$txt.WordSpacing = 16;
 	my $nbsp = "\c[NO-BREAK SPACE]";
 	$txt.print("♠ ♣$nbsp");
 	$txt.SetFillRGB( 1, .3, .3);  # reddish
@@ -105,7 +104,7 @@ $page.graphics: -> $_ {
     $page.text: -> $_ {
 	 use PDF::Basic::Ops :TextMode;
 	.font = ( $header-font, 12);
-	.SetTextRender: TextMode::OutlineText;
+	.TextRender = TextMode::OutlineText;
 	.SetLineWidth: .5;
 	.text-transform( :translate[50, 550], :slant(12) );
 	.ShowText('Outline Slanted Text @(50,550)');
@@ -135,8 +134,7 @@ sub draw-curve1($gfx) {
     $gfx.Save;
     $gfx.MoveTo(175, 720);
     $gfx.LineTo(175, 700);
-    $gfx.CurveTo1( 300, 800, 
-                   400, 720 );
+    $gfx.CurveTo1( 300, 800,  400, 720 );
     $gfx.ClosePath;
     $gfx.Stroke;
     $gfx.Restore;
