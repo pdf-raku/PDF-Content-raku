@@ -7,6 +7,9 @@ role PDF::Content::Resourced {
     }
 
     #| ensure that object is registered as a resource
+    method use-font($obj, |c) {
+	(self.Resources //= {}).use-font($obj, |c);
+    }
     method use-resource($obj, |c) {
 	(self.Resources //= {}).resource($obj, |c);
     }

@@ -100,29 +100,33 @@ role PDF::Content::ResourceDict {
     }
 
     method resource-entry(Str:D $type!, Str:D $key!) {
-        return unless
-            (self{$type}:exists)
-            && (self{$type}{$key}:exists);
-
-        my $object = self{$type}{$key};
-	$object;
+        .{$key} with self{$type};
     }
-
+    
     method core-font(|c) {
 	use PDF::Content::Util::Font;
+        self.use-font: PDF::Content::Util::Font::core-font( |c );
+    }
 
-        my $font-obj = PDF::Content::Util::Font::core-font( |c );
-        self!find-resource(sub ($_){  .<Type>:exists
-				   && .<Type> eq 'Font'
-				   && .font-obj === $font-obj},
+    multi method use-font(PDF::Content::Font $font) {
+        my $font-obj = $font.font-obj;
+        self!find-resource(sub ($_){ .?font-obj === $font-obj },
 			   :type<Font>)
-            // do {
-                my $dict = $font-obj.to-dict;
-                my $font-dict = PDF::DAO.coerce( :$dict );
-		PDF::DAO.coerce($font-dict, PDF::Content::Font);
-		$font-dict.font-obj = $font-obj;
-                self!register-resource( $font-dict );
-        };
+            // self!register-resource( $font );
+    }
+
+    method !build-font($font-obj) {
+        my $dict = $font-obj.to-dict;
+        my $font-dict = PDF::DAO.coerce( :$dict );
+	PDF::DAO.coerce($font-dict, PDF::Content::Font);
+	$font-dict.font-obj = $font-obj;
+        $font-dict;
+    }
+
+    multi method use-font($font-obj) is default {
+        self!find-resource(sub ($_){ .?font-obj === $font-obj },
+			   :type<Font>)
+            // self!register-resource( self!build-font($font-obj) );
     }
 
 }

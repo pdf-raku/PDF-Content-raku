@@ -8,6 +8,7 @@ role PDF::Content:ver<0.0.5>
     use PDF::DAO::Stream;
     use PDF::Content::Image;
     use PDF::Content::Text::Block;
+    use PDF::Content::Font;
 
     has $.parent;
 
@@ -186,7 +187,7 @@ role PDF::Content:ver<0.0.5>
     #! output text leave the text position at the end of the current line
     multi method print(Str $text,
 		       Bool :$stage = False,
-		       :$font = self!get-font,
+		       :$font = self!current-font,
 		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
         ) {
 	# detect and use the current text-state font
@@ -196,8 +197,8 @@ role PDF::Content:ver<0.0.5>
 	my Numeric $char-spacing = $.CharSpacing;
 
         my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :$font-size,
-						       :$word-spacing, :$horiz-scaling, :$char-spacing,
-						       |c );
+						         :$word-spacing, :$horiz-scaling, :$char-spacing,
+						         |c );
 
 	$.print( $text-block, |c)
 	    unless $stage;
@@ -210,19 +211,21 @@ role PDF::Content:ver<0.0.5>
 		       Bool :$nl = False,
 	) {
 
-	my $font-size = $text-block.font-size;
-	my $font-key = $.parent.resource-key($text-block.font);
+        my UInt $font-size = $text-block.font-size;
+        my $font = $.parent.use-font: $text-block.font;
+	my $font-key = $.parent.resource-key($font);
 
 	my Bool $in-text = $.context == GraphicsContext::Text;
 	self.op(BeginText) unless $in-text;
 
-	self.text-position = $position
-	    if $position;
+	self.text-position = $_
+	    with $position;
 
 	self.op(SetFont, $font-key, $font-size)
 	    unless $.FontKey
 	    && $font-key eq $.FontKey
 	    && $font-size == $.FontSize;
+
 	self.ops( $text-block.content(:$nl) );
 
 	self.op(EndText) unless $in-text;
@@ -243,10 +246,13 @@ role PDF::Content:ver<0.0.5>
         $.op(SetFont, $font-key, $size);
     }
 
-    method !get-font {
-       my $font = $.parent.resource-entry('Font', $.FontKey)
-           if $.FontKey;
-       $font // $!parent.core-font('Courier');
+    method !current-font {
+        with $.FontKey {
+            $.parent.resource-entry('Font', $_)
+        }
+        else {
+            $!parent.core-font('Courier');
+        }
     }
 
     method font is rw returns List {
@@ -263,7 +269,7 @@ role PDF::Content:ver<0.0.5>
 	    );
     }
     
-    multi method print(Str $text, :$font = self!get-font, |c) {
+    multi method print(Str $text, :$font = self!current-font, |c) {
         nextwith( $text, :$font, |c);
     }
 

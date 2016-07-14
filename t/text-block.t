@@ -14,15 +14,18 @@ role Parent {
     has $!key = 'Ft0';
     has Str %!keys{Any};
 
-    method use-resource($obj) {
-	my $key = ++ $!key;
-	self<Font>{$key} = $obj;
-	%!keys{$obj} = $key;
+    method use-font($obj) {
+        with %!keys{$obj} {
+            $_
+        }
+        else {
+	    my $key = ++ $!key;
+	    self<Font>{$key} = $obj;
+	    %!keys{$obj} = $key;
+        }
 	$obj;
     }
     method resource-key($obj) {
-	$.use-resource($obj)
-	unless %!keys{$obj}:exists;
 	%!keys{$obj};
     }
     method resource-entry($a,$b) {

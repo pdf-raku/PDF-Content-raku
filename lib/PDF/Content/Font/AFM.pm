@@ -1,6 +1,6 @@
  role PDF::Content::Font::AFM {
 
-     use PDF::Content::Font::Encodings;
+    use PDF::Content::Font::Encodings;
     has $.enc;
     has $!glyphs;
     has $!encoding;

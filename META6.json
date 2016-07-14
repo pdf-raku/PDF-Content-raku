@@ -2,19 +2,12 @@
     "perl"        : "6.c",
     "name"        : "PDF::Content",
     "version"     : "0.0.1",
-    "description" : "Content PDF content authoring, including text, images, fonts and graphics",
+    "description" : "Basic PDF content authoring, including text, images, fonts and graphics",
     "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM", "CSS::Grammar" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Graphics.git",
     "provides"    : {
 
         "PDF::Content" : "lib/PDF/Content.pm",
-
-        "PDF::Content::CSS" : "lib/PDF/Content/CSS.pm",
-        "PDF::Content::CSS::Boxed" : "lib/PDF/Content/CSS/Boxed.pm",
-        "PDF::Content::CSS::Color" : "lib/PDF/Content/CSS/Color.pm",
-        "PDF::Content::CSS::Image" : "lib/PDF/Content/CSS/Image.pm",
-        "PDF::Content::CSS::Text" : "lib/PDF/Content/CSS/Text.pm",
-
         "PDF::Content::Doc" : "lib/PDF/Content/Doc.pm",
 
         "PDF::Content::Graphics"     : "lib/PDF/Content/Graphics.pm",
