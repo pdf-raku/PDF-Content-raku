@@ -16,7 +16,7 @@ my $pdf = PDF::Content::Doc.new;
 my $page = $pdf.add-page;
 $page.MediaBox = [0, 0, 595, 842];
 my $font = $page.core-font( :family<Helvetica>, :weight<bold>, :style<italic> );
-$page.text: -> $_ {
+$page.text: {
     .text-position = [100, 150];
     .font = $font;
     .say: 'Hello, world!';
@@ -85,7 +85,7 @@ use PDF::Content::Doc;
 my $doc = PDF::Content::Doc.new;
 my $page = $doc.add-page;
 
-$page.graphics: -> $_ {
+$page.graphics: {
 
     $page.text: -> $txt {
 	$txt.text-position = [240, 600];
@@ -101,7 +101,7 @@ $page.graphics: -> $_ {
 
     my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
-    $page.text: -> $_ {
+    $page.text: {
 	 use PDF::Content::Ops :TextMode;
 	.font = ( $header-font, 12);
 	.TextRender = TextMode::OutlineText;
@@ -228,7 +228,7 @@ my $xobj-image = $doc-with-images.page(1).images[7];
 my $xobj-with-text  = $doc-with-text.page(1).to-xobject;
 my $xobj-with-images  = $doc-with-images.page(1).to-xobject;
 
-$page.graphics: -> $_ {
+$page.graphics: {
      # scale up the image; use it as a background
     .do($xobj-image, 6, 6, :width(600) );
 

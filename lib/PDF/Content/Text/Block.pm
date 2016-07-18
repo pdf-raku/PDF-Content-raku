@@ -162,7 +162,7 @@ class PDF::Content::Text::Block {
 
 	my @lines = $.lines.list;
         my @content = ( OpNames::SetTextLeading => [ $!line-height ], )
-	if $nl || +@lines > 1;
+	   if $nl || +@lines > 1;
 
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 

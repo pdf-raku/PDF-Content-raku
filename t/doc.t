@@ -9,7 +9,7 @@ my PDF::Content::Doc $doc .= new;
 my $page = $doc.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
-$page.text: -> $_ {
+$page.text: {
     .text-position = [200, 200];
     .font = [$header-font, 18];
     .say(:width(250),
@@ -18,7 +18,7 @@ $page.text: -> $_ {
          magna aliqua");
 }
 
-$page.graphics: -> $_ {
+$page.graphics: {
     my $img = .load-image: "t/images/basn0g01.png";
     .do($img, 100, 100);
 }
