@@ -3,7 +3,7 @@ use v6;
 use PDF::Content::Graphics;
 use PDF::Content::Resourced;
 
-role  PDF::Content::Page
+role PDF::Content::Page
     does PDF::Content::Resourced
     does PDF::Content::Graphics {
 

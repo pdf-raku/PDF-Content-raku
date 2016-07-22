@@ -10,7 +10,7 @@ module PDF::Content::Util::TransformMatrix {
     #
     # where a b c d e f are stored in a six digit array and the third column is implied.
 
-    sub deg2rad (Numeric $deg) {
+    sub deg2rad(Numeric $deg) {
         return $deg * pi / 180;
     }
 
@@ -81,7 +81,6 @@ module PDF::Content::Util::TransformMatrix {
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
 
     our sub transform-matrix(
-	Numeric :$slant,
 	:$translate,
 	:$rotate,
 	:$scale,
@@ -90,13 +89,12 @@ module PDF::Content::Util::TransformMatrix {
 	--> TransformMatrix
 	) {
 	my TransformMatrix $t = identity();
-	apply($t, skew( 0, $_) )               with $slant;
-	apply($t, translate( |@( vect($_) ) )) with $translate;
-	apply($t, rotate( $_ ))                with $rotate;
-	apply($t, scale( |@( vect($_) ) ))     with $scale;
-	apply($t, skew( |@( vect($_) ) ))      with $skew;
-	apply($t, $_)                          with $matrix;
-	[ $t.map({ round($_) }) ];
+	apply($t, translate( |vect($_) )) with $translate;
+	apply($t, rotate( $_ ))           with $rotate;
+	apply($t, scale( |vect($_) ))     with $scale;
+	apply($t, skew( |vect($_) ))      with $skew;
+	apply($t, $_)                     with $matrix;
+	[ $t.map: { round($_) } ];
     }
 
 
