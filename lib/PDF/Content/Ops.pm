@@ -436,7 +436,7 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 
         if $opn ~~ Pair {
 	    $op-name = $opn.key.Str;
-	    @args = @( $opn.value.map({ .value }) );
+	    @args = [ $opn.value.map: *.value ];
 	}
 	else {
 	    $op-name = $opn.Str;

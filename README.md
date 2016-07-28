@@ -177,7 +177,6 @@ sub draw-curve3($gfx) {
 draw-curve3($doc.add-page.gfx);
 
 ```
-
 For a full list of operators, please see PDF::Content::Ops.
 
 ### Resources and Reuse

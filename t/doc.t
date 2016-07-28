@@ -5,8 +5,8 @@ use Test;
 srand(123456);
 
 use PDF::Content::PDF;
-my PDF::Content::PDF $doc .= new;
-my $page = $doc.add-page;
+my PDF::Content::PDF $pdf .= new;
+my $page = $pdf.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
 $page.text: {
@@ -23,8 +23,8 @@ $page.graphics: {
     .do($img, 100, 100);
 }
 
-lives-ok { $doc.save-as("t/doc.pdf") }, 'save-as';
+lives-ok { $pdf.save-as("t/doc.pdf") }, 'save-as';
 
-throws-like { $doc.unknown-method }, X::Method::NotFound, '$doc unknown method';
+throws-like { $pdf.unknown-method }, X::Method::NotFound, '$pdf unknown method';
 
 done-testing;

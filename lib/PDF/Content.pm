@@ -191,7 +191,7 @@ role PDF::Content:ver<0.0.5>
 		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
         ) {
 	# detect and use the current text-state font
-	my Numeric $font-size = $.FontSize //= 16;
+	my Numeric $font-size = $.FontSize // 16;
 	my Numeric $word-spacing = $.WordSpacing;
 	my Numeric $horiz-scaling = $.HorizScaling;
 	my Numeric $char-spacing = $.CharSpacing;
@@ -211,7 +211,7 @@ role PDF::Content:ver<0.0.5>
 		       Bool :$nl = False,
 	) {
 
-        my UInt $font-size = $text-block.font-size;
+        my Numeric $font-size = $text-block.font-size;
         my $font = $.parent.use-font: $text-block.font;
 	my $font-key = $.parent.resource-key($font);
 

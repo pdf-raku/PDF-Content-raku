@@ -13,9 +13,9 @@ class PDF::Content::Text::Line {
     multi method align('justify', Numeric :$width! ) {
         my Numeric $actual-width = $.actual-width;
 
-        if $width > $actual-width {
+        if $width > $actual-width && $width / $actual-width < 2.0 {
             # stretch both word boundaries and non-breaking spaces
-            my @elastics = @!atoms.grep({ .elastic });
+            my @elastics = @!atoms.grep: *.elastic;
 
             if +@elastics {
                 my Numeric $stretch = ($width - $actual-width) / +@elastics;
