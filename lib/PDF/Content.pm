@@ -209,6 +209,8 @@ role PDF::Content:ver<0.0.5>
     multi method print(PDF::Content::Text::Block $text-block,
 		       :$position,
 		       Bool :$nl = False,
+                       Bool :$top = False,
+                       Bool :$left = False,
 	) {
 
         my Numeric $font-size = $text-block.font-size;
@@ -226,7 +228,7 @@ role PDF::Content:ver<0.0.5>
 	    && $font-key eq $.FontKey
 	    && $font-size == $.FontSize;
 
-	self.ops( $text-block.content(:$nl) );
+	self.ops: $text-block.content(:$nl, :$top, :$left);
 
 	self.op(EndText) unless $in-text;
 
@@ -236,6 +238,11 @@ role PDF::Content:ver<0.0.5>
     #! output text move the  text position down one line
     method say($text, |c) {
         $.print($text, :nl, |c);
+    }
+
+    #! a block of text, positioned from top, left corner
+    method paragraph($text, |c) {
+        $.print($text, :top, :left, |c);
     }
 
     #| thin wrapper to $.op(SetFont, ...)

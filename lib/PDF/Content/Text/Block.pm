@@ -22,7 +22,7 @@ class PDF::Content::Text::Block {
     has Str $!align where 'left'|'center'|'right'|'justify';
     has Str $.valign where 'top'|'center'|'bottom'|'text';
 
-    method actual-width(@lines = @!lines)  { @lines.max: *.actual-width; }
+    method actual-width  { @!lines.max: *.actual-width; }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
 
     multi submethod BUILD(Str  :$text!,
@@ -138,7 +138,7 @@ class PDF::Content::Text::Block {
             $line-width += $word-width;
         }
 
-        my $width = $!width // self.actual-width(@!lines)
+        my $width = $!width // self.actual-width
             if $!align eq 'justify';
 
         for @!lines {
@@ -152,13 +152,26 @@ class PDF::Content::Text::Block {
 
     method width  { $!width //= self.actual-width }
     method height { $!height //= self.actual-height }
+    method !dy {
+        given $!valign {
+            when 'center' { 0.5 }
+            when 'bottom' { 1.0 }
+            default       { 0 }
+        };
+    }
+    method top-offset {
+        self!dy * ($.height - $.actual-height);
+    }
 
     method align($!align) {
         .align($!align)
             for self.lines;
     }
 
-    method content(Bool :$nl = False) {
+    method content(Bool :$nl,   # add trailing line 
+                   Bool :$top,  # position from top
+                   Bool :$left, # position from left;
+                  ) {
 
         my @content = ( OpNames::SetTextLeading => [ $!line-height ], )
 	   if $nl || +@!lines > 1;
@@ -167,18 +180,20 @@ class PDF::Content::Text::Block {
 
         if $!valign ne 'text' {
 
-            my $dy = do given $!valign {
-                when 'center' { 0.5 }
-                when 'bottom' { 1.0 }
-                default { 0 }
-            };
-
             # adopt html style text positioning. from the top of the font, not the baseline.
-            @content.push: 'Td' => [0, $dy * $.height  -  $!font-base-height]
+            my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
+            @content.push: 'Td' => [0, $y-shift - $!font-base-height ]
         }
 
+        my $dx = do given $!align {
+            when 'center' { 0.5 }
+            when 'right'  { 1.0 }
+            default       { 0 }
+        }
+        my $x-shift = $left ?? $dx * $.width !! 0;
+
         for @!lines {
-            @content.push: .content(:$.font-size, :$space-size, :$!word-spacing);
+            @content.push: .content(:$.font-size, :$space-size, :$!word-spacing, :$x-shift);
             @content.push: OpNames::TextNextLine;
         }
 

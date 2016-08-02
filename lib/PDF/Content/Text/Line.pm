@@ -23,29 +23,30 @@ class PDF::Content::Text::Line {
                     for @elastics;
             }
 
-            $.indent = 0;
+            $!indent = 0;
         }
     }
 
     multi method align('left') {
-        $.indent = 0;
+        $!indent = 0;
     }
 
     multi method align('right') {
-        $.indent = - $.actual-width;
+        $!indent = - $.actual-width;
     }
 
     multi method align('center') {
-        $.indent = - $.actual-width  /  2;
+        $!indent = - $.actual-width  /  2;
     }
 
-    method content(Numeric :$font-size!, Numeric :$space-size!, Numeric :$word-spacing = 0) {
+    method content(Numeric :$font-size!, Numeric :$space-size!, Numeric :$word-spacing = 0, Numeric :$x-shift = 0) {
 
         my Numeric $scale = -1000 / $font-size;
         my Array $array = [];
 
-        $array.push( ($.indent * $scale ).round.Int )
-            if $.indent;
+        my Int $indent = ($!indent + $x-shift).round.Int;
+        $array.push: $indent
+            if $indent;
 
         for $.atoms.list {
 	    my Numeric $space = .space;
@@ -67,11 +68,11 @@ class PDF::Content::Text::Line {
 		}
 		else {
 		    # start a new string segment
-		    $array.push( $enc);
+		    $array.push: $enc;
 		}
 	    }
 
-            $array.push( $space )
+            $array.push: $space
                 if $space;
         }
 
