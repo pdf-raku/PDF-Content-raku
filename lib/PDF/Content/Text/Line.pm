@@ -44,12 +44,14 @@ class PDF::Content::Text::Line {
         my Numeric $scale = -1000 / $font-size;
         my Array $array = [];
 
-        my Int $indent = ($!indent + $x-shift).round.Int;
+        my Numeric $indent = $!indent + $x-shift;
+        $indent =  ($indent * $scale).round.Int;
         $array.push: $indent
             if $indent;
+        my Numeric $space;
 
         for $.atoms.list {
-	    my Numeric $space = .space;
+	    $space = .space;
 	    $space += $word-spacing
 		if $space > 0 && $word-spacing;
 	    $space = ($space * $scale).round.Int;
@@ -76,7 +78,7 @@ class PDF::Content::Text::Line {
                 if $space;
         }
 
-        $array.pop if +$array && $array[*-1] ~~ Numeric;
+        $array.pop if $space;
 
         (OpNames::ShowSpaceText) => [$array];
 
