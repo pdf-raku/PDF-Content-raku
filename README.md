@@ -44,9 +44,18 @@ $page.text: -> $txt {
     ut labore et dolore magna aliqua.
     --END--
             
-    $txt.font = ($font, 12);
-    $txt.say( $para, :width(200), :height(150) :align<right>, :kern);
+    $txt.font = $font, 12;
+    # output a text box with left, top corner at (20, 600)
+    $txt.say( $para, :width(200), :height(150), :position[ :left(20), :top(250)] );
+
+    # output kerned paragraph, flow from right to left, right, top edge at (250, 170)
+    $txt.say( $para, :width(200), :height(150), :align<right>, :kern, :position[450, 250] );
+    # add another line of text, flowing on to the next line
+    $txt.font = $page.core-font( :family<Helvetica>, :weight<bold> ), 12;
+    $txt.say( "But wait, there's more!!", :align<right>, :kern );
 }
+
+$pdf.save-as: "t/sample-text.pdf";
 ```
 
 #### Forms and images (`.load-image` and  `.do` methods):
@@ -87,14 +96,14 @@ my $page = $pdf.add-page;
 
 $page.graphics: {
 
-    $page.text: -> $txt {
-	$txt.text-position = [240, 600];
-	$txt.font = [ $page.core-font('ZapfDingbats'), 24];
-	$txt.WordSpacing = 16;
+    $page.text: {
+	.text-position = [240, 600];
+	.font = [ $page.core-font('ZapfDingbats'), 24];
+	.WordSpacing = 16;
 	my $nbsp = "\c[NO-BREAK SPACE]";
-	$txt.print("♠ ♣$nbsp");
-	$txt.SetFillRGB( 1, .3, .3);  # reddish
-	$txt.say("♦ ♥");
+	.print("♠ ♣$nbsp");
+	.SetFillRGB( 1, .3, .3);  # reddish
+	.say("♦ ♥");
     }
 
     # Display outline, slanted text, using the ShowText (`Td`) operator:

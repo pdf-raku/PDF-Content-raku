@@ -99,13 +99,14 @@ role PDF::Content:ver<0.0.5>
     #| set the current text position on the page/form
     method text-position is rw returns Vector {
 	my $gfx = self;
-	my Numeric @tm = @$.TextMatrix;
+	my Numeric @tm = @.TextMatrix;
 	Proxy.new(
 	    FETCH => method {
 		@tm[4,5]
 	    },
 	    STORE => method (Vector $v) {
-		@tm[4, 5] = @$v;
+                @tm[4] = $_ with $v[0];
+                @tm[5] = $_ with $v[1];
 		$gfx.op(SetTextMatrix, @tm);
 		@$v;
 	    },
@@ -206,11 +207,17 @@ role PDF::Content:ver<0.0.5>
 	$text-block;
     }
 
+    my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
+    my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
+    my subset Text-Position of List where {
+        .elems <= 2
+        && (!defined(.[0]) || .[0] ~~ Numeric|XPos-Pair)
+        && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
+    }
+
     multi method print(PDF::Content::Text::Block $text-block,
-		       :$position,
+		       Text-Position :$position,
 		       Bool :$nl = False,
-                       Bool :$top = False,
-                       Bool :$left = False,
 	) {
 
         my Numeric $font-size = $text-block.font-size;
@@ -220,8 +227,33 @@ role PDF::Content:ver<0.0.5>
 	my Bool $in-text = $.context == GraphicsContext::Text;
 	self.op(BeginText) unless $in-text;
 
-	self.text-position = $_
-	    with $position;
+        my Bool $left = False;
+        my Bool $top = False;
+
+	with $position {
+            die "illegal text position: $_"
+                unless $_ ~~ Text-Position;
+            my $x;
+            with $position[0] {
+                when Numeric {$x = $_}
+                when XPos-Pair {
+                    my constant Dx = %( :left(0.0), :center(0.5), :right(1.0) );
+                    $x = .value  +  Dx{.key} * $text-block.width;
+                    $left = True; # position from left
+                }
+            }
+            my $y;
+            with $position[1] {
+                when Numeric {$y = $_}
+                when YPos-Pair {
+                    my constant Dy = %( :top(0.0), :center(0.5), :bottom(1.0) );
+                    $y = .value  -  Dy{.key} * $text-block.height;
+                    $top = True; # position from top
+                }
+            }
+                    
+	    self.text-position = [$x, $y];
+        }
 
 	self.op(SetFont, $font-key, $font-size)
 	    unless $.FontKey
@@ -238,11 +270,6 @@ role PDF::Content:ver<0.0.5>
     #! output text move the  text position down one line
     method say($text, |c) {
         $.print($text, :nl, |c);
-    }
-
-    #! a block of text, positioned from top, left corner
-    method paragraph($text, |c) {
-        $.print($text, :top, :left, |c);
     }
 
     #| thin wrapper to $.op(SetFont, ...)
