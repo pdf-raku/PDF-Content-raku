@@ -33,49 +33,49 @@ class PDF::Content::Text::Block {
 
 	$!space-width = $!font.stringwidth( ' ', $!font-size );
 
-        my @chunks = flat $text.comb(/ [ <![ - ]> [ \w | <:Punctuation> ] ]+ '-'?
-                                || .
-                                /).map( {
+        my @chunks = flat $text.comb(/ [ <![ - ]> [ \w | <:Punctuation> ] ]+ '-'? || . /).map( {
 				    when /\n/  {' '}
                                     when $kern { $!font.kern($_, $!font-size).list }
                                     default    { $!font.filter($_) }
                                  });
 
-        constant NO-BREAK-WS = rx/ <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> /;
-        constant BREAKING-WS = rx/ <![ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> \s /;
+        constant NO-BREAK-WS = "\c[NO-BREAK SPACE]" | "\c[NARROW NO-BREAK SPACE]" | "\c[WORD JOINER]";
 
-        my @atoms;
+        my PDF::Content::Text::Atom @atoms;
+
         while @chunks {
             my $content = @chunks.shift;
             my %atom = :$content;
             %atom<space> = @chunks && @chunks[0] ~~ Numeric
                 ?? @chunks.shift
                 !! 0;
-            %atom<width> = $!font.stringwidth($content, $!font-size, :$kern);
             # don't atomize regular white-space
-            next if $content ~~ BREAKING-WS;
-            my Bool $followed-by-ws = ?(@chunks && @chunks[0] ~~ BREAKING-WS);
+            next if $content ~~ /^\s/ && $content ne NO-BREAK-WS; 
+            my Bool $followed-by-ws = ?(/^\s/ && $_ ne NO-BREAK-WS)
+                with @chunks[0];
+            %atom<width> = $!font.stringwidth($content, $!font-size, :$kern);
             my Bool $kerning = %atom<space> < 0;
 
-            my PDF::Content::Text::Atom $atom .= new( |%atom );
 	    do {
 		when $kerning {
-                    $atom.sticky = True;
+                    %atom<sticky> = True;
 		}
-		when $atom.content ~~ NO-BREAK-WS {
-                    $atom.elastic = True;
-                    $atom.sticky = True;
+		when $content eq NO-BREAK-WS {
+                    %atom<elastic> = True;
+                    %atom<sticky> = True;
                     @atoms[*-1].sticky = ? @atoms;
 		}
 		when $followed-by-ws {
-                    $atom.elastic = True;
-                    $atom.space = $!space-width;
+                    %atom<elastic> = True;
+                    %atom<space> = $!space-width;
 		}
 	    }
 
-            my Str $encoded = [~] $!font.encode( $atom.content );
+            my PDF::Content::Text::Atom $atom .= new( |%atom );
+
+            my Str $encoded = [~] $!font.encode( $content );
             $atom.encoded = $encoded
-                unless $encoded eq $atom.content;
+                unless $encoded eq $content;
 
             @atoms.push: $atom;
         }
@@ -83,7 +83,7 @@ class PDF::Content::Text::Block {
         self.BUILD( :@atoms, |c );
     }
 
-    multi submethod BUILD(:@atoms!,
+    multi submethod BUILD(PDF::Content::Text::Atom :@atoms!,
                           Numeric :$!line-height = $!font-size * 1.1,
 			  Numeric :$!horiz-scaling = 100,
 			  Numeric :$!char-spacing = 0,
@@ -113,7 +113,7 @@ class PDF::Content::Text::Block {
                 @word.push: $atom;
             } while $atom.sticky && @atoms;
 
-            my $trailing-space = @word[*-1].space;
+            my $trailing-space = $atom.space;
 	    if $trailing-space > 0 {
 		$char-count += $trailing-space * $!font-size / $!space-width;
 		$trailing-space += $!word-spacing;
