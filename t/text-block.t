@@ -15,10 +15,7 @@ role Parent {
     has Str %!keys{Any};
 
     method use-font($obj) {
-        with %!keys{$obj} {
-            $_
-        }
-        else {
+        without %!keys{$obj} {
 	    my $key = ++ $!key;
 	    self<Font>{$key} = $obj;
 	    %!keys{$obj} = $key;
