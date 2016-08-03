@@ -34,8 +34,8 @@ $pdf.save-as: "t/example.pdf";
 
 ```
 use PDF::Content::PDF;
-my $doc = PDF::Content::PDF.new;
-my $page = $doc.add-page;
+my $pdf = PDF::Content::PDF.new;
+my $page = $pdf.add-page;
 my $font = $page.core-font( :family<Helvetica> );
 
 $page.text: -> $txt {
@@ -56,8 +56,8 @@ The `.do` method can them be used to render it.
 
 ```
 use PDF::Content::PDF;
-my $doc = PDF::Content::PDF.new;
-my $page = $doc.add-page;
+my $pdf = PDF::Content::PDF.new;
+my $page = $pdf.add-page;
 
 $page.graphics: -> $gfx {
     my $img = $gfx.load-image("t/images/snoopy-happy-dance.jpg");
@@ -82,8 +82,8 @@ To display card suits symbols, using the ZapfDingbats core-font, with diamonds a
 
 ```
 use PDF::Content::PDF;
-my $doc = PDF::Content::PDF.new;
-my $page = $doc.add-page;
+my $pdf = PDF::Content::PDF.new;
+my $page = $pdf.add-page;
 
 $page.graphics: {
 
@@ -123,8 +123,8 @@ utility methods for handling text, images and graphics coordinates:
 
 ```
 use PDF::Content::PDF;
-my $doc = PDF::Content::PDF.new;
-my $page = $doc.add-page;
+my $pdf = PDF::Content::PDF.new;
+my $page = $pdf.add-page;
 
 # Draw a simple Bézier curve:
 
@@ -157,7 +157,7 @@ sub draw-curve2($gfx) {
         Q                     % restore
         --END--
 }
-draw-curve2($doc.add-page.gfx);
+draw-curve2($pdf.add-page.gfx);
 
 # ------------------------
 # Alternative 3: draw from raw data
@@ -174,7 +174,7 @@ sub draw-curve3($gfx) {
          'Q',               # restore
      ];
 }
-draw-curve3($doc.add-page.gfx);
+draw-curve3($pdf.add-page.gfx);
 
 ```
 For a full list of operators, please see PDF::Content::Ops.
@@ -184,10 +184,10 @@ For a full list of operators, please see PDF::Content::Ops.
 To list all images and forms for each page
 ```
 use PDF::Content::PDF;
-my $doc = PDF::Content::PDF.open: "t/images.pdf";
-for 1 ... $doc.page-count -> $page-no {
+my $pdf = PDF::Content::PDF.open: "t/images.pdf";
+for 1 ... $pdf.page-count -> $page-no {
     say "page: $page-no";
-    my $page = $doc.page: $page-no;
+    my $page = $pdf.page: $page-no;
     my %object = $page.resources('XObject');
 
     # also report on images embedded in the page content
@@ -216,17 +216,17 @@ The `to-xobject` method can be used to convert a page to an XObject Form to lay-
 
 ```
 use PDF::Content::PDF;
-my $doc-with-images = PDF::Content::PDF.open: "t/images.pdf";
-my $doc-with-text = PDF::Content::PDF.open: "t/example.pdf";
+my $pdf-with-images = PDF::Content::PDF.open: "t/images.pdf";
+my $pdf-with-text = PDF::Content::PDF.open: "t/example.pdf";
 
 my $new-doc = PDF::Content::PDF.new;
 
 # add a page; layup imported pages and images
 my $page = $new-doc.add-page;
 
-my $xobj-image = $doc-with-images.page(1).images[7];
-my $xobj-with-text  = $doc-with-text.page(1).to-xobject;
-my $xobj-with-images  = $doc-with-images.page(1).to-xobject;
+my $xobj-image = $pdf-with-images.page(1).images[7];
+my $xobj-with-text  = $pdf-with-text.page(1).to-xobject;
+my $xobj-with-images  = $pdf-with-images.page(1).to-xobject;
 
 $page.graphics: {
      # scale up the image; use it as a background
@@ -238,8 +238,8 @@ $page.graphics: {
 }
 
 # copy whole pages from a document
-for 1 .. $doc-with-text.page-count -> $page-no {
-    $new-doc.add-page: $doc-with-text.page($page-no);
+for 1 .. $pdf-with-text.page-count -> $page-no {
+    $new-doc.add-page: $pdf-with-text.page($page-no);
 }
 
 $new-doc.save-as: "t/reuse.pdf";
