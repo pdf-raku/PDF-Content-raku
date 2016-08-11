@@ -1,10 +1,11 @@
 use v6;
 
-use PDF::Content::Text::Line;
-use PDF::Content::Text::Atom;
-use PDF::Content::Ops :OpNames;
-
 class PDF::Content::Text::Block {
+
+    use PDF::Content::Text::Line;
+    use PDF::Content::Text::Atom;
+    use PDF::Content::Ops :OpNames;
+
     subset Percentage of Numeric where * > 0;
     has Numeric $.font-size is required;
     has         $.font is required;

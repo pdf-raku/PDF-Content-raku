@@ -474,8 +474,8 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 	@!ops.push($opn);
         self!track-context($op-name, $last-op);
         self.track-graphics($op-name, |@args );
-        (self.callback)($op-name, |@args, :gfx(self) )
-	    if self.callback.defined;
+        .($op-name, |@args, :gfx(self) )
+	    with self.callback;
 
 	@!ops[*-1];
     }

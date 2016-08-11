@@ -67,16 +67,15 @@ role PDF::Content:ver<0.0.5>
     #| extract any inline images from the content stream. returns an array of XObject Images
     method inline-images returns Array {
 	my PDF::DAO::Stream @images;
-	for $.ops.keys -> $i {
+	for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
 	    my $v = $.ops[$i];
-	    next unless $v.key eq 'BI';
+	    my $v1 = $.ops[$i+1];
+	    die "BI not followed by ID image in content stream"
+		unless $v1 && $v1.key eq 'ID';
 
 	    my %dict = ( :Type( :name<XObject> ), :Subtype( :name<Image> ),
 			 PDF::Content::Image.inline-to-xobject($v.value[0]<dict>),
 		);
-	    my $v1 = $.ops[$i+1];
-	    die "BI not followed by ID image in content stream"
-		unless $v1 && $v1.key eq 'ID';
 	    my $encoded = $v1.value[0]<encoded>;
 
 	    @images.push: PDF::DAO.coerce( :stream{ :%dict, :$encoded } );
@@ -133,15 +132,17 @@ role PDF::Content:ver<0.0.5>
 
         given $obj<Subtype> {
             when 'Image' {
-                if $width.defined {
-                    $height //= $width * ($obj<Height> / $obj<Width>);
-                }
-                elsif $height.defined {
-                    $width //= $height * ($obj<Width> / $obj<Height>);
+                with $width {
+                    $height //= $_ * ($obj<Height> / $obj<Width>);
                 }
                 else {
-                    $width = $obj<Width>;
-                    $height = $obj<Height>;
+                    with $height {
+                        $width //= $_ * ($obj<Width> / $obj<Height>);
+                    }
+                    else {
+                        $width = $obj<Width>;
+                        $height = $obj<Height>;
+                    }
                 }
 
                 $dx *= $width;
@@ -152,15 +153,17 @@ role PDF::Content:ver<0.0.5>
                 my Numeric $obj-width = $bbox[2] - $bbox[0] || 1;
                 my Numeric $obj-height = $bbox[3] - $bbox[1] || 1;
 
-                if $width.defined {
-                    $height //= $width * ($obj-height / $obj-width);
-                }
-                elsif $height.defined {
-                    $width //= $height * ($obj-width / $obj-height);
+                with $width {
+                    $height //= $_ * ($obj-height / $obj-width);
                 }
                 else {
-                    $width = $obj-width;
-                    $height = $obj-height;
+                    with $height {
+                        $width //= $_ * ($obj-width / $obj-height);
+                    }
+                    else {
+                        $width = $obj-width;
+                        $height = $obj-height;
+                    }
                 }
 
                 $dx *= $width;
@@ -289,11 +292,11 @@ role PDF::Content:ver<0.0.5>
         }
     }
 
-    method font is rw returns List {
+    method font is rw returns Array {
 	my $obj = self;
 	Proxy.new(
 	    FETCH => method {
-		($obj.FontKey, $obj.FontSize // 16);
+		[$obj.FontKey, $obj.FontSize // 16];
 	    },
 	    STORE => method ($v) {
 		my @v = $v.isa(List) ?? @$v !! [ $v, ];

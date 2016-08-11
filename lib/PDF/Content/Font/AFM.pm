@@ -1,4 +1,4 @@
- role PDF::Content::Font::AFM {
+role PDF::Content::Font::AFM {
 
     use PDF::Content::Font::Encodings;
     has $.enc;

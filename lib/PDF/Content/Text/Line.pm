@@ -1,9 +1,8 @@
 use v6;
 
-use PDF::Content::Text::Atom;
-use PDF::Content::Ops :OpNames;
-
 class PDF::Content::Text::Line {
+
+    use PDF::Content::Ops :OpNames;
 
     has @.atoms;
     has Numeric $.indent is rw = 0;
