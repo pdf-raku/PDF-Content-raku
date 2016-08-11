@@ -70,7 +70,7 @@ role PDF::Content:ver<0.0.5>
 	for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
 	    my $v = $.ops[$i];
 	    my $v1 = $.ops[$i+1];
-	    die "BI not followed by ID image in content stream"
+	    die "'BI' op not followed by 'ID' in content stream"
 		unless $v1 && $v1.key eq 'ID';
 
 	    my %dict = ( :Type( :name<XObject> ), :Subtype( :name<Image> ),
