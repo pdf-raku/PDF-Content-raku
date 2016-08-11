@@ -41,40 +41,40 @@ class PDF::Content::Text::Line {
     method content(Numeric :$font-size!, Numeric :$space-size!, Numeric :$word-spacing = 0, Numeric :$x-shift = 0) {
 
         my Numeric $scale = -1000 / $font-size;
-        my subset Str-or-Pos of Any where {Str|Numeric};
+        my subset Str-or-Pos of Any where Str|Numeric;
         my Str-or-Pos @line;
 
         my Numeric $indent = $!indent + $x-shift;
         $indent =  ($indent * $scale).round.Int;
         @line.push: $indent
             if $indent;
-        my Numeric $space;
+        my Numeric $pos;
 
         for $.atoms.list {
-            @line.push: $space
-                if $space;
+            @line.push: $pos
+                if $pos;
 
-	    $space = .space;
-	    $space += $word-spacing
-		if $space > 0 && $word-spacing;
-	    $space = ($space * $scale).round.Int;
+	    $pos = .space;
+	    $pos += $word-spacing
+		if $pos > 0 && $word-spacing;
+	    $pos = ($pos * $scale).round.Int;
 
-            my Str $enc = .encoded // .content;
+            my Str $str = .encoded // .content;
 
-	    if $space && $space-size && abs($space - $space-size) <= 1 {
+	    if $pos && $space-size && abs($pos - $space-size) <= 1 {
 		# optimization: use an actual space, when it fits
-		$enc ~= ' ';
-		$space = 0;
+		$str ~= ' ';
+		$pos = 0;
 	    }
 
-	    if $enc.chars {
+	    if $str.chars {
 		if @line && @line[*-1] ~~ Str {
 		    # on a string segment - concatonate
-		    @line[*-1] ~= $enc
+		    @line[*-1] ~= $str
 		}
 		else {
 		    # start a new string segment
-		    @line.push: $enc;
+		    @line.push: $str;
 		}
 	    }
 
