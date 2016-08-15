@@ -6,13 +6,14 @@ class PDF::Content::Text::Block {
     use PDF::Content::Text::Atom;
     use PDF::Content::Ops :OpNames;
 
-    subset Percentage of Numeric where * > 0;
+    has Str     $.text;
     has Numeric $.font-size is required;
     has         $.font is required;
     has Numeric $.font-height = $!font.height( $!font-size );
     has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
     has Numeric $.line-height;
     has Numeric $!space-width;
+    subset Percentage of Numeric where * > 0;
     has Percentage $.horiz-scaling = 100;
     has Numeric $.char-spacing = 0;
     has Numeric $.word-spacing = 0;
@@ -26,7 +27,7 @@ class PDF::Content::Text::Block {
     method actual-width  { @!lines.max: *.actual-width; }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
 
-    multi submethod BUILD(Str  :$text!,
+    multi submethod BUILD(Str  :$!text!,
                                :$!font!,
 			       :$!font-size = 16,
                           Bool :$kern       = False,
@@ -34,7 +35,7 @@ class PDF::Content::Text::Block {
 
 	$!space-width = $!font.stringwidth( ' ', $!font-size );
 
-        my @chunks = flat $text.comb(/ [ <![ - ]> [ \w | <:Punctuation> ] ]+ '-'? || . /).map( {
+        my @chunks = flat $!text.comb(/ [ <![ - ]> [ \w | <:Punctuation> ] ]+ '-'? || . /).map( {
 				    when /\n/  {' '}
                                     when $kern { $!font.kern($_, $!font-size).list }
                                     default    { $!font.filter($_) }
