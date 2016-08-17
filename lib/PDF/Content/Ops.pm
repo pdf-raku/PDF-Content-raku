@@ -429,8 +429,8 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
     }
 
     multi sub op(Str $op, |c) is default {
-        with %Ops{$op} -> &sub {
-            &sub($op,|c);
+        with %Ops{$op} {
+            .($op,|c);
         }
         else {
             die "unknown content operator: $op";
@@ -504,7 +504,7 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
     multi method track-graphics('q') {
         my @Tm = @!Tm;
         my @CTM = @!CTM;
-        my %gstate = :$!Tc, :$!Tw, :$!Th, :$!Tl, :$!Trise, :@Tm, :@CTM;
+        my %gstate = :$!Tc, :$!Tw, :$!Th, :$!Tl, :$!Tmode, :$!Trise, :$!Tf, :$!Tfs, :@Tm, :@CTM;
         @!gsave.push: %gstate;
     }
     multi method track-graphics('Q') {
@@ -515,7 +515,10 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
         $!Tw    = %gstate<Tw>;
         $!Th    = %gstate<Th>;
         $!Tl    = %gstate<Tl>;
+        $!Tmode = %gstate<Tmode>;
         $!Trise = %gstate<Trise>;
+        $!Tf    = %gstate<Tf>;
+        $!Tfs   = %gstate<Tfs>;
         @!Tm    = @(%gstate<Tm>);
         @!CTM   = @(%gstate<CTM>);
 	Restore;
