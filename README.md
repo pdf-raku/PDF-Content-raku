@@ -144,7 +144,7 @@ sub draw-curve1($gfx) {
     $gfx.Save;
     $gfx.MoveTo(175, 720);
     $gfx.LineTo(175, 700);
-    $gfx.CurveTo1( 300, 800,  400, 720 );
+    $gfx.CurveToInitial( 300, 800,  400, 720 );
     $gfx.ClosePath;
     $gfx.Stroke;
     $gfx.Restore;
@@ -178,8 +178,8 @@ sub draw-curve3($gfx) {
          :l[175, 700],      # line-to 
          :v[300, 800,
             400, 720],      # curve-to
-         :h[],              # close (:h[] is equivalent to 'h')
-         'S',               # stroke
+         :h[],              # close (or equivalently, 'h')
+         'S',               # stroke (or equivalently, :S[])
          'Q',               # restore
      ];
 }

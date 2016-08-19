@@ -6,6 +6,9 @@ use PDF::DAO::Util :from-ast;
 role PDF::Content::Ops {
 
     has &.callback is rw;
+    has Pair @!ops;
+    has Bool $.comment-ops is rw = False;
+    has Bool $.strict = True;
 
 =begin pod
 
@@ -30,13 +33,13 @@ d | SetDash | dashArray dashPhase | Set line dash pattern
 d0 | SetCharWidth | wx wy | Set glyph width in Type 3 font
 d1 | SetCharWidthBBox | wx wy llx lly urx ury | Set glyph width and bounding box in Type 3 font
 Do | XObject | name | Invoke named XObject
-DP | MarkPoint | tag properties | (PDF 1.2) Define marked-content point with property list
+DP | MarkPointDict | tag properties | (PDF 1.2) Define marked-content point with property list
 EI | EndImage | — | End inline image object
 EMC | EndMarkedContent | — | (PDF 1.2) End marked-content sequence
 ET | EndText | — | End text object
 EX | EndIgnore | — | (PDF 1.1) End compatibility section
 f | Fill | — | Fill path using nonzero winding number rule
-F | (n/a) | — | Fill path using nonzero winding number rule (obsolete)
+F | FillObsolete | — | Fill path using nonzero winding number rule (obsolete)
 f* | EOFill| — | Fill path using even-odd rule
 G | SetStrokeGray | gray | Set gray level for stroking operations
 g | SetFillGray | gray | Set gray level for nonstroking operations
@@ -51,7 +54,7 @@ k | SetFillCMYK | c m y k | Set CMYK color for nonstroking operations
 l | LineTo | x y | Append straight line segment to path
 m | MoveTo | x y | Begin new subpath
 M | SetMiterLimit | miterLimit | Set miter limit
-MP | MarkPoint2 | tag | (PDF 1.2) Define marked-content point
+MP | MarkPoint | tag | (PDF 1.2) Define marked-content point
 n | EndPath | — | End path without filling or stroking
 q | Save | — | Save graphics state
 Q | Restore | — | Restore graphics state
@@ -79,11 +82,11 @@ Tr | SetTextRender | render | Set text rendering mode
 Ts | SetTextRise | rise | Set text rise
 Tw | SetWordSpacing | wordSpace | Set word spacing
 Tz | SetHorizScaling | scale | Set horizontal text scaling
-v | CurveTo1 | x2 y2 x3 y3 | Append curved segment to path (initial point replicated)
+v | CurveToInitial | x2 y2 x3 y3 | Append curved segment to path (initial point replicated)
 w | SetLineWidth | lineWidth | Set line width
 W | Clip | — | Set clipping path using nonzero winding number rule
 W* | EOClip | — | Set clipping path using even-odd rule
-y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicated)
+y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point replicated)
 ' | MoveShowText | string | Move to next line and show text
 " | MoveSetShowText | aw ac string | Set word and character spacing, move to next line, and show text
 
@@ -91,35 +94,34 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 
 =end pod
 
-    has Pair @!ops;
-    has Bool $!strict = True;
-
     #| some convenient mnemomic names
     my Str enum OpNames is export(:OpNames) «
         :BeginImage<BI> :ImageData<ID> :EndImage<EI>
-        :BeginMarkedContent<BMC> :BeginMarkedContentDict<BDC> :EndMarkedContent<EMC>
-        :BeginText<BT> :EndText<ET>
-        :BeginIgnore<BX> :EndIgnore<EX>
-        :CloseEOFillStroke<b*> :CloseFillStroke<b> :EOFillStroke<B*>
-        :FillStroke<B> :CurveTo<c> :ConcatMatrix<cm>
-        :SetFillColorSpace<cs> :SetStrokeColorSpace<CS> :SetDash<d>
-        :SetCharWidth<d0> :SetCharWidthBBox<d1> :XObject<Do>
-        :MarkPoint<DP> :EOFill<f*> :Fill<f> :SetStrokeGray<G>
-        :SetFillGray<g> :SetGraphicsState<gs> :ClosePath<h> :SetFlat<i>
-        :SetLineJoin<j> :SetLineCap<J> :SetFillCMYK<k>
+        :BeginMarkedContent<BMC> :BeginMarkedContentDict<BDC>
+        :EndMarkedContent<EMC> :BeginText<BT> :EndText<ET>
+        :BeginIgnore<BX> :EndIgnore<EX> :CloseEOFillStroke<b*>
+        :CloseFillStroke<b> :EOFillStroke<B*> :FillStroke<B>
+        :CurveTo<c> :ConcatMatrix<cm> :SetFillColorSpace<cs>
+        :SetStrokeColorSpace<CS> :SetDash<d> :SetCharWidth<d0>
+        :SetCharWidthBBox<d1> :XObject<Do> :MarkPointDict<DP>
+        :EOFill<f*> :Fill<f> :FillObsolete<F> :SetStrokeGray<G>
+        :SetFillGray<g> :SetGraphicsState<gs> :ClosePath<h>
+        :SetFlat<i> :SetLineJoin<j> :SetLineCap<J> :SetFillCMYK<k>
         :SetStrokeCMYK<K> :LineTo<l> :MoveTo<m> :SetMiterLimit<M>
-        :MarkPoint2<MP> :EndPath<n> :Save<q> :Restore<Q>
-        :Rectangle<re> :SetFillRGB<rg> :SetStrokeRGB<RG>
-        :SetRenderingIntent<ri> :CloseStroke<s> :Stroke<S>
-        :SetStrokeColor<SC> :SetFillColor<sc> :SetFillColorN<scn>
-        :SetStrokeColorN<SCN> :ShFill<sh> :TextNextLine<T*>
-        :SetCharSpacing<Tc> :TextMove<Td> :TextMoveSet<TD>
-        :SetFont<Tf> :ShowText<Tj> :ShowSpaceText<TJ>
-        :SetTextLeading<TL> :SetTextMatrix<Tm> :SetTextRender<Tr>
-        :SetTextRise<Ts> :SetWordSpacing<Tw> :SetHorizScaling<Tz>
-        :CurveTo1<v> :EOClip<W*> :Clip<W> :SetLineWidth<w>
-        :CurveTo2<y> :MoveSetShowText<"> :MoveShowText<'>
+        :MarkPoint<MP> :EndPath<n> :Save<q> :Restore<Q> :Rectangle<re>
+        :SetFillRGB<rg> :SetStrokeRGB<RG> :SetRenderingIntent<ri>
+        :CloseStroke<s> :Stroke<S> :SetStrokeColor<SC>
+        :SetFillColor<sc> :SetFillColorN<scn> :SetStrokeColorN<SCN>
+        :ShFill<sh> :TextNextLine<T*> :SetCharSpacing<Tc>
+        :TextMove<Td> :TextMoveSet<TD> :SetFont<Tf> :ShowText<Tj>
+        :ShowSpaceText<TJ> :SetTextLeading<TL> :SetTextMatrix<Tm>
+        :SetTextRender<Tr> :SetTextRise<Ts> :SetWordSpacing<Tw>
+        :SetHorizScaling<Tz> :CurveToInitial<v> :EOClip<W*> :Clip<W>
+        :SetLineWidth<w> :CurveToFinal<y> :MoveSetShowText<">
+        :MoveShowText<'>
     »;
+
+    my constant %OpCode = OpNames.enums.invert.Hash;
 
     # See [PDF 1.7 TABLE 4.1 Operator categories]
     my constant GeneralGraphicOps = set <w J j M d ri i gs>;
@@ -306,7 +308,7 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
         #| dashArray dashPhase    d
         'd' => sub (Str $op, Array $args!, Numeric $real!) {
             my @array = $args.map({
-                when UInt    { :int(.Int) }
+                when Numeric { :real($_) }
                 when Pair    { $_ }
                 default {die "invalid entry in $op array: {.perl}"}
             });
@@ -416,7 +418,8 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
         my Str $op = $raw.key;
         my List $input_vals = $raw.value;
         # validate the operation and get fallback coercements for any missing pairs
-        my @vals = $raw.value.map({ from-ast($_) });
+        my subset Comment of Pair where {.key eq 'comment'}
+        my @vals = $raw.value.grep({$_ !~~ Comment}).map({ from-ast($_) });
         my $opn = op($op, |@vals);
 	my $coerced_vals = $opn.value;
 
@@ -476,8 +479,9 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
         self.track-graphics($op-name, |@args );
         .($op-name, |@args, :gfx(self) )
 	    with self.callback;
-
-	@!ops[*-1];
+        $opn.value.push: (:comment(%OpCode{$op-name}))
+            if $!comment-ops;
+	$opn;
     }
 
     multi method ops(Str $ops!) {
@@ -538,7 +542,7 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
     }
     multi method track-graphics('EMC') {
 	die "closing EMC without opening BMC or BDC in PDF content\n"
-	    unless @!tags && @!tags[*-1] eq 'BMC' | 'BDC';
+	    unless @!tags;
 	@!tags.pop;
     }
     multi method track-graphics('Tc', Numeric $!Tc!) {
@@ -592,13 +596,13 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
 	my UInt $nesting = 0;
 
         @!ops.map({
-	    my ($op, $args) = .kv;
+	    my $op = ~ .key;
 
 	    $nesting-- if $nesting && $op eq Closers;
 	    $writer.indent = '  ' x $nesting;
 	    $nesting++ if $op eq Openers;
 
-	    $writer.indent ~ $writer.write( :content($_) )
+	    $writer.indent ~ $writer.write: :content($_);
 	}).join: "\n";
     }
 
@@ -612,6 +616,6 @@ y | CurveTo2 | x1 y1 x3 y3 | Append curved segment to path (final point replicat
         self."$op-name"(|@args);
     }
 
-    multi method FALLBACK($name) is default { die "unknown method: $name\n" }
+    multi method FALLBACK($name) is default { die "unknown operator/method: $name\n" }
 
 }

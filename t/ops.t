@@ -111,10 +111,35 @@ EI
 BEGIN our $compile-time = PDF::Content::Ops.parse("BT/F1 16 Tf\n(Hi)Tj ET");
 is-json-equiv $compile-time[*-1], (:ET[]), 'compile time ops parse';
 $g.ops( $compile-time);
-is-json-equiv [ $g.ops[*-4..*] ], [ :BT[],
-				    :Tf[:name<F1>, :int(16)],
-				    :Tj[:literal<Hi>],
-				    :ET[] ], 'Text block parse';
+is-json-equiv [ $g.ops[*-4..*] ], [
+    :BT[],
+    :Tf[:name<F1>, :int(16)],
+    :Tj[:literal<Hi>],
+    :ET[],
+], 'Text block parse';
+
+$g = PDF::Content.new :comment-ops;
+
+$g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
+is-json-equiv $g.ops, [
+    :m[:int(175), :int(720), :comment<MoveTo>, ],
+    :l[:int(175), :int(700), :comment<LineTo>, ],
+    :v[:int(300), :int(800), :int(400), :int(720), :comment<CurveToInitial>, ],
+    :h[ :comment<ClosePath>, ],
+    :S[ :comment<Stroke>, ],
+], 'parse and comment';
+
+is-json-equiv [$g.content.lines], [
+    '175 720 m % MoveTo',
+    '175 700 l % LineTo',
+    '300 800 400 720 v % CurveToInitial',
+    'h % ClosePath',
+    'S % Stroke'
+], 'content with comments';
+
+my $g1 = PDF::Content.new;
+lives-ok {$g1.ops: $g.ops}, "comments import";
+is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
 
 done-testing;
 
