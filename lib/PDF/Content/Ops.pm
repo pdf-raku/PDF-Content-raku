@@ -9,6 +9,7 @@ role PDF::Content::Ops {
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict = True;
+    has $.parent;
 
 =begin pod
 
@@ -149,7 +150,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has Numeric $!Tl = 0;    #| leading
     has Numeric $!Tmode = 0; #| text rendering mode
     has Numeric $!Trise = 0; #| text rise
-    has Str $!Tf;            #| font entry name, e.g. 'F1'
+    has Hash $!Tf;           #| font dictionary
     has Numeric $!Tfs;       #| font size
     has Numeric @!Tm  = [ 1, 0, 0, 1, 0, 0, ];      #| text matrix
     has Numeric @!CTM = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
@@ -166,7 +167,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	:over-print-paint<OP>
 	:over-print-stroke<op>
 	:over-print-mode<OPM>
-	:fonts<Font>
+	:font<Font>
 	:black-generation-old<BG>
 	:black-generation<BG2>
 	:under-cover-removal-function-old<UCR>
@@ -203,7 +204,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method TextLeading  is rw { self!proxy($!Tl, 'SetTextLeading')  }
     method TextRender   is rw { self!proxy($!Tmode, 'SetTextRender') }
     method TextRise     is rw { self!proxy($!Trise, 'SetTextRise') }
-    method FontKey        { $!Tf  }
+    method Font           { $!Tf  }
     method FontSize       { $!Tfs }
     method GraphicsMatrix { @!CTM  }
 
@@ -545,6 +546,16 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    unless @!tags;
 	@!tags.pop;
     }
+    multi method track-graphics('gs', Str $key) {
+        with self.parent {
+            with .resource-entry('ExtGState', $key) {
+                with .<Font> { $!Tf = ~ .[0]; $!Tfs = + .[1] }
+            }
+            else {
+                die "unknown extended graphics state: /$key"
+            }
+        }
+    }
     multi method track-graphics('Tc', Numeric $!Tc!) {
     }
     multi method track-graphics('Tw', Numeric $!Tw!) {
@@ -553,10 +564,14 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('TL', Numeric $!Tl!) {
     }
-    multi method track-graphics('Tf', Str $!Tf!, Numeric $!Tfs!) {
-        with self.?parent {
-            die "unknown font key: /$!Tf"
-                unless .resource-entry('Font', $!Tf);
+    multi method track-graphics('Tf', Str $key, Numeric $!Tfs!) {
+        with self.parent {
+            with .resource-entry('Font', $key) {
+                $!Tf = $_;
+            }
+            else {
+                die "unknown font key: /$!Tf"
+            }
         }
     }
     multi method track-graphics('Ts', Numeric $!Trise!) {

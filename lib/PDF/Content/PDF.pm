@@ -24,6 +24,7 @@ class PDF::Content::PDF
 	does PDF::Content::ResourceDict {
 	    has PDF::DAO::Stream %.XObject is entry;
             has PDF::Content::Font %.Font is entry;
+            has PDF::DAO::Dict $.ExtGState is entry;
     }
 
     role Page

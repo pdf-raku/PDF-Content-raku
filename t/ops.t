@@ -17,7 +17,6 @@ is-json-equiv $g.GraphicsMatrix, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix -
 is-json-equiv $g.BeginText, (:BT[]), 'BeginText';
 
 is-json-equiv $g.op('Tf', 'F1', 16), (:Tf[ :name<F1>, :real(16) ]), 'Tf';
-is $g.FontKey, 'F1', '$g.FontKey';
 is $g.FontSize, 16, '$g.FontSize';
 
 is $g.TextLeading, 0, '$g.TextLeading - initial';

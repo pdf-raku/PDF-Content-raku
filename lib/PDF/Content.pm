@@ -10,8 +10,6 @@ role PDF::Content:ver<0.0.5>
     use PDF::Content::Text::Block;
     use PDF::Content::Font;
 
-    has $.parent;
-
     method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
 			Numeric :$opacity,
 			Numeric :$transparency is copy,
@@ -225,7 +223,6 @@ role PDF::Content:ver<0.0.5>
 
         my Numeric $font-size = $text-block.font-size;
         my $font = $.parent.use-font: $text-block.font;
-	my $font-key = $.parent.resource-key($font);
 
 	my Bool $in-text = $.context == GraphicsContext::Text;
 	self.op(BeginText) unless $in-text;
@@ -258,10 +255,9 @@ role PDF::Content:ver<0.0.5>
 	    self.text-position = [$x, $y];
         }
 
-	self.op(SetFont, $font-key, $font-size)
-	    unless $.FontKey
-	    && $font-key eq $.FontKey
-	    && $font-size == $.FontSize;
+        self.set-font($font, $font-size)
+            unless $font-size == ($.FontSize//-1)
+            && $font eqv $.Font;
 
 	self.ops: $text-block.content(:$nl, :$top, :$left);
 
@@ -277,26 +273,21 @@ role PDF::Content:ver<0.0.5>
 
     #| thin wrapper to $.op(SetFont, ...)
     multi method set-font( Hash $font!, Numeric $size = 16) {
-        $.op(SetFont, $!parent.resource-key($font), $size);
+        $.op(SetFont, $.parent.resource-key($font), $size);
     }
     multi method set-font( Str $font-key!, Numeric $size = 16) {
         $.op(SetFont, $font-key, $size);
     }
 
     method !current-font {
-        with $.FontKey {
-            $.parent.resource-entry('Font', $_)
-        }
-        else {
-            $!parent.core-font('Courier');
-        }
+        $.Font // $.parent.core-font('Courier');
     }
 
     method font is rw returns Array {
 	my $obj = self;
 	Proxy.new(
 	    FETCH => method {
-		[$obj.FontKey, $obj.FontSize // 16];
+		[$obj.Font, $obj.FontSize // 16];
 	    },
 	    STORE => method ($v) {
 		my @v = $v.isa(List) ?? @$v !! [ $v, ];
