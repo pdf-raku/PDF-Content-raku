@@ -24,13 +24,13 @@ class PDF::Content::Text::Block {
     has Str $!align where 'left'|'center'|'right'|'justify';
     has Str $.valign where 'top'|'center'|'bottom'|'text';
 
-    method actual-width  { @!lines.max: *.actual-width; }
+    method actual-width  { @!lines.map( *.actual-width ).max }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
 
-    multi submethod BUILD(Str  :$!text!,
-                               :$!font!,
-			       :$!font-size = 16,
-                          Bool :$kern       = False,
+    multi submethod BUILD(Str     :$!text!,
+                                  :$!font!,
+			  Numeric :$!font-size = 16,
+                          Bool    :$kern       = False,
 			  |c) {
 
 	$!space-width = $!font.stringwidth( ' ', $!font-size );
@@ -115,14 +115,14 @@ class PDF::Content::Text::Block {
                 @word.push: $atom;
             } while $atom.sticky && @atoms;
 
-            my $trailing-space = $atom.space;
+            my Numeric $trailing-space = $atom.space;
 	    if $trailing-space > 0 {
 		$char-count += $trailing-space * $!font-size / $!space-width;
 		$trailing-space += $!word-spacing;
 		$word-width += $!word-spacing;
 	    }
 
-	    my $visual-width = $line-width + $word-width - $trailing-space;
+	    my Numeric $visual-width = $line-width + $word-width - $trailing-space;
 	    $visual-width += ($char-count - 1) * $!char-spacing
 		if $char-count && $!char-spacing > 0;
 	    $visual-width *= $!horiz-scaling / 100

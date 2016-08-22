@@ -5,7 +5,7 @@ use PDF::Content;
 use PDF::Content::Text::Block;
 use PDF::Content::Util::Font;
 
-plan 1;
+plan 3;
 
 my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
@@ -31,7 +31,8 @@ role Parent {
 }
 my $parent = {} does Parent;
 my $text-block = PDF::Content::Text::Block.new( :$text, :$font, :$font-size );
-
+is-approx $text-block.actual-width, 364.448, '$.actual-width';
+is-approx $text-block.actual-height, 19.04, '$.actual-height';
 my $gfx = PDF::Content.new( :$parent );
 
 $gfx.say( $text-block );

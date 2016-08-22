@@ -127,7 +127,7 @@ Note: only the PDF core fonts are supported: Courier, Times, Helvetica, ZapfDing
 
 #### Low level graphics, colors and drawing
 
-PDF::Content::PDF::Contents::Gfx inherits from PDF::Content, which implements the full range of PDF content operations, plus
+PDF::Content inherits from PDF::Content::Op, which implements the full range of PDF content operations. It implments
 utility methods for handling text, images and graphics coordinates:
 
 ```
