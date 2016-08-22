@@ -549,7 +549,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     multi method track-graphics('gs', Str $key) {
         with self.parent {
             with .resource-entry('ExtGState', $key) {
-                with .<Font> { $!Tf = ~ .[0]; $!Tfs = + .[1] }
+                with .<Font> { $!Tf = .[0]; $!Tfs = + .[1] }
             }
             else {
                 die "unknown extended graphics state: /$key"
