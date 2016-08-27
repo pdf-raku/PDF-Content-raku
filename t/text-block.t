@@ -19,8 +19,6 @@ $gfx.Save;
 $gfx.BeginText;
 $gfx.text-position = [100, 350];
 $gfx.say( $text-block );
-# go bolder
-$text-block.thickness += 5;
 $gfx.print( $text-block );
 $gfx.EndText;
 $gfx.Restore;
@@ -35,8 +33,6 @@ is-json-equiv [ $gfx.ops ], [
     :TL[:real(17.6)],
     :TJ[ :array[:literal("Hello. Ting, ting, ting. Attention! \x[85] ATTENTION!")] ],
     'T*' => [],
-    :Tr[ :int(2) ],
-    :w[ :real(0.3125) ],
     :TJ[ :array[:literal("Hello. Ting, ting, ting. Attention! \x[85] ATTENTION!")] ],
     :ET[],
     :Q[],
