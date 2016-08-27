@@ -4,7 +4,7 @@ class PDF::Content::Text::Block {
 
     use PDF::Content::Text::Line;
     use PDF::Content::Text::Atom;
-    use PDF::Content::Ops :OpNames;
+    use PDF::Content::Ops :OpNames, :TextMode;
 
     has Str     $.text;
     has Numeric $.font-size is required;
@@ -23,6 +23,7 @@ class PDF::Content::Text::Block {
     has @.overflow is rw;
     has Str $!align where 'left'|'center'|'right'|'justify';
     has Str $.valign where 'top'|'center'|'bottom'|'text';
+    has Numeric $.thickness is rw = 0.0; #| extra font thickness
 
     method actual-width  { @!lines.map( *.actual-width ).max }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
@@ -90,8 +91,9 @@ class PDF::Content::Text::Block {
 			  Numeric :$!horiz-scaling = 100,
 			  Numeric :$!char-spacing = 0,
                           Numeric :$!word-spacing = 0,
-                          Numeric :$!width?,      #| optional constraint
-                          Numeric :$!height?,     #| optional constraint
+                          Numeric :$!thickness = 0, #| extra fint thickness
+                          Numeric :$!width?,        #| optional constraint
+                          Numeric :$!height?,       #| optional constraint
                           Str :$!align = 'left',
                           Str :$!valign = 'text',
         ) is default {
@@ -176,15 +178,20 @@ class PDF::Content::Text::Block {
                   ) {
 
         my @content = ( OpNames::SetTextLeading => [ $!line-height ], )
-	   if $nl || +@!lines > 1;
+	    if $nl || +@!lines > 1;
+
+        if $!thickness > 0 {
+            # outline text to increase boldness
+            @content.push( OpNames::SetTextRender => [ TextMode::FillOutlineText.value ] );
+            @content.push( OpNames::SetLineWidth  => [ $!thickness / $!font-size ] );
+        }
 
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 
         if $!valign ne 'text' {
-
             # adopt html style text positioning. from the top of the font, not the baseline.
             my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
-            @content.push: 'Td' => [0, $y-shift - $!font-base-height ]
+            @content.push( OpNames::TextMove => [0, $y-shift - $!font-base-height ] );
         }
 
         my $dx = do given $!align {

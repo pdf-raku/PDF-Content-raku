@@ -95,16 +95,18 @@ role PDF::Content:ver<0.0.5>
     my subset Vector of List where {.elems == 2 && all(.[0], .[1]) ~~ Numeric}
     #| set the current text position on the page/form
     method text-position is rw returns Vector {
-	my $gfx = self;
+        warn '$.text-position accessor used outside of a text-block'
+            unless $.context == GraphicsContext::Text;
+
 	my Numeric @tm = @.TextMatrix;
 	Proxy.new(
-	    FETCH => method {
+	    FETCH => sub ($) {
 		@tm[4,5]
 	    },
-	    STORE => method (Vector $v) {
+	    STORE => sub ($, Vector $v) {
                 @tm[4] = $_ with $v[0];
                 @tm[5] = $_ with $v[1];
-		$gfx.op(SetTextMatrix, @tm);
+		self.op(SetTextMatrix, @tm);
 		@$v;
 	    },
 	    );
