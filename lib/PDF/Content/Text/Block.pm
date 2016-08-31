@@ -3,10 +3,8 @@ use v6;
 class PDF::Content::Text::Block {
 
     use PDF::Content::Text::Line;
-    use PDF::Content::Text::Atom;
     use PDF::Content::Ops :OpNames, :TextMode;
 
-    has Str     $.text;
     has Numeric $.font-size is required;
     has         $.font is required;
     has Numeric $.font-height = $!font.height( $!font-size );
@@ -15,8 +13,6 @@ class PDF::Content::Text::Block {
     has Numeric $!space-width;
     subset Percentage of Numeric where * > 0;
     has Percentage $.horiz-scaling = 100;
-    has Numeric $.char-spacing = 0;
-    has Numeric $.word-spacing = 0;
     has Numeric $!width;
     has Numeric $!height;
     has @.lines;
@@ -27,129 +23,77 @@ class PDF::Content::Text::Block {
     method actual-width  { @!lines.map( *.actual-width ).max }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
 
-    multi submethod BUILD(Str     :$!text!,
-                                  :$!font!,
-			  Numeric :$!font-size = 16,
-                          Bool    :$kern       = False,
-			  |c) {
+    multi submethod BUILD(Str :$text!, |c) {
 
-	$!space-width = $!font.stringwidth( ' ', $!font-size );
+        my Str @words = $text.comb(/ [ <![ - ]> [ \w | <:Punctuation> | "\c[NO-BREAK SPACE]" | "\c[NARROW NO-BREAK SPACE]" | "\c[WORD JOINER]" ] ]+ '-'?/);
 
-        my @chunks = flat $!text.comb(/ [ <![ - ]> [ \w | <:Punctuation> ] ]+ '-'? || . /).map( {
-				    when /\n/  {' '}
-                                    when $kern { $!font.kern($_, $!font-size).list }
-                                    default    { $!font.filter($_) }
-                                 });
-
-        constant NO-BREAK-WS = "\c[NO-BREAK SPACE]" | "\c[NARROW NO-BREAK SPACE]" | "\c[WORD JOINER]";
-
-        my PDF::Content::Text::Atom @atoms;
-
-        while @chunks {
-            my $content = @chunks.shift;
-            my %atom = :$content;
-            %atom<space> = @chunks && @chunks[0] ~~ Numeric
-                ?? @chunks.shift
-                !! 0;
-            # don't atomize regular white-space
-            next if $content ~~ /^\s/ && $content ne NO-BREAK-WS; 
-            my Bool $followed-by-ws = ?(/^\s/ && $_ ne NO-BREAK-WS)
-                with @chunks[0];
-            %atom<width> = $!font.stringwidth($content, $!font-size, :$kern);
-            my Bool $kerning = %atom<space> < 0;
-
-	    do {
-		when $kerning {
-                    %atom<sticky> = True;
-		}
-		when $content eq NO-BREAK-WS {
-                    %atom<elastic> = True;
-                    %atom<sticky> = True;
-                    @atoms[*-1].sticky = ? @atoms;
-		}
-		when $followed-by-ws {
-                    %atom<elastic> = True;
-                    %atom<space> = $!space-width;
-		}
-	    }
-
-            my PDF::Content::Text::Atom $atom .= new( |%atom );
-
-            my Str $encoded = [~] $!font.encode( $content );
-            $atom.encoded = $encoded
-                unless $encoded eq $content;
-
-            @atoms.push: $atom;
-        }
-
-        self.BUILD( :@atoms, |c );
+        self.BUILD( :@words, |c );
     }
 
-    multi submethod BUILD(PDF::Content::Text::Atom :@atoms!,
+    multi submethod BUILD(Str  :@words!,
+                               :$!font!,
+			  Numeric :$!font-size = 16,
                           Numeric :$!line-height = $!font-size * 1.1,
 			  Numeric :$!horiz-scaling = 100,
-			  Numeric :$!char-spacing = 0,
-                          Numeric :$!word-spacing = 0,
+                          Numeric :$word-spacing is copy = 0,
                           Numeric :$!width?,        #| optional constraint
                           Numeric :$!height?,       #| optional constraint
                           Str :$!align = 'left',
                           Str :$!valign = 'text',
+                          Bool :$kern = False,
         ) is default {
 
+	$!space-width = $!font.stringwidth(' ', $!font-size );
+        $word-spacing += $!space-width;
         my PDF::Content::Text::Line $line;
-        my Numeric $line-width = 0.0;
-	my Numeric $char-count = 0.0;
+        my Bool $full = False;
 
-	@atoms = @atoms;
+        for @words -> $text {
 
-        while @atoms {
+            if $full {
+                @!overflow.push: $text;
+                next;
+            }
+            my $word;
+	    my $word-width;
 
-            my @word;
-            my $atom;
-	    my $word-width = 0;
+            if ($kern) {
+                ($word, $word-width) = $!font.kern($text);
+            }
+            else {
+                $word = [ $text, ];
+                $word-width = $!font.stringwidth($text);
+            }
+            $word-width *= $!font-size / 1000;
 
-            repeat {
-                $atom = @atoms.shift;
-		$char-count += $atom.content.chars;
-		$word-width += $atom.width + $atom.space;
-                @word.push: $atom;
-            } while $atom.sticky && @atoms;
-
-            my Numeric $trailing-space = $atom.space;
-	    if $trailing-space > 0 {
-		$char-count += $trailing-space * $!font-size / $!space-width;
-		$trailing-space += $!word-spacing;
-		$word-width += $!word-spacing;
-	    }
-
-	    my Numeric $visual-width = $line-width + $word-width - $trailing-space;
-	    $visual-width += ($char-count - 1) * $!char-spacing
-		if $char-count && $!char-spacing > 0;
-	    $visual-width *= $!horiz-scaling / 100
-		if $!horiz-scaling != 100;
-
-            if !$line || ($!width && $line.atoms && $visual-width > $!width) {
-                last if $!height && (@!lines + 1)  *  $!line-height > $!height;
-                $line = PDF::Content::Text::Line.new();
-                $line-width = 0.0;
-		$char-count = 0;
-                @!lines.push: $line;
+            for $word.list {
+                when Str {
+                    $_ = $!font.encode($_).join;
+                }
+                when Numeric {
+                    $_ = - $_;
+                }
             }
 
-            $line.atoms.append: @word;
-            $line-width += $word-width;
+            if !$line || ($!width && $line.actual-width + $word-width + $word-spacing > $!width) {
+                if $!height && (@!lines + 1)  *  $!line-height > $!height {
+                    $full = True;
+                    @!overflow.push: $text;
+                }
+                else {
+                    $line = PDF::Content::Text::Line.new( :$word-spacing );
+                    @!lines.push: $line;
+                }
+            }
+
+            $line.words.push: $word;
+            $line.word-width += $word-width;
         }
 
         my $width = $!width // self.actual-width
             if $!align eq 'justify';
 
-        for @!lines {
-            .atoms[*-1].elastic = False;
-            .atoms[*-1].space = 0;
-            .align($!align, :$width );
-        }
-
-        @!overflow = @atoms;
+        .align($!align, :$width ) for @!lines;
     }
 
     method width  { $!width //= self.actual-width }
@@ -194,7 +138,7 @@ class PDF::Content::Text::Block {
         my $x-shift = $left ?? $dx * $.width !! 0;
 
         for @!lines {
-            @content.push: .content(:$.font-size, :$space-size, :$!word-spacing, :$x-shift);
+            @content.push: .content(:$.font-size, :$space-size, :$x-shift);
             @content.push: OpNames::TextNextLine;
         }
 

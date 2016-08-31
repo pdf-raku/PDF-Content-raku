@@ -30,7 +30,6 @@
         "PDF::Content::Font::AFM"       : "lib/PDF/Content/Font/AFM.pm",
         "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
 
-        "PDF::Content::Text::Atom"      : "lib/PDF/Content/Text/Atom.pm",
         "PDF::Content::Text::Block"     : "lib/PDF/Content/Text/Block.pm",
         "PDF::Content::Text::Line"      : "lib/PDF/Content/Text/Line.pm",
 

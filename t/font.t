@@ -25,8 +25,8 @@ ok $hb-afm-again === $hb-afm, 'font caching';
 my $tr-afm = PDF::Content::Util::Font::core-font( 'Times-Roman' );
 is $tr-afm.stringwidth("RVX", :!kern), 2111, 'stringwidth :!kern';
 is $tr-afm.stringwidth("RVX", :kern), 2111 - 80, 'stringwidth :kern';
-is-deeply $tr-afm.kern("RVX" ), ['R', -80, 'VX'], '.kern(...)';
-is-deeply $tr-afm.kern("RVX", 12), ['R', -0.96, 'VX'], '.kern(..., $w))';
+is-deeply $tr-afm.kern("RVX" ), (['R', -80, 'VX'], 2031), '.kern(...)';
+is-deeply $tr-afm.kern("RVX", 12), (['R', -0.96, 'VX'], 2031 * 12 / 1000), '.kern(..., $w))';
 
 for (win => "Á®ÆØ",
      mac => "ç¨®¯") {

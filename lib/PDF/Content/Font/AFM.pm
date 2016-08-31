@@ -39,7 +39,7 @@ role PDF::Content::Font::AFM {
 
     #| reduce string to the displayable characters
     method filter(Str $text-in) {
-	$text-in.comb.grep({ $!glyphs{$_}:exists }).join: '';
+	$text-in.comb.grep({ $!glyphs{$_}:exists }).join;
     }
 
     #| map ourselves to a PDF::Content object
@@ -49,7 +49,7 @@ role PDF::Content::Font::AFM {
 		     :BaseFont( :name( self.FontName ) ),
 	};
 
-	if my $name = %enc-name{self.enc} {
+	with %enc-name{self.enc} -> $name {
 	    $dict<Encoding> = :$name;
 	}
 

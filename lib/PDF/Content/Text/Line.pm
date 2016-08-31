@@ -4,24 +4,22 @@ class PDF::Content::Text::Line {
 
     use PDF::Content::Ops :OpNames;
 
-    has @.atoms;
+    has @.words;
+    has Numeric $.word-width is rw = 0; #| sum of word widths
+    has Numeric $.word-spacing = 0;
     has Numeric $.indent is rw = 0;
 
-    method actual-width returns Numeric { [+] @!atoms.map({ .width + .space }) };
+    method actual-width returns Numeric {
+        my \w = @!words.elems - 1;
+        $!word-width + (w > 0 ?? w * $!word-spacing !! 0);
+    }
 
     multi method align('justify', Numeric :$width! ) {
         my Numeric $actual-width = $.actual-width;
+        my \w = @!words.elems - 1;
 
-        if $width > $actual-width && $width / $actual-width < 2.0 {
-            # stretch both word boundaries and non-breaking spaces
-            my @elastics = @!atoms.grep: *.elastic;
-
-            if +@elastics {
-                my Numeric $stretch = ($width - $actual-width) / +@elastics;
-                .space += $stretch
-                    for @elastics;
-            }
-
+        if w > 0 && $width > $actual-width && $width / $actual-width < 2.0 {
+            $!word-spacing += ($width - $actual-width) / w;
             $!indent = 0;
         }
     }
@@ -38,49 +36,42 @@ class PDF::Content::Text::Line {
         $!indent = - $.actual-width  /  2;
     }
 
-    method content(Numeric :$font-size!, Numeric :$space-size!, Numeric :$word-spacing = 0, Numeric :$x-shift = 0) {
+    method content(Numeric :$font-size!, Numeric :$space-size!, Numeric :$x-shift = 0) {
 
-        my Numeric $scale = -1000 / $font-size;
+        my Numeric \scale = -1000 / $font-size;
         my subset Str-or-Pos of Any where Str|Numeric;
         my Str-or-Pos @line;
 
         my Numeric $indent = $!indent + $x-shift;
-        $indent =  ($indent * $scale).round.Int;
+        $indent =  ($indent * scale).round.Int;
         @line.push: $indent
             if $indent;
         my Numeric $pos;
+        my int $wc = 0;
+        #| use a real space, if it fits
+        my \space-width = (scale * $!word-spacing).round.Int;
+        my \space = abs(space-width - $space-size) <= 1 ?? ' ' !! space-width;
 
-        for $.atoms.list {
-            @line.push: $pos
-                if $pos;
-
-	    $pos = .space;
-	    $pos += $word-spacing
-		if $pos > 0 && $word-spacing;
-	    $pos = ($pos * $scale).round.Int;
-
-            my Str $str = .encoded // .content;
-
-	    if $pos && $space-size && abs($pos - $space-size) <= 1 {
-		# optimization: use an actual space, when it fits
-		$str ~= ' ';
-		$pos = 0;
-	    }
-
-	    if $str.chars {
-		if @line && @line[*-1] ~~ Str {
-		    # on a string segment - concatonate
-		    @line[*-1] ~= $str
-		}
-		else {
-		    # start a new string segment
-		    @line.push: $str;
-		}
-	    }
-
+        for @!words -> \w {
+	    @line.push(space) if $wc++;
+            @line.append: w.list;
         }
 
-        (OpNames::ShowSpaceText) => [@line,];
+        #| coelesce adjacent strings
+        my @out;
+        my $n = 0;
+        my $prev = 0;
+        for @line {
+            if $_ ~~ Str && $prev ~~ Str {
+                @out[$n-1] ~= $_
+            }
+            else {
+                @out[$n++] = $_;
+            }
+            $prev = $_;
+        }
+
+        (OpNames::ShowSpaceText) => [@out,];
 
     }
 
