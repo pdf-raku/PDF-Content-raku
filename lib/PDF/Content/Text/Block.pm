@@ -5,9 +5,10 @@ class PDF::Content::Text::Block {
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpNames, :TextMode;
 
+    has Str $.text;
     has Numeric $.font-size is required;
     has         $.font is required;
-    has Numeric $.font-height = $!font.height( $!font-size );
+    has Numeric $.font-height;
     has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
     has Numeric $.line-height;
     has Numeric $!space-width;
@@ -23,14 +24,27 @@ class PDF::Content::Text::Block {
     method actual-width  { @!lines.map( *.actual-width ).max }
     method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
 
-    multi submethod BUILD(Str :$text!, |c) {
-
-        my Str @words = $text.comb(/ [ <![ - ]> [ \w | <:Punctuation> | "\c[NO-BREAK SPACE]" | "\c[NARROW NO-BREAK SPACE]" | "\c[WORD JOINER]" ] ]+ '-'?/);
-
-        self.BUILD( :@words, |c );
+    grammar Text {
+        token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
+        token space { [\s <!after <nbsp> >]+ }
+        token word  { [ <![ - ]> [<!before \s> . | <nbsp>] ]+ '-'? }
     }
 
-    multi submethod BUILD(Str  :@words!,
+    multi submethod BUILD(Str :$!text!, |c) {
+        my Str @chunks = $!text.comb(/<Text::word> || <Text::space>/);
+        self.BUILD( :@chunks, |c );
+    }
+
+    sub flush-space(@words) returns Bool {
+        if @words && @words[0] ~~ /<Text::space>/ {
+            @words.shift;
+            True
+        } else {
+            False
+        }
+    }
+
+    multi submethod BUILD(Str  :@chunks!,
                                :$!font!,
 			  Numeric :$!font-size = 16,
                           Numeric :$!line-height = $!font-size * 1.1,
@@ -43,17 +57,20 @@ class PDF::Content::Text::Block {
                           Bool :$kern = False,
         ) is default {
 
+        $!text //= @chunks.join;
 	$!space-width = $!font.stringwidth(' ', $!font-size );
+        $!font-height = $!font.height( $!font-size );
         $word-spacing += $!space-width;
-        my PDF::Content::Text::Line $line;
-        my Bool $full = False;
+        my Bool $follows-ws = False;
+        my PDF::Content::Text::Line $line .= new( :$word-spacing );
+        @!lines.push: $line;
 
-        for @words -> $text {
+        flush-space(@chunks);
+  
+        while @chunks {
 
-            if $full {
-                @!overflow.push: $text;
-                next;
-            }
+            my Str $text = @chunks.shift;
+
             my $word;
 	    my $word-width;
 
@@ -75,25 +92,34 @@ class PDF::Content::Text::Block {
                 }
             }
 
-            if !$line || ($!width && $line.actual-width + $word-width + $word-spacing > $!width) {
-                if $!height && (@!lines + 1)  *  $!line-height > $!height {
-                    $full = True;
+            if $!width && $line.words && $line.actual-width + $word-spacing + $word-width > $!width {
+                # line break
+                if $!height && self.actual-height + $!line-height > $!height {
+                    # height exceeded
                     @!overflow.push: $text;
+                    last;
                 }
                 else {
-                    $line = PDF::Content::Text::Line.new( :$word-spacing );
-                    @!lines.push: $line;
+                    $line = $line.new( :$word-spacing );
+                    @!lines.push: $line ;
                 }
+                $follows-ws = False;
             }
 
+            $line.word-boundary[+$line.words] = $follows-ws;
             $line.words.push: $word;
             $line.word-width += $word-width;
+
+            $follows-ws = flush-space(@chunks);
         }
+
+        @!overflow.append: @chunks;
 
         my $width = $!width // self.actual-width
             if $!align eq 'justify';
 
-        .align($!align, :$width ) for @!lines;
+        .align($!align, :$width )
+            for @!lines;
     }
 
     method width  { $!width //= self.actual-width }
