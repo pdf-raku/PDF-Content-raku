@@ -1,6 +1,5 @@
 use v6;
 
-use PDF::Writer;
 use PDF::DAO::Util :from-ast;
 
 role PDF::Content::Ops {
@@ -214,36 +213,35 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has GraphicsContext $.context = Page;
 
     method !track-context(Str $op, $last-op) {
-        my $transition = do given $op {
+        my \transition = do given $op {
 
-            when 'BT'       { [Page, Text] }
-            when 'ET'       { [Text, Page] }
+            when 'BT'     { [Page, Text] }
+            when 'ET'     { [Text, Page] }
 
-            when 'BI'       { [Page, Image] }
-            when 'EI'       { [Image, Page] }
+            when 'BI'     { [Page, Image] }
+            when 'EI'     { [Image, Page] }
 
-            when 'BX'       { [Page, External] }
-            when 'EX'       { [External, Page] }
+            when 'BX'     { [Page, External] }
+            when 'EX'     { [External, Page] }
 
-            when 'W' | 'W*' { [Path, Clipping] }
-            when 'm' | 're' { [Page, Path] }
-            when 'Do'       { [Page, Page ] }
-            when $op ∈ PaintingOps { [Clipping | Path, Page] }
-        }
+            when 'W'|'W*' { [Path, Clipping] }
+            when 'm'|'re' { [Page, Path] }
+            when 'Do'     { [Page, Page ] }
+            when $op ∈ PaintingOps { [Clipping|Path, Page] }
+       }
 
        my Bool $ok-here;
-
-       if $transition {
-           $ok-here = ?($transition[0] == $!context);
-           $!context = $transition[1];
+       if transition {
+           $ok-here = ?(transition[0] == $!context);
+           $!context = transition[1];
        }
        else {
-           $ok-here = do given $!context {
-               when Path     { $op ∈ PathOps }
-               when Text     { ?($op ∈ TextOps | TextStateOps | GeneralGraphicOps | ColorOps | MarkedContentOps) }
-               when Page     { ?($op ∈ TextStateOps | SpecialGraphicOps | GeneralGraphicOps | ColorOps | MarkedContentOps) }
-               when Image    { $op eq 'ID' }
-               default       { False }
+           $ok-here = ? do given $!context {
+               when Path  { $op ∈ PathOps }
+               when Text  { $op ∈ TextOps|TextStateOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
+               when Page  { $op ∈ TextStateOps|SpecialGraphicOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
+               when Image { $op eq 'ID' }
+               default    { False }
            }
        }
 
@@ -269,7 +267,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         },
 
         'BT'|'ET'|'EMC'|'BX'|'EX'|'b*'|'b'|'B*'|'B'|'f*'|'F'|'f'
-            | 'h'|'n'|'q'|'Q'|'s'|'S'|'T*'|'W*'|'W' => sub ($op) {
+            |'h'|'n'|'q'|'Q'|'s'|'S'|'T*'|'W*'|'W' => sub ($op) {
             $op => [];
         },
 
@@ -282,7 +280,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         },
 
         #| string                  Tj | '
-        'Tj' | "'" => sub ($op, Str $literal!) {
+        'Tj'|"'" => sub ($op, Str $literal!) {
             $op => [ :$literal ]
          },
 
@@ -421,13 +419,13 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         # validate the operation and get fallback coercements for any missing pairs
         my subset Comment of Pair where {.key eq 'comment'}
         my @vals = $raw.value.grep({$_ !~~ Comment}).map({ from-ast($_) });
-        my $opn = op($op, |@vals);
-	my $coerced_vals = $opn.value;
+        my \opn = op($op, |@vals);
+	my \coerced_vals = opn.value;
 
 	my @ast-values = $input_vals.pairs.map({
 	    .value ~~ Pair
 		?? .value
-		!! $coerced_vals[.key]
+		!! coerced_vals[.key]
 	});
 	$op => [ @ast-values ];
     }
@@ -442,15 +440,15 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     method op(*@args is copy) {
-        my $opn = op(|@args);
+        my \opn = op(|@args);
 	my Str $op-name;
 
-        if $opn ~~ Pair {
-	    $op-name = $opn.key.Str;
-	    @args = [ $opn.value.map: *.value ];
+        if opn ~~ Pair {
+	    $op-name = opn.key.Str;
+	    @args = [ opn.value.map: *.value ];
 	}
 	else {
-	    $op-name = $opn.Str;
+	    $op-name = opn.Str;
 	}
 
         if $!context == Text {
@@ -467,7 +465,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	if $!strict {
 	    if !@!gsave {
 		warn "graphics operation '$op-name' outside of a q ... Q graphics block\n"
-		    if $op-name ∈ GeneralGraphicOps | ColorOps
+		    if $op-name ∈ GeneralGraphicOps|ColorOps
 		    || $op-name eq 'cm';
 	    }
 	}
@@ -475,14 +473,14 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my Str $last-op = @!ops[*-1].key
 	    if @!ops;
 
-	@!ops.push($opn);
+	@!ops.push(opn);
         self!track-context($op-name, $last-op);
         self.track-graphics($op-name, |@args );
         .($op-name, |@args, :gfx(self) )
 	    with self.callback;
-        $opn.value.push: (:comment(%OpCode{$op-name}))
+        opn.value.push: (:comment(%OpCode{$op-name}))
             if $!comment-ops;
-	$opn;
+	opn;
     }
 
     multi method ops(Str $ops!) {
@@ -602,22 +600,22 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     #| serialize content. indent blocks for readability
     method content {
-        use PDF::Writer;
-	my constant Openers = 'q' | 'BT' | 'BMC' | 'BDC' | 'BX';
-	my constant Closers = 'Q' | 'ET' | 'EMC' | 'EX';
+        require PDF::Writer;
+	my constant Openers = 'q'|'BT'|'BMC'|'BDC'|'BX';
+	my constant Closers = 'Q'|'ET'|'EMC'|'EX';
 
 	$.finish;
-        my $writer = PDF::Writer.new;
+        my \writer = ::('PDF::Writer').new;
 	my UInt $nesting = 0;
 
         @!ops.map({
-	    my $op = ~ .key;
+	    my \op = ~ .key;
 
-	    $nesting-- if $nesting && $op eq Closers;
-	    $writer.indent = '  ' x $nesting;
-	    $nesting++ if $op eq Openers;
+	    $nesting-- if $nesting && op eq Closers;
+	    writer.indent = '  ' x $nesting;
+	    $nesting++ if op eq Openers;
 
-	    $writer.indent ~ $writer.write: :content($_);
+	    writer.indent ~ writer.write: :content($_);
 	}).join: "\n";
     }
 
@@ -625,8 +623,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     multi method FALLBACK(Str $op-name where {OpNames.enums{$op-name}:exists},
 			  *@args,
 	) {
-	my $op = OpNames.enums{$op-name};
-	my &op-meth = method (*@a) { self.op($op, |@a) };
+	my \op = OpNames.enums{$op-name};
+	my &op-meth = method (*@a) { self.op(op, |@a) };
         self.WHAT.^add_method($op-name, &op-meth );
         self."$op-name"(|@args);
     }
