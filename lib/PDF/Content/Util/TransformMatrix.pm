@@ -10,8 +10,8 @@ module PDF::Content::Util::TransformMatrix {
     #
     # where a b c d e f are stored in a six digit array and the third column is implied.
 
-    sub deg2rad(Numeric $deg) {
-        return $deg * pi / 180;
+    sub deg2rad(Numeric \deg) {
+        return deg * pi / 180;
     }
 
     subset TransformMatrix of Array where {.elems == 6}
@@ -25,12 +25,12 @@ module PDF::Content::Util::TransformMatrix {
         [1, 0, 0, 1, $x, $y];
     }
 
-    sub rotate( Numeric $deg! --> TransformMatrix) {
-        my Numeric $r = deg2rad($deg);
-        my Numeric $cos = cos($r);
-        my Numeric $sin = sin($r);
+    sub rotate( Numeric \deg --> TransformMatrix) {
+        my Numeric \r = deg2rad(deg);
+        my Numeric \cos = cos(r);
+        my Numeric \sin = sin(r);
 
-        [$cos, $sin, -$sin, $cos, 0, 0];
+        [cos, sin, -sin, cos, 0, 0];
     }
 
     sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
@@ -41,23 +41,23 @@ module PDF::Content::Util::TransformMatrix {
         [1, tan(deg2rad($x)), tan(deg2rad($y)), 1, 0, 0];
     }
 
-    #| multiply transform matrix $a X $b
-    our sub multiply(TransformMatrix $a!, TransformMatrix $b! --> TransformMatrix) {
+    #| multiply transform matrix x X y
+    our sub multiply(TransformMatrix \x, TransformMatrix \y --> TransformMatrix) {
 
-        [ $b[a]*$a[a] + $b[c]*$a[b],
-          $b[b]*$a[a] + $b[d]*$a[b],
-          $b[a]*$a[c] + $b[c]*$a[d],
-          $b[b]*$a[c] + $b[d]*$a[d],
-          $b[a]*$a[e] + $b[c]*$a[f] + $b[e],
-          $b[b]*$a[e] + $b[d]*$a[f] + $b[f],
+        [ y[a]*x[a] + y[c]*x[b],
+          y[b]*x[a] + y[d]*x[b],
+          y[a]*x[c] + y[c]*x[d],
+          y[b]*x[c] + y[d]*x[d],
+          y[a]*x[e] + y[c]*x[f] + y[e],
+          y[b]*x[e] + y[d]*x[f] + y[f],
         ];
     }
 
     #| Coordinate transfrom of x, y: See [PDF 1.7 Sectiono 4.2.3 Transformation Matrices]
     #|  x' = a.x  + c.y + e; y' = b.x + d.y +f
-    our sub transform(TransformMatrix $tm!, Numeric $x, Numeric $y) {
-	[ $tm[a]*$x + $tm[c]*$y + $tm[e],
-	  $tm[b]*$x + $tm[d]*$y + $tm[f], ]
+    our sub transform(TransformMatrix \tm, Numeric \x, Numeric \y) {
+	[ tm[a]*x + tm[c]*y + tm[e],
+	  tm[b]*x + tm[d]*y + tm[f], ]
     }
 
     #| Compute: $a = $a X $b
@@ -65,13 +65,13 @@ module PDF::Content::Util::TransformMatrix {
 	$a = multiply($a, $b);
     }
 
-    our sub round(Numeric $n) {
-	my Numeric $r = $n.round(1e-6);
-	my Int $i = $n.round;
+    our sub round(Numeric \n) {
+	my Numeric \r = n.round(1e-6);
+	my Int \i = n.round;
 	constant Epsilon = 1e-5;
-	abs($n - $i) < Epsilon
-	    ?? $i.Int   # assume it's an int
-	    !! $r;
+	abs(n - i) < Epsilon
+	    ?? i   # assume it's an int
+	    !! r;
     }
 
     multi sub vect(Numeric $n! --> List) {@($n, $n)}
