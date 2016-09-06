@@ -5,7 +5,11 @@ use PDF::Content::PDF;
 use PDF::Content::Text::Block;
 use PDF::Content::Util::Font;
 
-plan 3;
+plan 4;
+
+my \nbsp = "\c[NO-BREAK SPACE]";
+my @chunks = "z80 a-b.   {nbsp}A{nbsp}bc{nbsp} 42".comb: /<PDF::Content::Text::Block::Text::word> | <PDF::Content::Text::Block::Text::space> /;
+is-deeply @chunks, ["z80", " ", "a-", "b.", "   ", "{nbsp}A{nbsp}bc{nbsp}", " ", "42"], ;
 
 my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;

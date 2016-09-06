@@ -31,7 +31,7 @@ class PDF::Content::Text::Block {
     }
 
     multi submethod BUILD(Str :$!text!, |c) {
-        my Str @chunks = $!text.comb(/<Text::word> || <Text::space>/);
+        my Str @chunks = $!text.comb(/<Text::word> | <Text::space>/);
         self.BUILD( :@chunks, |c );
     }
 
