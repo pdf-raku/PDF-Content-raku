@@ -5,7 +5,7 @@ use PDF::Content::PDF;
 use PDF::Content::Text::Block;
 use PDF::Content::Util::Font;
 
-plan 4;
+plan 5;
 
 my \nbsp = "\c[NO-BREAK SPACE]";
 my @chunks = "z80 a-b.   {nbsp}A{nbsp}bc{nbsp} 42".comb: /<PDF::Content::Text::Block::Text::word> | <PDF::Content::Text::Block::Text::space> /;
@@ -22,6 +22,7 @@ my $gfx = $pdf.add-page.gfx;
 $gfx.Save;
 $gfx.BeginText;
 $gfx.text-position = [100, 350];
+is-deeply $gfx.text-position, (100, 350), 'text position';
 $gfx.say( $text-block );
 $gfx.print( $text-block );
 $gfx.EndText;

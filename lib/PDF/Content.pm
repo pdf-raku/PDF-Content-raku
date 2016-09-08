@@ -98,16 +98,16 @@ role PDF::Content:ver<0.0.5>
         warn '$.text-position accessor used outside of a text-block'
             unless $.context == GraphicsContext::Text;
 
-	my Numeric @tm = @.TextMatrix;
 	Proxy.new(
-	    FETCH => sub ($) {
-		@tm[4,5]
+	    FETCH => sub (\p) {
+	        $.TextMatrix[4, 5];
 	    },
-	    STORE => sub ($, Vector $v) {
-                @tm[4] = $_ with $v[0];
-                @tm[5] = $_ with $v[1];
+	    STORE => sub (\p, Vector \v) {
+	        my Numeric @tm = @.TextMatrix;
+                @tm[4] = $_ with v[0];
+                @tm[5] = $_ with v[1];
 		self.op(SetTextMatrix, @tm);
-		@$v;
+		v.list;
 	    },
 	    );
     }
@@ -286,14 +286,13 @@ role PDF::Content:ver<0.0.5>
     }
 
     method font is rw returns Array {
-	my $obj = self;
 	Proxy.new(
-	    FETCH => method {
-		[$obj.Font, $obj.FontSize // 16];
+	    FETCH => sub (\p) {
+		[self.Font, self.FontSize // 16];
 	    },
-	    STORE => method ($v) {
+	    STORE => sub (\p, $v) {
 		my @v = $v.isa(List) ?? @$v !! [ $v, ];
-		$obj.set-font(|@v);
+		self.set-font(|@v);
 		@v;
 	    },
 	    );
