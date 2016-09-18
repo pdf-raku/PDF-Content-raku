@@ -46,7 +46,7 @@ role PDF::Content:ver<0.0.5>
 	self.SetGraphicsState($gs-entry);
     }
 
-    method block( &do-stuff! ) {
+    method graphics( &do-stuff! ) {
         $.op(Save);
         &do-stuff(self);
         $.op(Restore);
@@ -176,7 +176,7 @@ role PDF::Content:ver<0.0.5>
             default { die "xobject has missing or unknown Subtype: {$obj.perl}" }
         }
 
-        self.block: {
+        self.graphics: {
 	    $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
 	    if $inline && $obj.Subtype eq 'Image' {
 		# serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]

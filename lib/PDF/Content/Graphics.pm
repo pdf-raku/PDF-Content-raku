@@ -10,7 +10,7 @@ role PDF::Content::Graphics {
 
     has PDF::Content $!pre-gfx; #| prepended graphics
     method pre-gfx { $!pre-gfx //= PDF::Content.new( :parent(self) ) }
-    method pre-graphics(&code) { self.pre-gfx.block( &code ) }
+    method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
 
     has PDF::Content $!gfx;     #| appended graphics
     method gfx(|c) {
@@ -25,7 +25,7 @@ role PDF::Content::Graphics {
 	    $gfx;
 	}
     }
-    method graphics(&code) { self.gfx.block( &code ) }
+    method graphics(&code) { self.gfx.graphics( &code ) }
     method text(&code) { self.gfx.text( &code ) }
 
     method contents-parse(Str $contents = $.contents ) {
