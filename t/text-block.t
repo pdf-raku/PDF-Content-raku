@@ -34,7 +34,7 @@ is-json-equiv [ $gfx.ops ], [
     :Tm[ :real(1),   :real(0),
          :real(0),   :real(1),
          :real(100), :real(350), ],
-    :Tf[:name<F1>, :real(16)],
+    :Tf[:name<F1>,   :real(16)],
     :TL[:real(17.6)],
     :TJ[ :array[:literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")] ],
     'T*' => [],

@@ -45,14 +45,10 @@ class PDF::Content::Text::Line {
         $indent =  ($indent * scale).round.Int;
         @line.push: $indent
             if $indent;
-        my Numeric $pos;
         my int $wc = 0;
-        #| use a real space, if it fits
-        my \space-width = (scale * $!word-spacing).round.Int;
-        my \space = abs(space-width - $space-size) <= 1 ?? ' ' !! space-width;
 
         for @!words -> \w {
-	    @line.push(space) if @!word-boundary[$wc++];
+	    @line.push: ' ' if @!word-boundary[$wc++];
             @line.append: w.list;
         }
 

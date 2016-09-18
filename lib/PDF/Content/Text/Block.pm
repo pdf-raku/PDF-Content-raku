@@ -12,6 +12,7 @@ class PDF::Content::Text::Block {
     has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
     has Numeric $.line-height;
     has Numeric $!space-width;
+    has Numeric $!word-spacing;
     subset Percentage of Numeric where * > 0;
     has Percentage $.horiz-scaling = 100;
     has Numeric $!width;
@@ -49,7 +50,7 @@ class PDF::Content::Text::Block {
 			  Numeric :$!font-size = 16,
                           Numeric :$!line-height = $!font-size * 1.1,
 			  Numeric :$!horiz-scaling = 100,
-                          Numeric :$word-spacing is copy = 0,
+                          Numeric :$!word-spacing = 0,
                           Numeric :$!width?,        #| optional constraint
                           Numeric :$!height?,       #| optional constraint
                           Str :$!align = 'left',
@@ -60,9 +61,9 @@ class PDF::Content::Text::Block {
         $!text //= @chunks.join;
 	$!space-width = $!font.stringwidth(' ', $!font-size );
         $!font-height = $!font.height( $!font-size );
-        $word-spacing += $!space-width;
         my Bool $follows-ws = False;
-        my PDF::Content::Text::Line $line .= new( :$word-spacing );
+        my $word-spacing = $!space-width + $!word-spacing;
+        my PDF::Content::Text::Line $line .= new: :$word-spacing;
         @!lines.push: $line;
 
         flush-space(@chunks);
@@ -164,6 +165,10 @@ class PDF::Content::Text::Block {
         my $x-shift = $left ?? $dx * $.width !! 0;
 
         for @!lines {
+            with .word-spacing - $!space-width {
+                @content.push( OpNames::SetWordSpacing => [ $!word-spacing = $_ ])
+                    unless $_ =~= $!word-spacing || +.words <= 1;
+            }
             @content.push: .content(:$.font-size, :$space-size, :$x-shift);
             @content.push: OpNames::TextNextLine;
         }
