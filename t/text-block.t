@@ -7,6 +7,9 @@ use PDF::Content::Util::Font;
 
 plan 5;
 
+# ensure consistant document ID generation
+srand(123456);
+
 my \nbsp = "\c[NO-BREAK SPACE]";
 my @chunks = "z80 a-b.   {nbsp}A{nbsp}bc{nbsp} 42".comb: /<PDF::Content::Text::Block::Text::word> | <PDF::Content::Text::Block::Text::space> /;
 is-deeply @chunks, ["z80", " ", "a-", "b.", "   ", "{nbsp}A{nbsp}bc{nbsp}", " ", "42"], ;

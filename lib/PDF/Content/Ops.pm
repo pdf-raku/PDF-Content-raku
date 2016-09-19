@@ -1,6 +1,20 @@
 use v6;
 
 use PDF::DAO::Util :from-ast;
+my role TextAtt {
+    has Str $.accessor-name is rw;
+    method compose(Mu $package) {
+        my \meth-name = self.accessor-name;
+        unless $package.^declares_method(meth-name) {
+            my \setter = 'Set' ~ meth-name;
+            my \accessor = self.rw
+                ?? sub (\obj) is rw { obj.rw-accessor( self, setter ); }
+                !! sub (\obj) { self.get_value( obj ) };
+            $package.^add_method( meth-name, accessor );
+        }
+    }
+}
+
 
 role PDF::Content::Ops {
 
@@ -142,17 +156,33 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         :FillOutlineClipText(6) :ClipText(7)
     »;
 
+    method rw-accessor($att, $setter) {
+        Proxy.new(
+            FETCH => sub ($) { $att.get_value(self) },
+            STORE => sub ($,*@v) {
+                self."$setter"(|@v);
+            });
+    }
+
+    multi trait_mod:<is>(Attribute $att, Str :$text-var!) {
+        $att does TextAtt;
+        $att.accessor-name = $att.name.substr(2);
+    }
+
     # *** TEXT STATE ***
-    has Numeric $!Tc = 0;    #| character spacing
-    has Numeric $!Tw = 0;    #| word spacing
-    has Numeric $!Th = 100;  #| horizontal scaling
-    has Numeric $!Tl = 0;    #| leading
-    has Numeric $!Tmode = 0; #| text rendering mode
-    has Numeric $!Trise = 0; #| text rise
-    has Hash $!Tf;           #| font dictionary
-    has Numeric $!Tfs;       #| font size
-    has Numeric @!Tm  = [ 1, 0, 0, 1, 0, 0, ];      #| text matrix
+    has Numeric $.CharSpacing  is text-var<Tc>    is rw = 0;
+    has Numeric $.WordSpacing  is text-var<Tw>    is rw = 0;
+    has Numeric $.HorizScaling is text-var<Th>    is rw = 100;
+    has Numeric $.TextLeading  is text-var<Tl>    is rw = 0;
+    has Numeric $.TextRender   is text-var<Tmode> is rw = 0; #| text rendering mode
+    has Numeric $.TextRise     is text-var<Trise> is rw = 0;
+    has Numeric @.TextMatrix   is text-var<Tm>    is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Hash    $.Font         is text-var<Tf>;  #| font dictionary
+    has Numeric $.FontSize     is text-var<Tfs>; #| font size
+
+    # *** Graphics STATE ***
     has Numeric @!CTM = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
+    method GraphicsMatrix { @!CTM  }
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
@@ -187,25 +217,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has @!gsave;
     has @!tags;
-
-    method !proxy(\var, $setter) {
-        Proxy.new(
-            FETCH => sub ($) { var },
-            STORE => sub ($,*@v) {
-                self."$setter"(|@v);
-            });
-    }
-
-    method TextMatrix   is rw { self!proxy(@!Tm, 'SetTextMatrix') }
-    method CharSpacing  is rw { self!proxy($!Tc, 'SetCharSpacing')  }
-    method WordSpacing  is rw { self!proxy($!Tw, 'SetWordSpacing')  }
-    method HorizScaling is rw { self!proxy($!Th, 'SetHorizScaling')  }
-    method TextLeading  is rw { self!proxy($!Tl, 'SetTextLeading')  }
-    method TextRender   is rw { self!proxy($!Tmode, 'SetTextRender') }
-    method TextRise     is rw { self!proxy($!Trise, 'SetTextRise') }
-    method Font           { $!Tf  }
-    method FontSize       { $!Tfs }
-    method GraphicsMatrix { @!CTM  }
 
     # States and transitions in [PDF 1.4 FIGURE 4.1 Graphics objects]
     my enum GraphicsContext is export(:GraphicsContext) <Path Text Clipping Page Shading External Image>;
@@ -505,25 +516,25 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     multi method track-graphics('q') {
-        my @Tm = @!Tm;
+        my @Tm = @!TextMatrix;
         my @CTM = @!CTM;
-        my %gstate = :$!Tc, :$!Tw, :$!Th, :$!Tl, :$!Tmode, :$!Trise, :$!Tf, :$!Tfs, :@Tm, :@CTM;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!FontSize, :@Tm, :@CTM;
         @!gsave.push: %gstate;
     }
     multi method track-graphics('Q') {
         die "bad nesting; Restore(Q) operator not matched by preceeding Save(q) operator in PDF content\n"
             unless @!gsave;
         my %gstate = @!gsave.pop;
-        $!Tc    = %gstate<Tc>;
-        $!Tw    = %gstate<Tw>;
-        $!Th    = %gstate<Th>;
-        $!Tl    = %gstate<Tl>;
-        $!Tmode = %gstate<Tmode>;
-        $!Trise = %gstate<Trise>;
-        $!Tf    = %gstate<Tf>;
-        $!Tfs   = %gstate<Tfs>;
-        @!Tm    = @(%gstate<Tm>);
-        @!CTM   = @(%gstate<CTM>);
+        $!CharSpacing  = %gstate<CharSpacing>;
+        $!WordSpacing  = %gstate<WordSpacing>;
+        $!HorizScaling = %gstate<HorizScaling>;
+        $!TextLeading  = %gstate<TextLeading>;
+        $!TextRender   = %gstate<TextRender>;
+        $!TextRise     = %gstate<TextRise>;
+        $!Font         = %gstate<Font>;
+        $!FontSize     = %gstate<FontSize>;
+        @!TextMatrix   = %gstate<Tm>.list;
+        @!CTM          = %gstate<CTM>.list;
 	Restore;
     }
     multi method track-graphics('cm', *@transform) {
@@ -531,7 +542,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!CTM = PDF::Content::Util::TransformMatrix::multiply(@!CTM, @transform);
     }
     multi method track-graphics('ET') {
-        @!Tm = [ 1, 0, 0, 1, 0, 0, ];
+        @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
     multi method track-graphics('BMC', Str $name!) {
 	@!tags.push: 'BMC';
@@ -547,45 +558,45 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     multi method track-graphics('gs', Str $key) {
         with self.parent {
             with .resource-entry('ExtGState', $key) {
-                with .<Font> { $!Tf = .[0]; $!Tfs = .[1] }
+                with .<Font> { $!Font = .[0]; $!FontSize = .[1] }
             }
             else {
                 die "unknown extended graphics state: /$key"
             }
         }
     }
-    multi method track-graphics('Tc', Numeric $!Tc!) {
+    multi method track-graphics('Tc', Numeric $!CharSpacing!) {
     }
-    multi method track-graphics('Tw', Numeric $!Tw!) {
+    multi method track-graphics('Tw', Numeric $!WordSpacing!) {
     }
-    multi method track-graphics('Tz', Numeric $!Th!) {
+    multi method track-graphics('Tz', Numeric $!HorizScaling!) {
     }
-    multi method track-graphics('TL', Numeric $!Tl!) {
+    multi method track-graphics('TL', Numeric $!TextLeading!) {
     }
-    multi method track-graphics('Tf', Str $key, Numeric $!Tfs!) {
+    multi method track-graphics('Tf', Str $key, Numeric $!FontSize!) {
         with self.parent {
             with .resource-entry('Font', $key) {
-                $!Tf = $_;
+                $!Font = $_;
             }
             else {
-                die "unknown font key: /$!Tf"
+                die "unknown font key: /$!Font"
             }
         }
     }
-    multi method track-graphics('Ts', Numeric $!Trise!) {
+    multi method track-graphics('Ts', Numeric $!TextRise!) {
     }
-    multi method track-graphics('Tm', *@!Tm) {
+    multi method track-graphics('Tm', *@!TextMatrix) {
     }
     multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
-        @!Tm[4] += $tx;
-        @!Tm[5] += $ty;
+        @!TextMatrix[4] += $tx;
+        @!TextMatrix[5] += $ty;
     }
     multi method track-graphics('TD', Numeric $tx!, Numeric $ty) {
-        $!Tl = - $ty;
+        $!TextLeading = - $ty;
         $.track-graphics(TextMove, $tx, $ty);
     }
     multi method track-graphics('T*') {
-        $.track-graphics(TextMove, 0, $!Tl);
+        $.track-graphics(TextMove, 0, $!TextLeading);
     }
     multi method track-graphics(*@args) is default {}
 
