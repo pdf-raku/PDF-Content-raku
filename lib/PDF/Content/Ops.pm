@@ -15,6 +15,8 @@ my role TextAtt {
     }
 }
 
+my role GraphicsAtt does TextAtt { }
+
 
 role PDF::Content::Ops {
 
@@ -43,7 +45,7 @@ c | CurveTo | x1 y1 x2 y2 x3 y3 | Append curved segment to path (three control p
 cm | ConcatMatrix | a b c d e f | Concatenate matrix to current transformation matrix
 CS | SetStrokeColorSpace | name | (PDF 1.1) Set color space for stroking operations
 cs | SetFillColorSpace | name | (PDF 1.1) Set color space for nonstroking operations
-d | SetDash | dashArray dashPhase | Set line dash pattern
+d | SetDashPattern | dashArray dashPhase | Set line dash pattern
 d0 | SetCharWidth | wx wy | Set glyph width in Type 3 font
 d1 | SetCharWidthBBox | wx wy llx lly urx ury | Set glyph width and bounding box in Type 3 font
 Do | XObject | name | Invoke named XObject
@@ -116,7 +118,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         :BeginIgnore<BX> :EndIgnore<EX> :CloseEOFillStroke<b*>
         :CloseFillStroke<b> :EOFillStroke<B*> :FillStroke<B>
         :CurveTo<c> :ConcatMatrix<cm> :SetFillColorSpace<cs>
-        :SetStrokeColorSpace<CS> :SetDash<d> :SetCharWidth<d0>
+        :SetStrokeColorSpace<CS> :SetDashPattern<d> :SetCharWidth<d0>
         :SetCharWidthBBox<d1> :XObject<Do> :MarkPointDict<DP>
         :EOFill<f*> :Fill<f> :FillObsolete<F> :SetStrokeGray<G>
         :SetFillGray<g> :SetGraphicsState<gs> :ClosePath<h>
@@ -159,30 +161,37 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method rw-accessor($att, $setter) {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
-            STORE => sub ($,*@v) {
-                self."$setter"(|@v);
+            STORE => sub ($,\v) {
+                self."$setter"(v)
+                    unless $att.get_value(self) eqv v;
             });
     }
 
-    multi trait_mod:<is>(Attribute $att, Str :$text-var!) {
+    multi trait_mod:<is>(Attribute $att, Str :$text!) {
         $att does TextAtt;
         $att.accessor-name = $att.name.substr(2);
     }
 
+    multi trait_mod:<is>(Attribute $att, Bool :$graphics!) {
+        $att does GraphicsAtt;
+        $att.accessor-name = $att.name.substr(2);
+    }
+
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing  is text-var<Tc>    is rw = 0;
-    has Numeric $.WordSpacing  is text-var<Tw>    is rw = 0;
-    has Numeric $.HorizScaling is text-var<Th>    is rw = 100;
-    has Numeric $.TextLeading  is text-var<Tl>    is rw = 0;
-    has Numeric $.TextRender   is text-var<Tmode> is rw = 0; #| text rendering mode
-    has Numeric $.TextRise     is text-var<Trise> is rw = 0;
-    has Numeric @.TextMatrix   is text-var<Tm>    is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Hash    $.Font         is text-var<Tf>;  #| font dictionary
-    has Numeric $.FontSize     is text-var<Tfs>; #| font size
+    has Numeric $.CharSpacing  is text<Tc>    is rw = 0;
+    has Numeric $.WordSpacing  is text<Tw>    is rw = 0;
+    has Numeric $.HorizScaling is text<Th>    is rw = 100;
+    has Numeric $.TextLeading  is text<Tl>    is rw = 0;
+    has Numeric $.TextRender   is text<Tmode> is rw = 0; #| text rendering mode
+    has Numeric $.TextRise     is text<Trise> is rw = 0;
+    has Numeric @.TextMatrix   is text<Tm>    is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Hash    $.Font         is text<Tf>;  #| font dictionary
+    has Numeric $.FontSize     is text<Tfs>; #| font size
 
     # *** Graphics STATE ***
-    has Numeric @!CTM = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
-    method GraphicsMatrix { @!CTM  }
+    has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
+    has Numeric $.LineWidth    is graphics is rw = 1.0;
+    has         @.DashPattern  is graphics is rw = 1.0;
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
@@ -517,8 +526,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     multi method track-graphics('q') {
         my @Tm = @!TextMatrix;
-        my @CTM = @!CTM;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!FontSize, :@Tm, :@CTM;
+        my @CTM = @!GraphicsMatrix;
+        my @Dp = @!DashPattern;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!FontSize, :$!LineWidth, :@Tm, :@CTM, :@Dp;
         @!gsave.push: %gstate;
     }
     multi method track-graphics('Q') {
@@ -533,13 +543,15 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!TextRise     = %gstate<TextRise>;
         $!Font         = %gstate<Font>;
         $!FontSize     = %gstate<FontSize>;
+        $!LineWidth    = %gstate<LineWidth>;
         @!TextMatrix   = %gstate<Tm>.list;
-        @!CTM          = %gstate<CTM>.list;
+        @!GraphicsMatrix = %gstate<CTM>.list;
+        @!DashPattern  = %gstate<Dp>.list;
 	Restore;
     }
     multi method track-graphics('cm', *@transform) {
         require PDF::Content::Util::TransformMatrix;
-        @!CTM = PDF::Content::Util::TransformMatrix::multiply(@!CTM, @transform);
+        @!GraphicsMatrix = PDF::Content::Util::TransformMatrix::multiply(@!GraphicsMatrix, @transform);
     }
     multi method track-graphics('ET') {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
@@ -597,6 +609,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('T*') {
         $.track-graphics(TextMove, 0, $!TextLeading);
+    }
+    multi method track-graphics('w', Numeric $!LineWidth) {
+    }
+    multi method track-graphics('d', *@!DashPattern) {
     }
     multi method track-graphics(*@args) is default {}
 
