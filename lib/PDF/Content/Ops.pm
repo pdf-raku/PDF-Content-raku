@@ -1,7 +1,7 @@
 use v6;
 
 use PDF::DAO::Util :from-ast;
-my role TextAtt {
+my role GraphicsAtt {
     has Str $.accessor-name is rw;
     method compose(Mu $package) {
         my \meth-name = self.accessor-name;
@@ -14,9 +14,6 @@ my role TextAtt {
         }
     }
 }
-
-my role GraphicsAtt does TextAtt { }
-
 
 role PDF::Content::Ops {
 
@@ -167,31 +164,36 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
-    multi trait_mod:<is>(Attribute $att, Str :$text!) {
-        $att does TextAtt;
-        $att.accessor-name = $att.name.substr(2);
-    }
+    my Method %PostOp;
 
-    multi trait_mod:<is>(Attribute $att, Bool :$graphics!) {
+    multi trait_mod:<is>(Attribute $att, :$graphics!) {
         $att does GraphicsAtt;
         $att.accessor-name = $att.name.substr(2);
+        if $graphics ~~ Method {
+            my \setter = 'Set' ~ $att.accessor-name;
+            my Str \op = OpNames.enums{setter}
+                or die "No OpNames::{setter} entry for {$att.name}";
+            %PostOp{op} = $graphics;
+        }
     }
-
+        
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing  is text<Tc>    is rw = 0;
-    has Numeric $.WordSpacing  is text<Tw>    is rw = 0;
-    has Numeric $.HorizScaling is text<Th>    is rw = 100;
-    has Numeric $.TextLeading  is text<Tl>    is rw = 0;
-    has Numeric $.TextRender   is text<Tmode> is rw = 0; #| text rendering mode
-    has Numeric $.TextRise     is text<Trise> is rw = 0;
-    has Numeric @.TextMatrix   is text<Tm>    is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Hash    $.Font         is text<Tf>;  #| font dictionary
-    has Numeric $.FontSize     is text<Tfs>; #| font size
+    has Numeric $.CharSpacing  is graphics(method ($!CharSpacing)  {}) is rw = 0;
+    has Numeric $.WordSpacing  is graphics(method ($!WordSpacing)  {}) is rw = 0;
+    has Numeric $.HorizScaling is graphics(method ($!HorizScaling) {}) is rw = 100;
+    has Numeric $.TextLeading  is graphics(method ($!TextLeading)  {}) is rw = 0;
+    has Numeric $.TextRender   is graphics(method ($!TextRender)   {}) is rw = 0;
+    has Numeric $.TextRise     is graphics(method ($!TextRise)     {}) is rw = 0;
+    has Numeric @.TextMatrix   is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Hash    $.Font         is graphics; #| font dictionary
+    has Numeric $.FontSize     is graphics; #| font size
 
     # *** Graphics STATE ***
     has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
-    has Numeric $.LineWidth    is graphics is rw = 1.0;
-    has         @.DashPattern  is graphics is rw = [[], 0];
+    has Numeric $.LineWidth    is graphics(method ($!LineWidth) {}) is rw = 1.0;
+    has         @.DashPattern  is graphics(method (Array $a, Numeric $p ) {
+                                               @!DashPattern = [ [$a.map: *.value], $p]; 
+                                           }) is rw = [[], 0];
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
@@ -577,14 +579,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             }
         }
     }
-    multi method track-graphics('Tc', Numeric $!CharSpacing!) {
-    }
-    multi method track-graphics('Tw', Numeric $!WordSpacing!) {
-    }
-    multi method track-graphics('Tz', Numeric $!HorizScaling!) {
-    }
-    multi method track-graphics('TL', Numeric $!TextLeading!) {
-    }
     multi method track-graphics('Tf', Str $key, Numeric $!FontSize!) {
         with self.parent {
             with .resource-entry('Font', $key) {
@@ -595,10 +589,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             }
         }
     }
-    multi method track-graphics('Ts', Numeric $!TextRise!) {
-    }
-    multi method track-graphics('Tm', *@!TextMatrix) {
-    }
     multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
         @!TextMatrix[4] += $tx;
         @!TextMatrix[5] += $ty;
@@ -607,15 +597,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!TextLeading = - $ty;
         $.track-graphics(TextMove, $tx, $ty);
     }
-    multi method track-graphics('T*') {
-        $.track-graphics(TextMove, 0, $!TextLeading);
+    multi method track-graphics($op, *@args) is default {
+        .(self,|@args) with %PostOp{$op};
     }
-    multi method track-graphics('w', Numeric $!LineWidth) {
-    }
-    multi method track-graphics('d', Array $a, Numeric $p ) {
-        @!DashPattern = [ [$a.map: *.value], $p];
-    }
-    multi method track-graphics(*@args) is default {}
 
     method finish {
 	die "Unclosed @!tags[] at end of content stream\n"
