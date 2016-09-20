@@ -21,6 +21,7 @@ is $g.FontSize, 16, '$g.FontSize';
 
 is $g.TextLeading, 0, '$g.TextLeading - initial';
 $g.TextLeading = 22;
+dies-ok { $g.TextLeading = 'nah' }, 'assigment type-checking';
 is $g.TextLeading, 22, '$g.TextLeading - updated';
 
 is $g.WordSpacing, 0, '$g.WordSpacing - initial';
@@ -38,6 +39,10 @@ is $g.TextRise, 1.5, '$g.TextRise - updated';
 is $g.CharSpacing, 0, '$g.CharSpacing - initial';
 $g.CharSpacing = -.5;
 is $g.CharSpacing, -.5, '$g.CharSpacing - updated';
+
+is $g.DashPattern, [[], 0], 'DashPattern - initial';
+$g.DashPattern = [[3, 5], 6];
+is $g.DashPattern, [[3, 5], 6], 'DashPattern - updated';
 
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0], '$g.TextMatrix - initial';
 $g.TextMatrix = [ 10, 1, 15, 2, 3, 4];

@@ -161,9 +161,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method rw-accessor($att, $setter) {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
-            STORE => sub ($,\v) {
-                self."$setter"(v)
-                    unless $att.get_value(self) eqv v;
+            STORE => sub ($,*@v) {
+                self."$setter"(|@v)
+                    unless $att.get_value(self).list eqv @v.list;
             });
     }
 
@@ -191,7 +191,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     # *** Graphics STATE ***
     has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
     has Numeric $.LineWidth    is graphics is rw = 1.0;
-    has         @.DashPattern  is graphics is rw = 1.0;
+    has         @.DashPattern  is graphics is rw = [[], 0];
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
@@ -612,7 +612,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('w', Numeric $!LineWidth) {
     }
-    multi method track-graphics('d', *@!DashPattern) {
+    multi method track-graphics('d', Array $a, Numeric $p ) {
+        @!DashPattern = [ [$a.map: *.value], $p];
     }
     multi method track-graphics(*@args) is default {}
 
