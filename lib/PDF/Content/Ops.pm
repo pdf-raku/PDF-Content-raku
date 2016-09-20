@@ -160,7 +160,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,*@v) {
                 self."$setter"(|@v)
-                    unless $att.get_value(self).list eqv @v.list;
+                    unless [$att.get_value(self).list] eqv @v;
             });
     }
 

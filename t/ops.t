@@ -19,9 +19,15 @@ is-json-equiv $g.BeginText, (:BT[]), 'BeginText';
 is-json-equiv $g.op('Tf', 'F1', 16), (:Tf[ :name<F1>, :real(16) ]), 'Tf';
 is $g.FontSize, 16, '$g.FontSize';
 
+my $ops1 = +$g.ops;
 is $g.TextLeading, 0, '$g.TextLeading - initial';
 $g.TextLeading = 22;
+my $ops2 = +$g.ops;
+ok $ops2 > $ops1, 'Op added';
 dies-ok { $g.TextLeading = 'nah' }, 'assigment type-checking';
+is $ops2, +$g.ops, 'Op ignored';
+$g.TextLeading = 22;
+is $ops2, +$g.ops, 'Op optimised';
 is $g.TextLeading, 22, '$g.TextLeading - updated';
 
 is $g.WordSpacing, 0, '$g.WordSpacing - initial';
