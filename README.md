@@ -102,7 +102,7 @@ $page.graphics: {
 	.WordSpacing = 16;
 	my $nbsp = "\c[NO-BREAK SPACE]";
 	.print("♠ ♣$nbsp");
-	.SetFillRGB( 1, .3, .3);  # reddish
+	.FillColor = :DeviceRGB[ 1, .3, .3];  # reddish
 	.say("♦ ♥");
     }
 
@@ -114,7 +114,7 @@ $page.graphics: {
 	 use PDF::Content::Ops :TextMode;
 	.font = ( $header-font, 12);
 	.TextRender = TextMode::OutlineText;
-	.SetLineWidth: .5;
+	.LineWidth = .5;
         .text-transform( :skew[0, 12] );
 	.text-transform( :translate[50, 550] );
 	.ShowText('Outline Slanted Text @(50,550)');

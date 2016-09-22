@@ -165,10 +165,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     my Method %PostOp;
+    my Attribute %GraphicVars;
 
     multi trait_mod:<is>(Attribute $att, :$graphics!) {
         $att does GraphicsAtt;
         $att.accessor-name = $att.name.substr(2);
+        %GraphicVars{$att.accessor-name} = $att;
         if $graphics ~~ Method {
             my \setter = 'Set' ~ $att.accessor-name;
             my Str \op = OpNames.enums{setter}
@@ -178,15 +180,16 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
         
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing  is graphics(method ($!CharSpacing)  {}) is rw = 0;
-    has Numeric $.WordSpacing  is graphics(method ($!WordSpacing)  {}) is rw = 0;
-    has Numeric $.HorizScaling is graphics(method ($!HorizScaling) {}) is rw = 100;
-    has Numeric $.TextLeading  is graphics(method ($!TextLeading)  {}) is rw = 0;
-    has Numeric $.TextRender   is graphics(method ($!TextRender)   {}) is rw = 0;
-    has Numeric $.TextRise     is graphics(method ($!TextRise)     {}) is rw = 0;
-    has Numeric @.TextMatrix   is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Hash    $.Font         is graphics; #| font dictionary
-    has Numeric $.FontSize     is graphics; #| font size
+    has Numeric $.CharSpacing   is graphics(method ($!CharSpacing)  {}) is rw = 0;
+    has Numeric $.WordSpacing   is graphics(method ($!WordSpacing)  {}) is rw = 0;
+    has Numeric $.HorizScaling  is graphics(method ($!HorizScaling) {}) is rw = 100;
+    has Numeric $.TextLeading   is graphics(method ($!TextLeading)  {}) is rw = 0;
+    has Numeric $.TextRender    is graphics(method ($!TextRender)   {}) is rw = 0;
+    has Numeric $.TextRise      is graphics(method ($!TextRise)     {}) is rw = 0;
+    has Numeric @.TextMatrix    is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Hash    $.Font          is graphics; #| font dictionary
+    has Numeric $.FontSize      is graphics; #| font size
+    has Hash    @.GraphicStates is graphics;
 
     # *** Graphics STATE ***
     has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
@@ -194,6 +197,41 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has         @.DashPattern  is graphics(method (Array $a, Numeric $p ) {
                                                @!DashPattern = [ [$a.map: *.value], $p]; 
                                            }) is rw = [[], 0];
+    has $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
+    has $!StrokeColor is graphics;
+    method StrokeColor is rw {
+        Proxy.new(
+            FETCH => sub ($) {$!StrokeColorSpace => $!StrokeColor},
+            STORE => sub ($, Pair $color) {
+                if $color.key ~~ /^ Device(RGB|Gray|CMYK) $/ {
+                    unless $color eqv self.StrokeColor {
+                        my $cs = ~ $0;
+                        self."SetStroke$cs"(|$color.value);
+                    }
+                }
+                else {
+                   die "unhandled colorspace: {$color.key}";
+               }
+            });
+    }
+
+    has $.FillColorSpace is graphics(method ($!FillColorSpace) {}) is rw = 'DeviceGray';
+    has     $!FillColor is graphics;
+    method FillColor is rw {
+        Proxy.new(
+            FETCH => sub ($) {$!FillColorSpace => $!FillColor},
+            STORE => sub ($, Pair $color) {
+                if $color.key ~~ /^ Device(RGB|Gray|CMYK) $/ {
+                    unless $color eqv self.FillColor {
+                        my $cs = ~ $0;
+                        self."SetFill$cs"(|$color.value);
+                    }
+                }
+                else {
+                   die "unhandled colorspace: {$color.key}";
+               }
+            });
+    }
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
@@ -530,7 +568,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my @Tm = @!TextMatrix;
         my @CTM = @!GraphicsMatrix;
         my @Dp = @!DashPattern;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!FontSize, :$!LineWidth, :@Tm, :@CTM, :@Dp;
+        my @GS = @!GraphicStates;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!FontSize, :$!LineWidth, :@Tm, :@CTM, :@Dp, :@GS, :$!StrokeColorSpace, :$!FillColorSpace;
+        # todo - get this trait driven
+        ## for %GraphicVars.pairs {
+        ##    %gstate{.key} = .value.get_value(.value, self);
+        ## }
         @!gsave.push: %gstate;
     }
     multi method track-graphics('Q') {
@@ -549,11 +592,38 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!TextMatrix   = %gstate<Tm>.list;
         @!GraphicsMatrix = %gstate<CTM>.list;
         @!DashPattern  = %gstate<Dp>.list;
+        @!GraphicStates  = %gstate<GS>.list;
+        $!StrokeColorSpace = %gstate<StrokeColorSpace>;
+        $!FillColorSpace = %gstate<FillColorSpace>;
 	Restore;
     }
     multi method track-graphics('cm', *@transform) {
         require PDF::Content::Util::TransformMatrix;
         @!GraphicsMatrix = PDF::Content::Util::TransformMatrix::multiply(@!GraphicsMatrix, @transform);
+    }
+    multi method track-graphics('rg', *@rgb) {
+        $!FillColorSpace = 'DeviceRGB';
+        $!FillColor = @rgb;
+    }
+    multi method track-graphics('RG', *@rgb) {
+        $!StrokeColorSpace = 'DeviceRGB';
+        $!StrokeColor = @rgb;
+    }
+    multi method track-graphics('g', *@gray) {
+        $!FillColorSpace = 'DeviceGray';
+        $!FillColor = @gray;
+    }
+    multi method track-graphics('G', *@gray) {
+        $!StrokeColorSpace = 'DeviceGray';
+        $!StrokeColor = @gray;
+    }
+    multi method track-graphics('k', *@cmyk) {
+        $!FillColorSpace = 'DeviceCmyk';
+        $!FillColor = @cmyk;
+    }
+    multi method track-graphics('K', *@cmyk) {
+        $!StrokeColorSpace = 'DeviceCmyk';
+        $!StrokeColor = @cmyk;
     }
     multi method track-graphics('ET') {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];

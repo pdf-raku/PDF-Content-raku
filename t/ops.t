@@ -19,15 +19,32 @@ is-json-equiv $g.BeginText, (:BT[]), 'BeginText';
 is-json-equiv $g.op('Tf', 'F1', 16), (:Tf[ :name<F1>, :real(16) ]), 'Tf';
 is $g.FontSize, 16, '$g.FontSize';
 
+is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - initial';
+is-json-equiv $g.op('RG', .1, .2, .3), (:RG[ :real(.1), :real(.2), :real(.3) ] ), 'CS';
+is-deeply $g.StrokeColor, (:DeviceRGB[.1, .2, .3]), '$g.StrokeColor - updated';
+is $g.StrokeColorSpace, 'DeviceRGB', '$g.StrokeColorSpace - updated';
 my $ops1 = +$g.ops;
+$g.StrokeColor = :DeviceRGB[.4, .5, .6];
+my $ops2 = +$g.ops;
+ok $ops2 > $ops1, 'StrokColor Op added';
+$g.StrokeColor = :DeviceRGB[.4, .5, .6];
+is $ops2, +$g.ops, 'StrokeColor Op optimised';
+
+is-deeply $g.StrokeColor, (:DeviceRGB[.4, .5, .6]), '$g.StrokeColor - updated again';
+
+is $g.FillColorSpace, 'DeviceGray', '$g.FillColorSpace - initial';
+is-json-equiv $g.op('cs', 'DeviceRGB'), (:cs[ :name<DeviceRGB> ] ), 'CS';
+is $g.FillColorSpace, 'DeviceRGB', '$g.FillColorSpace - updated';
+
+$ops1 = +$g.ops;
 is $g.TextLeading, 0, '$g.TextLeading - initial';
 $g.TextLeading = 22;
-my $ops2 = +$g.ops;
-ok $ops2 > $ops1, 'Op added';
+$ops2 = +$g.ops;
+ok $ops2 > $ops1, 'TextLeading Op added';
 dies-ok { $g.TextLeading = 'nah' }, 'assigment type-checking';
 is $ops2, +$g.ops, 'Op ignored';
 $g.TextLeading = 22;
-is $ops2, +$g.ops, 'Op optimised';
+is $ops2, +$g.ops, 'TextLeading Op optimised';
 is $g.TextLeading, 22, '$g.TextLeading - updated';
 
 is $g.WordSpacing, 0, '$g.WordSpacing - initial';
@@ -74,6 +91,7 @@ $g.Restore;
 is-json-equiv $g.GraphicsMatrix, [1, 0, 0, 1, 0, 0, ], '$g.GraphicMatrix - restored';
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0], '$g.TextMatrix - restored';
 is $g.TextLeading, 0, '$g.TextLeading - restored';
+is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - restored';
 
 lives-ok {$g.content}, 'content with matching BT ... ET  q ... Q - lives';
 
