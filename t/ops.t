@@ -32,6 +32,9 @@ is $ops2, +$g.ops, 'StrokeColor Op optimised';
 
 is-deeply $g.StrokeColor, (:DeviceRGB[.4, .5, .6]), '$g.StrokeColor - updated again';
 
+$g.StrokeColor = :DeviceN[.7, .8];
+is-deeply $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';
+
 is $g.FillColorSpace, 'DeviceGray', '$g.FillColorSpace - initial';
 is-json-equiv $g.op('cs', 'DeviceRGB'), (:cs[ :name<DeviceRGB> ] ), 'CS';
 is $g.FillColorSpace, 'DeviceRGB', '$g.FillColorSpace - updated';
