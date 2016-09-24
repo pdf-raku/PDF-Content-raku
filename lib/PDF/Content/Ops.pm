@@ -8,7 +8,21 @@ my role GraphicsAtt {
         unless $package.^declares_method(meth-name) {
             my \setter = 'Set' ~ meth-name;
             my \accessor = self.rw
-                ?? sub (\obj) is rw { obj.rw-accessor( self, setter ); }
+                ?? sub (\obj) is rw { obj.graphics-accessor( self, setter ); }
+                !! sub (\obj) { self.get_value( obj ) };
+            $package.^add_method( meth-name, accessor );
+        }
+    }
+}
+
+my role ExtGraphicsAtt {
+    has Str $.accessor-name is rw;
+    has Str $.key is rw;
+    method compose(Mu $package) {
+        my \meth-name = self.accessor-name;
+        unless $package.^declares_method(meth-name) {
+            my \accessor = self.rw
+                ?? sub (\obj) is rw { obj.ext-graphics-accessor( self, self.key ); }
                 !! sub (\obj) { self.get_value( obj ) };
             $package.^add_method( meth-name, accessor );
         }
@@ -148,6 +162,37 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     my constant ColorOps = set <CS cs SC SCN sc scn G g RG rg K k>;
     my constant MarkedContentOps = set <MP DP BMC BDC EMC>;
 
+    # Extended Graphics States (Resource /ExtGState entries)
+    # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
+    my enum ExtGState is export(:ExtGState) «
+	:LineWidth<LW>
+	:LineCap<LC>
+	:LineJoinStyle<LJ>
+	:MiterLimit<ML>
+	:DashPattern<D>
+	:RenderingIntent<RI>
+	:OverPrintPaint<OP>
+	:OverPrintStroke<op>
+	:OverPrintMode<OPM>
+	:Font<Font>
+	:BlackGeneration-old<BG>
+	:BlackGeneration<BG2>
+	:UnderCoverRemovalFunction-old<UCR>
+	:UnderCoverRemovalFunction<UCR2>
+	:TransferFunction-old<TR>
+	:TransferFunction<TR2>
+	:Halftone<HT>
+	:FlatnessTolerance<FT>
+	:SmoothnessTolerance<ST>
+        :StrokeAdjust<SA>
+        :BlendMode<BM>
+        :SoftMask<SMask>
+	:StrokeAlpha<CA>
+	:FillAlpha<ca>
+	:AlphaSource<AIS>
+	:TextKnockout<TK>
+    »;
+
     #| [PDF 1.7 TABLE 5.3 Text rendering modes]
     my Int enum TextMode is export(:TextMode) «
 	:FillText(0) :OutlineText(1) :FillOutlineText(2)
@@ -155,7 +200,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         :FillOutlineClipText(6) :ClipText(7)
     »;
 
-    method rw-accessor($att, $setter) {
+    method graphics-accessor($att, $setter) {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,*@v) {
@@ -164,45 +209,63 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
+    method ext-graphics-accessor($att, $key) {
+        Proxy.new(
+            FETCH => sub ($) { $att.get_value(self) },
+            STORE => sub ($,\v) {
+                unless $att.get_value(self) eqv v {
+                    my $gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> }, $key => v });
+                    with self.parent {
+                        my Str $gs-entry = self.parent.resource-key($gs, :eqv);
+	                self.SetGraphicsState($gs-entry);
+                    }
+                    else {
+                        warn "unable to set extended graphics state - no parent";
+                    }
+                }
+            });
+    }
+
     my Method %PostOp;
     my Attribute %GraphicVars;
+    my Str %ExtGStateEntries;
 
     multi trait_mod:<is>(Attribute $att, :$graphics!) {
         $att does GraphicsAtt;
         $att.accessor-name = $att.name.substr(2);
         %GraphicVars{$att.accessor-name} = $att;
 
-        for $graphics.list -> \arg {
-            if arg ~~ Pair {
-                given arg.key {
-                    when 'set' {
-                        die ":set option should be a method"
-                            unless arg.value ~~ Method;
-                        my \setter = 'Set' ~ $att.accessor-name;
-                        my Str \op = OpNames.enums{setter}
-                            or die "No OpNames::{setter} entry for {$att.name}";
-                        %PostOp{op} = arg.value;
-                    }
-                    default { warn "ignoring graphics trait oattribute: $_"; }
-                }
-            }
-            else {
-		warn "ignoring entry trait attribute: {arg.perl}"
-                    unless arg ~~ Bool;
-            }
-
+        if $graphics ~~ Method {
+            my \setter = 'Set' ~ $att.accessor-name;
+            my Str \op = OpNames.enums{setter}
+                or die "No OpNames::{setter} entry for {$att.name}";
+            %PostOp{op} = $graphics;
+        }
+        else {
+	    warn "ignoring graphics trait"
+                unless $graphics ~~ Bool;
         }
     }
-        
+
+    multi trait_mod:<is>(Attribute $att, :$ext-graphics!) {
+        $att does ExtGraphicsAtt;
+        my $method-name = $att.name.substr(2);
+        $att.accessor-name = $method-name;
+        %GraphicVars{$method-name} = $att;
+        $att.key = ExtGState.enums{$method-name}
+            or die "no ExtGState::$method-name enumeration";
+        %ExtGStateEntries{$method-name} = $att.key;
+    }
+
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing   is graphics(:set(method ($!CharSpacing)  {})) is rw = 0;
-    has Numeric $.WordSpacing   is graphics(:set(method ($!WordSpacing)  {})) is rw = 0;
-    has Numeric $.HorizScaling  is graphics(:set(method ($!HorizScaling) {})) is rw = 100;
-    has Numeric $.TextLeading   is graphics(:set(method ($!TextLeading)  {})) is rw = 0;
-    has Numeric $.TextRender    is graphics(:set(method ($!TextRender)   {})) is rw = 0;
-    has Numeric $.TextRise      is graphics(:set(method ($!TextRise)     {})) is rw = 0;
-    has Numeric @.TextMatrix    is graphics(:set(method (*@!TextMatrix)  {})) is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Array   $.Font          is graphics(:set(method (Str $key, Numeric $size!) {
+    has Numeric $.CharSpacing   is graphics(method ($!CharSpacing)  {}) is rw = 0;
+    has Numeric $.WordSpacing   is graphics(method ($!WordSpacing)  {}) is rw = 0;
+    has Numeric $.HorizScaling  is graphics(method ($!HorizScaling) {}) is rw = 100;
+    has Numeric $.TextLeading   is graphics(method ($!TextLeading)  {}) is rw = 0;
+    has Numeric $.TextRender    is graphics(method ($!TextRender)   {}) is rw = 0;
+    has Numeric $.TextRise      is graphics(method ($!TextRise)     {}) is rw = 0;
+    has Numeric @.TextMatrix    is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Array   $.Font          is graphics(method (Str $key, Numeric $size!) {
         with self.parent {
             with .resource-entry('Font', $key) -> \font-face {
                 $!Font = [font-face, $size];
@@ -214,19 +277,18 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         else {
             $!Font = [$key, $size];
         }
-    })) is rw;
+    }) is rw;
     method font-face {$!Font[0]}
     method font-size {$!Font[1]}
-    has Hash    @.GraphicStates is graphics;
 
     # *** Graphics STATE ***
     has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
-    has Numeric $.LineWidth    is graphics(:set(method ($!LineWidth) {})) is rw = 1.0;
-    has         @.DashPattern  is graphics(:set(method (Array $a, Numeric $p ) {
+    has Numeric $.LineWidth    is graphics(method ($!LineWidth) {}) is rw = 1.0;
+    has         @.DashPattern  is graphics(method (Array $a, Numeric $p ) {
                                                @!DashPattern = [ [$a.map: *.value], $p]; 
-                                           })) is rw = [[], 0];
+                                           }) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
-    has ColorSpace $.StrokeColorSpace is graphics(:set(method ($!StrokeColorSpace) {})) is rw = 'DeviceGray';
+    has ColorSpace $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
     has $!StrokeColor is graphics;
     method StrokeColor is rw {
         Proxy.new(
@@ -248,7 +310,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
-    has ColorSpace $.FillColorSpace is graphics(:set(method ($!FillColorSpace) {})) is rw = 'DeviceGray';
+    has ColorSpace $.FillColorSpace is graphics(method ($!FillColorSpace) {}) is rw = 'DeviceGray';
     has $!FillColor is graphics;
     method FillColor is rw {
         Proxy.new(
@@ -270,36 +332,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
-    # Extended Graphics States (Resource /ExtGState entries)
-    # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
-    my enum ExtGState is export(:ExtGState) «
-	:line-width<LW>
-	:line-cap<LC>
-	:line-join-style<LJ>
-	:miter-limit<ML>
-	:dash-pattern<D>
-	:rendering-intent<RI>
-	:over-print-paint<OP>
-	:over-print-stroke<op>
-	:over-print-mode<OPM>
-	:font<Font>
-	:black-generation-old<BG>
-	:black-generation<BG2>
-	:under-cover-removal-function-old<UCR>
-	:under-cover-removal-function<UCR2>
-	:transfer-function-old<TR>
-	:transfer-function<TR2>
-	:halftone<HT>
-	:flatness-tolerance<FT>
-	:smoothness-tolerance<ST>
-        :stroke-adjust<SA>
-        :blend-mode<BM>
-        :soft-mask<SMask>
-	:stroke-alpha<CA>
-	:fill-alpha<ca>
-	:alpha-source<AIS>
-	:text-knockout<TK>
-    »;
+    # *** Extended Graphics STATE ***
+    has $.StrokeAlpha is ext-graphics is rw = 1.0;
+    has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     has @!gsave;
     has @!tags;
@@ -605,8 +640,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my @Tm = @!TextMatrix;
         my @CTM = @!GraphicsMatrix;
         my @Dp = @!DashPattern;
-        my @GS = @!GraphicStates;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :@GS, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor;
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -628,7 +662,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!TextMatrix   = %gstate<Tm>.list;
         @!GraphicsMatrix = %gstate<CTM>.list;
         @!DashPattern  = %gstate<Dp>.list;
-        @!GraphicStates  = %gstate<GS>.list;
         $!StrokeColorSpace = %gstate<StrokeColorSpace>;
         $!FillColorSpace = %gstate<FillColorSpace>;
         $!StrokeColor  = %gstate<StrokeColor>;
@@ -695,6 +728,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 with .<D>    { @!DashPattern = .list }
                 with .<Font> { $!Font = $_ }
                 with .<LW>   { $!LineWidth = $_ }
+                ## todo - get this attribute driven
+                with .<CA>   { $!StrokeAlpha = $_ }
+                with .<ca>   { $!FillAlpha = $_ }
             }
             else {
                 die "unknown extended graphics state: /$key"
@@ -754,5 +790,4 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     multi method FALLBACK($name) is default { die "unknown operator/method: $name\n" }
-
 }

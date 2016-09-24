@@ -23,8 +23,8 @@ role PDF::Content:ver<0.0.5>
         }
 
 	with $transparency {
-	    %settings<fill-alpha> //= $_;
-	    %settings<stroke-alpha> //= $_;
+	    %settings<FillAlpha> //= $_;
+	    %settings<StrokeAlpha> //= $_;
 	}
 
 	for %settings.keys.sort {
@@ -42,7 +42,7 @@ role PDF::Content:ver<0.0.5>
 	    }
 	}
 
-	my $gs-entry = self.parent.resource-key($gs, :eqv);
+	my Str $gs-entry = self.parent.resource-key($gs, :eqv);
 	self.SetGraphicsState($gs-entry);
     }
 
