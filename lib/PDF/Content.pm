@@ -191,11 +191,11 @@ role PDF::Content:ver<0.0.5>
     #! output text leave the text position at the end of the current line
     multi method print(Str $text,
 		       Bool :$stage = False,
-		       :$font = self!current-font,
+		       :$font = self!current-font[0],
 		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
         ) {
 	# detect and use the current text-state font
-	my Numeric $font-size = $.FontSize // 16;
+	my Numeric $font-size = $.font-size // self!current-font[1];
 	my Numeric $word-spacing = $.WordSpacing;
 	my Numeric $horiz-scaling = $.HorizScaling;
 	my Numeric $char-spacing = $.CharSpacing;
@@ -257,9 +257,7 @@ role PDF::Content:ver<0.0.5>
 	    self.text-position = [$x, $y];
         }
 
-        self.set-font($font, $font-size)
-            unless $font-size == ($.FontSize//-1)
-            && $font eqv $.Font;
+        self.set-font($font, $font-size);
 
 	self.ops: $text-block.content(:$nl, :$top, :$left);
 
@@ -275,30 +273,27 @@ role PDF::Content:ver<0.0.5>
 
     #| thin wrapper to $.op(SetFont, ...)
     multi method set-font( Hash $font!, Numeric $size = 16) {
-        $.op(SetFont, $.parent.resource-key($font), $size);
-    }
-    multi method set-font( Str $font-key!, Numeric $size = 16) {
-        $.op(SetFont, $font-key, $size);
+        $.op(SetFont, $.parent.resource-key($font), $size)
+            if !$.font-face || $.font-size != $size || $.font-face !eqv $font;
     }
 
     method !current-font {
-        $.Font // $.parent.core-font('Courier');
+        $.Font // [$.parent.core-font('Courier'), 16]
     }
 
     method font is rw returns Array {
 	Proxy.new(
 	    FETCH => sub (\p) {
-		[self.Font, self.FontSize // 16];
+		$.Font;
 	    },
 	    STORE => sub (\p, $v) {
 		my @v = $v.isa(List) ?? @$v !! [ $v, ];
 		self.set-font(|@v);
-		@v;
 	    },
 	    );
     }
     
-    multi method print(Str $text, :$font = self!current-font, |c) {
+    multi method print(Str $text, :$font = self!current-font[0], |c) {
         nextwith( $text, :$font, |c);
     }
 

@@ -171,34 +171,62 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $att does GraphicsAtt;
         $att.accessor-name = $att.name.substr(2);
         %GraphicVars{$att.accessor-name} = $att;
-        if $graphics ~~ Method {
-            my \setter = 'Set' ~ $att.accessor-name;
-            my Str \op = OpNames.enums{setter}
-                or die "No OpNames::{setter} entry for {$att.name}";
-            %PostOp{op} = $graphics;
+
+        for $graphics.list -> \arg {
+            if arg ~~ Pair {
+                given arg.key {
+                    when 'set' {
+                        die ":set option should be a method"
+                            unless arg.value ~~ Method;
+                        my \setter = 'Set' ~ $att.accessor-name;
+                        my Str \op = OpNames.enums{setter}
+                            or die "No OpNames::{setter} entry for {$att.name}";
+                        %PostOp{op} = arg.value;
+                    }
+                    default { warn "ignoring graphics trait oattribute: $_"; }
+                }
+            }
+            else {
+		warn "ignoring entry trait attribute: {arg.perl}"
+                    unless arg ~~ Bool;
+            }
+
         }
     }
         
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing   is graphics(method ($!CharSpacing)  {}) is rw = 0;
-    has Numeric $.WordSpacing   is graphics(method ($!WordSpacing)  {}) is rw = 0;
-    has Numeric $.HorizScaling  is graphics(method ($!HorizScaling) {}) is rw = 100;
-    has Numeric $.TextLeading   is graphics(method ($!TextLeading)  {}) is rw = 0;
-    has Numeric $.TextRender    is graphics(method ($!TextRender)   {}) is rw = 0;
-    has Numeric $.TextRise      is graphics(method ($!TextRise)     {}) is rw = 0;
-    has Numeric @.TextMatrix    is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Hash    $.Font          is graphics; #| font dictionary
-    has Numeric $.FontSize      is graphics; #| font size
+    has Numeric $.CharSpacing   is graphics(:set(method ($!CharSpacing)  {})) is rw = 0;
+    has Numeric $.WordSpacing   is graphics(:set(method ($!WordSpacing)  {})) is rw = 0;
+    has Numeric $.HorizScaling  is graphics(:set(method ($!HorizScaling) {})) is rw = 100;
+    has Numeric $.TextLeading   is graphics(:set(method ($!TextLeading)  {})) is rw = 0;
+    has Numeric $.TextRender    is graphics(:set(method ($!TextRender)   {})) is rw = 0;
+    has Numeric $.TextRise      is graphics(:set(method ($!TextRise)     {})) is rw = 0;
+    has Numeric @.TextMatrix    is graphics(:set(method (*@!TextMatrix)  {})) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Array   $.Font          is graphics(:set(method (Str $key, Numeric $size!) {
+        with self.parent {
+            with .resource-entry('Font', $key) -> \font-face {
+                $!Font = [font-face, $size];
+            }
+            else {
+                die "unknown font key: /$key"
+            }
+        }
+        else {
+            $!Font = [$key, $size];
+        }
+    })) is rw;
+    method font-face {$!Font[0]}
+    method font-size {$!Font[1]}
     has Hash    @.GraphicStates is graphics;
 
     # *** Graphics STATE ***
     has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
-    has Numeric $.LineWidth    is graphics(method ($!LineWidth) {}) is rw = 1.0;
-    has         @.DashPattern  is graphics(method (Array $a, Numeric $p ) {
+    has Numeric $.LineWidth    is graphics(:set(method ($!LineWidth) {})) is rw = 1.0;
+    has         @.DashPattern  is graphics(:set(method (Array $a, Numeric $p ) {
                                                @!DashPattern = [ [$a.map: *.value], $p]; 
-                                           }) is rw = [[], 0];
+                                           })) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
-    has ColorSpace $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
+    has ColorSpace $.StrokeColorSpace is graphics(:set(method ($!StrokeColorSpace) {})) is rw = 'DeviceGray';
     has $!StrokeColor is graphics;
     method StrokeColor is rw {
         Proxy.new(
@@ -210,7 +238,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                         self."SetStroke$cs"(|$color.value);
                     }
                     elsif $color.key ~~ ColorSpace {
-                        self."SetStrokeColorN"(|$color.value, $color.key);
+                        self.SetStrokeColorSpace($color.key);
+                        self.SetStrokeColorN(|$color.value);
                     }
                     else {
                        die "unknown colorspace: {$color.key}";
@@ -219,7 +248,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
-    has ColorSpace $.FillColorSpace is graphics(method ($!FillColorSpace) {}) is rw = 'DeviceGray';
+    has ColorSpace $.FillColorSpace is graphics(:set(method ($!FillColorSpace) {})) is rw = 'DeviceGray';
     has $!FillColor is graphics;
     method FillColor is rw {
         Proxy.new(
@@ -231,7 +260,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                         self."SetFill$cs"(|$color.value);
                     }
                     elsif $color.key ~~ ColorSpace {
-                        self."SetFillColorN"(|$color.value, $color.key);
+                        self.SetFillColorSpace($color.key);
+                        self.SetFillColorN(|$color.value);
                     }
                     else {
                        die "unknown colorspace: {$color.key}";
@@ -576,7 +606,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my @CTM = @!GraphicsMatrix;
         my @Dp = @!DashPattern;
         my @GS = @!GraphicStates;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!FontSize, :$!LineWidth, :@Tm, :@CTM, :@Dp, :@GS, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :@GS, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor;
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -594,7 +624,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!TextRender   = %gstate<TextRender>;
         $!TextRise     = %gstate<TextRise>;
         $!Font         = %gstate<Font>;
-        $!FontSize     = %gstate<FontSize>;
         $!LineWidth    = %gstate<LineWidth>;
         @!TextMatrix   = %gstate<Tm>.list;
         @!GraphicsMatrix = %gstate<CTM>.list;
@@ -663,20 +692,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     multi method track-graphics('gs', Str $key) {
         with self.parent {
             with .resource-entry('ExtGState', $key) {
-                with .<Font> { $!Font = .[0]; $!FontSize = .[1] }
+                with .<D>    { @!DashPattern = .list }
+                with .<Font> { $!Font = $_ }
+                with .<LW>   { $!LineWidth = $_ }
             }
             else {
                 die "unknown extended graphics state: /$key"
-            }
-        }
-    }
-    multi method track-graphics('Tf', Str $key, Numeric $!FontSize!) {
-        with self.parent {
-            with .resource-entry('Font', $key) {
-                $!Font = $_;
-            }
-            else {
-                die "unknown font key: /$!Font"
             }
         }
     }
