@@ -50,6 +50,7 @@ class PDF::Content::Text::Block {
 			  Numeric :$!font-size = 16,
                           Numeric :$!line-height = $!font-size * 1.1,
 			  Numeric :$!horiz-scaling = 100,
+                          Numeric :$char-spacing = 0,
                           Numeric :$!word-spacing = 0,
                           Numeric :$!width?,        #| optional constraint
                           Numeric :$!height?,       #| optional constraint
@@ -63,6 +64,8 @@ class PDF::Content::Text::Block {
         $!font-height = $!font.height( $!font-size );
         my Bool $follows-ws = False;
         my $word-spacing = $!space-width + $!word-spacing;
+        $word-spacing *= $!horiz-scaling / 100
+            if $!horiz-scaling != 100;
         my PDF::Content::Text::Line $line .= new: :$word-spacing;
         @!lines.push: $line;
 
@@ -82,7 +85,9 @@ class PDF::Content::Text::Block {
                 $word = [ $text, ];
                 $word-width = $!font.stringwidth($text);
             }
-            $word-width *= $!font-size / 1000;
+            $word-width *= $!font-size * $!horiz-scaling / 100000;
+            $word-width *= ($text.chars - 1) * $char-spacing
+                if $char-spacing > 0;
 
             for $word.list {
                 when Str {
