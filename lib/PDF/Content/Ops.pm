@@ -640,7 +640,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my @Tm = @!TextMatrix;
         my @CTM = @!GraphicsMatrix;
         my @Dp = @!DashPattern;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor, :$!StrokeAlpha, :$!FillAlpha;
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -666,6 +666,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!FillColorSpace = %gstate<FillColorSpace>;
         $!StrokeColor  = %gstate<StrokeColor>;
         $!FillColor   = %gstate<FillColor>;
+        $!StrokeAlpha = %gstate<StrokeAlpha>;
+        $!FillAlpha = %gstate<FillAlpha>;
 	Restore;
     }
     multi method track-graphics('cm', *@transform) {
@@ -689,21 +691,17 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!StrokeColor = @gray;
     }
     multi method track-graphics('k', *@cmyk) {
-        $!FillColorSpace = 'DeviceCmyk';
+        $!FillColorSpace = 'DeviceCMYK';
         $!FillColor = @cmyk;
     }
     multi method track-graphics('K', *@cmyk) {
-        $!StrokeColorSpace = 'DeviceCmyk';
+        $!StrokeColorSpace = 'DeviceCMYK';
         $!StrokeColor = @cmyk;
     }
     multi method track-graphics('scn', *@scn) {
-        $!StrokeColorSpace = @scn.pop
-            if @scn[*-1] ~~ ColorSpace;
         $!FillColor = @scn;
     }
     multi method track-graphics('SCN', *@scn) {
-        $!StrokeColorSpace = @scn.pop
-            if @scn[*-1] ~~ ColorSpace;
         $!StrokeColor = @scn;
     }
     multi method track-graphics('sc', |c) { self.track-graphics('scn', |c) }
