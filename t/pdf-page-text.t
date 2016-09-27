@@ -81,19 +81,25 @@ for (
     :TextRise(0), :TextRise(3), :TextRise(-3),
     :HorizScaling(50), :HorizScaling(100), :HorizScaling(150),
     :CharSpacing(-1.5), :CharSpacing(-.5), :CharSpacing(.5), :CharSpacing(1.5),
-    :WordSpacing(-2), :WordSpacing(8),
+    :WordSpacing(-2), :WordSpacing(5), :leading(8), :leading(15),
     ) {
     my %settings = %default-settings;
     %settings{.key} = .value;
+    my %opts;
 
     for %settings.keys {
-        $gfx."$_"() = %settings{$_};
-        %settings{$_}:delete
-            if %settings{$_} == %default-settings{$_}
-    }    
+        if /^<[A..Z]>/ {
+            $gfx."$_"() = %settings{$_};
+            %settings{$_}:delete
+                if %settings{$_} == %default-settings{$_}
+        }
+        else {
+            %opts{$_} = %settings{$_};
+        }
+    }
 
     $gfx.text-position = ($x, $y);
-    my $text-block = $gfx.say( ("*** {%settings} *** ", $sample, $sample2).join(' '), :$width, :$height);
+    my $text-block = $gfx.say( ("*** {%settings} *** ", $sample, $sample2).join(' '), :$width, :$height, |%opts);
 
     if $x < 400 {
         $x += 110;
