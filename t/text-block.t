@@ -11,8 +11,8 @@ plan 5;
 srand(123456);
 
 my \nbsp = "\c[NO-BREAK SPACE]";
-my @chunks = "z80 a-b.   {nbsp}A{nbsp}bc{nbsp} 42".comb: /<PDF::Content::Text::Block::Text::word> | <PDF::Content::Text::Block::Text::space> /;
-is-deeply @chunks, ["z80", " ", "a-", "b.", "   ", "{nbsp}A{nbsp}bc{nbsp}", " ", "42"], ;
+my @chunks = "z80 a-b. -3   {nbsp}A{nbsp}bc{nbsp} 42".comb: /<PDF::Content::Text::Block::Text::word> | <PDF::Content::Text::Block::Text::space> /;
+is-deeply @chunks, ["z80", " ", "a-", "b.", " ", "-", "3", "   ", "{nbsp}A{nbsp}bc{nbsp}", " ", "42"], ;
 
 my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;

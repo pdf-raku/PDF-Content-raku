@@ -77,8 +77,9 @@ $page.graphics: -> $gfx {
     $gfx.transform( :translate[285, 250]);
     $gfx.transform( :rotate(-10), :scale(1.5) );
     $gfx.set-graphics( :transparency(.5) );
-    $gfx.do($img, 300, 380, :width(150) );
+    $gfx.do($img, :width(150) );
 }
+$pdf.save-as: "t/sample-image.pdf";
 ```
 
 Note: at this stage, only the `JPEG`, `GIF` and `PNG` image formats are supported.
@@ -226,7 +227,7 @@ The `to-xobject` method can be used to convert a page to an XObject Form to lay-
 ```
 use PDF::Content::PDF;
 my $pdf-with-images = PDF::Content::PDF.open: "t/images.pdf";
-my $pdf-with-text = PDF::Content::PDF.open: "t/example.pdf";
+my $pdf-with-text = PDF::Content::PDF.open: "t/pdf-page-text.pdf";
 
 my $new-doc = PDF::Content::PDF.new;
 

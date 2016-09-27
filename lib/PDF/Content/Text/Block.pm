@@ -28,7 +28,7 @@ class PDF::Content::Text::Block {
     grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
         token space { [\s <!after <nbsp> >]+ }
-        token word  { [ <![ - ]> [<!before \s> . | <nbsp>] ]+ '-'? }
+        token word  { [ <![ - ]> [<!before \s> . | <nbsp>] ]+ '-'? | '-' }
     }
 
     multi submethod BUILD(Str :$!text!, |c) {
@@ -63,7 +63,7 @@ class PDF::Content::Text::Block {
 	$!space-width = $!font.stringwidth(' ', $!font-size );
         $!font-height = $!font.height( $!font-size );
         my Bool $follows-ws = False;
-        my $word-spacing = $!space-width + $!word-spacing;
+        my $word-spacing = $!space-width + $!word-spacing + $char-spacing;
         $word-spacing *= $!horiz-scaling / 100
             if $!horiz-scaling != 100;
         my PDF::Content::Text::Line $line .= new: :$word-spacing;
@@ -86,8 +86,8 @@ class PDF::Content::Text::Block {
                 $word-width = $!font.stringwidth($text);
             }
             $word-width *= $!font-size * $!horiz-scaling / 100000;
-            $word-width *= ($text.chars - 1) * $char-spacing
-                if $char-spacing > 0;
+            $word-width += ($text.chars - 1) * $char-spacing
+                if $char-spacing > -$!font-size;
 
             for $word.list {
                 when Str {
