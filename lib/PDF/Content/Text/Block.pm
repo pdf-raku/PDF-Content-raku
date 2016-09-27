@@ -174,7 +174,7 @@ class PDF::Content::Text::Block {
                 @content.push( OpNames::SetWordSpacing => [ $!word-spacing = $_ ])
                     unless $_ =~= $!word-spacing || +.words <= 1;
             }
-            @content.push: .content(:$.font-size, :$space-size, :$x-shift);
+            @content.push: .content(:$.font-size, :$x-shift);
             @content.push: OpNames::TextNextLine;
         }
 

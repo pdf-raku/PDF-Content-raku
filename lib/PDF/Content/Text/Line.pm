@@ -36,13 +36,13 @@ class PDF::Content::Text::Line {
         $!indent = - $.actual-width  /  2;
     }
 
-    method content(Numeric :$font-size!, Numeric :$space-size!, Numeric :$x-shift = 0) {
+    method content(Numeric :$font-size!, Numeric :$x-shift = 0) {
         my Numeric \scale = -1000 / $font-size;
         my subset Str-or-Pos of Any where Str|Numeric;
         my Str-or-Pos @line;
 
         my Numeric $indent = $!indent + $x-shift;
-        $indent =  ($indent * scale).round.Int;
+        $indent = ($indent * scale).round.Int;
         @line.push: $indent
             if $indent;
         my int $wc = 0;
