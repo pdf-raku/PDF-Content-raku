@@ -196,13 +196,11 @@ role PDF::Content:ver<0.0.5>
         ) {
 	# detect and use the current text-state font
 	my Numeric $font-size = $.font-size // self!current-font[1];
-	my Numeric $word-spacing = $.WordSpacing;
-	my Numeric $horiz-scaling = $.HorizScaling;
-	my Numeric $char-spacing = $.CharSpacing;
 
-        my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :$font-size,
-						         :$word-spacing, :$horiz-scaling, :$char-spacing,
-						         |c );
+        my PDF::Content::Text::Block $text-block .= new(
+            :$text, :$font, :$font-size,
+	    :$.WordSpacing, :$.HorizScaling, :$.CharSpacing,
+	    |c );
 
 	$.print( $text-block, |c)
 	    unless $stage;

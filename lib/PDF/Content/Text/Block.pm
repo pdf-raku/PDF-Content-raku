@@ -10,11 +10,11 @@ class PDF::Content::Text::Block {
     has         $.font is required;
     has Numeric $.font-height;
     has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
-    has Numeric $.line-height;
+    has Numeric $.leading;
     has Numeric $!space-width;
-    has Numeric $!word-spacing;
+    has Numeric $!WordSpacing;
     subset Percentage of Numeric where * > 0;
-    has Percentage $.horiz-scaling = 100;
+    has Percentage $!HorizScaling = 100;
     has Numeric $!width;
     has Numeric $!height;
     has @.lines;
@@ -23,7 +23,7 @@ class PDF::Content::Text::Block {
     has Str $.valign where 'top'|'center'|'bottom'|'text';
 
     method actual-width  { @!lines.map( *.actual-width ).max }
-    method actual-height { (+@!lines - 1) * $!line-height  +  $!font-height }
+    method actual-height { (+@!lines - 1) * $!leading  +  $!font-height }
 
     grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
@@ -37,25 +37,22 @@ class PDF::Content::Text::Block {
     }
 
     sub flush-space(@words) returns Bool {
-        if @words && @words[0] ~~ /<Text::space>/ {
-            @words.shift;
-            True
-        } else {
-            False
-        }
+        my \flush = ? (@words && @words[0] ~~ /<Text::space>/);
+        @words.shift if flush;
+        flush;
     }
 
     multi submethod BUILD(Str  :@chunks!,
                                :$!font!,
 			  Numeric :$!font-size = 16,
-                          Numeric :$!line-height = $!font-size * 1.1,
-			  Numeric :$!horiz-scaling = 100,
-                          Numeric :$char-spacing = 0,
-                          Numeric :$!word-spacing = 0,
+                          Numeric :$!leading = $!font-size * 1.1,
+			  Numeric :$!HorizScaling = 100,
+                          Numeric :$CharSpacing = 0,
+                          Numeric :$!WordSpacing = 0,
                           Numeric :$!width?,        #| optional constraint
                           Numeric :$!height?,       #| optional constraint
-                          Str :$!align = 'left',
-                          Str :$!valign = 'text',
+                          Str  :$!align = 'left',
+                          Str  :$!valign = 'text',
                           Bool :$kern = False,
         ) is default {
 
@@ -63,9 +60,9 @@ class PDF::Content::Text::Block {
 	$!space-width = $!font.stringwidth(' ', $!font-size );
         $!font-height = $!font.height( $!font-size );
         my Bool $follows-ws = False;
-        my $word-spacing = $!space-width + $!word-spacing + $char-spacing;
-        $word-spacing *= $!horiz-scaling / 100
-            if $!horiz-scaling != 100;
+        my $word-spacing = $!space-width + $!WordSpacing + $CharSpacing;
+        $word-spacing *= $!HorizScaling / 100
+            if $!HorizScaling != 100;
         my PDF::Content::Text::Line $line .= new: :$word-spacing;
         @!lines.push: $line;
 
@@ -85,9 +82,9 @@ class PDF::Content::Text::Block {
                 $word = [ $text, ];
                 $word-width = $!font.stringwidth($text);
             }
-            $word-width *= $!font-size * $!horiz-scaling / 100000;
-            $word-width += ($text.chars - 1) * $char-spacing
-                if $char-spacing > -$!font-size;
+            $word-width *= $!font-size * $!HorizScaling / 100000;
+            $word-width += ($text.chars - 1) * $CharSpacing
+                if $CharSpacing > -$!font-size;
 
             for $word.list {
                 when Str {
@@ -100,7 +97,7 @@ class PDF::Content::Text::Block {
 
             if $!width && $line.words && $line.actual-width + $word-spacing + $word-width > $!width {
                 # line break
-                if $!height && self.actual-height + $!line-height > $!height {
+                if $!height && self.actual-height + $!leading > $!height {
                     # height exceeded
                     @!overflow.push: $text;
                     last;
@@ -151,8 +148,9 @@ class PDF::Content::Text::Block {
                    Bool :$left, # position from left;
                   ) {
 
-        my @content = ( OpNames::SetTextLeading => [ $!line-height ], )
-	    if $nl || +@!lines > 1;
+        my @content;
+        @content.push: ( OpNames::SetTextLeading => [ $!leading ] )
+            if $nl || +@!lines > 1;
 
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 
@@ -171,8 +169,8 @@ class PDF::Content::Text::Block {
 
         for @!lines {
             with .word-spacing - $!space-width {
-                @content.push( OpNames::SetWordSpacing => [ $!word-spacing = $_ ])
-                    unless $_ =~= $!word-spacing || +.words <= 1;
+                @content.push( OpNames::SetWordSpacing => [ $!WordSpacing = $_ ])
+                    unless $_ =~= $!WordSpacing || +.words <= 1;
             }
             @content.push: .content(:$.font-size, :$x-shift);
             @content.push: OpNames::TextNextLine;
