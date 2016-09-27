@@ -11,18 +11,18 @@ role PDF::Content:ver<0.0.5>
     use PDF::Content::Font;
 
     method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
-			Numeric :$opacity,
-			Numeric :$transparency is copy,
+			Numeric :$opacity is copy,
+			Numeric :$transparency,
 			*%settings,
 	) {
 
 	my constant %Entries = %( ExtGState.enums.invert );
 
-	with $opacity {
-	    $transparency = 1 - $_
+	with $transparency {
+	    $opacity = 1 - $_
         }
 
-	with $transparency {
+	with $opacity {
 	    %settings<FillAlpha> //= $_;
 	    %settings<StrokeAlpha> //= $_;
 	}
