@@ -13,6 +13,7 @@ class PDF::Content::Text::Block {
     has Numeric $.leading;
     has Numeric $!space-width;
     has Numeric $!WordSpacing;
+    has Numeric $!CharSpacing;
     subset Percentage of Numeric where * > 0;
     has Percentage $!HorizScaling = 100;
     has Numeric $!width;
@@ -42,12 +43,27 @@ class PDF::Content::Text::Block {
         flush;
     }
 
+    #| calculates actual spacing between words
+    method !word-gap {
+        my $word-gap = $!space-width + $!WordSpacing + $!CharSpacing;
+        $word-gap *= $!HorizScaling / 100
+            if $!HorizScaling != 100;
+        $word-gap;
+    }
+
+    #| calculates WordSpacing needed to achieve a given word-gap
+    method !word-spacing($word-gap is copy) {
+        $word-gap /= $!HorizScaling / 100
+            if $!HorizScaling != 100;
+        $word-gap - $!space-width - $!CharSpacing;
+    }
+
     multi submethod BUILD(Str  :@chunks!,
                                :$!font!,
 			  Numeric :$!font-size = 16,
                           Numeric :$!leading = $!font-size * 1.1,
 			  Numeric :$!HorizScaling = 100,
-                          Numeric :$CharSpacing = 0,
+                          Numeric :$!CharSpacing = 0,
                           Numeric :$!WordSpacing = 0,
                           Numeric :$!width?,        #| optional constraint
                           Numeric :$!height?,       #| optional constraint
@@ -60,10 +76,9 @@ class PDF::Content::Text::Block {
 	$!space-width = $!font.stringwidth(' ', $!font-size );
         $!font-height = $!font.height( $!font-size );
         my Bool $follows-ws = False;
-        my $word-spacing = $!space-width + $!WordSpacing + $CharSpacing;
-        $word-spacing *= $!HorizScaling / 100
-            if $!HorizScaling != 100;
-        my PDF::Content::Text::Line $line .= new: :$word-spacing;
+        my $word-gap = self!word-gap;
+
+        my PDF::Content::Text::Line $line .= new: :$word-gap;
         @!lines.push: $line;
 
         flush-space(@chunks);
@@ -83,8 +98,8 @@ class PDF::Content::Text::Block {
                 $word-width = $!font.stringwidth($text);
             }
             $word-width *= $!font-size * $!HorizScaling / 100000;
-            $word-width += ($text.chars - 1) * $CharSpacing
-                if $CharSpacing > -$!font-size;
+            $word-width += ($text.chars - 1) * $!CharSpacing
+                if $!CharSpacing > -$!font-size;
 
             for $word.list {
                 when Str {
@@ -95,7 +110,7 @@ class PDF::Content::Text::Block {
                 }
             }
 
-            if $!width && $line.words && $line.actual-width + $word-spacing + $word-width > $!width {
+            if $!width && $line.words && $line.actual-width + $word-gap + $word-width > $!width {
                 # line break
                 if $!height && self.actual-height + $!leading > $!height {
                     # height exceeded
@@ -103,7 +118,7 @@ class PDF::Content::Text::Block {
                     last;
                 }
                 else {
-                    $line = $line.new( :$word-spacing );
+                    $line = $line.new( :$word-gap );
                     @!lines.push: $line ;
                 }
                 $follows-ws = False;
@@ -167,17 +182,23 @@ class PDF::Content::Text::Block {
         }
         my $x-shift = $left ?? $dx * $.width !! 0;
 
-        for @!lines {
-            with .word-spacing - $!space-width {
-                @content.push( OpNames::SetWordSpacing => [ $!WordSpacing = $_ ])
-                    unless $_ =~= $!WordSpacing || +.words <= 1;
+        my $word-spacing = $!WordSpacing;
+
+        for @!lines -> \line {
+            with self!word-spacing(line.word-gap) {
+                @content.push( OpNames::SetWordSpacing => [ $word-spacing = $_ ])
+                    unless $_ =~= $word-spacing || +line.words <= 1;
             }
-            @content.push: .content(:$.font-size, :$x-shift);
+            @content.push: line.content(:$.font-size, :$x-shift);
             @content.push: OpNames::TextNextLine;
         }
 
         @content.pop
             if !$nl && @content;
+
+        # restore original value
+        @content.push( OpNames::SetWordSpacing => [ $!WordSpacing ])
+            unless $!WordSpacing =~= $word-spacing;
 
         @content;
     }

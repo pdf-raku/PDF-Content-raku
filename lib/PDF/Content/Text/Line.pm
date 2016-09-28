@@ -6,12 +6,12 @@ class PDF::Content::Text::Line {
 
     has @.words;
     has Numeric $.word-width is rw = 0; #| sum of word widths
-    has Numeric $.word-spacing = 0;
+    has Numeric $.word-gap = 0;
     has Numeric $.indent is rw = 0;
     has Bool @.word-boundary;
 
     method actual-width returns Numeric {
-        $!word-width + @!word-boundary.grep(*.so) * $!word-spacing;
+        $!word-width + @!word-boundary.grep(*.so) * $!word-gap;
     }
 
     multi method align('justify', Numeric :$width! ) {
@@ -19,7 +19,7 @@ class PDF::Content::Text::Line {
         my Numeric \wb = +@!word-boundary.grep: *.so;
 
         if actual-width && wb && 1.0 < $width / actual-width < 2.0 {
-            $!word-spacing += ($width - actual-width) / wb;
+            $!word-gap += ($width - actual-width) / wb;
             $!indent = 0;
         }
     }

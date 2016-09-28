@@ -80,7 +80,7 @@ my %default-settings = :TextRise(0), :HorizScaling(100), :CharSpacing(0), :WordS
 for (
     :TextRise(0), :TextRise(3), :TextRise(-3),
     :HorizScaling(50), :HorizScaling(100), :HorizScaling(150),
-    :CharSpacing(-1.5), :CharSpacing(-.5), :CharSpacing(.5), :CharSpacing(1.5),
+    :CharSpacing(-1.0), :CharSpacing(-.5), :CharSpacing(.5), :CharSpacing(1.5),
     :WordSpacing(-2), :WordSpacing(5), :leading(8), :leading(15),
     ) {
     my %settings = %default-settings;

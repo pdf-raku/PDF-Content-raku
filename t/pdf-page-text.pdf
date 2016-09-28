@@ -25,7 +25,7 @@
 >> endobj
 
 4 0 obj <<
-  /Length 5093
+  /Length 5444
 >> stream
 BT
   50 100 Td
@@ -88,20 +88,28 @@ BT
   T*
   1 0 0 1 110 190 Tm
   11 TL
+  14.71 Tw
   [ (*** text justify***) ] TJ
   T*
+  1.473333 Tw
   [ (Lorem ipsum dolor sit) ] TJ
   T*
+  20.52 Tw
   [ (amet, consectetur) ] TJ
   T*
+  1.466667 Tw
   [ (adipiscing elit, sed do) ] TJ
   T*
+  28.31 Tw
   [ (eiusmod tempor) ] TJ
   T*
+  1.65 Tw
   [ (incididunt ut labore et) ] TJ
   T*
+  3.31 Tw
   [ (dolore magna aliqua.) ] TJ
   T*
+  0 Tw
   1 0 0 1 235 700 Tm
   11 TL
   0 -9.31 Td
@@ -156,20 +164,28 @@ BT
   1 0 0 1 235 190 Tm
   11 TL
   0 -9.31 Td
+  0.173333 Tw
   [ (*** top justify*** Lorem) ] TJ
   T*
+  2.583333 Tw
   [ (ipsum dolor sit amet,) ] TJ
   T*
+  1.07 Tw
   [ (consectetur adipiscing) ] TJ
   T*
+  3.69 Tw
   [ (elit, sed do eiusmod) ] TJ
   T*
+  6.37 Tw
   [ (tempor incididunt ut) ] TJ
   T*
+  15.26 Tw
   [ (labore et dolore) ] TJ
   T*
+  37.19 Tw
   [ (magna aliqua.) ] TJ
   T*
+  0 Tw
   1 0 0 1 360 700 Tm
   11 TL
   0 30.69 Td
@@ -224,20 +240,28 @@ BT
   1 0 0 1 360 190 Tm
   11 TL
   0 30.69 Td
+  8.875 Tw
   [ (*** center justify***) ] TJ
   T*
+  1.473333 Tw
   [ (Lorem ipsum dolor sit) ] TJ
   T*
+  20.52 Tw
   [ (amet, consectetur) ] TJ
   T*
+  1.466667 Tw
   [ (adipiscing elit, sed do) ] TJ
   T*
+  28.31 Tw
   [ (eiusmod tempor) ] TJ
   T*
+  1.65 Tw
   [ (incididunt ut labore et) ] TJ
   T*
+  3.31 Tw
   [ (dolore magna aliqua.) ] TJ
   T*
+  0 Tw
   1 0 0 1 485 700 Tm
   11 TL
   0 70.69 Td
@@ -292,20 +316,28 @@ BT
   1 0 0 1 485 190 Tm
   11 TL
   0 70.69 Td
+  7.485 Tw
   [ (*** bottom justify***) ] TJ
   T*
+  1.473333 Tw
   [ (Lorem ipsum dolor sit) ] TJ
   T*
+  20.52 Tw
   [ (amet, consectetur) ] TJ
   T*
+  1.466667 Tw
   [ (adipiscing elit, sed do) ] TJ
   T*
+  28.31 Tw
   [ (eiusmod tempor) ] TJ
   T*
+  1.65 Tw
   [ (incididunt ut labore et) ] TJ
   T*
+  3.31 Tw
   [ (dolore magna aliqua.) ] TJ
   T*
+  0 Tw
 ET
 endstream endobj
 
@@ -336,7 +368,7 @@ endstream endobj
 >> endobj
 
 8 0 obj <<
-  /Length 7122
+  /Length 7064
 >> stream
 BT
   /F1 10 Tf
@@ -509,16 +541,18 @@ BT
   [ (dolore magna) ] TJ
   T*
   100 Tz
-  -1.5 Tc
+  -1 Tc
   1 0 0 1 130 530 Tm
   11 TL
-  [ (*** CharSpacing -1.5 ***) ] TJ
+  [ (*** CharSpacing -1 ***) ] TJ
   T*
-  [ (Lorem ipsum dolor sit amet,) ] TJ
+  [ (Lorem ipsum dolor sit) ] TJ
   T*
-  [ (consectetur adipiscing elit, sed) ] TJ
+  [ (amet, consectetur) ] TJ
   T*
-  [ (do eiusmod tempor incididunt) ] TJ
+  [ (adipiscing elit, sed do) ] TJ
+  T*
+  [ (eiusmod tempor incididunt) ] TJ
   T*
   [ (ut labore et dolore magna) ] TJ
   T*
@@ -526,17 +560,15 @@ BT
   T*
   [ (veniam, quis nostrud) ] TJ
   T*
-  [ (exercitation ullamco laboris nisi) ] TJ
+  [ (exercitation ullamco laboris) ] TJ
   T*
-  [ (ut aliquip ex ea commodo) ] TJ
+  [ (nisi ut aliquip ex ea) ] TJ
   T*
-  [ (consequat. Duis aute irure) ] TJ
+  [ (commodo consequat. Duis) ] TJ
   T*
-  [ (dolor in reprehenderit in) ] TJ
+  [ (aute irure dolor in) ] TJ
   T*
-  [ (voluptate velit esse cillum) ] TJ
-  T*
-  [ (dolore eu fugiat nulla pariatur. ut) ] TJ
+  [ (reprehenderit in voluptate) ] TJ
   T*
   -0.5 Tc
   1 0 0 1 240 530 Tm
@@ -755,10 +787,10 @@ xref
 0000000068 00000 n 
 0000000140 00000 n 
 0000000311 00000 n 
-0000005459 00000 n 
-0000005570 00000 n 
-0000005676 00000 n 
-0000005831 00000 n 
+0000005810 00000 n 
+0000005921 00000 n 
+0000006027 00000 n 
+0000006182 00000 n 
 trailer
 <<
   /ID [ <4386dc7bc3489e418b44434e3a168843> <4386dc7bc3489e418b44434e3a168843> ]
@@ -766,5 +798,5 @@ trailer
   /Size 9
 >>
 startxref
-13008
+13301
 %%EOF
