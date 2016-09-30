@@ -12,10 +12,10 @@ class PDF::Content::Text::Block {
     has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
     has Numeric $.leading;
     has Numeric $!space-width;
-    has Numeric $!WordSpacing;
-    has Numeric $!CharSpacing;
+    has Numeric $.WordSpacing;
+    has Numeric $.CharSpacing;
     subset Percentage of Numeric where * > 0;
-    has Percentage $!HorizScaling = 100;
+    has Percentage $.HorizScaling = 100;
     has Numeric $!width;
     has Numeric $!height;
     has @.lines;

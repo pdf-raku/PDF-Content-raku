@@ -256,7 +256,8 @@ role PDF::Content:ver<0.0.5>
         }
 
         self.set-font($font, $font-size);
-
+        self."$_"() = $text-block."$_"()
+            for <CharSpacing WordSpacing HorizScaling>;
 	self.ops: $text-block.content(:$nl, :$top, :$left);
 
 	self.op(EndText) unless $in-text;
