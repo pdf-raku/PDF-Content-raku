@@ -23,8 +23,8 @@ class PDF::Content::Text::Block {
     has Str $!align where 'left'|'center'|'right'|'justify';
     has Str $.valign where 'top'|'center'|'bottom'|'text';
 
-    method actual-width  { @!lines.map( *.actual-width ).max }
-    method actual-height { (+@!lines - 1) * $!leading  +  $!font-height }
+    method content-width  { @!lines.map( *.content-width ).max }
+    method content-height { (+@!lines - 1) * $!leading  +  $!font-height }
 
     grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
@@ -110,9 +110,9 @@ class PDF::Content::Text::Block {
                 }
             }
 
-            if $!width && $line.words && $line.actual-width + $word-gap + $word-width > $!width {
+            if $!width && $line.words && $line.content-width + $word-gap + $word-width > $!width {
                 # line break
-                if $!height && self.actual-height + $!leading > $!height {
+                if $!height && self.content-height + $!leading > $!height {
                     # height exceeded
                     @!overflow.push: $text;
                     last;
@@ -133,15 +133,15 @@ class PDF::Content::Text::Block {
 
         @!overflow.append: @chunks;
 
-        my $width = $!width // self.actual-width
+        my $width = $!width // self.content-width
             if $!align eq 'justify';
 
         .align($!align, :$width )
             for @!lines;
     }
 
-    method width  { $!width //= self.actual-width }
-    method height { $!height //= self.actual-height }
+    method width  { $!width //= self.content-width }
+    method height { $!height //= self.content-height }
     method !dy {
         given $!valign {
             when 'center' { 0.5 }
@@ -150,7 +150,7 @@ class PDF::Content::Text::Block {
         };
     }
     method top-offset {
-        self!dy * ($.height - $.actual-height);
+        self!dy * ($.height - $.content-height);
     }
 
     method align($!align) {
