@@ -28,16 +28,16 @@ role PDF::Content::Image {
     #| lightweight replacement for deprecated $buf.unpack
     method unpack(Buf $buf, *@templ ) {
 	my @bytes = $buf.list;
-        my Bool $nw = $.network-endian;
+        my Bool \nw = $.network-endian;
         my uint $off = 0;
 
 	@templ.map: {
 	    my uint $size = .^nativesize div 8;
 	    my uint $v = 0;
-            my uint $i = $nw ?? 0 !! $size;
+            my uint $i = nw ?? 0 !! $size;
             for 1 .. $size {
                 $v +<= 8;
-                $v += @bytes[$off + ($nw ?? $i++ !! --$i)];
+                $v += @bytes[$off + (nw ?? $i++ !! --$i)];
 	    }
             $off += $size;
 

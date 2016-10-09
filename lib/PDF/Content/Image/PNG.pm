@@ -23,7 +23,7 @@ class PDF::Content::Image::PNG
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
-        my uint ($l,$w,$h,$bpc,$cs,$cm,$fm,$im);
+        my uint ($w,$h,$bpc,$cs,$cm,$fm,$im);
         my Buf $palette;
         my Buf $trns;
         my Buf $crc;
@@ -74,8 +74,8 @@ class PDF::Content::Image::PNG
         %dict<Height> = $h;
 
 	my %opts = :$w, :$h, :%dict, :$stream, :$alpha;
-	%opts<trns> = $trns if $trns.defined;
-	%opts<palette> = $palette if $palette.defined;
+	%opts<trns> = $_ with $trns;
+	%opts<palette> = $_ with $palette;
 	png-to-stream($cs, $bpc, |%opts);
     }
 

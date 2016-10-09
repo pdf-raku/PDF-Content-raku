@@ -18,84 +18,61 @@ class PDF::Content::Image::GIF
         %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, :int($col-size-1), $color-table ];
     }
 
-    sub vec(buf8 $buf, UInt $off) {
-        ($buf[ $off div 8] +> ($off mod 8)) mod 2
+    sub vec(buf8 \buf, UInt \off) {
+        (buf[ off div 8] +> (off mod 8)) mod 2
     }
 
-    method !de-compress(UInt $ibits, buf8 $stream) {
-        my UInt $bits = $ibits;
-        my UInt $reset-code = 1 +< ($ibits - 1);
-        my UInt $end-code   = $reset-code + 1;
-        my UInt $next-code  = $end-code + 1;
+    method !decompress(UInt \ibits, buf8 \stream --> Buf) {
+        my UInt \reset-code = 1 +< (ibits - 1);
+        my UInt \end-code   = reset-code + 1;
+        my UInt \maxptr = 8 * +stream;
+        my UInt $next-code  = end-code + 1;
+        my UInt $bits = ibits;
         my UInt $ptr = 0;
-        my UInt $maxptr = 8 * +$stream;
-        my Str $out = '';
+        my @out;
         my UInt $outptr = 0;
 
-        my Str @d = (0 ..^ $reset-code).map: *.chr;
+        my @d = (0 ..^ reset-code).map: {[$_,]};
 
-        while ($ptr + $bits) <= $maxptr {
-            my UInt $tag = [+] (0 ..^ $bits).map: { vec($stream, $ptr + $_) +< $_ };
+        while ($ptr + $bits) <= maxptr {
+            my UInt \tag = [+] (0 ..^ $bits).map: { vec(stream, $ptr + $_) +< $_ };
             $ptr += $bits;
             $bits++
                 if $next-code == 1 +< $bits and $bits < 12;
 
-            if $tag == $reset-code {
-                $bits = $ibits;
-                $next-code = $end-code + 1;
+            if tag == reset-code {
+                $bits = ibits;
+                $next-code = end-code + 1;
                 next;
-            } elsif $tag == $end-code {
+            } elsif tag == end-code {
                 last;
-            } elsif $tag < $reset-code {
-                $out ~= @d[$next-code++] = @d[$tag];
-            } elsif $tag > $end-code {
-                @d[$next-code] = @d[$tag];
-                @d[$next-code] ~= @d[$tag + 1].substr( 0, 1);
-                $out ~= @d[$next-code++];
+            } else {
+                @d[$next-code] = [ @d[tag].list ];
+                @d[$next-code].push: @d[tag + 1][0]
+                    if tag > end-code;
+                @out.append: @d[$next-code++].list;
             }
         }
 
-        $out;
+        Buf.new(@out);
     }
 
-    method !de-interlace(Str $data, UInt $width, UInt $height) {
+    method !deinterlace(Buf $data, UInt $width, UInt $height) {
         my UInt $row;
-        my Str @result;
+        my Buf @result;
         my UInt $idx = 0;
 
-        #Pass 1 - every 8th row, starting with row 0
-        $row = 0;
-        while $row < $height {
-            @result[$row] = substr($data, $idx*$width, $width);
-            $row += 8;
-            $idx++;
+        for [ 0 => 8, 4 => 8, 2 => 4, 1 => 2] {
+            my $row = .key;
+            my \incr = .value;
+            while $row < $height {
+                @result[$row] = $data.subbuf( $idx*$width, $width);
+                $row += incr;
+                $idx++;
+            }
         }
 
-        #Pass 2 - every 8th row, starting with row 4
-        $row = 4;
-        while $row < $height {
-            @result[$row] = substr($data, $idx*$width, $width);
-            $row += 8;
-            $idx++;
-        }
-
-        #Pass 3 - every 4th row, starting with row 2
-        $row = 2;
-        while $row < $height {
-            @result[$row] = substr($data, $idx*$width, $width);
-            $row += 4;
-            $idx++;
-        }
-
-        #Pass 4 - every 2th row, starting with row 1
-        $row = 1;
-        while $row < $height {
-            @result[$row] = substr($data, $idx*$width, $width);
-            $row += 2;
-            $idx++;
-        }
-
-        [~] @result
+        [~] @result.map: *.decode('latin-1');
     }
 
     method read(IO::Handle $fh!, Bool :$trans = True) {
@@ -140,9 +117,10 @@ class PDF::Content::Image::GIF
                         ($len,) = $.unpack($fh.read(1), uint8);
                     }
 
-                    $encoded = self!de-compress($sep+1, $stream);
-                    $encoded = self!de-interlace($encoded, %dict<Width>, %dict<Height> )
-                        if $interlaced;
+                    my Buf $data = self!decompress($sep+1, $stream);
+                    $encoded = $interlaced
+                        ?? self!deinterlace($encoded, %dict<Width>, %dict<Height> )
+                        !! $data.decode: 'latin-1';
 
                     %dict<Length> = $encoded.codes;
                     last;
