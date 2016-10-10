@@ -43,7 +43,6 @@ class PDF::Content::Image::GIF
             if tag == reset-code {
                 $bits = ibits;
                 $next-code = end-code + 1;
-                next;
             } elsif tag == end-code {
                 last;
             } else {

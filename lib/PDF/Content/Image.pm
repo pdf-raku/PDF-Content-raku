@@ -45,6 +45,17 @@ role PDF::Content::Image {
 	}
     }
 
+    method type(IO::Path $path) {
+        given $path.extension {
+            when m:i/^ jpe?g $/ { 'JPEG' }
+            when m:i/^ gif $/   { 'GIF' }
+            when m:i/^ png $/   { 'PNG' }
+            default {
+                die X::PDF::Image::UnknownType.new( :$path );
+            }
+        }
+    }
+
     multi method open(Str $path! ) {
         self.open( $path.IO );
     }
@@ -55,14 +66,7 @@ role PDF::Content::Image {
 
     multi method open(IO::Handle $fh!) {
         my $path = $fh.path;
-        my Str $type = do given $path.extension {
-            when m:i/^ jpe?g $/ { 'JPEG' }
-            when m:i/^ gif $/   { 'GIF' }
-            when m:i/^ png $/   { 'PNG' }
-            default {
-                die X::PDF::Image::UnknownType.new( :$path );
-            }
-        };
+        my Str $type = self.type: $path; 
 
         require ::('PDF::Content::Image')::($type);
         ::('PDF::Content::Image')::($type).read($fh);
