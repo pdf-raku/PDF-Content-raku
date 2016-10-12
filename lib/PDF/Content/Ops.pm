@@ -67,7 +67,7 @@ ET | EndText | — | End text object
 EX | EndIgnore | — | (PDF 1.1) End compatibility section
 f | Fill | — | Fill path using nonzero winding number rule
 F | FillObsolete | — | Fill path using nonzero winding number rule (obsolete)
-f* | EOFill| — | Fill path using even-odd rule
+f* | EOFill | — | Fill path using even-odd rule
 G | SetStrokeGray | gray | Set gray level for stroking operations
 g | SetFillGray | gray | Set gray level for nonstroking operations
 gs | SetGraphicsState | dictName | (PDF 1.2) Set parameters from graphics state parameter dictionary
