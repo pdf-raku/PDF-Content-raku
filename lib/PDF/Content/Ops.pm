@@ -670,42 +670,65 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!FillAlpha = %gstate<FillAlpha>;
 	Restore;
     }
-    multi method track-graphics('cm', *@transform) {
+    multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
         require PDF::Content::Util::TransformMatrix;
-        @!GraphicsMatrix = PDF::Content::Util::TransformMatrix::multiply(@!GraphicsMatrix, @transform);
+        @!GraphicsMatrix = PDF::Content::Util::TransformMatrix::multiply(@!GraphicsMatrix, [a, b, c, d, e, f]);
     }
-    multi method track-graphics('rg', *@rgb) {
+    multi method track-graphics('rg', \r, \g, \b) {
         $!FillColorSpace = 'DeviceRGB';
-        $!FillColor = @rgb;
+        $!FillColor = [r, g, b];
     }
-    multi method track-graphics('RG', *@rgb) {
+    multi method track-graphics('RG', \r, \g, \b) {
         $!StrokeColorSpace = 'DeviceRGB';
-        $!StrokeColor = @rgb;
+        $!StrokeColor = [r, g, b]
     }
-    multi method track-graphics('g', *@gray) {
+    multi method track-graphics('g', \gray) {
         $!FillColorSpace = 'DeviceGray';
-        $!FillColor = @gray;
+        $!FillColor = [ gray, ];
     }
-    multi method track-graphics('G', *@gray) {
+    multi method track-graphics('G', \gray) {
         $!StrokeColorSpace = 'DeviceGray';
-        $!StrokeColor = @gray;
+        $!StrokeColor = [ gray, ];
     }
-    multi method track-graphics('k', *@cmyk) {
+    multi method track-graphics('k', \c, \m, \y, \k) {
         $!FillColorSpace = 'DeviceCMYK';
-        $!FillColor = @cmyk;
+        $!FillColor = [ c, m, y, k ];
     }
-    multi method track-graphics('K', *@cmyk) {
+    multi method track-graphics('K', \c, \m, \y, \k) {
         $!StrokeColorSpace = 'DeviceCMYK';
-        $!StrokeColor = @cmyk;
+        $!StrokeColor = [ c, m, y, k ];
     }
-    multi method track-graphics('scn', *@scn) {
-        $!FillColor = @scn;
+
+    method !check-color-args($op, $cs, @scn) {
+        my \arity = do given $cs {
+            when 'DeviceGray'|'CalGray'|'Indexed' { 1 }
+            when 'DeviceRGB'|'CalRGB'|'Lab'  { 3 }
+            when 'DeviceCMYK' { 4 }
+        }
+
+        if arity {
+            my $got = +@scn;
+            $got-- if @scn && @scn[*-1] ~~ Str;
+            die "Incorrect number of arguments in $op command, expected {arity} $cs colors, got: $got"
+                unless $got == arity;
+        }
     }
-    multi method track-graphics('SCN', *@scn) {
-        $!StrokeColor = @scn;
+    multi method track-graphics('scn', *@colors) {
+        self!check-color-args('scn', $!FillColorSpace, @colors);
+        $!FillColor = @colors;
     }
-    multi method track-graphics('sc', |c) { self.track-graphics('scn', |c) }
-    multi method track-graphics('SC', |c) { self.track-graphics('SCN', |c) }
+    multi method track-graphics('SCN', *@colors) {
+        self!check-color-args('SCN', $!StrokeColorSpace, @colors);
+        $!StrokeColor = @colors;
+    }
+    multi method track-graphics('sc', *@colors) {
+        self!check-color-args('sc', $!FillColorSpace, @colors);
+        $!FillColor = @colors;
+    }
+    multi method track-graphics('SC', *@colors) {
+        self!check-color-args('SC', $!StrokeColorSpace, @colors);
+        $!StrokeColor = @colors;
+    }
     multi method track-graphics('ET') {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
@@ -787,5 +810,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         self."$op-name"(|@args);
     }
 
-    multi method FALLBACK($name) is default { die "unknown operator/method: $name\n" }
+    multi method FALLBACK($name, |c) is default {
+        die %OpCode{$name}:exists 
+            ?? "incorrect arguments to '$name' command"
+            !! "unknown operator/method: $name\n";
+    }
 }

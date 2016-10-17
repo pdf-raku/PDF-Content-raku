@@ -38,6 +38,8 @@ is-json-equiv $g.op('Tf', 'F1', 16), (:Tf[ :name<F1>, :real(16) ]), 'Tf';
 is $g.font-size, 16, '$g.font-size';
 
 is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - initial';
+dies-ok { $g.op('SCN', .2, .3, .4) }, 'SCN (/DeviceGray)';
+
 is-json-equiv $g.op('RG', .1, .2, .3), (:RG[ :real(.1), :real(.2), :real(.3) ] ), 'CS';
 is-deeply $g.StrokeColor, (:DeviceRGB[.1, .2, .3]), '$g.StrokeColor - updated';
 is $g.StrokeColorSpace, 'DeviceRGB', '$g.StrokeColorSpace - updated';
@@ -48,7 +50,13 @@ ok $ops2 > $ops1, 'StrokColor Op added';
 $g.StrokeColor = :DeviceRGB[.4, .5, .6];
 is $ops2, +$g.ops, 'StrokeColor Op optimised';
 
+is $g.StrokeColorSpace, 'DeviceRGB', '$g.StrokeColorSpace - initial';
+
+dies-ok { $g.StrokeColor = :DeviceRGB[.4, .5, .6, .8] }, 'wrong number of colors - dies';
+
 is-deeply $g.StrokeColor, (:DeviceRGB[.4, .5, .6]), '$g.StrokeColor - updated again';
+
+lives-ok { $g.op('SCN', .2, .3, .4) }, 'SCN (/DeviceRGB)';
 
 $g.StrokeColor = :DeviceN[.7, .8];
 is-deeply $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';
