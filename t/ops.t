@@ -206,5 +206,8 @@ my $g1 = PDF::Content.new;
 lives-ok {$g1.ops: $g.ops}, "comments import";
 is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
 
+lives-ok { $g.?Junk }, 'speculative method call';
+dies-ok { $g.Junk }, 'normal method call';
+
 done-testing;
 

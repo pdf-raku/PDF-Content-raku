@@ -800,19 +800,20 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	}).join: "\n";
     }
 
-    # e.g. $.Restore :== $.op('Q', [])
-    multi method FALLBACK(Str $op-name where {OpNames.enums{$op-name}:exists},
-			  *@args,
-	) {
-	my \op = OpNames.enums{$op-name};
-	my &op-meth = method (*@a) { self.op(op, |@a) };
-        self.WHAT.^add_method($op-name, &op-meth );
-        self."$op-name"(|@args);
+    method can($meth-name) {
+        my @can = callsame;
+        if !@can && $meth-name ∈ OpNames.enums {
+            # e.g. $.Restore :== $.op('Q', [])
+            my \op = OpNames.enums{$meth-name};
+            @can = [ method (*@a) { self.op(op, |@a) }, ];
+            self.^add_method($meth-name, @can[0] );
+        }
+        @can;
     }
 
-    multi method FALLBACK($name, |c) is default {
-        die %OpCode{$name}:exists 
-            ?? "incorrect arguments to '$name' command"
-            !! "unknown operator/method: $name\n";
+    method FALLBACK($name, |c) is default {
+        self.can($name)
+            ?? self."$name"(|c)
+            !! die "unknown operator/method: $name";
     }
 }
