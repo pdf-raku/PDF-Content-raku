@@ -122,7 +122,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 =end pod
 
     #| some convenient mnemomic names
-    my Str enum OpNames is export(:OpNames) «
+    my Str enum OpCode is export(:OpCode) «
         :BeginImage<BI> :ImageData<ID> :EndImage<EI>
         :BeginMarkedContent<BMC> :BeginMarkedContentDict<BDC>
         :EndMarkedContent<EMC> :BeginText<BT> :EndText<ET>
@@ -148,7 +148,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         :MoveShowText<'>
     »;
 
-    my constant %OpCode = OpNames.enums.invert.Hash;
+    my constant %OpCode = OpCode.enums.invert.Hash;
 
     # See [PDF 1.7 TABLE 4.1 Operator categories]
     my constant GeneralGraphicOps = set <w J j M d ri i gs>;
@@ -237,8 +237,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
         if $graphics ~~ Method {
             my \setter = 'Set' ~ $att.accessor-name;
-            my Str \op = OpNames.enums{setter}
-                or die "No OpNames::{setter} entry for {$att.name}";
+            my Str \op = OpCode.enums{setter}
+                or die "No OpCode::{setter} entry for {$att.name}";
             %PostOp{op} = $graphics;
         }
         else {
@@ -381,7 +381,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	   unless $ok-here;
     }
 
-    my %Ops = BEGIN %(
+    my Routine %Ops = BEGIN %(
 
         #| BI dict ID stream EI
         'BI' => sub ($op, Hash $dict = {}) {
@@ -800,20 +800,24 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	}).join: "\n";
     }
 
-    method can($meth-name) {
-        my @can = callsame;
-        if !@can && $meth-name ∈ OpNames.enums {
-            # e.g. $.Restore :== $.op('Q', [])
-            my \op = OpNames.enums{$meth-name};
-            @can = [ method (*@a) { self.op(op, |@a) }, ];
-            self.^add_method($meth-name, @can[0] );
+    method can(\name) {
+        my @meths = callsame;
+        if !@meths {
+            with OpCode.enums{name} -> \op {
+                # e.g. $.Restore :== $.op('Q', [])
+                my &meth = method (*@a) { self.op(op, |@a) };
+                self.WHAT.^add_method(name, &meth );
+                @meths.push: &meth
+            }
         }
-        @can;
+        @meths;
     }
-
-    method FALLBACK($name, |c) is default {
-        self.can($name)
-            ?? self."$name"(|c)
-            !! die "unknown operator/method: $name";
+    method dispatch:<.?>(\name, |c) is raw {
+        self.can(name) ?? self."{name}"(|c) !! Nil
+    }
+    method FALLBACK(\name, |c) {
+        self.can(name)
+            ?? self."{name}"(|c)
+            !! die X::Method::NotFound.new( :method(name), :typename(self.^name) );
     }
 }

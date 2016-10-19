@@ -6,7 +6,7 @@ use PDF::Content;
 role PDF::Content::Graphics {
 
     use PDF::Content;
-    use PDF::Content::Ops :OpNames;
+    use PDF::Content::Ops :OpCode;
 
     has PDF::Content $!pre-gfx; #| prepended graphics
     method pre-gfx { $!pre-gfx //= PDF::Content.new( :parent(self) ) }
@@ -17,9 +17,9 @@ role PDF::Content::Graphics {
 	$!gfx //= do {
 	    my Pair @ops = self.contents-parse;
 	    my PDF::Content $gfx .= new( :parent(self), |c );
-	    if @ops && ! (@ops[0].key eq OpNames::Save && @ops[*-1].key eq OpNames::Restore) {
-		@ops.unshift: OpNames::Save => [];
-		@ops.push: OpNames::Restore => [];
+	    if @ops && ! (@ops[0].key eq OpCode::Save && @ops[*-1].key eq OpCode::Restore) {
+		@ops.unshift: OpCode::Save => [];
+		@ops.push: OpCode::Restore => [];
 	    }
 	    $gfx.ops: @ops;
 	    $gfx;

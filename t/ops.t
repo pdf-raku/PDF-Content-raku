@@ -2,7 +2,7 @@ use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
-use PDF::Content::Ops :OpNames;
+use PDF::Content::Ops :OpCode;
 
 role Parent {
     has $!key = 'R0';
@@ -206,8 +206,8 @@ my $g1 = PDF::Content.new;
 lives-ok {$g1.ops: $g.ops}, "comments import";
 is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
 
-lives-ok { $g.?Junk }, 'speculative method call';
-dies-ok { $g.Junk }, 'normal method call';
+lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';
+dies-ok { $g.Junk }, 'unknown method/operator: . invocation';
 
 done-testing;
 
