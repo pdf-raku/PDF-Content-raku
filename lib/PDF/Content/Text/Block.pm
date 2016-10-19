@@ -3,7 +3,7 @@ use v6;
 class PDF::Content::Text::Block {
 
     use PDF::Content::Text::Line;
-    use PDF::Content::Ops :OpNames, :TextMode;
+    use PDF::Content::Ops :OpCode, :TextMode;
 
     has Str $.text;
     has Numeric $.font-size is required;
@@ -164,7 +164,7 @@ class PDF::Content::Text::Block {
                   ) {
 
         my @content;
-        @content.push: ( OpNames::SetTextLeading => [ $!leading ] )
+        @content.push: ( OpCode::SetTextLeading => [ $!leading ] )
             if $nl || +@!lines > 1;
 
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
@@ -172,7 +172,7 @@ class PDF::Content::Text::Block {
         if $!valign ne 'text' {
             # adopt html style text positioning. from the top of the font, not the baseline.
             my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
-            @content.push( OpNames::TextMove => [0, $y-shift - $!font-base-height ] );
+            @content.push( OpCode::TextMove => [0, $y-shift - $!font-base-height ] );
         }
 
         my $dx = do given $!align {
@@ -186,18 +186,18 @@ class PDF::Content::Text::Block {
 
         for @!lines -> \line {
             with self!word-spacing(line.word-gap) {
-                @content.push( OpNames::SetWordSpacing => [ $word-spacing = $_ ])
+                @content.push( OpCode::SetWordSpacing => [ $word-spacing = $_ ])
                     unless $_ =~= $word-spacing || +line.words <= 1;
             }
             @content.push: line.content(:$.font-size, :$x-shift);
-            @content.push: OpNames::TextNextLine;
+            @content.push: OpCode::TextNextLine;
         }
 
         @content.pop
             if !$nl && @content;
 
         # restore original value
-        @content.push( OpNames::SetWordSpacing => [ $!WordSpacing ])
+        @content.push( OpCode::SetWordSpacing => [ $!WordSpacing ])
             unless $!WordSpacing =~= $word-spacing;
 
         @content;

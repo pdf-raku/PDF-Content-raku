@@ -1,7 +1,7 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Content::Ops :OpNames;
+use PDF::Content::Ops :OpCode;
 plan 6;
 
 class Graphics does PDF::Content::Ops {};

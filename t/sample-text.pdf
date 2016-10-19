@@ -3,13 +3,15 @@
 1 0 obj <<
   /Type /Catalog
   /Pages 2 0 R
->> endobj
+>>
+endobj
 
 2 0 obj <<
   /Type /Pages
   /Count 1
   /Kids [ 3 0 R ]
->> endobj
+>>
+endobj
 
 3 0 obj <<
   /Type /Page
@@ -22,7 +24,8 @@
       /F2 6 0 R
     >>
   >>
->> endobj
+>>
+endobj
 
 4 0 obj <<
   /Length 556
@@ -54,21 +57,24 @@ BT
   [ 11053 (But wait, there\222) 60 (s more!!) ] TJ
   T*
 ET
-endstream endobj
+endstream
+endobj
 
 5 0 obj <<
   /Type /Font
   /Subtype /Type1
   /BaseFont /Helvetica
   /Encoding /WinAnsiEncoding
->> endobj
+>>
+endobj
 
 6 0 obj <<
   /Type /Font
   /Subtype /Type1
   /BaseFont /Helvetica-Bold
   /Encoding /WinAnsiEncoding
->> endobj
+>>
+endobj
 
 xref
 0 7

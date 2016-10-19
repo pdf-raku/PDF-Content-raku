@@ -1,7 +1,7 @@
 use v6;
 use Test;
 use PDF::Content::PDF;
-use PDF::Content::Ops :OpNames;
+use PDF::Content::Ops :OpCode;
 
 # ensure consistant document ID generation
 srand(123456);
@@ -71,7 +71,7 @@ $height = 150;
 $x = 20;
 my $y = 700;
 
-my $op-tab = OpNames.enums;
+my $op-tab = OpCode.enums;
 
 $gfx.BeginText;
 $gfx.set-font($reg-font, 10);

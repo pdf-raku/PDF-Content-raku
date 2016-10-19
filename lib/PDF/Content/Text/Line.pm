@@ -2,7 +2,7 @@ use v6;
 
 class PDF::Content::Text::Line {
 
-    use PDF::Content::Ops :OpNames;
+    use PDF::Content::Ops :OpCode;
 
     has @.words;
     has Numeric $.word-width is rw = 0; #| sum of word widths
@@ -66,7 +66,7 @@ class PDF::Content::Text::Line {
             $prev = $_;
         }
 
-        (OpNames::ShowSpaceText) => [@out,];
+        (OpCode::ShowSpaceText) => [@out,];
 
     }
 

@@ -2,18 +2,21 @@
 %¥±ë
 1 0 obj <<
   /CreationDate (D:20151225000000Z00'00')
->> endobj
+>>
+endobj
 
 2 0 obj <<
   /Type /Catalog
   /Pages 3 0 R
->> endobj
+>>
+endobj
 
 3 0 obj <<
   /Type /Pages
   /Count 1
   /Kids [ 4 0 R ]
->> endobj
+>>
+endobj
 
 4 0 obj <<
   /Type /Page
@@ -25,7 +28,8 @@
       /F1 6 0 R
     >>
   >>
->> endobj
+>>
+endobj
 
 5 0 obj <<
   /Length 78
@@ -37,14 +41,16 @@ BT
   [ (Hello, world!) ] TJ
   T*
 ET
-endstream endobj
+endstream
+endobj
 
 6 0 obj <<
   /Type /Font
   /Subtype /Type1
   /BaseFont /Helvetica-BoldOblique
   /Encoding /WinAnsiEncoding
->> endobj
+>>
+endobj
 
 xref
 0 7

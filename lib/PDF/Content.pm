@@ -1,5 +1,5 @@
 use v6;
-use PDF::Content::Ops :OpNames, :GraphicsContext, :ExtGState;
+use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
 role PDF::Content:ver<0.0.5>
     does PDF::Content::Ops {
