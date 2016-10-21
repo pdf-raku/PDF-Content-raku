@@ -45,7 +45,7 @@ role PDF::Content::Image {
 	}
     }
 
-    method type(IO::Path $path) {
+    method image-type(IO::Path $path) {
         given $path.extension {
             when m:i/^ jpe?g $/ { 'JPEG' }
             when m:i/^ gif $/   { 'GIF' }
@@ -66,7 +66,7 @@ role PDF::Content::Image {
 
     multi method open(IO::Handle $fh!) {
         my $path = $fh.path;
-        my Str $type = self.type: $path; 
+        my Str $type = self.image-type: $path; 
 
         require ::('PDF::Content::Image')::($type);
         ::('PDF::Content::Image')::($type).read($fh);
