@@ -10,7 +10,6 @@
         "PDF::Content::PDF"             : "lib/PDF/Content/PDF.pm",
 
         "PDF::Content"                  : "lib/PDF/Content.pm",
-        "PDF::Content::Canvas"          : "lib/PDF/Content/Canvas.pm",
 
         "PDF::Content::Graphics"        : "lib/PDF/Content/Graphics.pm",
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",

@@ -9,7 +9,6 @@ role PDF::Content:ver<0.0.5>
     use PDF::Content::Image;
     use PDF::Content::Text::Block;
     use PDF::Content::Font;
-    use PDF::Content::Canvas;
 
     method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
 			Numeric :$opacity is copy,
@@ -60,7 +59,8 @@ role PDF::Content:ver<0.0.5>
     }
 
     method canvas( &do-stuff! ) {
-        my PDF::Content::Canvas $canvas .= new;
+        require HTML::Canvas;
+        my $canvas = ::('HTML::Canvas').new;
         &do-stuff($canvas);
         self.draw($canvas);
     }
@@ -272,7 +272,7 @@ role PDF::Content:ver<0.0.5>
         $text-block;
     }
 
-    #| output text move the  text position down one line
+    #| output text; move the text position down one line
     method say($text, |c) {
         $.print($text, :nl, |c);
     }
@@ -303,9 +303,9 @@ role PDF::Content:ver<0.0.5>
         nextwith( $text, :$font, |c);
     }
 
-    method draw(PDF::Content::Canvas $canvas) {
+    method draw($canvas) {
         self.op(Save);
-        self.ops: $canvas.content;
+        $canvas.to-pdf(self);
         self.op(Restore);
     }
 

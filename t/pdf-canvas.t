@@ -1,6 +1,6 @@
 use v6;
 use Test;
-
+plan 2;
 # ensure consistant document ID generation
 srand(123456);
 
@@ -8,6 +8,11 @@ use PDF::Content::PDF;
 my PDF::Content::PDF $pdf .= new;
 my $page = $pdf.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
+
+unless try {require HTML::Canvas; 1} {
+    skip-rest 'HTML::Canvas required to run canvas tests';
+    exit;
+}
 
 $page.canvas: {
     .beginPath();
