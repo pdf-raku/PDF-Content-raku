@@ -206,8 +206,8 @@ my $g1 = PDF::Content.new;
 lives-ok {$g1.ops: $g.ops}, "comments import";
 is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
 
-dies-ok { $g.Junk }, 'unknown method/operator: . invocation';
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';
+dies-ok { $g.Junk }, 'unknown method/operator: . invocation';
 
 done-testing;
 

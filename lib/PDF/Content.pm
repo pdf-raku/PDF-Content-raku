@@ -58,6 +58,13 @@ role PDF::Content:ver<0.0.5>
         $.op(EndText);
     }
 
+    method canvas( &do-stuff! ) {
+        require HTML::Canvas;
+        my $canvas = ::('HTML::Canvas').new;
+        &do-stuff($canvas);
+        self.draw($canvas);
+    }
+
     method load-image(Str $spec ) {
         PDF::Content::Image.open( $spec );
     }
@@ -265,7 +272,7 @@ role PDF::Content:ver<0.0.5>
         $text-block;
     }
 
-    #! output text move the  text position down one line
+    #| output text; move the text position down one line
     method say($text, |c) {
         $.print($text, :nl, |c);
     }
@@ -294,6 +301,12 @@ role PDF::Content:ver<0.0.5>
     
     multi method print(Str $text, :$font = self!current-font[0], |c) {
         nextwith( $text, :$font, |c);
+    }
+
+    method draw($canvas) {
+        self.op(Save);
+        $canvas.to-pdf(self);
+        self.op(Restore);
     }
 
 }

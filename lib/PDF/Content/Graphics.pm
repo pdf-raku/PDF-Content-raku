@@ -27,6 +27,7 @@ role PDF::Content::Graphics {
     }
     method graphics(&code) { self.gfx.graphics( &code ) }
     method text(&code) { self.gfx.text( &code ) }
+    method canvas(&code) { self.gfx.canvas( &code ) }
 
     method contents-parse(Str $contents = $.contents ) {
         PDF::Content.parse($contents);

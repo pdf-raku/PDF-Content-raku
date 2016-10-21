@@ -608,7 +608,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	@!ops.push(opn);
         self!track-context($op-name, $last-op);
         self.track-graphics($op-name, |@args );
-        .($op-name, |@args, :gfx(self) )
+        .($op-name, |@args, :obj(self) )
 	    with self.callback;
         opn.value.push: (:comment(%OpCode{$op-name}))
             if $!comment-ops;
