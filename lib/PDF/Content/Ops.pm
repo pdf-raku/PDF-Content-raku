@@ -3,29 +3,25 @@ use v6;
 use PDF::DAO::Util :from-ast;
 my role GraphicsAtt {
     has Str $.accessor-name is rw;
-    method compose(Mu $package) {
+    method compose(Mu \package) {
         my \meth-name = self.accessor-name;
-        unless $package.^declares_method(meth-name) {
-            my \setter = 'Set' ~ meth-name;
-            my \accessor = self.rw
-                ?? sub (\obj) is rw { obj.graphics-accessor( self, setter ); }
-                !! sub (\obj) { self.get_value( obj ) };
-            $package.^add_method( meth-name, accessor );
-        }
+        nextsame
+            if package.^declares_method(meth-name)
+            || ! self.rw;
+        my \setter = 'Set' ~ meth-name;
+        package.^add_method( meth-name, sub (\obj) is rw { obj.graphics-accessor( self, setter ); } );
     }
 }
 
 my role ExtGraphicsAtt {
     has Str $.accessor-name is rw;
     has Str $.key is rw;
-    method compose(Mu $package) {
+    method compose(Mu \package) {
         my \meth-name = self.accessor-name;
-        unless $package.^declares_method(meth-name) {
-            my \accessor = self.rw
-                ?? sub (\obj) is rw { obj.ext-graphics-accessor( self, self.key ); }
-                !! sub (\obj) { self.get_value( obj ) };
-            $package.^add_method( meth-name, accessor );
-        }
+        nextsame
+            if package.^declares_method(meth-name)
+            || ! self.rw;
+        package.^add_method( meth-name, sub (\obj) is rw { obj.ext-graphics-accessor( self, self.key ); } );
     }
 }
 
