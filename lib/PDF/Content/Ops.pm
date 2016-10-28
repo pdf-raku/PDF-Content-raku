@@ -358,23 +358,32 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             when $op ∈ PaintingOps { [Clipping|Path, Page] }
        }
 
-       my Bool $ok-here;
-       if transition {
-           $ok-here = ?(transition[0] == $!context);
-           $!context = transition[1];
-       }
-       else {
-           $ok-here = ? do given $!context {
-               when Path  { $op ∈ PathOps }
-               when Text  { $op ∈ TextOps|TextStateOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
-               when Page  { $op ∈ TextStateOps|SpecialGraphicOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
-               when Image { $op eq 'ID' }
-               default    { False }
-           }
-       }
+        my Bool $ok-here;
+        if transition {
+            $ok-here = ?(transition[0] == $!context);
+            $!context = transition[1];
+        }
+        else {
+            $ok-here = ? do given $!context {
+                when Path  { $op ∈ PathOps }
+                when Text  { $op ∈ TextOps|TextStateOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
+                when Page  { $op ∈ TextStateOps|SpecialGraphicOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
+                when Image { $op eq 'ID' }
+                default    { False }
+            }
+        }
 
-       warn "unexpected '$op' operation " ~ ($last-op ?? "(following '$last-op')" !! '(first operation)')
-	   unless $ok-here;
+        unless $ok-here {
+            if $!context == Text && $op ∈ SpecialGraphicOps {
+                warn "special graphics operation '$op' used in a BT ... ET text block"
+            }
+            elsif $op ∈ TextOps {
+                warn "text operation '$op' outside of a BT ... ET text block\n";
+            }
+            else {
+                warn "unexpected '$op' operation " ~ ($last-op ?? "(following '$last-op')" !! '(first operation)')
+            }
+        }
     }
 
     my Routine %Ops = BEGIN %(
@@ -579,15 +588,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    $op-name = opn.Str;
 	}
 
-        if $!context == Text {
-	    warn "special graphics operation '$op-name' used in a BT ... ET text block"
-	        if $op-name ∈ SpecialGraphicOps;
-        }
-        else {
-            warn "text operation '$op-name' outside of a BT ... ET text block\n"
-	        if $op-name ∈ TextOps;
-        }
-
 	# not illegal just bad practice. makes it harder to later edit/reuse this content stream
 	# and may upset downstream utilities
 	if $!strict {
@@ -771,7 +771,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    if @!tags;
 	die "q(Save) unmatched by closing Q(Restore) at end of content stream\n"
 	    if @!gsave;
-        warn "unexpected end of content stream"
+        warn "unexpected end of content stream in $!context context"
 	    unless $!context == Page;
     }
 
