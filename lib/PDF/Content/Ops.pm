@@ -341,35 +341,38 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has GraphicsContext $.context = Page;
 
     method !track-context(Str $op, $last-op) {
-        my \transition = do given $op {
 
-            when 'BT'     { [Page, Text] }
-            when 'ET'     { [Text, Page] }
+        my constant %ContextTransition = %(
+            'BT'     => ( (Page) => Text ),
+            'ET'     => ( (Text) => Page ),
 
-            when 'BI'     { [Page, Image] }
-            when 'EI'     { [Image, Page] }
+            'BI'     => ( (Page) => Image ),
+            'EI'     => ( (Image) => Page ),
 
-            when 'BX'     { [Page, External] }
-            when 'EX'     { [External, Page] }
+            'BX'     => ( (Page) => External ),
+            'EX'     => ( (External) => Page ),
 
-            when 'W'|'W*' { [Path, Clipping] }
-            when 'm'|'re' { [Page, Path] }
-            when 'Do'     { [Page, Page ] }
-            when $op ∈ PaintingOps { [Clipping|Path, Page] }
-       }
+            'W'|'W*' => ( (Path) => Clipping ),
+            'm'|'re' => ( (Page) => Path ),
+            'Do'     => ( (Page) => Page ),
+            any(PaintingOps.keys) => ( (Clipping|Path) => Page ),
+        );
 
-        my Bool $ok-here;
-        if transition {
-            $ok-here = ?(transition[0] == $!context);
-            $!context = transition[1];
+        my constant %ContextSet = %(
+           (Path) => PathOps,
+           (Text) => TextOps ∪ TextStateOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps,
+           (Page) => TextStateOps ∪ SpecialGraphicOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps,
+           (Image) => set <ID>,
+        );
+
+        my Bool $ok-here = False;
+        with %ContextTransition{$op} {
+            $ok-here = ?(.key == $!context);
+            $!context = .value;
         }
         else {
-            $ok-here = ? do given $!context {
-                when Path  { $op ∈ PathOps }
-                when Text  { $op ∈ TextOps|TextStateOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
-                when Page  { $op ∈ TextStateOps|SpecialGraphicOps|GeneralGraphicOps|ColorOps|MarkedContentOps }
-                when Image { $op eq 'ID' }
-                default    { False }
+            with %ContextSet{$!context} {
+                $ok-here = $op ∈ $_;
             }
         }
 
