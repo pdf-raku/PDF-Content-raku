@@ -8,17 +8,17 @@ role Parent {
     has $!key = 'R0';
     has Str %!keys{Any};
     method use-resource($obj) {
-	%!keys{$obj} = ++ $!key;
+        %!keys{$obj} = ++ $!key;
         self{$obj<Type>}{$!key} = $obj;
-	$obj;
+        $obj;
     }
     method resource-key($obj) {
-	$.use-resource($obj)
-	    unless %!keys{$obj}:exists;
-	%!keys{$obj};
+        $.use-resource($obj)
+            unless %!keys{$obj}:exists;
+        %!keys{$obj};
     }
     method resource-entry($a,$b) {
-	self{$a}{$b};
+        self{$a}{$b};
     }
 }
 my $parent = { :Font{ :F1{} }, } does Parent;
@@ -136,10 +136,10 @@ $g = PDF::Content.new;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 is-json-equiv $g.ops, [:m[:int(175), :int(720)],
-		       :l[:int(175), :int(700)],
-		       :v[:int(300), :int(800), :int(400), :int(720)],
-		       :h[],
-		       :S[],
+                       :l[:int(175), :int(700)],
+                       :v[:int(300), :int(800), :int(400), :int(720)],
+                       :h[],
+                       :S[],
     ], 'basic parse';
 
 my $image-block = 'BI                  % Begin inline image object
@@ -154,24 +154,29 @@ J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
 %R.s(4KE3&d&7hb*7[%Ct2HCqC~>
 EI';
 
+my @image-lines = q:to"EI".lines;;
+J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
+%…Omitted data…
+%R.s(4KE3&d&7hb*7[%Ct2HCqC~>
+EI
+
 $g.ops($image-block);
-is-json-equiv $g.ops[*-3], {:BI[:dict{:BPC(:int(8)),
-				      :CS(:name<RGB>),
-				      :F(:array[:name<A85>, :name<LZW>]),
-				      :H(:int(17)),
-				      :W(:int(17)) }]}, 'Image BI';
-is-json-equiv $g.ops[*-2], {:ID[:encoded("J1/gKA>.]AN\&J?]-<HW]aRVcg*bb.\\eKAdVV\%/PcZ\n\%…Omitted data…\n\%R.s(4KE3\&d\&7hb*7[\%Ct2HCqC~>")]}, 'Image ID';
+is-json-equiv $g.ops[*-3], {:BI[:dict{
+                                    :W(:int(17)),
+                                    :H(:int(17)),
+                                    :CS(:name<RGB>),
+                                    :BPC(:int(8)),
+                                    :F(:array[:name<A85>, :name<LZW>]),
+                                     }]}, 'Image BI';
+
+is-json-equiv [$g.ops[*-2]<ID>[0]<encoded>.lines], @image-lines, 'Image ID';
 is-json-equiv $g.ops[*-1], (:EI[]), 'Image EI';
 
 my @inline-images = $g.inline-images;
 
 is-json-equiv @inline-images, [{:BitsPerComponent(8), :ColorSpace<RGB>, :Filter<A85 LZW>, :Height(17), :Width(17),
                                 :Length(86), :Subtype<Image>, :Type<XObject> },], 'inline-images';
-is-deeply @inline-images[0].encoded.lines, q:to"EI".lines, 'image data';
-J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
-%…Omitted data…
-%R.s(4KE3&d&7hb*7[%Ct2HCqC~>
-EI
+is-deeply [@inline-images[0].encoded.lines], @image-lines, 'image lines';
 
 BEGIN our $compile-time = PDF::Content::Ops.parse("BT/F1 16 Tf\n(Hi)Tj ET");
 is-json-equiv $compile-time[*-1], (:ET[]), 'compile time ops parse';
@@ -210,4 +215,3 @@ lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';
 dies-ok { $g.Junk }, 'unknown method/operator: . invocation';
 
 done-testing;
-

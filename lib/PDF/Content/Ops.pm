@@ -35,7 +35,7 @@ role PDF::Content::Ops {
 
 =begin pod
 
-This role implements methods and mnemonics for the full operator table, as defined in specification [PDF 1.7 Appendix A]:
+The PDF::Content::Ops role implements methods and mnemonics for the full operator table, as defined in specification [PDF 1.7 Appendix A]:
 
 =begin table
 * Operator * | *Mnemonic* | *Operands* | *Description*
@@ -342,7 +342,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     method !track-context(Str $op, $last-op) {
 
-        my constant %ContextTransition = %(
+        my constant %Transition = %(
             'BT'     => ( (Page) => Text ),
             'ET'     => ( (Text) => Page ),
 
@@ -358,7 +358,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             any(PaintingOps.keys) => ( (Clipping|Path) => Page ),
         );
 
-        my constant %ContextSet = %(
+        my constant %InSitu = %(
            (Path) => PathOps,
            (Text) => TextOps ∪ TextStateOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps,
            (Page) => TextStateOps ∪ SpecialGraphicOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps,
@@ -366,12 +366,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         );
 
         my Bool $ok-here = False;
-        with %ContextTransition{$op} {
+        with %Transition{$op} {
             $ok-here = ?(.key == $!context);
             $!context = .value;
         }
         else {
-            with %ContextSet{$!context} {
+            with %InSitu{$!context} {
                 $ok-here = $op ∈ $_;
             }
         }
