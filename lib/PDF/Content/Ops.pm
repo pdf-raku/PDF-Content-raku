@@ -31,7 +31,7 @@ role PDF::Content::Ops {
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict = True;
-    has $.parent;
+    has $.parent handles <resource-key resource-entry core-font use-font>;
 
 =begin pod
 
@@ -212,7 +212,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 unless $att.get_value(self) eqv v {
                     my $gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> }, $key => v });
                     with self.parent {
-                        my Str $gs-entry = self.parent.resource-key($gs, :eqv);
+                        my Str $gs-entry = .resource-key($gs, :eqv);
 	                self.SetGraphicsState($gs-entry);
                     }
                     else {

@@ -42,7 +42,7 @@ role PDF::Content:ver<0.0.5>
 	    }
 	}
 
-	my Str $gs-entry = self.parent.resource-key($gs, :eqv);
+	my Str $gs-entry = self.resource-key($gs, :eqv);
 	self.SetGraphicsState($gs-entry);
     }
 
@@ -133,7 +133,7 @@ role PDF::Content:ver<0.0.5>
               Bool    :$inline = False,
         )  {
 
-        my Str:D $key = $.parent.resource-key($obj),
+        my Str:D $key = $.resource-key($obj),
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
         my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
@@ -228,11 +228,11 @@ role PDF::Content:ver<0.0.5>
 		       Bool :$nl = False,
 	) {
 
-        my Numeric $font-size = $text-block.font-size;
-        my $font = $.parent.use-font: $text-block.font;
+        my Numeric \font-size = $text-block.font-size;
+        my \font = $.use-font($text-block.font);
+	my Bool \in-text = $.context == GraphicsContext::Text;
 
-	my Bool $in-text = $.context == GraphicsContext::Text;
-	self.op(BeginText) unless $in-text;
+	self.op(BeginText) unless in-text;
 
         my Bool $left = False;
         my Bool $top = False;
@@ -262,12 +262,12 @@ role PDF::Content:ver<0.0.5>
 	    self.text-position = [$x, $y];
         }
 
-        self.set-font($font, $font-size);
+        self.set-font(font, font-size);
         self."$_"() = $text-block."$_"()
             for <CharSpacing WordSpacing HorizScaling>;
 	self.ops: $text-block.content(:$nl, :$top, :$left);
 
-	self.op(EndText) unless $in-text;
+	self.op(EndText) unless in-text;
 
         $text-block;
     }
@@ -279,12 +279,12 @@ role PDF::Content:ver<0.0.5>
 
     #| thin wrapper to $.op(SetFont, ...)
     multi method set-font( Hash $font!, Numeric $size = 16) {
-        $.op(SetFont, $.parent.resource-key($font), $size)
+        $.op(SetFont, $.resource-key($font), $size)
             if !$.font-face || $.font-size != $size || $.font-face !eqv $font;
     }
 
     method !current-font {
-        $.Font // [$.parent.core-font('Courier'), 16]
+        $.Font // [$.core-font('Courier'), 16]
     }
 
     method font is rw returns Array {
