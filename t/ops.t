@@ -211,6 +211,11 @@ my $g1 = PDF::Content.new;
 lives-ok {$g1.ops: $g.ops}, "comments import";
 is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
 
+$g.Save;
+$g.GraphicsMatrix = [0, -2, 2, 0, 40, -20];
+is-deeply [ $g.GraphicsMatrix.list ], [0.0, -2.0, 2.0, 0.0, 40.0, -20.0], 'graphics matrix assignment';
+$g.Restore;
+
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';
 dies-ok { $g.Junk }, 'unknown method/operator: . invocation';
 

@@ -65,6 +65,35 @@ module PDF::Content::Util::TransformMatrix {
 	$a = multiply($a, $b);
     }
 
+    # return true of this is the identity matrix =~= [1, 0, 0, 1, 0, 0 ]
+    our sub is-identity(TransformMatrix \m) {
+        ! (m.list Z identity()).first: { .[0] !=~= .[1] };
+    }
+
+    #| caculate an inverse, if possible
+    our sub inverse(TransformMatrix \m) {
+
+        #| todo: sensitive to divides by zero. Is there a better algorithm?
+        my $div0;
+        sub mdiv(\num, \denom) {num =~= 0 ?? 0.0 !! denom =~= 0 ?? do {$div0++; 1.0} !! num / denom; } 
+        my \Ib =  mdiv( m[b], m[c] * m[b] - m[d] * m[a]);
+        my \Ia = mdiv(1 - m[c] * Ib, m[a]);
+
+        my \Id = mdiv(m[a], m[a] * m[d] - m[b] * m[c]);
+        my \Ic = mdiv(1 - m[d] * Id, m[b]);
+
+        my \If = mdiv(m[f] * m[a] - m[b] * m[e], m[b] * m[c] - m[a] * m[d]);
+        my \Ie = mdiv(0 - m[e] - m[c] * If, m[a]);
+
+        with $div0 {
+            warn "unable to invert matrix: {m}";
+            identity();
+        }
+        else {
+            [ Ia, Ib, Ic, Id, Ie, If, ];
+        }
+    }
+
     our sub round(Numeric \n) {
 	my Numeric \r = n.round(1e-6);
 	my Int \i = n.round;

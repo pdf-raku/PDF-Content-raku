@@ -7,7 +7,7 @@ my role GraphicsAtt {
         my \meth-name = self.accessor-name;
         nextsame
             if package.^declares_method(meth-name)
-            || ! self.rw;
+            || ! (self.has_accessor && self.rw);
         my \setter = 'Set' ~ meth-name;
         package.^add_method( meth-name, sub (\obj) is rw { obj.graphics-accessor( self, setter ); } );
     }
@@ -20,7 +20,7 @@ my role ExtGraphicsAtt {
         my \meth-name = self.accessor-name;
         nextsame
             if package.^declares_method(meth-name)
-            || ! self.rw;
+            || ! (self.has_accessor && self.rw);
         package.^add_method( meth-name, sub (\obj) is rw { obj.ext-graphics-accessor( self, self.key ); } );
     }
 }
@@ -278,7 +278,18 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method font-size {$!Font[1]}
 
     # *** Graphics STATE ***
-    has Numeric @.GraphicsMatrix is graphics is rw = [ 1, 0, 0, 1, 0, 0, ];      #| graphics matrix;
+    has Numeric @!GraphicsMatrix is graphics = [ 1, 0, 0, 1, 0, 0, ];     #| graphics matrix;
+    method GraphicsMatrix is rw {
+        Proxy.new(
+            FETCH => sub ($) {@!GraphicsMatrix},
+            STORE => sub ($, List $gm) {
+                my @gm-inv = PDF::Content::Util::TransformMatrix::inverse(@!GraphicsMatrix);
+                my @tform = PDF::Content::Util::TransformMatrix::multiply($gm, @gm-inv);
+                self.ConcatMatrix( |@tform )
+                    unless PDF::Content::Util::TransformMatrix::is-identity(@tform);
+                @!GraphicsMatrix;
+            });
+    }
     has Numeric $.LineWidth    is graphics(method ($!LineWidth) {}) is rw = 1.0;
     has         @.DashPattern  is graphics(method (Array $a, Numeric $p ) {
                                                @!DashPattern = [ [$a.map: *.value], $p]; 

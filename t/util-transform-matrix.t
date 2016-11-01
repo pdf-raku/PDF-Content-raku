@@ -32,4 +32,13 @@ my $tform = PDF::Content::Util::TransformMatrix::transform-matrix(
 
 is-deeply [ PDF::Content::Util::TransformMatrix::transform($tform, 5, 15) ], [(10 + 5) * 2, (20 + 15) * 2], 'transform';
 is-deeply [ PDF::Content::Util::TransformMatrix::transform($tform, 25, 30) ], [(10 + 25) * 2, (20 + 30) * 2], 'transform';
+my @inv = PDF::Content::Util::TransformMatrix::inverse($tform);
+is-deeply @inv, [0.5, 0.0, 0.0, 0.5, -10.0, -20.0], 'inverse';
+my @id = PDF::Content::Util::TransformMatrix::multiply($tform, @inv);
+is-deeply @id, [1.0, 0.0, 0.0, 1.0, 0.0, 0.0], 'inverse multiplication';
+
+ok PDF::Content::Util::TransformMatrix::is-identity(@id), 'identity';
+@id[1]+= .2;
+nok PDF::Content::Util::TransformMatrix::is-identity(@id), 'id non-identity';
+
 done-testing;
