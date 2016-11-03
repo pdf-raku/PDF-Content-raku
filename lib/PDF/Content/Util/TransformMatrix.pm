@@ -53,11 +53,36 @@ module PDF::Content::Util::TransformMatrix {
         ];
     }
 
-    #| Coordinate transfrom of x, y: See [PDF 1.7 Sectiono 4.2.3 Transformation Matrices]
-    #|  x' = a.x  + c.y + e; y' = b.x + d.y +f
-    our sub transform(TransformMatrix \tm, Numeric \x, Numeric \y) {
-	[ tm[a]*x + tm[c]*y + tm[e],
-	  tm[b]*x + tm[d]*y + tm[f], ]
+    #| Coordinate transform (or dot product) of x, y
+    #|    x' = a.x  + c.y + e; y' = b.x + d.y +f
+    #| See [PDF 1.7 Section 4.2.3 Transformation Matrices]
+    our sub dot(TransformMatrix \m, Numeric \x, Numeric \y) {
+	my \tx = m[a]*x + m[c]*y + m[e];
+	my \ty = m[b]*x + m[d]*y + m[f];
+        (tx, ty);
+    }
+
+    #| inverse of the above. Convert from untransformed to transformed space
+    our sub inverse-dot(TransformMatrix \m, Numeric \tx, Numeric \ty) {
+        # nb two different simultaneous equations for the above.
+        # there are further solutions. Could be alernate fomulation?
+        my ($x, $y);
+        my \div1 = m[d] * m[a]  -  m[c] * m[b];
+        if div1|m[a] !=~= 0.0 {
+            $y = (ty * m[a]  - m[b] * tx + m[e] * m[b]  -  m[f] * m[a]) / div1;
+            $x = (tx  -  m[c] * $y  -  m[e]) / m[a];
+        }
+        else {
+            my \div2 = m[b] * m[c]  -  m[a] * m[d];
+            if div2|m[c] !=~= 0  {
+                $x = (ty * m[c]  +  m[d] * m[e]  - m[f] * m[c] - m[d] * tx) / div2;
+                $y = (tx  -  m[a] * $x  -  m[e]) / m[c];
+            }
+            else {
+                die "unable to compute coordinates";
+            }
+        }
+        ($x, $y);
     }
 
     #| Compute: $a = $a X $b
@@ -76,14 +101,14 @@ module PDF::Content::Util::TransformMatrix {
         #| todo: sensitive to divides by zero. Is there a better algorithm?
         my $div0;
         sub mdiv(\num, \denom) {num =~= 0 ?? 0.0 !! denom =~= 0 ?? do {$div0++; 1.0} !! num / denom; } 
-        my \Ib =  mdiv( m[b], m[c] * m[b] - m[d] * m[a]);
+        my \Ib = mdiv( m[b], m[c] * m[b] - m[d] * m[a]);
         my \Ia = mdiv(1 - m[c] * Ib, m[a]);
 
         my \Id = mdiv(m[a], m[a] * m[d] - m[b] * m[c]);
         my \Ic = mdiv(1 - m[d] * Id, m[b]);
 
         my \If = mdiv(m[f] * m[a] - m[b] * m[e], m[b] * m[c] - m[a] * m[d]);
-        my \Ie = mdiv(0 - m[e] - m[c] * If, m[a]);
+        my \Ie = mdiv(- m[e] - m[c] * If, m[a]);
 
         with $div0 {
             warn "unable to invert matrix: {m}";
@@ -125,6 +150,5 @@ module PDF::Content::Util::TransformMatrix {
 	apply($t, $_)                     with $matrix;
 	[ $t.map: { round($_) } ];
     }
-
 
 }
