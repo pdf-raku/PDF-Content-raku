@@ -278,16 +278,16 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method font-size {$!Font[1]}
 
     # *** Graphics STATE ***
-    has Numeric @!GraphicsMatrix is graphics = [ 1, 0, 0, 1, 0, 0, ];     #| graphics matrix;
-    method GraphicsMatrix is rw {
+    has Numeric @!CTM is graphics = [ 1, 0, 0, 1, 0, 0, ];     #| graphics matrix;
+    method CTM is rw {
         Proxy.new(
-            FETCH => sub ($) {@!GraphicsMatrix},
+            FETCH => sub ($) {@!CTM},
             STORE => sub ($, List $gm) {
-                my @gm-inv = PDF::Content::Util::TransformMatrix::inverse(@!GraphicsMatrix);
+                my @gm-inv = PDF::Content::Util::TransformMatrix::inverse(@!CTM);
                 my @tform = PDF::Content::Util::TransformMatrix::multiply($gm, @gm-inv);
                 self.ConcatMatrix( |@tform )
                     unless PDF::Content::Util::TransformMatrix::is-identity(@tform);
-                @!GraphicsMatrix;
+                @!CTM;
             });
     }
     has Numeric $.LineWidth    is graphics(method ($!LineWidth) {}) is rw = 1.0;
@@ -648,7 +648,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     multi method track-graphics('q') {
         my @Tm = @!TextMatrix;
-        my @CTM = @!GraphicsMatrix;
+        my @CTM = @!CTM;
         my @Dp = @!DashPattern;
         my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor, :$!StrokeAlpha, :$!FillAlpha;
         # todo - get this trait driven
@@ -670,7 +670,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!Font         = %gstate<Font>;
         $!LineWidth    = %gstate<LineWidth>;
         @!TextMatrix   = %gstate<Tm>.list;
-        @!GraphicsMatrix = %gstate<CTM>.list;
+        @!CTM = %gstate<CTM>.list;
         @!DashPattern  = %gstate<Dp>.list;
         $!StrokeColorSpace = %gstate<StrokeColorSpace>;
         $!FillColorSpace = %gstate<FillColorSpace>;
@@ -682,7 +682,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
         require PDF::Content::Util::TransformMatrix;
-        @!GraphicsMatrix = PDF::Content::Util::TransformMatrix::multiply(@!GraphicsMatrix, [a, b, c, d, e, f]);
+        @!CTM = PDF::Content::Util::TransformMatrix::multiply(@!CTM, [a, b, c, d, e, f]);
     }
     multi method track-graphics('rg', \r, \g, \b) {
         $!FillColorSpace = 'DeviceRGB';

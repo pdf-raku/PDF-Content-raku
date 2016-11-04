@@ -26,11 +26,11 @@ my $g = PDF::Content.new: :$parent;
 
 $g.op(Save);
 
-is-json-equiv $g.GraphicsMatrix, [1, 0, 0, 1, 0, 0], '$g.GraphicsMatrix - initial';
+is-json-equiv $g.CTM, [1, 0, 0, 1, 0, 0], '$g.CTM - initial';
 $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
-is-json-equiv $g.GraphicsMatrix, [10, 1, 15, 2, 3, 4], '$g.GraphicMatrix - updated';
+is-json-equiv $g.CTM, [10, 1, 15, 2, 3, 4], '$g.GraphicMatrix - updated';
 $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
-is-json-equiv $g.GraphicsMatrix, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix - updated again';
+is-json-equiv $g.CTM, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix - updated again';
 
 is-json-equiv $g.BeginText, (:BT[]), 'BeginText';
 
@@ -120,12 +120,12 @@ dies-ok {$g.content}, 'content with unclosed "BT" - dies';
 is-json-equiv $g.op(EndText), (:ET[]), 'EndText';
 
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0, ], '$g.TextMatrix - outside of text block';
-is-json-equiv $g.GraphicsMatrix, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix - outside of text block';
+is-json-equiv $g.CTM, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix - outside of text block';
 
 dies-ok {$g.content}, 'content with unclosed "q" (gsave) - dies';
 $g.Restore;
 
-is-json-equiv $g.GraphicsMatrix, [1, 0, 0, 1, 0, 0, ], '$g.GraphicMatrix - restored';
+is-json-equiv $g.CTM, [1, 0, 0, 1, 0, 0, ], '$g.GraphicMatrix - restored';
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0], '$g.TextMatrix - restored';
 is $g.TextLeading, 0, '$g.TextLeading - restored';
 is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - restored';
@@ -212,8 +212,8 @@ lives-ok {$g1.ops: $g.ops}, "comments import";
 is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
 
 $g.Save;
-$g.GraphicsMatrix = [0, -2, 2, 0, 40, -20];
-is-deeply [ $g.GraphicsMatrix.list ], [0.0, -2.0, 2.0, 0.0, 40.0, -20.0], 'graphics matrix assignment';
+$g.CTM = [0, -2, 2, 0, 40, -20];
+is-deeply [ $g.CTM.list ], [0.0, -2.0, 2.0, 0.0, 40.0, -20.0], 'graphics matrix assignment';
 $g.Restore;
 
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';

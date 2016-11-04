@@ -65,7 +65,7 @@ module PDF::Content::Util::TransformMatrix {
     #| inverse of the above. Convert from untransformed to transformed space
     our sub inverse-dot(TransformMatrix \m, Numeric \tx, Numeric \ty) {
         # nb two different simultaneous equations for the above.
-        # there are further solutions. Could be alernate fomulation?
+        # there are further solutions. Could be alternate fomulation?
         my ($x, $y);
         my \div1 = m[d] * m[a]  -  m[c] * m[b];
         if div1|m[a] !=~= 0.0 {
