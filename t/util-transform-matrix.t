@@ -17,7 +17,6 @@ my @scaled = PDF::Content::Util::TransformMatrix::transform-matrix(:scale(1.5));
 is-deeply @scaled, [1.5e0, 0, 0, 1.5e0, 0, 0], 'scale transform matrix';
 is-deeply PDF::Content::Util::TransformMatrix::transform-matrix(:scale[1.5, 2.5]), [1.5e0, 0, 0, 2.5e0, 0, 0], 'scale transform matrix';
 
-
 is-deeply PDF::Content::Util::TransformMatrix::dot(@identity, 10, 20), (10, 20), 'identity dot product';
 is-deeply PDF::Content::Util::TransformMatrix::dot(@translated, 10, 20), (20, 40), 'translated dot product';
 is-deeply PDF::Content::Util::TransformMatrix::dot(@rotated, 10, 20), (-20, 10), 'rotated dot product';

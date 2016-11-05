@@ -17,15 +17,15 @@ module PDF::Content::Util::TransformMatrix {
     subset TransformMatrix of Array where {.elems == 6}
     my Int enum TransformMatrixElem « :a(0) :b(1) :c(2) :d(3) :e(4) :f(5) »;
 
-    sub identity returns TransformMatrix {
+    our sub identity returns TransformMatrix {
         [1, 0, 0, 1, 0, 0];
     }
 
-    sub translate(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
+    our sub translate(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
         [1, 0, 0, 1, $x, $y];
     }
 
-    sub rotate( Numeric \deg --> TransformMatrix) {
+    our sub rotate( Numeric \deg --> TransformMatrix) {
         my Numeric \r = deg2rad(deg);
         my Numeric \cos = cos(r);
         my Numeric \sin = sin(r);
@@ -33,11 +33,11 @@ module PDF::Content::Util::TransformMatrix {
         [cos, sin, -sin, cos, 0, 0];
     }
 
-    sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
+    our sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
         [$x, 0, 0, $y, 0, 0];
     }
 
-    sub skew(Numeric $x, Numeric $y = $x --> TransformMatrix) {
+    our sub skew(Numeric $x, Numeric $y = $x --> TransformMatrix) {
         [1, tan(deg2rad($x)), tan(deg2rad($y)), 1, 0, 0];
     }
 
@@ -51,6 +51,41 @@ module PDF::Content::Util::TransformMatrix {
           y[a]*x[e] + y[c]*x[f] + y[e],
           y[b]*x[e] + y[d]*x[f] + y[f],
         ];
+    }
+
+    sub mdiv(\num, \denom, Bool $div-err is rw) {
+        if num =~= 0 {
+            0.0
+        }
+        elsif denom =~= 0 {
+            $div-err = True;
+            0.0
+        }
+        else {
+            num / denom;
+        }
+    } 
+    #| caculate an inverse, if possible
+    our sub inverse(TransformMatrix \m) {
+
+        #| todo: sensitive to divides by zero. Is there a better algorithm?
+        my Bool $div-err;
+        my \Ib = mdiv( m[b], m[c] * m[b] - m[d] * m[a], $div-err);
+        my \Ia = mdiv(1 - m[c] * Ib, m[a], $div-err);
+
+        my \Id = mdiv(m[a], m[a] * m[d] - m[b] * m[c], $div-err);
+        my \Ic = mdiv(1 - m[d] * Id, m[b], $div-err);
+
+        my \If = mdiv(m[f] * m[a] - m[b] * m[e], m[b] * m[c] - m[a] * m[d], $div-err);
+        my \Ie = mdiv(- m[e] - m[c] * If, m[a], $div-err);
+
+        if $div-err {
+            warn "unable to invert matrix: {m}";
+            identity();
+        }
+        else {
+            [ Ia, Ib, Ic, Id, Ie, If, ];
+        }
     }
 
     #| Coordinate transform (or dot product) of x, y
@@ -93,30 +128,6 @@ module PDF::Content::Util::TransformMatrix {
     # return true of this is the identity matrix =~= [1, 0, 0, 1, 0, 0 ]
     our sub is-identity(TransformMatrix \m) {
         ! (m.list Z identity()).first: { .[0] !=~= .[1] };
-    }
-
-    #| caculate an inverse, if possible
-    our sub inverse(TransformMatrix \m) {
-
-        #| todo: sensitive to divides by zero. Is there a better algorithm?
-        my $div0;
-        sub mdiv(\num, \denom) {num =~= 0 ?? 0.0 !! denom =~= 0 ?? do {$div0++; 1.0} !! num / denom; } 
-        my \Ib = mdiv( m[b], m[c] * m[b] - m[d] * m[a]);
-        my \Ia = mdiv(1 - m[c] * Ib, m[a]);
-
-        my \Id = mdiv(m[a], m[a] * m[d] - m[b] * m[c]);
-        my \Ic = mdiv(1 - m[d] * Id, m[b]);
-
-        my \If = mdiv(m[f] * m[a] - m[b] * m[e], m[b] * m[c] - m[a] * m[d]);
-        my \Ie = mdiv(- m[e] - m[c] * If, m[a]);
-
-        with $div0 {
-            warn "unable to invert matrix: {m}";
-            identity();
-        }
-        else {
-            [ Ia, Ib, Ic, Id, Ie, If, ];
-        }
     }
 
     our sub round(Numeric \n) {

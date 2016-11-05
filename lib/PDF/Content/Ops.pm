@@ -283,10 +283,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         Proxy.new(
             FETCH => sub ($) {@!CTM},
             STORE => sub ($, List $gm) {
-                my @gm-inv = PDF::Content::Util::TransformMatrix::inverse(@!CTM);
-                my @tform = PDF::Content::Util::TransformMatrix::multiply($gm, @gm-inv);
-                self.ConcatMatrix( |@tform )
-                    unless PDF::Content::Util::TransformMatrix::is-identity(@tform);
+                my @ctm-inv = PDF::Content::Util::TransformMatrix::inverse(@!CTM);
+                my @diff = PDF::Content::Util::TransformMatrix::multiply($gm, @ctm-inv);
+                self.ConcatMatrix( |@diff )
+                    unless PDF::Content::Util::TransformMatrix::is-identity(@diff);
                 @!CTM;
             });
     }
@@ -395,7 +395,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 warn "text operation '$op' outside of a BT ... ET text block\n";
             }
             else {
-                warn "unexpected '$op' operation " ~ ($last-op ?? "(following '$last-op')" !! '(first operation)')
+                warn "unexpected '$op' operation " ~ ($last-op ?? "(in $!context context, following '$last-op')" !! '(first operation)')
             }
         }
     }
@@ -759,7 +759,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 with .<D>    { @!DashPattern = .list }
                 with .<Font> { $!Font = $_ }
                 with .<LW>   { $!LineWidth = $_ }
-                ## todo - get this attribute driven
                 with .<CA>   { $!StrokeAlpha = $_ }
                 with .<ca>   { $!FillAlpha = $_ }
             }
