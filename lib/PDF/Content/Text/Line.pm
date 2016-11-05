@@ -66,7 +66,9 @@ class PDF::Content::Text::Line {
             $prev = $_;
         }
 
-        (OpCode::ShowSpaceText) => [@out,];
+        @out == 1 && @out[0].isa(Str)
+            ?? ((OpCode::ShowText) => [@out[0],])
+            !! ((OpCode::ShowSpaceText) => [@out,]);
 
     }
 

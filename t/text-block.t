@@ -39,9 +39,9 @@ is-json-equiv [ $gfx.ops ], [
          :real(100), :real(350), ],
     :Tf[:name<F1>,   :real(16)],
     :TL[:real(17.6)],
-    :TJ[ :array[:literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")] ],
+    :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
     'T*' => [],
-    :TJ[ :array[:literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")] ],
+    :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
     :ET[],
     :Q[],
     ], 'simple text block';

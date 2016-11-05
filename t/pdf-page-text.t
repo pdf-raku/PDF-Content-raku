@@ -26,7 +26,7 @@ is-deeply [$gfx.content.lines], [
     "  50 100 Td", 
     "  /F1 18 Tf",
     "  19.8 TL",
-    "  [ (Hello,) ] TJ",
+    "  (Hello,) Tj",
     "  T*",
     "  [ (W) 60 (orld!) ] TJ",
     "  T*",

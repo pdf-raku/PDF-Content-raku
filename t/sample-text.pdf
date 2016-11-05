@@ -28,19 +28,19 @@ endobj
 endobj
 
 4 0 obj <<
-  /Length 556
+  /Length 540
 >> stream
 BT
   /F1 12 Tf
   1 0 0 1 20 250 Tm
   13.2 TL
-  [ (Lorem ipsum dolor sit amet,) ] TJ
+  (Lorem ipsum dolor sit amet,) Tj
   T*
-  [ (consectetur adipiscing elit, sed do) ] TJ
+  (consectetur adipiscing elit, sed do) Tj
   T*
-  [ (eiusmod tempor incididunt ut labore) ] TJ
+  (eiusmod tempor incididunt ut labore) Tj
   T*
-  [ (et dolore magna aliqua.) ] TJ
+  (et dolore magna aliqua.) Tj
   T*
   1 0 0 1 450 250 Tm
   13.2 TL
@@ -83,8 +83,8 @@ xref
 0000000068 00000 n 
 0000000134 00000 n 
 0000000305 00000 n 
-0000000915 00000 n 
-0000001021 00000 n 
+0000000899 00000 n 
+0000001005 00000 n 
 trailer
 <<
   /ID [ <48337c305c556207eaf676a9f672310f> <48337c305c556207eaf676a9f672310f> ]
@@ -92,5 +92,5 @@ trailer
   /Size 7
 >>
 startxref
-1132
+1116
 %%EOF
