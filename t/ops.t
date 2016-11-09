@@ -199,13 +199,13 @@ is-json-equiv $g.ops, [
     :S[ :comment<Stroke>, ],
 ], 'parse and comment';
 
-is-json-equiv [$g.content.lines], [
+is-deeply $g.content-dump, $(
     '175 720 m % MoveTo',
     '175 700 l % LineTo',
     '300 800 400 720 v % CurveToInitial',
     'h % ClosePath',
     'S % Stroke'
-], 'content with comments';
+), 'content with comments';
 
 my $g1 = PDF::Content.new;
 lives-ok {$g1.ops: $g.ops}, "comments import";

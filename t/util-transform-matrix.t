@@ -10,7 +10,7 @@ is-deeply @translated, [1, 0, 0, 1, 10, 20], 'translate transform matrix';
 
 is-deeply PDF::Content::Util::TransformMatrix::transform-matrix(:translate(30)), [1, 0, 0, 1, 30, 30], 'translate transform matrix';
 
-my @rotated = PDF::Content::Util::TransformMatrix::transform-matrix(:rotate(90) );
+my @rotated = PDF::Content::Util::TransformMatrix::transform-matrix(:rotate(pi/2) );
 is-deeply @rotated, [0, 1, -1, 0, 0, 0], 'rotate transform matrix';
 
 my @scaled = PDF::Content::Util::TransformMatrix::transform-matrix(:scale(1.5));
@@ -32,7 +32,7 @@ is-approx $skew[2], 0.36397, 'skew transform';
 
 my $chained = PDF::Content::Util::TransformMatrix::transform-matrix(
     :translate[10, 20],
-    :rotate(270),
+    :rotate(1.5 * pi),
     :scale(2) );
 
 is-deeply $chained, [0, -2, 2, 0, 40, -20], 'chained transforms';

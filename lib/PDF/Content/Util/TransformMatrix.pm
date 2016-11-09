@@ -25,8 +25,7 @@ module PDF::Content::Util::TransformMatrix {
         [1, 0, 0, 1, $x, $y];
     }
 
-    our sub rotate( Numeric \deg --> TransformMatrix) {
-        my Numeric \r = deg2rad(deg);
+    our sub rotate( Numeric \r --> TransformMatrix) {
         my Numeric \cos = cos(r);
         my Numeric \sin = sin(r);
 

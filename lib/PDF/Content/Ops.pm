@@ -809,6 +809,16 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	}).join: "\n";
     }
 
+    #| dump of serialized content - for debugging/testing
+    method content-dump {
+        require PDF::Writer;
+        my \writer = ::('PDF::Writer').new;
+
+        @!ops.map: {
+	    writer.write: :content($_);
+	};
+    }
+
     method can(\name) {
         my @meths = callsame;
         if !@meths {

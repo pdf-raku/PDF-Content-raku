@@ -21,16 +21,16 @@ $gfx.set-font($bold-font, $font-size);
 $gfx.say('Hello, World!', :$width, :kern);
 $gfx.EndText;
 
-is-deeply [$gfx.content.lines], [
+is-deeply $gfx.content-dump, $(
     "BT",
-    "  50 100 Td", 
-    "  /F1 18 Tf",
-    "  19.8 TL",
-    "  (Hello,) Tj",
-    "  T*",
-    "  [ (W) 60 (orld!) ] TJ",
-    "  T*",
-    "ET"];
+    "50 100 Td", 
+    "/F1 18 Tf",
+    "19.8 TL",
+    "(Hello,) Tj",
+    "T*",
+    "[ (W) 60 (orld!) ] TJ",
+    "T*",
+    "ET");
 
 $width = 100;
 my $height = 80;
