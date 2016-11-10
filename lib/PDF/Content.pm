@@ -58,10 +58,10 @@ role PDF::Content:ver<0.0.5>
         $.op(EndText);
     }
 
-    method canvas( &do-stuff! ) {
+    method canvas( &mark-up! ) {
         require HTML::Canvas;
         my $canvas = ::('HTML::Canvas').new;
-        &do-stuff($canvas);
+        $canvas.context(&mark-up);
         self.draw($canvas);
     }
 
@@ -304,9 +304,10 @@ role PDF::Content:ver<0.0.5>
     }
 
     method draw($canvas) {
-        self.op(Save);
-        $canvas.to-pdf(self);
-        self.op(Restore);
+        require HTML::Canvas::Render::PDF;
+        my $renderer = ::('HTML::Canvas::Render::PDF').new: :gfx(self);
+
+        $canvas.render($renderer);
     }
 
 }

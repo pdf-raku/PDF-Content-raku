@@ -5,23 +5,23 @@ class PDF::Content::Text::Block {
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
 
-    has Str $.text;
-    has Numeric $.font-size is required;
+    has Str     $.text;
     has         $.font is required;
-    has Numeric $.font-height;
+    has Numeric $.font-size = 16;
+    has Numeric $.leading = $!font-size * 1.1;
+    has Numeric $.font-height  = $!font.height( $!font-size );
     has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
-    has Numeric $.leading;
-    has Numeric $!space-width;
-    has Numeric $.WordSpacing;
-    has Numeric $.CharSpacing;
+    has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
+    has Numeric $.WordSpacing = 0;
+    has Numeric $.CharSpacing = 0;
     subset Percentage of Numeric where * > 0;
     has Percentage $.HorizScaling = 100;
-    has Numeric $!width;
-    has Numeric $!height;
+    has Numeric $.width;
+    has Numeric $.height;
     has @.lines;
     has @.overflow is rw;
-    has Str $!align where 'left'|'center'|'right'|'justify';
-    has Str $.valign where 'top'|'center'|'bottom'|'text';
+    has Str $.align where 'left'|'center'|'right'|'justify' = 'left';
+    has Str $.valign where 'top'|'center'|'bottom'|'text' = 'text';
 
     method content-width  { @!lines.map( *.content-width ).max }
     method content-height { (+@!lines - 1) * $!leading  +  $!font-height }
@@ -29,12 +29,12 @@ class PDF::Content::Text::Block {
     grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
         token space { [\s <!after <nbsp> >]+ }
-        token word  { [ <![ - ]> [<!before \s> . | <nbsp>] ]+ '-'? | '-' }
+        token word  { [ <![ - ]> <!before <space>> . ]+ '-'? | '-' }
     }
 
-    multi submethod BUILD(Str :$!text!, |c) {
+    multi submethod TWEAK(Str :$!text!, |c) {
         my Str @chunks = $!text.comb(/<Text::word> | <Text::space>/);
-        self.BUILD( :@chunks, |c );
+        self.TWEAK( :@chunks, |c );
     }
 
     sub flush-space(@words) returns Bool {
@@ -58,23 +58,9 @@ class PDF::Content::Text::Block {
         $word-gap - $!space-width - $!CharSpacing;
     }
 
-    multi submethod BUILD(Str  :@chunks!,
-                               :$!font!,
-			  Numeric :$!font-size = 16,
-                          Numeric :$!leading = $!font-size * 1.1,
-			  Numeric :$!HorizScaling = 100,
-                          Numeric :$!CharSpacing = 0,
-                          Numeric :$!WordSpacing = 0,
-                          Numeric :$!width?,        #| optional constraint
-                          Numeric :$!height?,       #| optional constraint
-                          Str  :$!align = 'left',
-                          Str  :$!valign = 'text',
-                          Bool :$kern = False,
-        ) is default {
+    multi submethod TWEAK(Str :@chunks!, Bool :$kern = False) is default {
 
         $!text //= @chunks.join;
-	$!space-width = $!font.stringwidth(' ', $!font-size );
-        $!font-height = $!font.height( $!font-size );
         my Bool $follows-ws = False;
         my $word-gap = self!word-gap;
 
@@ -84,7 +70,6 @@ class PDF::Content::Text::Block {
         flush-space(@chunks);
   
         while @chunks {
-
             my Str $text = @chunks.shift;
 
             my $word;
