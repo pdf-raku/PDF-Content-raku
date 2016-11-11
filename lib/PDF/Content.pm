@@ -304,8 +304,8 @@ role PDF::Content:ver<0.0.5>
     }
 
     method draw($canvas) {
-        require HTML::Canvas::Render::PDF;
-        my $renderer = ::('HTML::Canvas::Render::PDF').new: :gfx(self);
+        require HTML::Canvas::To::PDF;
+        my $renderer = ::('HTML::Canvas::To::PDF').new: :gfx(self);
 
         $canvas.render($renderer);
     }

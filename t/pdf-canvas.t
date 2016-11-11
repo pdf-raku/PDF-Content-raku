@@ -9,8 +9,8 @@ my PDF::Content::PDF $pdf .= new;
 my $page = $pdf.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
-unless try {require HTML::Canvas::Render::PDF; 1} {
-    skip-rest 'HTML::Canvas::Render::PDF required to run canvas tests';
+unless try {require HTML::Canvas::To::PDF; 1} {
+    skip-rest 'HTML::Canvas::To::PDF required to run canvas tests';
     exit;
 }
 
