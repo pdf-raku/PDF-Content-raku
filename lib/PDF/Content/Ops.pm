@@ -389,13 +389,13 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
         unless $ok-here {
             if $!context == Text && $op ∈ SpecialGraphicOps {
-                warn "special graphics operation '$op' used in a BT ... ET text block"
+                warn "special graphics operation '$op' (%OpCode{$op}) used in a BT ... ET text block"
             }
             elsif $op ∈ TextOps {
-                warn "text operation '$op' outside of a BT ... ET text block\n";
+                warn "text operation '$op' (%OpCode{$op}) outside of a BT ... ET text block\n";
             }
             else {
-                warn "unexpected '$op' operation " ~ ($last-op ?? "(in $!context context, following '$last-op')" !! '(first operation)')
+                warn "unexpected '$op' (%OpCode{$op}) operation" ~ ($last-op ?? ", in $!context context, following '$last-op' (%OpCode{$last-op})" !! ' (first operation)')
             }
         }
     }
