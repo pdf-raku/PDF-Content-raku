@@ -343,8 +343,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
-    has @!gsave;
-    has @!tags;
+    has @.gsave;
+    has @.tags;
 
     # States and transitions in [PDF 1.4 FIGURE 4.1 Graphics objects]
     my enum GraphicsContext is export(:GraphicsContext) <Path Text Clipping Page Shading External Image>;

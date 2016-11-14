@@ -1,11 +1,12 @@
 role PDF::Content::Font::AFM {
 
     use PDF::Content::Font::Encodings;
-    has $.enc;
-    has $!glyphs;
-    has $!encoding;
+    my subset EncodingStr of Str where 'mac'|'win'|'sym'|'zapf';
+    has $.enc = 'win';
+    has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
+    has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
 
-    method set-encoding( Str :$!enc = 'win') {
+    submethod set-encoding( EncodingStr :$!enc = 'win') {
 	given $!enc {
 	    when 'mac' {
 		$!glyphs = $PDF::Content::Font::Encodings::mac-glyphs;
@@ -22,9 +23,6 @@ role PDF::Content::Font::AFM {
 	    when 'zapf' {
 		$!glyphs = $PDF::Content::Font::Encodings::zapf-glyphs;
 		$!encoding = $PDF::Content::Font::Encodings::zapf-encoding;
-	    }
-	    default { 
-		die ":enc not 'win', 'mac'. 'sym' or 'zapf': $_";
 	    }
 	}
     }

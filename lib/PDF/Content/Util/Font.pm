@@ -69,7 +69,7 @@ module PDF::Content::Util::Font {
 
     our proto sub core-font(|c) {*};
 
-    multi sub core-font( Str :$family!, Str :$weight?, Str :$style?, :$enc) {
+    multi sub core-font( Str :$family! is copy, Str :$weight?, Str :$style?, :$enc) {
 
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
             ?? 'bold' !! '';
@@ -77,6 +77,9 @@ module PDF::Content::Util::Font {
         # italic & oblique can be treated as synonyms for core fonts
         my Str $italic = $style && $style ~~ m:i/italic|oblique/
             ?? 'italic' !! '';
+
+        $bold ||= 'bold' if $family ~~ s/:i:s '-'? bold//;
+        $italic ||= $0.lc if $family ~~ s/:i:s '-'? (italic|oblique)//;
 
         my Str $sfx = $bold || $italic
             ?? '-' ~ $bold ~ $italic
@@ -89,10 +92,12 @@ module PDF::Content::Util::Font {
 
     sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
-        my $fnt = (%core-font-cache{$font-name.lc}{$enc} //= (Font::AFM.metrics-class( $font-name )
-							      but PDF::Content::Font::AFM).new(:$enc));
-        $fnt.set-encoding(:$enc);
-        $fnt;
+        %core-font-cache{$font-name.lc}{$enc} //= do {
+            my \font = (Font::AFM.metrics-class( $font-name )
+                        but PDF::Content::Font::AFM).new(:$enc);
+            font.set-encoding(:$enc);
+            font;
+        }
     }
 
     multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^ ZapfDingbats $/ }) {
