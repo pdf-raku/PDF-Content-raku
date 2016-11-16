@@ -196,6 +196,14 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         :FillOutlineClipText(6) :ClipText(7)
     »;
 
+    my Int enum LineCaps is export(:LineCaps) «
+	:ButtCaps(0) :RoundCaps(1) :SquareCaps(2)
+    »;
+
+    my Int enum LineJoin is export(:LineJoin) «
+	:MiterJoin(0) :RoundJoin(1) :BevelJoin(2)
+    »;
+
     method graphics-accessor($att, $setter) {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
@@ -290,8 +298,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 @!CTM;
             });
     }
-    has Numeric $.LineWidth    is graphics(method ($!LineWidth) {}) is rw = 1.0;
-    has         @.DashPattern  is graphics(method (Array $a, Numeric $p ) {
+    has Numeric $.LineWidth   is graphics(method ($!LineWidth) {}) is rw = 1.0;
+    has UInt    $.LineCap     is graphics(method ($!LineCap) {}) is rw = ButtCaps;
+    has UInt    $.LineJoin    is graphics(method ($!LineJoin) {}) is rw = MiterJoin;
+    has         @.DashPattern is graphics(method (Array $a, Numeric $p ) {
                                                @!DashPattern = [ [$a.map: *.value], $p]; 
                                            }) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
@@ -641,16 +651,16 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	use PDF::Grammar::Content;
 	use PDF::Grammar::Content::Actions;
 	state $actions //= PDF::Grammar::Content::Actions.new;
-	PDF::Grammar::Content.parse($content, :$actions)
+	my \p = PDF::Grammar::Content.parse($content, :$actions)
 	    // die "unable to parse content stream: $content";
-	$/.ast
+	p.ast
     }
 
     multi method track-graphics('q') {
         my @Tm = @!TextMatrix;
         my @CTM = @!CTM;
         my @Dp = @!DashPattern;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor, :$!StrokeAlpha, :$!FillAlpha;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor, :$!StrokeAlpha, :$!FillAlpha;
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -669,6 +679,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!TextRise     = %gstate<TextRise>;
         $!Font         = %gstate<Font>;
         $!LineWidth    = %gstate<LineWidth>;
+        $!LineCap      = %gstate<LineCap>;
+        $!LineJoin     = %gstate<LineJoin>;
         @!TextMatrix   = %gstate<Tm>.list;
         @!CTM = %gstate<CTM>.list;
         @!DashPattern  = %gstate<Dp>.list;
@@ -758,6 +770,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             with .resource-entry('ExtGState', $key) {
                 with .<D>    { @!DashPattern = .list }
                 with .<Font> { $!Font = $_ }
+                with .<LC>   { $!LineCap = $_ }
+                with .<LJ>   { $!LineJoin = $_ }
                 with .<LW>   { $!LineWidth = $_ }
                 with .<CA>   { $!StrokeAlpha = $_ }
                 with .<ca>   { $!FillAlpha = $_ }
