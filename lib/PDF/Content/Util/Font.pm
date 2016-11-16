@@ -78,8 +78,8 @@ module PDF::Content::Util::Font {
         my Str $italic = $style && $style ~~ m:i/italic|oblique/
             ?? 'italic' !! '';
 
-        $bold ||= 'bold' if $family ~~ s/:i:s '-'? bold//;
-        $italic ||= $0.lc if $family ~~ s/:i:s '-'? (italic|oblique)//;
+        $bold ||= 'bold' if $family ~~ s/:i:s '-'? bold //;
+        $italic ||= $0.lc if $family ~~ s/:i:s '-'? (italic|oblique) //;
 
         my Str $sfx = $bold || $italic
             ?? '-' ~ $bold ~ $italic
