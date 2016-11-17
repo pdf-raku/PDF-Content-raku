@@ -10,7 +10,7 @@ class PDF::Content::Text::Block {
     has Numeric $.font-size = 16;
     has Numeric $.leading = $!font-size * 1.1;
     has Numeric $.font-height  = $!font.height( $!font-size );
-    has Numeric $.font-base-height = $!font.height( $!font-size, :from-baseline );
+    has Str     $.baseline where 'ideographic'|'top' = 'ideographic';
     has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
     has Numeric $.WordSpacing = 0;
     has Numeric $.CharSpacing = 0;
@@ -21,10 +21,18 @@ class PDF::Content::Text::Block {
     has @.lines;
     has @.overflow is rw;
     has Str $.align where 'left'|'center'|'right'|'justify' = 'left';
-    has Str $.valign where 'top'|'center'|'bottom'|'text' = 'text';
+    has Str $.valign where 'top'|'center'|'bottom' = 'top';
 
+    method !baseline-shift {
+        given $!baseline {
+            when 'top' { $!font.height( $!font-size, :from-baseline ); }
+            when 'ideographic' { 0 }
+            default { die "unhandled baseline: $_"; }
+        }
+
+    }
     method content-width  { @!lines.map( *.content-width ).max }
-    method content-height { (+@!lines - 1) * $!leading  +  $!font-height }
+    method content-height { max( (+@!lines - 1) * $!leading  +  $!font-height, 0) }
 
     grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
@@ -154,10 +162,11 @@ class PDF::Content::Text::Block {
 
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 
-        if $!valign ne 'text' {
-            # adopt html style text positioning. from the top of the font, not the baseline.
+        {
             my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
-            @content.push( OpCode::TextMove => [0, $y-shift - $!font-base-height ] );
+            $y-shift += self!baseline-shift;
+            @content.push( OpCode::TextMove => [0, $y-shift ] )
+                unless $y-shift =~= 0.0;
         }
 
         my $dx = do given $!align {

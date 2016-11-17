@@ -50,13 +50,15 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 ut labore et dolore magna aliqua.
 --I-SAID, ENOUGH!!--
 
-for <text top center bottom> -> $valign {
+my $baseline = 'top';
+
+for <top center bottom> -> $valign {
 
     my $y = 700;
 
     for <left center right justify> -> $align {
         $gfx.text-position = ($x, $y);
-        my $text-block = $gfx.say( "*** $valign $align*** " ~ $sample, :$width, :$height, :$valign, :$align);
+        $gfx.say( "*** $valign $align*** " ~ $sample, :$width, :$height, :$valign, :$align, :$baseline);
         $y -= 170;
     }
 
@@ -82,6 +84,7 @@ for (
     :HorizScaling(50), :HorizScaling(100), :HorizScaling(150),
     :CharSpacing(-1.0), :CharSpacing(-.5), :CharSpacing(.5), :CharSpacing(1.5),
     :WordSpacing(-2), :WordSpacing(5), :leading(8), :leading(15),
+    :baseline<top>,
     ) {
     my %settings = %default-settings;
     %settings{.key} = .value;
