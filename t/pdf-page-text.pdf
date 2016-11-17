@@ -28,7 +28,7 @@ endobj
 endobj
 
 4 0 obj <<
-  /Length 3976
+  /Length 3980
 >> stream
 BT
   50 100 Td
@@ -43,7 +43,7 @@ BT
   /F2 10 Tf
   1 0 0 1 110 700 Tm
   11 TL
-  0 9.31 Td
+  0 -9.31 Td
   (*** top left*** Lorem) Tj
   T*
   (ipsum dolor sit amet,) Tj
@@ -60,7 +60,7 @@ BT
   T*
   1 0 0 1 110 530 Tm
   11 TL
-  0 9.31 Td
+  0 -9.31 Td
   [ 3530 (*** top center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -77,7 +77,7 @@ BT
   T*
   1 0 0 1 110 360 Tm
   11 TL
-  0 9.31 Td
+  0 -9.31 Td
   [ 9337 (*** top right*** Lorem) ] TJ
   T*
   [ 9225 (ipsum dolor sit amet,) ] TJ
@@ -94,7 +94,7 @@ BT
   T*
   1 0 0 1 110 190 Tm
   11 TL
-  0 9.31 Td
+  0 -9.31 Td
   0.173333 Tw
   (*** top justify*** Lorem) Tj
   T*
@@ -119,7 +119,7 @@ BT
   0 Tw
   1 0 0 1 235 700 Tm
   11 TL
-  0 49.31 Td
+  0 30.69 Td
   (*** center left***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -136,7 +136,7 @@ BT
   T*
   1 0 0 1 235 530 Tm
   11 TL
-  0 49.31 Td
+  0 30.69 Td
   [ 4224 (*** center center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -153,7 +153,7 @@ BT
   T*
   1 0 0 1 235 360 Tm
   11 TL
-  0 49.31 Td
+  0 30.69 Td
   [ 7614 (*** center right***) ] TJ
   T*
   [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -170,7 +170,7 @@ BT
   T*
   1 0 0 1 235 190 Tm
   11 TL
-  0 49.31 Td
+  0 30.69 Td
   8.875 Tw
   (*** center justify***) Tj
   T*
@@ -195,7 +195,7 @@ BT
   0 Tw
   1 0 0 1 360 700 Tm
   11 TL
-  0 89.31 Td
+  0 70.69 Td
   (*** bottom left***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -212,7 +212,7 @@ BT
   T*
   1 0 0 1 360 530 Tm
   11 TL
-  0 89.31 Td
+  0 70.69 Td
   [ 4363 (*** bottom center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -229,7 +229,7 @@ BT
   T*
   1 0 0 1 360 360 Tm
   11 TL
-  0 89.31 Td
+  0 70.69 Td
   [ 7892 (*** bottom right***) ] TJ
   T*
   [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -246,7 +246,7 @@ BT
   T*
   1 0 0 1 360 190 Tm
   11 TL
-  0 89.31 Td
+  0 70.69 Td
   7.485 Tw
   (*** bottom justify***) Tj
   T*
@@ -303,7 +303,7 @@ endobj
 endobj
 
 8 0 obj <<
-  /Length 6800
+  /Length 6801
 >> stream
 BT
   /F1 10 Tf
@@ -714,7 +714,7 @@ BT
   T*
   1 0 0 1 460 360 Tm
   11 TL
-  0 9.31 Td
+  0 -9.31 Td
   (*** baseline top ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -752,10 +752,10 @@ xref
 0000000068 00000 n 
 0000000140 00000 n 
 0000000311 00000 n 
-0000004342 00000 n 
-0000004453 00000 n 
-0000004559 00000 n 
-0000004714 00000 n 
+0000004346 00000 n 
+0000004457 00000 n 
+0000004563 00000 n 
+0000004718 00000 n 
 trailer
 <<
   /ID [ <867b4841444e1643c74ca7767ce9dd84> <867b4841444e1643c74ca7767ce9dd84> ]
@@ -763,5 +763,5 @@ trailer
   /Size 9
 >>
 startxref
-11569
+11574
 %%EOF

@@ -25,7 +25,7 @@ class PDF::Content::Text::Block {
 
     method !baseline-shift {
         given $!baseline {
-            when 'top' { $!font.height( $!font-size, :from-baseline ); }
+            when 'top' { - $!font.height( $!font-size, :from-baseline ); }
             when 'ideographic' { 0 }
             default { die "unhandled baseline: $_"; }
         }
