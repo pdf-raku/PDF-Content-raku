@@ -1,7 +1,5 @@
 use v6;
 
-use PDF::Content;
-
 #| this role is applied to PDF::Content::Type::Page, PDF::Content::Type::Pattern and PDF::Content::Type::XObject::Form
 role PDF::Content::Graphics {
 
@@ -43,17 +41,13 @@ role PDF::Content::Graphics {
 	self.gfx(:&callback);
     }
 
-    method cb-finish {
+    method finish {
+        my $decoded = do with $!pre-gfx { .content } else { '' };
+        $decoded ~= "\n" if $decoded;
+        $decoded ~= do with $!gfx { .content } else { '' };
 
-        my $prepend = $!pre-gfx && $!pre-gfx.ops
-            ?? $!pre-gfx.content ~ "\n"
-            !! '';
-
-        my $append = $!gfx && $!gfx.ops
-            ?? $!gfx.content
-            !! '';
-
-        self.decoded = $prepend ~ $append;
+        self.decoded = $decoded;
     }
 
+    method cb-finish { $.finish }
 }

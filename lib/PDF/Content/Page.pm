@@ -45,20 +45,28 @@ role PDF::Content::Page
 	$streams.keys.map({ $streams[$_].decoded }).join: '';
     }
 
-    #| produce an XObject form for this page
-    method to-xobject($from = self, :$coerce, Array :$bbox = $from.trim-box) {
-
+    method xobject-form(     :$coerce,
+                       Array :$bbox = PageSizes::Letter,
+                       Hash  :$resources = {},
+                      ) {
         my %dict = (
 	    Type => :name<XObject>,
 	    Subtype => :name<Form>,
-	    Resources => $from.Resources.clone,
-	    BBox => $bbox.clone,
+	    Resources => $resources,
+	    BBox => $bbox,
 	    );
 
         my $xobject = PDF::DAO.coerce( :stream{ :%dict });
 	PDF::DAO.coerce($xobject, $coerce) if $coerce ~~ PDF::DAO::Tie;
+        $xobject;
+    }
 
+    #| produce an XObject form for this page
+    method to-xobject($from = self, :$coerce, Array :$bbox = $from.trim-box.clone) {
+
+        my $resources = $from.Resources.clone,
 	# copy unflushed graphics
+        my $xobject = self.xobject-form( :$coerce, :$bbox, :$resources);
         $xobject.pre-gfx.ops($from.pre-gfx.ops);
         $xobject.gfx.ops($from.gfx.ops);
 
@@ -78,26 +86,21 @@ role PDF::Content::Page
         $xobject;
     }
 
-    method cb-finish {
-
+    method finish {
 	self.MediaBox //= [0, 0, 612, 792];
 
-	if ($.pre-gfx && $.pre-gfx.ops) || ($.gfx && $.gfx.ops) {
-	    my $prepend = $.pre-gfx && $.pre-gfx.ops
-		?? $.pre-gfx.content ~ "\n"
-		!! '';
+	my $decoded = $.pre-gfx.content;
+        $decoded ~= "\n" if $decoded;
+	$decoded ~= $.gfx.content;
 
-	    my $append = $.gfx && $.gfx.ops
-		?? $.gfx.content
-		!! '';
-
-	    if self<Contents> ~~ PDF::DAO::Stream {
-		self<Contents>.decoded = $prepend ~ $append;
-	    }
-	    else {
-		self<Contents> = PDF::DAO::Stream.new( :decoded($prepend ~ $append) );
-	    }
+	if self<Contents> ~~ PDF::DAO::Stream {
+	    self<Contents>.decoded = $decoded;
+	}
+	else {
+	    self<Contents> = PDF::DAO::Stream.new: :$decoded;
         }
     }
+
+    method cb-finish { $.finish }
 
 }

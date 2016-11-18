@@ -27,6 +27,17 @@ class PDF::Content::PDF
             has PDF::DAO::Dict $.ExtGState is entry;
     }
 
+    my role XObject-Form
+        does PDF::DAO::Tie::Hash
+        does PDF::Content::Resourced
+        does PDF::Content::Graphics {
+            has Resources $.Resources is entry;
+    }
+
+    method xobject-form(|c) {
+        PDF::Content::Page.xobject-form(:coerce(XObject-Form), |c);
+    }
+
     role Page
 	does PDF::DAO::Tie::Hash
 	does PDF::Content::Page
@@ -39,19 +50,11 @@ class PDF::Content::PDF
 	has Numeric @.BleedBox is entry(:len(4));
 	has Numeric @.TrimBox is entry(:len(4));
 	has Numeric @.ArtBox is entry(:len(4));
-	
+
 	my subset StreamOrArray of Any where PDF::DAO::Stream | Array;
 	has StreamOrArray $.Contents is entry;
 
 	method to-xobject(|c) {
-
-	    my role XObject-Form
-		does PDF::DAO::Tie::Hash
-		does PDF::Content::Resourced
-		does PDF::Content::Graphics {
-		    has Resources $.Resources is entry;
-	    }
-
 	    PDF::Content::Page.to-xobject(self, :coerce(XObject-Form), |c);
 	}
     }

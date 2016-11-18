@@ -102,7 +102,7 @@ for (
     }
 
     $gfx.text-position = ($x, $y);
-    my $text-block = $gfx.say( ("*** {%settings} *** ", $sample, $sample2).join(' '), :$width, :$height, |%opts);
+    $gfx.say( ("*** {%settings} *** ", $sample, $sample2).join(' '), :$width, :$height, |%opts);
 
     if $x < 400 {
         $x += 110;
@@ -111,7 +111,6 @@ for (
         $y -= 170;
         $x = 20;
     }
-
 }
 
 $gfx.EndText;
