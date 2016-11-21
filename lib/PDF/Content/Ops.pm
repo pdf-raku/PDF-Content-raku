@@ -218,8 +218,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,\v) {
                 unless $att.get_value(self) eqv v {
-                    my $gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> }, $key => v });
                     with self.parent {
+                        my  &grepper = sub (Hash $_) {
+                            .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
+                        }
+                        my $gs = .find-resource(&grepper, :type<ExtGState>)
+                            //  PDF::DAO.coerce({ :Type{ :name<ExtGState> }, $key => v });
                         my Str $gs-entry = .resource-key($gs, :eqv);
 	                self.SetGraphicsState($gs-entry);
                     }
@@ -310,18 +314,18 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method StrokeColor is rw {
         Proxy.new(
             FETCH => sub ($) {$!StrokeColorSpace => $!StrokeColor},
-            STORE => sub ($, Pair $color) {
-                unless $color eqv self.StrokeColor {
-                    if $color.key ~~ /^ Device(RGB|Gray|CMYK) $/ {
+            STORE => sub ($, Pair $_) {
+                unless .key eq $!StrokeColorSpace && .value eqv $!StrokeColor {
+                    if .key ~~ /^ Device(RGB|Gray|CMYK) $/ {
                         my $cs = ~ $0;
-                        self."SetStroke$cs"(|$color.value);
+                        self."SetStroke$cs"(|.value);
                     }
-                    elsif $color.key ~~ ColorSpace {
-                        self.SetStrokeColorSpace($color.key);
-                        self.SetStrokeColorN(|$color.value);
+                    elsif .key ~~ ColorSpace {
+                        self.SetStrokeColorSpace(.key);
+                        self.SetStrokeColorN(|.value);
                     }
                     else {
-                       die "unknown colorspace: {$color.key}";
+                       die "unknown colorspace: {.key}";
                    }
                }
             });
@@ -839,7 +843,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             with OpCode.enums{name} -> \op {
                 # e.g. $.Restore :== $.op('Q', [])
                 my &meth = method (*@a) { self.op(op, |@a) };
-                self.WHAT.^add_method(name, &meth );
+                self.^add_method(name, &meth );
                 @meths.push: &meth
             }
         }

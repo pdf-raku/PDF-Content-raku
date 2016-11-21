@@ -20,11 +20,9 @@ role PDF::Content::Resourced {
     #| my %fonts = $doc.page(1).resources('Font');
     multi method resources('ProcSet') {
 	my @entries;
-	my $resources = self.Resources;
-	my $resource-entries = $resources.ProcSet
-	    if $resources;
-	@entries = $resource-entries.keys.map( { $resource-entries[$_] } )
-	    if $resource-entries;
+	my $resource-entries = .ProcSet with self.Resources;
+	@entries = .keys.map( { $resource-entries[$_] } )
+	    with $resource-entries;
 	@entries;	
     }
     multi method resources(Str $type) is default {
@@ -32,23 +30,17 @@ role PDF::Content::Resourced {
 	my $resources = self.Resources;
 	my Hash $resource-entries = $resources{$type}
 	    if $resources && ($resources{$type}:exists);
-	%entries = $resource-entries.keys.map( { $_ => $resource-entries{$_} } )
-	    if $resource-entries;
+	%entries = .keys.map( { $_ => $resource-entries{$_} } )
+	    with $resource-entries;
 	%entries;
     }
 
     method resource-entry(|c) {
-	my $resources = self.Resources
-	    // return;
-
-        $resources.resource-entry(|c);
+        .resource-entry(|c) with self.Resources;
     }
 
-    method !find-resource( |c ) {
-        my $resources = self.Resources
-	    // return;
-
-	$resources.find-resource(|c);
+    method find-resource( |c ) {
+	.find-resource(|c) with self.Resources;
     }
 
     method images(Bool :$inline = True) {

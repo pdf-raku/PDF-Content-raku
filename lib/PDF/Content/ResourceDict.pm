@@ -6,47 +6,41 @@ role PDF::Content::ResourceDict {
     use PDF::DAO::Name;
     use PDF::Content::Font;
 
-    has Str %!resource-key;
+    has Str %!resource-key; # {Any}
     method resource-key($object is copy, |c --> Str:D) {
-	$object = $.resource($object, |c)
-	    unless %!resource-key{$object.WHICH};
-	%!resource-key{$object.WHICH};
+        $object = $.resource($object, |c)
+           unless %!resource-key{$object.WHICH};
+       %!resource-key{$object.WHICH};
     }
     
-    method !type( PDF::DAO $object ) is default {
-
-        my $type = do given $object {
-	    when Hash {
-		when .<Type>:exists {
-		    given .<Type> {
-			when 'ExtGState' | 'Font' | 'XObject' | 'Pattern' { $_ }
-		    }
-		}
-		when .<PatternType>:exists { 'Pattern' }
-		when .<ShadingType>:exists { 'Shading' }
-		when .<Subtype>:exists && .<Subtype> ~~ 'Form' | 'Image' | 'PS' {
-		    # XObject /Type with /Type defaulted
-		    'XObject'
-		}
-	    }
-	    when Array && .[0] ~~ PDF::DAO::Name {
-		# e.g. [ /CalRGB << /WhitePoint [ 1.0 1.0 1.0 ] >> ]
-		'ColorSpace'
-	    }
-        };
-	
-	unless $type {
-	    warn "unrecognised graphics object: {$object.perl}";
-	    $type = 'Other'
-	}
-	
-	$type;
+    method !type( PDF::DAO $_ ) is default {
+        when Hash {
+            when .<Type>:exists {
+                given .<Type> {
+                    when 'ExtGState' | 'Font' | 'XObject' | 'Pattern' { $_ }
+                }
+            }
+            when .<PatternType>:exists { 'Pattern' }
+            when .<ShadingType>:exists { 'Shading' }
+            when .<Subtype>:exists && .<Subtype> ~~ 'Form' | 'Image' | 'PS' {
+                # XObject /Type with /Type defaulted
+                'XObject'
+            }
+        }
+        when Array && .[0] ~~ PDF::DAO::Name {
+            # e.g. [ /CalRGB << /WhitePoint [ 1.0 1.0 1.0 ] >> ]
+            'ColorSpace'
+        }
+        default {
+	    warn "unrecognised graphics resource object: {.perl}";
+	    'Other'
+        }
     }
 
-    method !find-resource( &match, Str :$type! ) {
+    method find-resource( &match, Str :$type! ) {
         my $entry;
 
-        if my $resources = self{$type} {
+        with self{$type} -> $resources {
 
             for $resources.keys {
                 my $resource = $resources{$_};
@@ -95,7 +89,7 @@ role PDF::Content::ResourceDict {
 	my &match = $eqv
 	    ?? sub ($_){$_ eqv $object}
 	    !! sub ($_){$_ === $object};
-        self!find-resource(&match, :$type)
+        self.find-resource(&match, :$type)
             // self!register-resource( $object );
     }
 
@@ -110,7 +104,7 @@ role PDF::Content::ResourceDict {
 
     multi method use-font(PDF::Content::Font $font) {
         my $font-obj = $font.font-obj;
-        self!find-resource(sub ($_){ .?font-obj === $font-obj },
+        self.find-resource(sub ($_){ .?font-obj === $font-obj },
 			   :type<Font>)
             // self!register-resource( $font );
     }
@@ -124,7 +118,7 @@ role PDF::Content::ResourceDict {
     }
 
     multi method use-font($font-obj) is default {
-        self!find-resource(sub ($_){ .?font-obj === $font-obj },
+        self.find-resource(sub ($_){ .?font-obj === $font-obj },
 			   :type<Font>)
             // self!register-resource( self!build-font($font-obj) );
     }

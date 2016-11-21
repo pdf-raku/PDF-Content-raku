@@ -7,6 +7,22 @@ use PDF::Content::Ops :OpCode;
 role Parent {
     has $!key = 'R0';
     has Str %!keys{Any};
+    method find-resource(&match, :$type) {
+        my $entry;
+
+        with self{$type} -> $resources {
+
+            for $resources.keys {
+                my $resource = $resources{$_};
+                if &match($resource) {
+		    $entry = $resource;
+                    last;
+                }
+            }
+        }
+
+        $entry;
+     }
     method use-resource($obj) {
         %!keys{$obj} = ++ $!key;
         self{$obj<Type>}{$!key} = $obj;
