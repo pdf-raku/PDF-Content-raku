@@ -600,7 +600,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             .($op,|c);
         }
         else {
-            die "unknown content operator: $op";
+            die "unknown content operator: '$op'";
         }
     }
 
@@ -652,10 +652,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     method parse(Str $content) {
-	use PDF::Grammar::Content;
+	use PDF::Grammar::Content::Fast;
 	use PDF::Grammar::Content::Actions;
 	state $actions //= PDF::Grammar::Content::Actions.new;
-	my \p = PDF::Grammar::Content.parse($content, :$actions)
+	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
 	    // die "unable to parse content stream: $content";
 	p.ast
     }
