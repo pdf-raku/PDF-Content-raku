@@ -3,30 +3,25 @@ use v6;
 class X::PDF::Image::WrongHeader is Exception {
     has Str $.type is required;
     has Str $.header is required;
-    has IO::Handle $.fh is required;
+    has $.path is required;
     method message {
-        "{$!fh.path} image doesn't have a {$!type} header: {$.header.perl}"
+        "{$!path} image doesn't have a {$!type} header: {$.header.perl}"
     }
 }
 
 class X::PDF::Image::UnknownType is Exception {
-    has IO::Path $.path;
+    has $.path is required;
     method message {
-        for $!path.extension {
-            $_
-                ?? "can't yet handle files of type: $_"
-                !! "unable to determine image-type: {$!path.basename}"
-        }
+        die "unable to open image: $!path";
     }
 }
 
 role PDF::Content::Image {
-
     use PDF::DAO;
     method network-endian { True }
 
     #| lightweight replacement for deprecated $buf.unpack
-    method unpack(Buf $buf, *@templ ) {
+    method unpack($buf, *@templ ) {
 	my @bytes = $buf.list;
         my Bool \nw = $.network-endian;
         my uint $off = 0;
@@ -45,15 +40,34 @@ role PDF::Content::Image {
 	}
     }
 
-    method image-type(IO::Path $path) {
-        given $path.extension {
-            when m:i/^ jpe?g $/ { 'JPEG' }
-            when m:i/^ gif $/   { 'GIF' }
-            when m:i/^ png $/   { 'PNG' }
-            default {
-                die X::PDF::Image::UnknownType.new( :$path );
-            }
+    method !image-type($_, :$path!) {
+        when m:i/^ jpe?g $/    { 'JPEG' }
+        when m:i/^ gif $/      { 'GIF' }
+        when m:i/^ png $/      { 'PNG' }
+        when m:i/^ pdf|json $/ { 'PDF' }
+        default {
+            die X::PDF::Image::UnknownType.new( :$path );
         }
+    }
+
+    multi method open(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
+        use Base64;
+        use PDF::Storage::Input;
+        my $path = ~ $0;
+        my Str \mime-type = ( $0<t> // '(missing)').lc;
+        my Str \mime-subtype = ( $0<s> // '').lc;
+        my Bool \base64 = ? $0<b64>;
+        my Numeric \start = $0<start>.to;
+
+        die "expected mime-type 'image', got '{mime-type}': $path"
+            unless mime-type eq 'image';
+        
+        my $image-type = self!image-type(mime-subtype, :$path);
+        my $data = base64 ?? decode-base64($_, :bin).decode("latin-1") !! $_
+            with substr($data-uri, start);
+
+        my $fh = PDF::Storage::Input.coerce($data, :$path);
+        self!open($image-type, $fh);
     }
 
     multi method open(Str $path! ) {
@@ -66,8 +80,11 @@ role PDF::Content::Image {
 
     multi method open(IO::Handle $fh!) {
         my $path = $fh.path;
-        my Str $type = self.image-type: $path; 
+        my Str $type = self!image-type($path.extension, :$path);
+        self!open($type, $fh);
+    }
 
+    method !open(Str $type, $fh) {
         require ::('PDF::Content::Image')::($type);
         ::('PDF::Content::Image')::($type).read($fh);
     }

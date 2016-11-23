@@ -49,6 +49,16 @@ is-json-equiv $gif<ColorSpace>, ['Indexed', 'DeviceRGB', 31, "\xFF\xFF\xFF\xFF\x
 ok $gif<Length>, 'gif dict length';
 is $gif.encoded.codes, $gif<Length>, 'gif encoded length';
 
+my $image;
+if lives-ok({$image1 = PDF::Content::Image.open: "t/images/tiny.pdf";}, "open PDF as image - lives") {
+    @images.push: 'PDF - Form' => $image;
+}
+
+my $image-data = "data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7";
+if lives-ok({$image = PDF::Content::Image.open: $image-data;}, "open data url - lives") {
+    @images.push: 'Data URI (GIF)' => $image;
+}
+
 for (
     'png-1bit-gray' => {
         :file<t/images/basn0g01.png>, :Width(32), :Height(32),

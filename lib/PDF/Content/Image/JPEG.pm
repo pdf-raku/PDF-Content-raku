@@ -7,14 +7,14 @@ use PDF::DAO;
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
 
-    method read(IO::Handle $fh!) {
+    method read($fh!) {
         my Blob $buf;
         my uint ($bpc, $height, $width, $cs);
         my Bool $is-dct;
 
         $fh.seek(0, SeekFromBeginning);
         my $header = $fh.read(2).decode: 'latin-1';
-        die X::PDF::Image::WrongHeader.new( :type<JPEG>, :$header, :$fh )
+        die X::PDF::Image::WrongHeader.new( :type<JPEG>, :$header, :path($fh.path) )
             unless $header ~~ "\xFF\xD8";
 
         loop {

@@ -14,12 +14,12 @@ class PDF::Content::Image::PNG
     method network-endian { True }
 
     sub network-words(Buf $buf) {
-        $buf.map: -> $hi, $lo {
-            $hi +< 0x08  +  $lo;
+        $buf.map: -> \hi, \lo {
+            hi +< 0x08  +  lo;
         }
     }
 
-    method read(IO::Handle $fh!, Bool :$alpha=True --> PDF::DAO::Stream) {
+    method read($fh!, Bool :$alpha=True --> PDF::DAO::Stream) {
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
@@ -33,7 +33,7 @@ class PDF::Content::Image::PNG
         subset PNG-Header of Str where [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
         my Str $header = $fh.read(8).decode('latin-1');
 
-        die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :$fh )
+        die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :path($fh.path) )
             unless $header ~~ PNG-Header;
 
         while !$fh.eof {

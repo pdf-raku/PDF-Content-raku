@@ -9,7 +9,7 @@ class PDF::Content::Image::GIF
 
     method network-endian { False }
 
-    method !read-colorspace(IO::Handle $fh,  UInt $flags, %dict) {
+    method !read-colorspace($fh,  UInt $flags, %dict) {
         my UInt $col-size = 2 ** (($flags +& 0x7) + 1);
         my Str $encoded = $fh.read( 3 * $col-size).decode('latin-1');
         my $color-table = $col-size > 64
@@ -74,14 +74,14 @@ class PDF::Content::Image::GIF
         [~] @result.map: *.decode('latin-1');
     }
 
-    method read(IO::Handle $fh!, Bool :$trans = True) {
+    method read($fh!, Bool :$trans = True) {
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
         my Bool $interlaced = False;
         my Str $encoded = '';
 
         my $header = $fh.read(6).decode: 'latin-1';
-        die X::PDF::Image::WrongHeader.new( :type<GIF>, :$header, :$fh )
+        die X::PDF::Image::WrongHeader.new( :type<GIF>, :$header, :path($fh.path) )
             unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
         my $buf = $fh.read: 7; # logical descr.
