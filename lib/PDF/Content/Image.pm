@@ -59,12 +59,12 @@ role PDF::Content::Image {
         my Bool \base64 = ? $0<b64>;
         my Numeric \start = $0<start>.to;
 
-        die "expected mime-type 'image', got '{mime-type}': $path"
-            unless mime-type eq 'image';
-        
+        die "expected mime-type 'image/*' or 'application/pdf', got '{mime-type}': $path"
+            unless mime-type eq (mime-subtype eq 'pdf' ?? 'application' !! 'image');
         my $image-type = self!image-type(mime-subtype, :$path);
-        my $data = base64 ?? decode-base64($_, :bin).decode("latin-1") !! $_
-            with substr($data-uri, start);
+        my $data = substr($data-uri, start);
+        $data = decode-base64($data, :bin).decode("latin-1")
+            if base64;
 
         my $fh = PDF::Storage::Input.coerce($data, :$path);
         self!open($image-type, $fh);
