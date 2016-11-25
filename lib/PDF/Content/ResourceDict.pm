@@ -7,6 +7,8 @@ role PDF::Content::ResourceDict {
     use PDF::Content::Font;
 
     has Str %!resource-key; # {Any}
+    has Int %!counter;
+
     method resource-key($object is copy, |c --> Str:D) {
         $object = $.resource($object, |c)
            unless %!resource-key{$object.WHICH};
@@ -23,7 +25,7 @@ role PDF::Content::ResourceDict {
             when .<PatternType>:exists { 'Pattern' }
             when .<ShadingType>:exists { 'Shading' }
             when .<Subtype>:exists && .<Subtype> ~~ 'Form' | 'Image' | 'PS' {
-                # XObject /Type with /Type defaulted
+                # XObject with /Type defaulted
                 'XObject'
             }
         }
@@ -62,8 +64,8 @@ role PDF::Content::ResourceDict {
 	) {
 
 	my constant %Prefix = %(
-	    :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>, :Shading<Sh>,
-	    :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
+	    :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>,
+            :Shading<Sh>, :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
 	    :Other<Obj>,
 	);
 
@@ -71,7 +73,12 @@ role PDF::Content::ResourceDict {
 	    ?? %Prefix{$type}{ $object<Subtype> }
 	    !! %Prefix{$type};
 
-        my Str $key = (1..*).map({$prefix ~ $_}).first({ self{$type}{$_}:!exists });
+        my Str $key;
+        # make a unique resource key
+        repeat {
+            $key = $prefix ~ ++%!counter{$prefix};
+        } while self.keys.first: { self{$_}{$key}:exists };
+
         self{$type}{$key} = $object;
 
 	%!resource-key{$object.WHICH} = $key;
