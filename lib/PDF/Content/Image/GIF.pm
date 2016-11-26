@@ -1,6 +1,5 @@
 use v6;
 use PDF::Content::Image;
-use PDF::DAO;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::GIF
 
@@ -26,13 +25,13 @@ class PDF::Content::Image::GIF
         my UInt \reset-code = 1 +< (ibits - 1);
         my UInt \end-code   = reset-code + 1;
         my UInt \maxptr = 8 * +stream;
-        my UInt $next-code  = end-code + 1;
-        my UInt $bits = ibits;
-        my UInt $ptr = 0;
-        my @out;
-        my UInt $outptr = 0;
+        my int $next-code  = end-code + 1;
+        my int $bits = ibits;
+        my int $ptr = 0;
+        my uint8 @out;
+        my int $outptr = 0;
 
-        my @d = (0 ..^ reset-code).map: {[$_,]};
+        my @d = (0 ..^ reset-code).map: {[$_, ]};
 
         while ($ptr + $bits) <= maxptr {
             my UInt \tag = [+] (0 ..^ $bits).map: { vec(stream, $ptr + $_) +< $_ };
@@ -162,6 +161,7 @@ class PDF::Content::Image::GIF
         }
         $fh.close;
 
+        use PDF::DAO;
         PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
 

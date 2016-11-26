@@ -88,7 +88,6 @@ role PDF::Content::Page
 
     method finish {
 	self.MediaBox //= [0, 0, 612, 792];
-
 	my $decoded = $.pre-gfx.content;
         $decoded ~= "\n" if $decoded;
 	$decoded ~= $.gfx.content;

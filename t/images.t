@@ -49,15 +49,19 @@ is-json-equiv $gif<ColorSpace>, ['Indexed', 'DeviceRGB', 31, "\xFF\xFF\xFF\xFF\x
 ok $gif<Length>, 'gif dict length';
 is $gif.encoded.codes, $gif<Length>, 'gif encoded length';
 
-my $image;
+is $gif.data-uri, 'data:image/GIF;base64,R0lGODlhEwATAMQAAP/////78P/f/9Tf/8zM/8DcwKbK8P+Y////qv/fqtTfqtS/qtSfqqq/qqCgpKqfqoCAgH+fqv//Vf/fVdS/VdSfVaqfVYCAAKp/VapfVap/AH9fVVVfVSpfVVU/VQAAACH5BAkIAAcALAAAAAATABMAAAWsoFYcJLmcY0lqx5Kl7UJR1aNiy1gMR7EkAYSQwoDtSr5AcCJJICgYgar0QySaQuGJN10gmMKgUFGBYViWqxOhVJJt58LogWW3A4vagWuqICR2AAB4GA1TJBgTVm0AChsPMCoFGBRZARYbDpFTBRB+CBiPBVJTLH1CmSkXCyU4owcPHBAQHA9cCxgwBCkODgYOHoZImyQOEQa0wodTDrMdHjbLh7McmtLLcsQkIQA7', 'data-uri from file';
+
+my $image1;
 if lives-ok({$image1 = PDF::Content::Image.open: "t/images/tiny.pdf";}, "open PDF as image - lives") {
-    @images.push: 'PDF - Form' => $image;
+    @images.push: 'PDF - Form' => $image1;
 }
 
+my $image2;
 my $image-data = "data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7";
-if lives-ok({$image = PDF::Content::Image.open: $image-data;}, "open data url - lives") {
-    @images.push: 'Data URI (GIF)' => $image;
+if lives-ok({$image2 = PDF::Content::Image.open: $image-data;}, "open data url - lives") {
+    @images.push: 'Data URI (GIF)' => $image2;
 }
+is $image2.data-uri, $image-data, 'data-uri from source string';
 
 for (
     'png-1bit-gray' => {

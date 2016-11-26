@@ -1,8 +1,10 @@
 use v6;
+# doesn't work if this 'use' statement is deleted
+# rakudo 2016.11 read invocation: No such symbol 'PDF::Content::PDF'
 use PDF::Content::Image;
+
 class PDF::Content::Image::PDF {
     method read($fh) {
-        # not working: No such symbol 'PDF::Content::PDF'
         my $class = (require ::('PDF::Content::PDF'));
         $fh.seek(0, SeekFromBeginning);
         my $header = $fh.read(4).decode: 'latin-1';

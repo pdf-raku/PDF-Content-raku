@@ -23,11 +23,10 @@ class PDF::Content::Image::PNG
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
-        my uint ($w,$h,$bpc,$cs,$cm,$fm,$im);
+        my uint ($w,$h,$bpc,$cs);
         my Buf $palette;
         my Buf $trns;
         my Buf $crc;
-        my Buf $buf;
         my buf8 $stream .= new;
 
         subset PNG-Header of Str where [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
@@ -43,8 +42,9 @@ class PDF::Content::Image::PNG
             given $blk {
 
                 when 'IHDR' {
-                    $buf = $fh.read($l);
-                    ($w,$h,$bpc,$cs,$cm,$fm,$im) = $.unpack($buf, uint32, uint32, uint8, uint8, uint8, uint8, uint8);
+                    my Buf $buf = $fh.read($l);
+                    ($w, $h, $bpc, $cs,
+                     my $cm, my $fm, my $im) = $.unpack($buf, uint32, uint32, uint8, uint8, uint8, uint8, uint8);
                     die "Unsupported Compression($cm) Method" if $cm;
                     die "Unsupported Interlace($im) Method" if $im;
                     die "Unsupported Filter($fm) Method" if $fm;

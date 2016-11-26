@@ -16,7 +16,7 @@ class X::PDF::Image::UnknownType is Exception {
     }
 }
 
-role PDF::Content::Image {
+class PDF::Content::Image {
     use PDF::DAO;
     method network-endian { True }
 
@@ -67,7 +67,7 @@ role PDF::Content::Image {
             if base64;
 
         my $fh = PDF::Storage::Input.coerce($data, :$path);
-        self!open($image-type, $fh);
+        self!open($image-type, $fh, :$data-uri);
     }
 
     multi method open(Str $path! ) {
@@ -84,9 +84,36 @@ role PDF::Content::Image {
         self!open($type, $fh);
     }
 
-    method !open(Str $type, $fh) {
-        require ::('PDF::Content::Image')::($type);
-        ::('PDF::Content::Image')::($type).read($fh);
+    method !open(Str $type, $fh, |c) {
+        my \image = (require ::('PDF::Content::Image')::($type)).read($fh);
+        self!set-source(image, :$fh, :$type, |c);
+    }
+
+    method !set-source($obj, :$fh!, :$type!, :$data-uri) {
+        my subset Str-or-IOHandle of Any where Str|IO::Handle;
+        my role Sourced[Str-or-IOHandle $source, Str $type] {
+            has Str $.data-uri is rw;
+            method data-uri is rw {
+                Proxy.new(
+                    FETCH => sub ($) {
+                        $!data-uri //= do {
+                            use Base64;
+                            my $raw = do with $source {
+                                .isa(Str)
+                                    ?? .substr(0)
+                                    !! .path.IO.slurp(:bin);
+                            }
+                            my $enc = encode-base64($raw, :str);
+                            sprintf 'data:image/%s;base64,%s', $type, $enc;
+                        }
+                    },
+                    STORE => sub ($, $!data-uri) {},
+                )
+            }
+        }
+        $obj does Sourced[$fh, $type];
+        $obj.data-uri = $_ with $data-uri;
+        $obj;
     }
 
     method inline-to-xobject(Hash $inline-dict, Bool :$invert) {
