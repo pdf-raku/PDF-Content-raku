@@ -12,18 +12,18 @@ class PDF::Content::PDF
     use PDF::DAO::Stream;
 
     use PDF::Content::Graphics;
-    use PDF::Content::Font;
     use PDF::Content::Page;
     use PDF::Content::PageNode;
     use PDF::Content::PageTree;
     use PDF::Content::Resourced;    
     use PDF::Content::ResourceDict;
 
-    role Resources
+    role ResourceDict
 	does PDF::DAO::Tie::Hash
 	does PDF::Content::ResourceDict {
+            use PDF::Content::Font;
+            has PDF::Content::Font %.Font  is entry;
 	    has PDF::DAO::Stream %.XObject is entry;
-            has PDF::Content::Font %.Font is entry;
             has PDF::DAO::Dict $.ExtGState is entry;
     }
 
@@ -31,7 +31,7 @@ class PDF::Content::PDF
         does PDF::DAO::Tie::Hash
         does PDF::Content::Resourced
         does PDF::Content::Graphics {
-            has Resources $.Resources is entry;
+            has ResourceDict $.Resources is entry;
     }
 
     method xobject-form(|c) {
@@ -43,19 +43,19 @@ class PDF::Content::PDF
 	does PDF::Content::Page
 	does PDF::Content::PageNode {
 
- 	has Resources $.Resources is entry(:inherit);
+ 	has ResourceDict $.Resources is entry(:inherit);
 	#| inheritable page properties
 	has Numeric @.MediaBox is entry(:inherit,:len(4));
-	has Numeric @.CropBox is entry(:inherit,:len(4));
+	has Numeric @.CropBox  is entry(:inherit,:len(4));
 	has Numeric @.BleedBox is entry(:len(4));
-	has Numeric @.TrimBox is entry(:len(4));
-	has Numeric @.ArtBox is entry(:len(4));
+	has Numeric @.TrimBox  is entry(:len(4));
+	has Numeric @.ArtBox   is entry(:len(4));
 
 	my subset StreamOrArray of Any where PDF::DAO::Stream | Array;
 	has StreamOrArray $.Contents is entry;
 
 	method to-xobject(|c) {
-	    PDF::Content::Page.to-xobject(self, :coerce(XObject-Form), |c);
+            PDF::Content::Page.to-xobject(self, :coerce(XObject-Form), |c);
 	}
     }
 
@@ -64,13 +64,13 @@ class PDF::Content::PDF
 	does PDF::Content::PageNode
 	does PDF::Content::PageTree {
 
-	has Resources $.Resources is entry(:inherit);
+	has ResourceDict $.Resources is entry(:inherit);
 	#| inheritable page properties
 	has Numeric @.MediaBox is entry(:inherit,:len(4));
-	has Numeric @.CropBox is entry(:inherit,:len(4));
+	has Numeric @.CropBox  is entry(:inherit,:len(4));
 
-	has Page @.Kids is entry(:required, :indirect);
-        has UInt $.Count is entry(:required);
+	has Page @.Kids        is entry(:required, :indirect);
+        has UInt $.Count       is entry(:required);
     }
 
     role Catalog
