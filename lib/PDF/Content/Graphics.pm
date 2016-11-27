@@ -11,15 +11,38 @@ role PDF::Content::Graphics {
     method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
 
     has PDF::Content $!gfx;     #| appended graphics
+
+    method !tidy-ops(@ops) {
+        my $nesting = 0;
+        my $wrap = False;
+
+        for @ops {
+            given .key {
+                when OpCode::Save {$nesting++}
+                when OpCode::Restore {$nesting--}
+                default {
+                    $wrap = True
+                        if $nesting <= 0
+                        && PDF::Content::Ops.is-graphics-op: $_;
+                }
+            }
+        }
+
+        @ops.push: OpCode::Restore => []
+            while $nesting-- > 0;
+
+	if $wrap {
+	    @ops.unshift: OpCode::Save => [];
+	    @ops.push: OpCode::Restore => [];
+	}
+        @ops;
+    }
+
     method gfx(|c) {
 	$!gfx //= do {
 	    my Pair @ops = self.contents-parse;
 	    my PDF::Content $gfx .= new( :parent(self), |c );
-	    if @ops && ! (@ops[0].key eq OpCode::Save && @ops[*-1].key eq OpCode::Restore) {
-		@ops.unshift: OpCode::Save => [];
-		@ops.push: OpCode::Restore => [];
-	    }
-	    $gfx.ops: @ops;
+	    $gfx.ops: self!tidy-ops(@ops);
 	    $gfx;
 	}
     }

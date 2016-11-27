@@ -30,7 +30,7 @@ role PDF::Content::Ops {
     has &.callback is rw;
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
-    has Bool $.strict = True;
+    has Bool $.strict is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font>;
 
 =begin pod
@@ -604,25 +604,29 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         }
     }
 
+    method is-graphics-op($op-name) {
+        my constant GraphicsOps = GeneralGraphicOps ∪ ColorOps ∪ set <cm>;
+        $op-name ∈ GraphicsOps;
+    }
+
     method op(*@args is copy) {
         my \opn = op(|@args);
 	my Str $op-name;
 
         if opn ~~ Pair {
 	    $op-name = opn.key.Str;
-	    @args = [ opn.value.map: *.value ];
+	    @args = opn.value.map: *.value;
 	}
 	else {
 	    $op-name = opn.Str;
 	}
 
-	# not illegal just bad practice. makes it harder to later edit/reuse this content stream
-	# and may upset downstream utilities
 	if $!strict {
 	    if !@!gsave {
-		warn "graphics operation '$op-name' outside of a q ... Q graphics block\n"
-		    if $op-name ∈ GeneralGraphicOps|ColorOps
-		    || $op-name eq 'cm';
+	        # not illegal just bad practice. makes it harder to later edit/reuse this content stream
+	        # and may upset downstream utilities
+		warn "graphics operation '$op-name' (%OpCode{$op-name}) outside of a 'q' ... 'Q' (Save .. Restore) graphics block\n"
+		    if self.is-graphics-op: $op-name;
 	    }
 	}
 
@@ -644,9 +648,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     multi method ops(Array $ops?) {
-	if $ops.defined {
+	with $ops {
 	    self.op($_)
-		for $ops.list
+		for .list
 	}
         @!ops;
     }
