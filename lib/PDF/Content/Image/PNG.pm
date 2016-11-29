@@ -29,11 +29,11 @@ class PDF::Content::Image::PNG
         my Buf $crc;
         my buf8 $stream .= new;
 
-        subset PNG-Header of Str where [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
+        constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
         my Str $header = $fh.read(8).decode('latin-1');
 
         die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :path($fh.path) )
-            unless $header ~~ PNG-Header;
+            unless $header eq PNG-Header;
 
         while !$fh.eof {
             my uint ($l) = $.unpack( $fh.read(4), uint32 );
@@ -234,18 +234,17 @@ class PDF::Content::Image::PNG
 	%dict<ColorSpace> = :name<DeviceRGB>;
 	%dict<BitsPerComponent> = $bpc;
 	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(4), :Columns($w) };
-                
 	$stream = PDF::Storage::Filter.decode( $stream, :%dict );
-
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
 
 	my uint $n = $bpc div 8;
 	my uint $i = 0;
+        my uint $stream-len = +$stream;
 
 	my buf8 $rgb-channels  .= new;
 	my buf8 $alpha-channel .= new;
-	while $i < +$stream {
+	while $i < $stream-len {
 	    $rgb-channels.push( $stream[$i++] ) xx ($n*3);
 	    $alpha-channel.push( $stream[$i++] ) xx $n;
 	}

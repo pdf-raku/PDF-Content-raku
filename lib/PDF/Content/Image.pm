@@ -104,7 +104,7 @@ class PDF::Content::Image {
                                     !! .path.IO.slurp(:bin);
                             }
                             my $enc = encode-base64($raw, :str);
-                            sprintf 'data:image/%s;base64,%s', $type, $enc;
+                            sprintf 'data:image/%s;base64,%s', $type.lc, $enc;
                         }
                     },
                     STORE => sub ($, $!data-uri) {},
