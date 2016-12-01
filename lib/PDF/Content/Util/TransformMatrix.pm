@@ -132,14 +132,13 @@ module PDF::Content::Util::TransformMatrix {
     our sub round(Numeric \n) {
 	my Numeric \r = n.round(1e-6);
 	my Int \i = n.round;
-	constant Epsilon = 1e-5;
-	abs(n - i) < Epsilon
-	    ?? i   # assume it's an int
+        r =~= i
+	    ?? i   # near enough to an int
 	    !! r;
     }
 
-    multi sub vect(Numeric $n! --> List) {@($n, $n)}
-    multi sub vect(Array $v where {+$v == 2} --> List) {@$v}
+    multi sub vect(Numeric $n! --> List) {$n xx 2}
+    multi sub vect(List $v where {+$v == 2} --> List) {$v.list}
 
     #| 3 [PDF 1.7 Section 4.2.2 Common Transforms
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew

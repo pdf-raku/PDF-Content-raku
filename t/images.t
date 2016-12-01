@@ -35,10 +35,11 @@ is $jpeg<BitsPerComponent>, 8, 'jpeg bpc';
 is $jpeg<ColorSpace>, 'DeviceRGB', 'jpeg cs';
 ok $jpeg<Length>, 'jpeg dict length';
 is $jpeg.encoded.codes, $jpeg<Length>, 'jpeg encoded length';
+is $jpeg.width, 24, 'jpeg width';
+is $jpeg.height, 24, 'jpeg height';
 
 my $gif;
-##lives-ok {
-$gif = PDF::Content::Image.open: "t/images/lightbulb.gif";##}, "open gif - lives";
+lives-ok {$gif = PDF::Content::Image.open: "t/images/lightbulb.gif";}, "open gif - lives";
 @images.push: 'GIF - Content' => $gif;
 isa-ok $gif, ::('PDF::DAO::Stream'), 'gif object';
 is $gif<Type>, 'XObject', 'gif type';
@@ -54,6 +55,8 @@ is $gif.data-uri, 'data:image/gif;base64,R0lGODlhEwATAMQAAP/////78P/f/9Tf/8zM/8D
 
 my $image1;
 if lives-ok({$image1 = PDF::Content::Image.open: "t/images/tiny.pdf";}, "open PDF as image - lives") {
+    is $image1.width, 48, 'PDF image width';
+    is $image1.height, 60, 'PDF image height';
     @images.push: 'PDF - Form' => $image1;
 }
 

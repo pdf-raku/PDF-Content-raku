@@ -8,8 +8,8 @@ class PDF::Content::Image::PNG
 
     use PDF::DAO;
     use PDF::DAO::Stream;
-    use PDF::Storage::Filter;
-    use PDF::Storage::Util :resample;
+    use PDF::IO::Filter;
+    use PDF::IO :resample;
 
     method network-endian { True }
 
@@ -187,7 +187,7 @@ class PDF::Content::Image::PNG
 	%dict<DecodeParms> = { :Predictor(15), :Colors(2), :Columns($w), :BitsPerComponent($bpc) };
 	%dict<BitsPerComponent> = $bpc;
 
-	$stream = PDF::Storage::Filter.decode( $stream, :%dict );
+	$stream = PDF::IO::Filter.decode( $stream, :%dict );
 
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
@@ -234,7 +234,7 @@ class PDF::Content::Image::PNG
 	%dict<ColorSpace> = :name<DeviceRGB>;
 	%dict<BitsPerComponent> = $bpc;
 	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(4), :Columns($w) };
-	$stream = PDF::Storage::Filter.decode( $stream, :%dict );
+	$stream = PDF::IO::Filter.decode( $stream, :%dict );
 	# Strip alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
 

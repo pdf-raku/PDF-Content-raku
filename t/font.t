@@ -1,5 +1,6 @@
-use Test;
 use v6;
+use Test;
+plan 20;
 
 use PDF::Content::Util::Font;
 

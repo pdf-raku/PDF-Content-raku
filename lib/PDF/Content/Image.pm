@@ -52,7 +52,7 @@ class PDF::Content::Image {
 
     multi method open(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
         use Base64;
-        use PDF::Storage::Input;
+        use PDF::IO::Input;
         my $path = ~ $0;
         my Str \mime-type = ( $0<t> // '(missing)').lc;
         my Str \mime-subtype = ( $0<s> // '').lc;
@@ -66,7 +66,7 @@ class PDF::Content::Image {
         $data = decode-base64($data, :bin).decode("latin-1")
             if base64;
 
-        my $fh = PDF::Storage::Input.coerce($data, :$path);
+        my $fh = PDF::IO::Input.coerce($data, :$path);
         self!open($image-type, $fh, :$data-uri);
     }
 
@@ -86,12 +86,32 @@ class PDF::Content::Image {
 
     method !open(Str $type, $fh, |c) {
         my \image = (require ::('PDF::Content::Image')::($type)).read($fh);
-        self!set-source(image, :$fh, :$type, |c);
+        my Numeric $width;
+        my Numeric $height;
+        given image<Subtype> {
+                when 'Image' {
+                    $width = image<Width>;
+                    $height = image<Height>
+                }
+                when 'Form' {
+                    my $bbox = image<BBox>;
+                    $width = $bbox[2] - $bbox[0];
+                    $height = $bbox[3] - $bbox[1];
+                }
+                default {
+                    die "not an XObject Image";
+                }
+            }
+
+        self!add-details(image, :$fh, :$type, :$width, :$height, |c);
     }
 
-    method !set-source($obj, :$fh!, :$type!, :$data-uri) {
+    method !add-details($obj, :$fh!, :$type!, :$width!, :$height!, :$data-uri) {
         my subset Str-or-IOHandle of Any where Str|IO::Handle;
-        my role Sourced[Str-or-IOHandle $source, Str $type] {
+        my role Details[Str-or-IOHandle $source, Str $type, $width, $height] {
+            method width  { $width }
+            method height { $height }
+            method image-type { $type }
             has Str $.data-uri is rw;
             method data-uri is rw {
                 Proxy.new(
@@ -111,7 +131,7 @@ class PDF::Content::Image {
                 )
             }
         }
-        $obj does Sourced[$fh, $type];
+        $obj does Details[$fh, $type, $width, $height];
         $obj.data-uri = $_ with $data-uri;
         $obj;
     }
@@ -135,7 +155,7 @@ class PDF::Content::Image {
             :CMYK<DeviceCMYK>,
             # Notes:
             # 1. Ambiguous 'Indexed' entry seems to be a typo in the spec
-            # 2. filter abbreviations are handled in PDF::Storage::Filter
+            # 2. filter abbreviations are handled in PDF::IO::Filter
             );
 
         my $alias = $invert ?? %Abbreviations.invert.Hash !! %Abbreviations;
