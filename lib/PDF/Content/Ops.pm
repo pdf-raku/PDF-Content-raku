@@ -35,6 +35,12 @@ role PDF::Content::Ops {
 
 =begin pod
 
+=head1 NAME
+
+PDF::Content::Ops
+
+=head1 DESCRIPTION
+
 The PDF::Content::Ops role implements methods and mnemonics for the full operator table, as defined in specification [PDF 1.7 Appendix A]:
 
 =begin table
@@ -295,6 +301,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         Proxy.new(
             FETCH => sub ($) {@!CTM},
             STORE => sub ($, List $gm) {
+                require PDF::Content::Util::TransformMatrix;
                 my @ctm-inv = PDF::Content::Util::TransformMatrix::inverse(@!CTM);
                 my @diff = PDF::Content::Util::TransformMatrix::multiply($gm, @ctm-inv);
                 self.ConcatMatrix( |@diff )
@@ -690,7 +697,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!LineCap      = %gstate<LineCap>;
         $!LineJoin     = %gstate<LineJoin>;
         @!TextMatrix   = %gstate<Tm>.list;
-        @!CTM = %gstate<CTM>.list;
+        @!CTM          = %gstate<CTM>.list;
         @!DashPattern  = %gstate<Dp>.list;
         $!StrokeColorSpace = %gstate<StrokeColorSpace>;
         $!FillColorSpace = %gstate<FillColorSpace>;

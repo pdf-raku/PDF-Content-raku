@@ -38,7 +38,7 @@ class PDF::Content::Text::Line {
 
     method content(Numeric :$font-size!, Numeric :$x-shift = 0) {
         my Numeric \scale = -1000 / $font-size;
-        my subset Str-or-Pos of Any where Str|Numeric;
+        my subset Str-or-Pos where Str|Numeric;
         my Str-or-Pos @line;
 
         my Numeric $indent = $!indent + $x-shift;

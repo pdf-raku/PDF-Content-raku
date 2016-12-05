@@ -107,7 +107,7 @@ class PDF::Content::Image {
     }
 
     method !add-details($obj, :$fh!, :$type!, :$width!, :$height!, :$data-uri) {
-        my subset Str-or-IOHandle of Any where Str|IO::Handle;
+        my subset Str-or-IOHandle where Str|IO::Handle;
         my role Details[Str-or-IOHandle $source, Str $type, $width, $height] {
             method width  { $width }
             method height { $height }

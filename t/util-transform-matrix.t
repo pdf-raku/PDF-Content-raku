@@ -22,11 +22,15 @@ is-deeply PDF::Content::Util::TransformMatrix::dot(@translated, 10, 20), (20, 40
 is-deeply PDF::Content::Util::TransformMatrix::dot(@rotated, 10, 20), (-20, 10), 'rotated dot product';
 is-deeply PDF::Content::Util::TransformMatrix::dot(@scaled, 10, 20), (15e0, 30e0), 'scaled dot product';
 
-my $skew = PDF::Content::Util::TransformMatrix::transform-matrix( :skew(10));
+sub deg2rad(Numeric \deg) {
+    return deg * pi / 180;
+}
+
+my $skew = PDF::Content::Util::TransformMatrix::transform-matrix( :skew(deg2rad(10)));
 is-approx $skew[1], 0.176327, 'skew transform';
 is-approx $skew[2], 0.176327, 'skew transform';
 
-$skew = PDF::Content::Util::TransformMatrix::transform-matrix(:skew[10, 20]);
+$skew = PDF::Content::Util::TransformMatrix::transform-matrix(:skew[deg2rad(10), deg2rad(20)]);
 is-approx $skew[1], 0.176327, 'skew transform';
 is-approx $skew[2], 0.36397, 'skew transform';
 

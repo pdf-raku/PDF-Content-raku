@@ -10,11 +10,7 @@ module PDF::Content::Util::TransformMatrix {
     #
     # where a b c d e f are stored in a six digit array and the third column is implied.
 
-    sub deg2rad(Numeric \deg) {
-        return deg * pi / 180;
-    }
-
-    subset TransformMatrix of Array where {.elems == 6}
+    subset TransformMatrix of List where {.elems == 6}
     my Int enum TransformMatrixElem « :a(0) :b(1) :c(2) :d(3) :e(4) :f(5) »;
 
     our sub identity returns TransformMatrix {
@@ -37,18 +33,18 @@ module PDF::Content::Util::TransformMatrix {
     }
 
     our sub skew(Numeric $x, Numeric $y = $x --> TransformMatrix) {
-        [1, tan(deg2rad($x)), tan(deg2rad($y)), 1, 0, 0];
+        [1, tan($x), tan($y), 1, 0, 0];
     }
 
     #| multiply transform matrix x X y
     our sub multiply(TransformMatrix \x, TransformMatrix \y --> TransformMatrix) {
 
-        [ y[a]*x[a] + y[c]*x[b],
-          y[b]*x[a] + y[d]*x[b],
-          y[a]*x[c] + y[c]*x[d],
-          y[b]*x[c] + y[d]*x[d],
-          y[a]*x[e] + y[c]*x[f] + y[e],
-          y[b]*x[e] + y[d]*x[f] + y[f],
+        [ y[a] * x[a]  +  y[c] * x[b],
+          y[b] * x[a]  +  y[d] * x[b],
+          y[a] * x[c]  +  y[c] * x[d],
+          y[b] * x[c]  +  y[d] * x[d],
+          y[a] * x[e]  +  y[c] * x[f]  +  y[e],
+          y[b] * x[e]  +  y[d] * x[f]  +  y[f],
         ];
     }
 
@@ -64,10 +60,9 @@ module PDF::Content::Util::TransformMatrix {
             num / denom;
         }
     } 
-    #| caculate an inverse, if possible
-    our sub inverse(TransformMatrix \m) {
+    #| calculate an inverse, if possible
+    our sub inverse(TransformMatrix \m --> TransformMatrix) {
 
-        #| todo: sensitive to divides by zero. Is there a better algorithm?
         my Bool $div-err;
         my \Ib = mdiv( m[b], m[c] * m[b] - m[d] * m[a], $div-err);
         my \Ia = mdiv(1 - m[c] * Ib, m[a], $div-err);
@@ -91,15 +86,14 @@ module PDF::Content::Util::TransformMatrix {
     #|    x' = a.x  + c.y + e; y' = b.x + d.y +f
     #| See [PDF 1.7 Section 4.2.3 Transformation Matrices]
     our sub dot(TransformMatrix \m, Numeric \x, Numeric \y) {
-	my \tx = m[a]*x + m[c]*y + m[e];
-	my \ty = m[b]*x + m[d]*y + m[f];
+	my \tx = m[a] * x  +  m[c] * y  +  m[e];
+	my \ty = m[b] * x  +  m[d] * y  +  m[f];
         (tx, ty);
     }
 
     #| inverse of the above. Convert from untransformed to transformed space
     our sub inverse-dot(TransformMatrix \m, Numeric \tx, Numeric \ty) {
         # nb two different simultaneous equations for the above.
-        # there are further solutions. Could be alternate fomulation?
         my ($x, $y);
         my \div1 = m[d] * m[a]  -  m[c] * m[b];
         if div1|m[a] !=~= 0.0 {
@@ -129,18 +123,17 @@ module PDF::Content::Util::TransformMatrix {
         ! (m.list Z identity()).first: { .[0] !=~= .[1] };
     }
 
+    #| round to 6 decimal places. convert to int, if there's no further precision loss
     our sub round(Numeric \n) {
-	my Numeric \r = n.round(1e-6);
-	my Int \i = n.round;
-        r =~= i
-	    ?? i   # near enough to an int
-	    !! r;
+	my Numeric $r = n.round(1e-6);
+	my int $i = n.round;
+        $r == $i ?? $i !! $r;
     }
 
     multi sub vect(Numeric $n! --> List) {$n xx 2}
     multi sub vect(List $v where {+$v == 2} --> List) {$v.list}
 
-    #| 3 [PDF 1.7 Section 4.2.2 Common Transforms
+    #| 3 [PDF 1.7 Section 4.2.2 Common Transforms]
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
 
     our sub transform-matrix(

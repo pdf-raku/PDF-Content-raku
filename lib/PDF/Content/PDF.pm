@@ -51,7 +51,7 @@ class PDF::Content::PDF
 	has Numeric @.TrimBox  is entry(:len(4));
 	has Numeric @.ArtBox   is entry(:len(4));
 
-	my subset StreamOrArray of Any where PDF::DAO::Stream | Array;
+	my subset StreamOrArray where PDF::DAO::Stream | Array;
 	has StreamOrArray $.Contents is entry;
 
 	method to-xobject(|c) {
