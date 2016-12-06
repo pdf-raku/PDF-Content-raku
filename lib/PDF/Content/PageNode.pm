@@ -29,9 +29,9 @@ role PDF::Content::PageNode {
 	default      { self!get-prop($_) // self.bbox('crop') }
     }
 
-    method media-box(|c) is rw { self.bbox('media', |c ) }
-    method crop-box(|c)  is rw { self.bbox('crop',  |c ) }
-    method bleed-box(|c) is rw { self.bbox('bleed', |c ) }
+    method media-box(|c) is rw { self.bbox('media', |c) }
+    method crop-box(|c)  is rw { self.bbox('crop',  |c) }
+    method bleed-box(|c) is rw { self.bbox('bleed', |c) }
     method trim-box(|c)  is rw { self.bbox('trim',  |c) }
     method art-box(|c)   is rw { self.bbox('art',   |c) }
 
