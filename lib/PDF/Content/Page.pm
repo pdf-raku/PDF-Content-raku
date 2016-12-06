@@ -2,6 +2,7 @@ use v6;
 
 use PDF::Content::Graphics;
 use PDF::Content::Resourced;
+use PDF::Content::XObject;
 
 role PDF::Content::Page
     does PDF::Content::Resourced

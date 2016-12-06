@@ -17,6 +17,7 @@ class PDF::Content::PDF
     use PDF::Content::PageTree;
     use PDF::Content::Resourced;    
     use PDF::Content::ResourceDict;
+    use PDF::Content::XObject;
 
     role ResourceDict
 	does PDF::DAO::Tie::Hash
@@ -29,6 +30,7 @@ class PDF::Content::PDF
 
     my role XObject-Form
         does PDF::DAO::Tie::Hash
+        does PDF::Content::XObject
         does PDF::Content::Resourced
         does PDF::Content::Graphics {
             has ResourceDict $.Resources is entry;

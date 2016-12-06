@@ -27,6 +27,7 @@
         "PDF::Content::Image::JPEG"     : "lib/PDF/Content/Image/JPEG.pm",
         "PDF::Content::Image::PNG"      : "lib/PDF/Content/Image/PNG.pm",
         "PDF::Content::Image::PDF"      : "lib/PDF/Content/Image/PDF.pm",
+        "PDF::Content::XObject"         : "lib/PDF/Content/XObject.pm",
 
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
         "PDF::Content::Font::AFM"       : "lib/PDF/Content/Font/AFM.pm",

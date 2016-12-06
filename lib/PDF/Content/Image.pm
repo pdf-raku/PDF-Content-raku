@@ -18,6 +18,7 @@ class X::PDF::Image::UnknownType is Exception {
 
 class PDF::Content::Image {
     use PDF::DAO;
+    use PDF::Content::XObject;
     method network-endian { True }
 
     #| lightweight replacement for deprecated $buf.unpack
@@ -84,56 +85,13 @@ class PDF::Content::Image {
         self!open($type, $fh);
     }
 
-    method !open(Str $type, $fh, |c) {
-        my \image = (require ::('PDF::Content::Image')::($type)).read($fh);
-        my Numeric $width;
-        my Numeric $height;
-        given image<Subtype> {
-                when 'Image' {
-                    $width = image<Width>;
-                    $height = image<Height>
-                }
-                when 'Form' {
-                    my $bbox = image<BBox>;
-                    $width = $bbox[2] - $bbox[0];
-                    $height = $bbox[3] - $bbox[1];
-                }
-                default {
-                    die "not an XObject Image";
-                }
-            }
+    method !open(Str $image-type, $fh, |c) {
+        my \image = (require ::('PDF::Content::Image')::($image-type)).read($fh);
+        image does PDF::Content::XObject
+            unless image ~~ PDF::Content::XObject;
 
-        self!add-details(image, :$fh, :$type, :$width, :$height, |c);
-    }
-
-    method !add-details($obj, :$fh!, :$type!, :$width!, :$height!, :$data-uri) {
-        my subset Str-or-IOHandle where Str|IO::Handle;
-        my role Details[Str-or-IOHandle $source, Str $type, $width, $height] {
-            method width  { $width }
-            method height { $height }
-            method image-type { $type }
-            has Str $.data-uri is rw;
-            method data-uri is rw {
-                Proxy.new(
-                    FETCH => sub ($) {
-                        $!data-uri //= do {
-                            use Base64;
-                            my $raw = do with $source {
-                                .isa(Str)
-                                    ?? .substr(0)
-                                    !! .path.IO.slurp(:bin);
-                            }
-                            my $enc = encode-base64($raw, :str);
-                            sprintf 'data:image/%s;base64,%s', $type.lc, $enc;
-                        }
-                    },
-                    STORE => sub ($, $!data-uri) {},
-                )
-            }
-        }
-        $obj does Details[$fh, $type, $width, $height];
-        $obj.data-uri = $_ with $data-uri;
-        $obj;
+        image.set-source(:source($fh), :$image-type, |c);
+        image;
     }
 
     method inline-to-xobject(Hash $inline-dict, Bool :$invert) {
