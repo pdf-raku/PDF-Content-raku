@@ -27,6 +27,7 @@ $gfx.BeginText;
 $gfx.text-position = [100, 350];
 is-deeply $gfx.text-position, (100, 350), 'text position';
 $gfx.say( $text-block );
+$text-block.baseline = 'bottom';
 $gfx.print( $text-block );
 $gfx.EndText;
 $gfx.Restore;
@@ -41,6 +42,7 @@ is-json-equiv [ $gfx.ops ], [
     :TL[:real(17.6)],
     :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
     'T*' => [],
+    :Td[ :real(0), :real(3.648) ],
     :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
     :ET[],
     :Q[],

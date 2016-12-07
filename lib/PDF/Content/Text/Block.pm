@@ -10,7 +10,7 @@ class PDF::Content::Text::Block {
     has Numeric $.font-size = 16;
     has Numeric $.leading = $!font-size * 1.1;
     has Numeric $.font-height  = $!font.height( $!font-size );
-    has Str     $.baseline = 'alphabetic';
+    has Str     $.baseline is rw = 'alphabetic';
     has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
     has Numeric $.WordSpacing = 0;
     has Numeric $.CharSpacing = 0;
