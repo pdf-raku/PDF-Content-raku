@@ -9,6 +9,7 @@ role PDF::Content:ver<0.0.5>
     use PDF::Content::Image;
     use PDF::Content::Text::Block;
     use PDF::Content::Font;
+    use PDF::Content::XObject;
 
     method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
 			Numeric :$opacity is copy,
@@ -136,50 +137,32 @@ role PDF::Content:ver<0.0.5>
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
         my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
-        given $obj<Subtype> {
-            when 'Image' {
-                with $width {
-                    $height //= $_ * ($obj<Height> / $obj<Width>);
-                }
-                else {
-                    with $height {
-                        $width //= $_ * ($obj<Width> / $obj<Height>);
-                    }
-                    else {
-                        $width = $obj<Width>;
-                        $height = $obj<Height>;
-                    }
-                }
+        $obj does PDF::Content::XObject
+            unless $obj ~~  PDF::Content::XObject;
+        my $obj-width = $obj.width || 1;
+        my $obj-height = $obj.height || 1;
 
-                $dx *= $width;
-                $dy *= $height;
+        with $width {
+            $height //= $_ * ($obj-height / $obj-width);
+        }
+        else {
+            with $height {
+                $width //= $_ * ($obj-width / $obj-height);
             }
+            else {
+                $width = $obj-width;
+                $height = $obj-height;
+            }
+        }
+
+        $dx *= $width;
+        $dy *= $height;
+
+        with $obj<Subtype> {
             when 'Form' {
-                my Array $bbox = $obj<BBox>;
-                my Numeric $obj-width = $bbox[2] - $bbox[0] || 1;
-                my Numeric $obj-height = $bbox[3] - $bbox[1] || 1;
-
-                with $width {
-                    $height //= $_ * ($obj-height / $obj-width);
-                }
-                else {
-                    with $height {
-                        $width //= $_ * ($obj-width / $obj-height);
-                    }
-                    else {
-                        $width = $obj-width;
-                        $height = $obj-height;
-                    }
-                }
-
-                $dx *= $width;
-                $dy *= $height;
-
                 $width /= $obj-width;
                 $height /= $obj-height;
-
             }
-            default { die "xobject has missing or unknown Subtype: {$obj.perl}" }
         }
 
         self.graphics: {
@@ -198,7 +181,7 @@ role PDF::Content:ver<0.0.5>
     multi method print(Str $text,
 		       Bool :$stage = False,
 		       :$font = self!current-font[0],
-		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height
+		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height, :$baseline
         ) {
 	# detect and use the current text-state font
 	my Numeric $font-size = $.font-size // self!current-font[1];
