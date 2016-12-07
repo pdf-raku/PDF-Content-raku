@@ -10,7 +10,7 @@ class PDF::Content::Text::Block {
     has Numeric $.font-size = 16;
     has Numeric $.leading = $!font-size * 1.1;
     has Numeric $.font-height  = $!font.height( $!font-size );
-    has Str     $.baseline where 'ideographic'|'top' = 'ideographic';
+    has Str     $.baseline = 'alphabetic';
     has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
     has Numeric $.WordSpacing = 0;
     has Numeric $.CharSpacing = 0;
@@ -23,11 +23,15 @@ class PDF::Content::Text::Block {
     has Str $.align where 'left'|'center'|'right'|'justify' = 'left';
     has Str $.valign where 'top'|'center'|'bottom' = 'top';
 
-    method !baseline-shift {
-        given $!baseline {
-            when 'top' { - $!font.height( $!font-size, :from-baseline ); }
-            when 'ideographic' { 0 }
-            default { die "unhandled baseline: $_"; }
+    method !text-rise {
+        given $!baseline.lc {
+            when 'top'         { $!font.height( $!font-size, :from-baseline); }
+            when 'bottom'      { $!font.height( $!font-size, :from-baseline) - $!font.height( $!font-size) }
+            when 'middle'      { $!font.height( $!font-size, :from-baseline) - $!font.height( $!font-size)/2 }
+            when 'ideographic' { $!font.height( $!font-size, :from-baseline) - $!font-size; }
+            when 'hanging'     { $!font.height( $!font-size, :from-baseline, :hanging) }
+            when 'alphabetic'  { 0 }
+            default { warn "unhandled baseline: $_"; }
         }
 
     }
@@ -164,7 +168,7 @@ class PDF::Content::Text::Block {
 
         {
             my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
-            $y-shift += self!baseline-shift;
+            $y-shift -= self!text-rise;
             @content.push( OpCode::TextMove => [0, $y-shift ] )
                 unless $y-shift =~= 0.0;
         }

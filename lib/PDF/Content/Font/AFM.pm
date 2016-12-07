@@ -28,9 +28,10 @@ role PDF::Content::Font::AFM {
     }
 
     #| compute the overall font-height
-    method height($pointsize?, Bool :$from-baseline = False) {
+    method height($pointsize?, Bool :$from-baseline, Bool :$hanging) {
 	my List $bbox = $.FontBBox;
 	my Numeric $height = $bbox[3];
+        $height *= .75 if $hanging;  # not applicable to core fonts - approximate
 	$height -= $bbox[1] unless $from-baseline;
 	$pointsize ?? $height * $pointsize / 1000 !! $height;
     }
