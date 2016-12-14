@@ -25,13 +25,16 @@ class PDF::Content::Text::Block {
 
     method !text-rise {
         given $!baseline.lc {
+            when 'alphabetic'  { 0 }
             when 'top'         { $!font.height( $!font-size, :from-baseline); }
             when 'bottom'      { $!font.height( $!font-size, :from-baseline) - $!font.height( $!font-size) }
             when 'middle'      { $!font.height( $!font-size, :from-baseline) - $!font.height( $!font-size)/2 }
             when 'ideographic' { $!font.height( $!font-size, :from-baseline) - $!font-size; }
             when 'hanging'     { $!font.height( $!font-size, :from-baseline, :hanging) }
-            when 'alphabetic'  { 0 }
-            default { warn "unhandled baseline: $_"; }
+            default {
+                warn "unhandled text baseline: $_";
+                0;
+            }
         }
 
     }
