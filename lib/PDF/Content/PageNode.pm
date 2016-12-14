@@ -40,7 +40,7 @@ role PDF::Content::PageNode {
     method width  { with $!width { $_ } else { self!size()[0] } }
     method height { with $!height { $_ } else { self!size()[1] } }
     method !size {
-        my $bbox = self!media-box;
+        my $bbox = self.media-box;
         $!width = $bbox[2] - $bbox[0];
         $!height = $bbox[3] - $bbox[1];
         ($!width, $!height);
