@@ -27,6 +27,8 @@ my role ExtGraphicsAtt {
 
 role PDF::Content::Ops {
 
+    use PDF::Writer;
+
     has &.callback is rw;
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
@@ -54,7 +56,7 @@ BI | BeginImage | — | Begin inline image object
 BMC | BeginMarkedContent | tag | (PDF 1.2) Begin marked-content sequence
 BT | BeginText | — | Begin text object
 BX | BeginIgnore | — | (PDF 1.1) Begin compatibility section
-c | CurveTo | x1 y1 x2 y2 x3 y3 | Append curved segment to path (three control points)
+c | CurveTo | x1 y1 x2 y2 x3 y3 | Append curved segment to path (two control points)
 cm | ConcatMatrix | a b c d e f | Concatenate matrix to current transformation matrix
 CS | SetStrokeColorSpace | name | (PDF 1.1) Set color space for stroking operations
 cs | SetFillColorSpace | name | (PDF 1.1) Set color space for nonstroking operations
@@ -819,32 +821,30 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     #| serialize content. indent blocks for readability
     method content {
-        require PDF::Writer;
 	my constant Openers = 'q'|'BT'|'BMC'|'BDC'|'BX';
 	my constant Closers = 'Q'|'ET'|'EMC'|'EX';
+        my PDF::Writer $writer .= new;
 
 	$.finish;
-        my \writer = ::('PDF::Writer').new;
 	my UInt $nesting = 0;
 
         @!ops.map({
 	    my \op = ~ .key;
 
 	    $nesting-- if $nesting && op eq Closers;
-	    writer.indent = '  ' x $nesting;
+	    $writer.indent = '  ' x $nesting;
 	    $nesting++ if op eq Openers;
 
-	    writer.indent ~ writer.write: :content($_);
+	    $writer.indent ~ $writer.write: :content($_);
 	}).join: "\n";
     }
 
     #| dump of serialized content - for debugging/testing
     method content-dump {
-        require PDF::Writer;
-        my \writer = ::('PDF::Writer').new;
+        my PDF::Writer $writer .= new;
 
         @!ops.map: {
-	    writer.write: :content($_);
+	    $writer.write: :content($_);
 	};
     }
 
