@@ -835,7 +835,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    $writer.indent = '  ' x $nesting;
 	    $nesting++ if op eq Openers;
 
-	    $writer.indent ~ $writer.write: :content($_);
+	    my \pad = op eq 'EI'
+                ?? ''
+                !! $writer.indent;
+            pad ~ $writer.write: :content($_);
 	}).join: "\n";
     }
 

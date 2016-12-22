@@ -5,7 +5,7 @@
     "api"         : "PDF-1.7",
     "auth"        : "github:p6-pdf",
     "description" : "Minimalistic PDF content authoring; including text, images, fonts and graphics",
-    "depends"     : [ "PDF::IO", "PDF::Grammar", "Font::AFM", "Base64" ],
+    "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM", "Base64" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Content.git",
     "provides"    : {
 
