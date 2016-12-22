@@ -1,10 +1,10 @@
 use v6;
 
-use PDF::DAO::Type::PDF;
+use PDF;
 
 #| A minimal class for manipulating PDF graphical content
 class PDF::Content::PDF
-    is PDF::DAO::Type::PDF {
+    is PDF {
 
     use PDF::DAO::Tie;
     use PDF::DAO::Tie::Hash;
