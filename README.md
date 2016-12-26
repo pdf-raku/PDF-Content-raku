@@ -2,17 +2,16 @@
 
 This is a Perl 6 module for basic PDF content creation and editing, including text, images, fonts and general graphics.
 
-It includes `PDF::Content::PDF` a minimal class for
-creating or editing PDF documents, including:
+It includes `PDF::Lite`; a minimal class for creating or editing PDF documents, including:
 - Basic Text (core fonts only)
 - Simple forms and images (GIF, JPEG & PNG)
 - Low-level graphics and content operators
 - Content reuse (Pages and form objects)
 ```
 use v6;
-use PDF::Content::PDF;
+use PDF::Lite;
 
-my $pdf = PDF::Content::PDF.new;
+my $pdf = PDF::Lite.new;
 my $page = $pdf.add-page;
 $page.MediaBox = [0, 0, 595, 842];
 my $font = $page.core-font( :family<Helvetica>, :weight<bold>, :style<italic> );
@@ -33,8 +32,8 @@ $pdf.save-as: "t/example.pdf";
 `.say` and `.print` are simple convenience methods for displaying simple blocks of text with optional line-wrapping, alignment and kerning.
 
 ```
-use PDF::Content::PDF;
-my $pdf = PDF::Content::PDF.new;
+use PDF::Lite;
+my $pdf = PDF::Lite.new;
 my $page = $pdf.add-page;
 my $font = $page.core-font( :family<Helvetica> );
 
@@ -64,8 +63,8 @@ The `.image` method can be used to load an image and register it as a page resou
 The `.do` method can them be used to render it.
 
 ```
-use PDF::Content::PDF;
-my $pdf = PDF::Content::PDF.new;
+use PDF::Lite;
+my $pdf = PDF::Lite.new;
 my $page = $pdf.add-page;
 
 $page.graphics: -> $gfx {
@@ -91,8 +90,8 @@ For a full table of `.set-graphics` options, please see PDF::Content::Ops, ExtGS
 To display card suits symbols, using the ZapfDingbats core-font, with diamonds and hearts colored red:
 
 ```
-use PDF::Content::PDF;
-my $pdf = PDF::Content::PDF.new;
+use PDF::Lite;
+my $pdf = PDF::Lite.new;
 my $page = $pdf.add-page;
 
 $page.graphics: {
@@ -132,8 +131,8 @@ PDF::Content inherits from PDF::Content::Op, which implements the full range of 
 utility methods for handling text, images and graphics coordinates:
 
 ```
-use PDF::Content::PDF;
-my $pdf = PDF::Content::PDF.new;
+use PDF::Lite;
+my $pdf = PDF::Lite.new;
 my $page = $pdf.add-page;
 
 # Draw a simple Bézier curve:
@@ -193,8 +192,8 @@ For a full list of operators, please see PDF::Content::Ops.
 
 To list all images and forms for each page
 ```
-use PDF::Content::PDF;
-my $pdf = PDF::Content::PDF.open: "t/images.pdf";
+use PDF::Lite;
+my $pdf = PDF::Lite.open: "t/images.pdf";
 for 1 ... $pdf.page-count -> $page-no {
     say "page: $page-no";
     my $page = $pdf.page: $page-no;
@@ -225,11 +224,11 @@ Whole pages or individual resources may be copied from one PDF to another.
 The `to-xobject` method can be used to convert a page to an XObject Form to lay-up one or more input pages on an output page.
 
 ```
-use PDF::Content::PDF;
-my $pdf-with-images = PDF::Content::PDF.open: "t/images.pdf";
-my $pdf-with-text = PDF::Content::PDF.open: "t/pdf-page-text.pdf";
+use PDF::Lite;
+my $pdf-with-images = PDF::Lite.open: "t/images.pdf";
+my $pdf-with-text = PDF::Lite.open: "t/pdf-page-text.pdf";
 
-my $new-doc = PDF::Content::PDF.new;
+my $new-doc = PDF::Lite.new;
 
 # add a page; layup imported pages and images
 my $page = $new-doc.add-page;

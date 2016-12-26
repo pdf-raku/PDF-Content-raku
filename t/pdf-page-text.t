@@ -1,12 +1,12 @@
 use v6;
 use Test;
-use PDF::Content::PDF;
+use PDF::Lite;
 use PDF::Content::Ops :OpCode;
 
 # ensure consistant document ID generation
 srand(123456);
 
-my $pdf = PDF::Content::PDF.new;
+my $pdf = PDF::Lite.new;
 my $page = $pdf.add-page;
 my $gfx = $page.gfx;
 my $width = 50;
