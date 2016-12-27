@@ -4,9 +4,9 @@ use Test;
 # ensure consistant document ID generation
 srand(123456);
 
-use PDF::Content::PDF;
+use PDF::Lite;
 use PDF::Grammar::Test :is-json-equiv;
-my PDF::Content::PDF $pdf .= new;
+my PDF::Lite $pdf .= new;
 my $page = $pdf.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 
@@ -33,7 +33,7 @@ lives-ok { $pdf.save-as("t/doc.pdf") }, 'save-as';
 
 throws-like { $pdf.unknown-method }, X::Method::NotFound, '$pdf unknown method';
 
-lives-ok { $pdf = PDF::Content::PDF.open("t/doc.pdf") }, 'open';
+lives-ok { $pdf = PDF::Lite.open("t/doc.pdf") }, 'open';
 is-json-equiv $pdf.page(1).gfx.ops[0..6], (
     :q[], 
     :BT[],
