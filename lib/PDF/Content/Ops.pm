@@ -813,7 +813,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method finish {
 	die "Unclosed @!tags[] at end of content stream\n"
 	    if @!tags;
-	die "q(Save) unmatched by closing Q(Restore) at end of content stream\n"
+	die "q (Save) unmatched by closing Q (Restore) at end of content stream\n"
 	    if @!gsave;
         warn "unexpected end of content stream in $!context context"
 	    unless $!context == Page;
