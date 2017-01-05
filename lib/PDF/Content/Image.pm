@@ -87,7 +87,7 @@ class PDF::Content::Image {
 
     method !open(Str $image-type, $fh, |c) {
         my \image = (require ::('PDF::Content::Image')::($image-type)).read($fh);
-        image does PDF::Content::XObject
+        image does PDF::Content::XObject[image<Subtype>]
             unless image ~~ PDF::Content::XObject;
 
         image.set-source(:source($fh), :$image-type, |c);
