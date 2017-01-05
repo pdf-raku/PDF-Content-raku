@@ -4,12 +4,13 @@ my role XObject {
     has Str-or-IOHandle $.source;
     has Str $.image-type;
     method set-source(Str-or-IOHandle :$!source, :$!image-type, :$data-uri) {}
-    method !wrap-form {
+    method !gen-pdf {
+        use PDF; # workaround to ensure loading of PDF::Lite
         # wrap this form in a single page PDF
         my $pdf = (require ::('PDF::Lite')).new;
         my $page = $pdf.add-page;
         $page<MediaBox> = $_ with self.?bbox;
-        $page.do(self);
+        $page.gfx.do(self);
         $pdf.Str;
     }
 
@@ -18,18 +19,19 @@ my role XObject {
             FETCH => sub ($) {
                 $!data-uri //= do {
                     use Base64;
-                    my $type = $.image-type.lc;
+                    my $sub-type = $.image-type.lc;
                     my Str $bytes = do with $!source {
                         .isa(Str)
                             ?? .substr(0)
                             !! .path.IO.slurp(:enc<latin-1>);
                     }
                     else {
-                        $type = 'pdf';
-                        self!wrap-form;
+                        $sub-type = 'application/pdf';
+                        self!gen-pdf;
                     }
                     my $enc = encode-base64($bytes, :str);
-                    sprintf 'data:image/%s;base64,%s', $type, $enc;
+                    my $type = $sub-type eq 'pdf' ?? 'application' !! 'image';
+                    sprintf 'data:%s/%s;base64,%s', $type, $sub-type, $enc;
                 }
             },
             STORE => sub ($, $!data-uri) {},
