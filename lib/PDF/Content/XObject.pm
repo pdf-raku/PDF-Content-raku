@@ -1,47 +1,4 @@
-my role XObject {
-    has Str $.data-uri;
-    my subset Str-or-IOHandle where Str|IO::Handle;
-    has Str-or-IOHandle $.source;
-    has Str $.image-type;
-    method set-source(Str-or-IOHandle :$!source, :$!image-type, :$data-uri) {}
-    method !gen-pdf {
-        use PDF; # workaround to ensure loading of PDF::Lite
-        # wrap this form in a single page PDF
-        my $pdf = (require ::('PDF::Lite')).new;
-        my $page = $pdf.add-page;
-        $page<MediaBox> = $_ with self.?bbox;
-        $page.gfx.do(self);
-        $pdf.Str;
-    }
-
-    method data-uri is rw {
-        Proxy.new(
-            FETCH => sub ($) {
-                $!data-uri //= do {
-                    use Base64;
-                    my $sub-type = $.image-type.lc;
-                    my Str $bytes = do with $!source {
-                        .isa(Str)
-                            ?? .substr(0)
-                            !! .path.IO.slurp(:enc<latin-1>);
-                    }
-                    else {
-                        $sub-type = 'application/pdf';
-                        self!gen-pdf;
-                    }
-                    my $enc = encode-base64($bytes, :str);
-                    my $type = $sub-type eq 'pdf' ?? 'application' !! 'image';
-                    sprintf 'data:%s/%s;base64,%s', $type, $sub-type, $enc;
-                }
-            },
-            STORE => sub ($, $!data-uri) {},
-        )
-    }
-
-    method Str { self.data-uri }
-}
-
-role PDF::Content::XObject['Form'] does XObject {
+role PDF::Content::XObject['Form'] {
     has Numeric $.width;
     has Numeric $.height;
     method width  { with $!width  { $_ } else { self!size()[0] } }
@@ -52,11 +9,9 @@ role PDF::Content::XObject['Form'] does XObject {
         $!height = $bbox[3] - $bbox[1];
         ($!width, $!height);
     }
-    method bbox { self<BBox> }
-    method image-type { 'PDF' }
 }
 
-role PDF::Content::XObject['Image'] does XObject {
+role PDF::Content::XObject['Image'] {
     has Numeric $.width;
     has Numeric $.height;
     method width  { with $!width  { $_ } else { self!size()[0] } }
@@ -66,7 +21,36 @@ role PDF::Content::XObject['Image'] does XObject {
         $!height = self<Height>;
         ($!width, $!height);
     }
-    method bbox { [0, 0, self<Width>, self<Height> ] }
+    has Str $.data-uri;
+    my subset Str-or-IOHandle where Str|IO::Handle;
+    has Str-or-IOHandle $.source;
+    has Str $.image-type;
+    method set-source(Str-or-IOHandle :$!source, :$!image-type, :$data-uri) {}
+
+    method data-uri is rw {
+        Proxy.new(
+            FETCH => sub ($) {
+                $!data-uri //= do {
+                    with $!source {
+                        use Base64;
+                        my Str $bytes = .isa(Str)
+                            ?? .substr(0)
+                            !! .path.IO.slurp(:enc<latin-1>);
+                        my $enc = encode-base64($bytes, :str);
+                        sprintf 'data:image/%s;base64,%s', $.image-type.lc, $enc;
+                    }
+                    else {
+                        fail 'image is not associated with a sourxe';
+                    }
+                }
+            },
+            STORE => sub ($, $!data-uri) {},
+        )
+    }
+
+    method Str { self.data-uri }
 }
 
-role PDF::Content::XObject['PS'] does XObject {}
+role PDF::Content::XObject['PS'] {
+    # stub
+}

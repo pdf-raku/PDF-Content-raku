@@ -90,7 +90,7 @@ class PDF::Content::Image {
         image does PDF::Content::XObject[image<Subtype>]
             unless image ~~ PDF::Content::XObject;
 
-        image.set-source(:source($fh), :$image-type, |c);
+        image.?set-source(:source($fh), :$image-type, |c);
         image;
     }
 
