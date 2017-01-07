@@ -7,7 +7,7 @@ use PDF::Content::Text::Block;
 use PDF::Content::Util::Font;
 
 unless try {require PDF::Lite; 1} {
-    skip-rest 'PDF::Lite is required to run canvas tests';
+    skip-rest 'PDF::Lite is required to run tests';
     exit;
 }
 
