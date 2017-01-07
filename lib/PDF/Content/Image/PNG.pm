@@ -9,7 +9,7 @@ class PDF::Content::Image::PNG
     use PDF::DAO;
     use PDF::DAO::Stream;
     use PDF::IO::Filter;
-    use PDF::IO :resample;
+    use PDF::IO::Util :resample;
 
     method network-endian { True }
 

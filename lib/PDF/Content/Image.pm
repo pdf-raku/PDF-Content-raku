@@ -53,7 +53,7 @@ class PDF::Content::Image {
 
     multi method open(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
         use Base64;
-        use PDF::IO::Input;
+        use PDF::IO;
         my $path = ~ $0;
         my Str \mime-type = ( $0<t> // '(missing)').lc;
         my Str \mime-subtype = ( $0<s> // '').lc;
@@ -67,7 +67,7 @@ class PDF::Content::Image {
         $data = decode-base64($data, :bin).decode("latin-1")
             if base64;
 
-        my $fh = PDF::IO::Input.coerce($data, :$path);
+        my $fh = PDF::IO.coerce($data, :$path);
         self!open($image-type, $fh, :$data-uri);
     }
 
