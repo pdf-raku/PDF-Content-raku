@@ -1,11 +1,15 @@
 use v6;
 use Test;
+plan 5;
+use PDF; # give rakudo a hand loading PDF::Lite
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Block;
 use PDF::Content::Util::Font;
-use PDF::Lite;
 
-plan 5;
+unless try {require PDF::Lite; 1} {
+    skip-rest 'PDF::Lite is required to run canvas tests';
+    exit;
+}
 
 # ensure consistant document ID generation
 srand(123456);
@@ -17,7 +21,7 @@ is-deeply @chunks, ["z80", " ", "a-", "b.", " ", "-", "3", "   ", "{nbsp}A{nbsp}
 my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
 my $text = " Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
-my $pdf = PDF::Lite.new;
+my $pdf = ::('PDF::Lite').new;
 my $text-block = PDF::Content::Text::Block.new( :$text, :$font, :$font-size );
 is-approx $text-block.content-width, 360.88, '$.content-width';
 is-approx $text-block.content-height, 19.04, '$.content-height';

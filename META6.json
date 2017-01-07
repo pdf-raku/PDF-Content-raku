@@ -6,7 +6,6 @@
     "auth"        : "github:p6-pdf",
     "description" : "Basic PDF content authoring; including text, images, fonts and graphics",
     "depends"     : [ "PDF::Grammar", "Font::AFM", "Base64" ],
-    "test-depends" : [ "PDF::Lite" ],
     "source-url"  : "git://github.com/p6-pdf/p6-PDF-Content.git",
     "provides"    : {
 
