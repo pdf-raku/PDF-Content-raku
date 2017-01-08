@@ -1,0 +1,44 @@
+use v6;
+use PDF;
+class t::PDFTiny is PDF {
+    use PDF::DAO::Tie;
+    use PDF::Content::Page;
+    use PDF::Content::PageNode;
+    use PDF::Content::PageTree;
+    use PDF::Content::ResourceDict;
+    my role ResourceDict
+	does PDF::DAO::Tie::Hash
+	does PDF::Content::ResourceDict { }
+    my role PageNode
+	does PDF::DAO::Tie::Hash
+	does PDF::Content::PageNode {
+
+ 	has ResourceDict $.Resources is entry(:inherit);
+    }
+    my role Page does PageNode does PDF::Content::Page {
+	has Numeric @.MediaBox is entry(:inherit,:len(4));
+    }
+    my role Pages does PageNode does PDF::Content::PageTree {
+	has Page @.Kids        is entry(:required, :indirect);
+        has UInt $.Count       is entry(:required);
+    }
+    my role Catalog
+	does PDF::DAO::Tie::Hash {
+	has Pages $.Pages is entry(:required, :indirect);
+
+	method cb-finish {
+	    self.Pages.?cb-finish;
+	}
+
+    }
+
+    has Catalog $.Root is entry(:required, :indirect);
+
+    method cb-init {
+	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], :Count(0), } };
+    }
+    
+    for <page add-page page-count> {
+        $?CLASS.^add_method($_,  method (|a) { self.Root.Pages."$_"(|a) });
+    }
+}

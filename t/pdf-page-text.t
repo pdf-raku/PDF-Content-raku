@@ -1,17 +1,13 @@
 use v6;
 use Test;
 plan 1;
-use PDF; # give rakudo a hand loading PDF::Lite
 use PDF::Content::Ops :OpCode;
-
-unless try {require PDF::Lite; 1} {
-    skip-rest 'PDF::Lite is required to run tests';
-    exit;
-}
+use lib '.';
+use t::PDFTiny;
 # ensure consistant document ID generation
 srand(123456);
 
-my $pdf = ::('PDF::Lite').new;
+my $pdf = t::PDFTiny.new;
 my $page = $pdf.add-page;
 my $gfx = $page.gfx;
 my $width = 50;
