@@ -6,9 +6,18 @@ class t::PDFTiny is PDF {
     use PDF::Content::PageNode;
     use PDF::Content::PageTree;
     use PDF::Content::ResourceDict;
+    use PDF::Content::Resourced;
+    use PDF::Content::XObject;
     my role ResourceDict
 	does PDF::DAO::Tie::Hash
 	does PDF::Content::ResourceDict { }
+    my role XObject-Form
+        does PDF::DAO::Tie::Hash
+        does PDF::Content::XObject['Form']
+        does PDF::Content::Resourced
+        does PDF::Content::Graphics {
+            has ResourceDict $.Resources is entry;
+    }
     my role PageNode
 	does PDF::DAO::Tie::Hash
 	does PDF::Content::PageNode {
@@ -17,6 +26,11 @@ class t::PDFTiny is PDF {
     }
     my role Page does PageNode does PDF::Content::Page {
 	has Numeric @.MediaBox is entry(:inherit,:len(4));
+	has Numeric @.CropBox  is entry(:len(4));
+	has Numeric @.TrimBox  is entry(:len(4));
+	method to-xobject(|c) {
+            PDF::Content::Page.to-xobject(self, :coerce(XObject-Form), |c);
+	}
     }
     my role Pages does PageNode does PDF::Content::PageTree {
 	has Page @.Kids        is entry(:required, :indirect);
