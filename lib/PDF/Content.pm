@@ -133,12 +133,11 @@ role PDF::Content:ver<0.0.5>
               Bool    :$inline = False,
         )  {
 
-        my Str:D $key = $.resource-key($obj),
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
         my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
         $obj does PDF::Content::XObject[$obj<Subtype>]
-            unless $obj ~~  PDF::Content::XObject;
+            unless $obj ~~ PDF::Content::XObject;
         my $obj-width = $obj.width || 1;
         my $obj-height = $obj.height || 1;
 
@@ -172,6 +171,7 @@ role PDF::Content:ver<0.0.5>
 		$.ops( $obj.inline-content );
 	    }
 	    else {
+                my Str:D $key = $.resource-key($obj),
 		$.op(XObject, $key);
 	    }
         };

@@ -1,6 +1,7 @@
 use v6;
 use PDF;
 class t::PDFTiny is PDF {
+    use PDF::DAO;
     use PDF::DAO::Tie;
     use PDF::Content::Page;
     use PDF::Content::PageNode;
@@ -31,6 +32,12 @@ class t::PDFTiny is PDF {
 	method to-xobject(|c) {
             PDF::Content::Page.to-xobject(self, :coerce(XObject-Form), |c);
 	}
+	method tiling-pattern(|c) {
+            my constant Pattern = XObject-Form; # structurally identical
+            my $stream = PDF::Content::Page.tiling-pattern(|c),
+            PDF::DAO.coerce($stream, Pattern);
+            $stream
+	}
     }
     my role Pages does PageNode does PDF::Content::PageTree {
 	has Page @.Kids        is entry(:required, :indirect);
@@ -43,7 +50,6 @@ class t::PDFTiny is PDF {
 	method cb-finish {
 	    self.Pages.?cb-finish;
 	}
-
     }
 
     has Catalog $.Root is entry(:required, :indirect);

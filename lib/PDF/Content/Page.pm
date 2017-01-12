@@ -46,35 +46,33 @@ role PDF::Content::Page
 	$streams.keys.map({ $streams[$_].decoded }).join: '';
     }
 
-    method xobject-form(     :$coerce,
-                       Array :$bbox = PageSizes::Letter,
-                       Hash  :$resources = {},
-                      ) {
-        my %dict = (
-	    Type => :name<XObject>,
-	    Subtype => :name<Form>,
-	    Resources => $resources,
-	    BBox => $bbox,
-	    );
-
-        my $xobject = PDF::DAO.coerce( :stream{ :%dict });
-	PDF::DAO.coerce($xobject, $coerce) if $coerce ~~ PDF::DAO::Tie;
-        $xobject;
+    method xobject-form(*%dict) {
+        for <coerce bbox resources> {
+            die "deprecated $_ option"
+                if %dict{$_}:exists;
+        }
+        %dict<Type> = :name<XObject>;
+        %dict<Subtype> = :name<Form>;
+        %dict<Resources> //= {};
+        %dict<BBox> //= PageSizes::Letter;
+        PDF::DAO.coerce( :stream{ :%dict });
     }
 
     #| produce an XObject form for this page
-    method to-xobject($from = self, :$coerce, Array :$bbox = $from.trim-box.clone) {
-
-        my $resources = $from.Resources.clone,
+    method to-xobject($from = self, :$coerce, Array :$BBox = $from.trim-box.clone, :$bbox) {
+        die "deprecated bbox option" with $bbox;
+        my $Resources = $from.Resources.clone,
 	# copy unflushed graphics
-        my $xobject = self.xobject-form( :$coerce, :$bbox, :$resources);
+        my $xobject = self.xobject-form( :$BBox, :$Resources);
+        PDF::DAO.coerce($xobject, $coerce)
+            if $coerce ~~ PDF::DAO::Tie;
         $xobject.pre-gfx.ops($from.pre-gfx.ops);
         $xobject.gfx.ops($from.gfx.ops);
 
 	# copy content streams
 	my Array $content-streams = $from.content-streams;
-        $xobject.edit-stream: :append( [~] $content-streams.map: *.decoded );
         if +$content-streams {
+            $xobject.edit-stream: :append( [~] $content-streams.map: *.decoded );
             # inherit compression from the first stream segment
             for $content-streams[0] {
                 $xobject<Filter> = .<Filter>.clone
@@ -85,6 +83,21 @@ role PDF::Content::Page
         }
 
         $xobject;
+    }
+
+    method !pattern(*%dict) {
+        %dict<Type> = :name<Pattern>;
+        PDF::DAO.coerce( :stream{ :%dict });
+    }
+
+    method tiling-pattern(List    :$BBox!,
+                          Numeric :$XStep = $BBox[2] - $BBox[0],
+                          Numeric :$YStep = $BBox[3] - $BBox[1],
+                          Int :$PaintType = 1,
+                          Int :$TilingType = 1,
+                          |c
+                         ) {
+        self!pattern(:PatternType(1), :$BBox, :$XStep, :$YStep, :$PaintType, :$TilingType, |c);
     }
 
     method finish {

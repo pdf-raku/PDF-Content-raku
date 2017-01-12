@@ -54,9 +54,7 @@ is $gif.encoded.codes, $gif<Length>, 'gif encoded length';
 is $gif.data-uri, 'data:image/gif;base64,R0lGODlhEwATAMQAAP/////78P/f/9Tf/8zM/8DcwKbK8P+Y////qv/fqtTfqtS/qtSfqqq/qqCgpKqfqoCAgH+fqv//Vf/fVdS/VdSfVaqfVYCAAKp/VapfVap/AH9fVVVfVSpfVVU/VQAAACH5BAkIAAcALAAAAAATABMAAAWsoFYcJLmcY0lqx5Kl7UJR1aNiy1gMR7EkAYSQwoDtSr5AcCJJICgYgar0QySaQuGJN10gmMKgUFGBYViWqxOhVJJt58LogWW3A4vagWuqICR2AAB4GA1TJBgTVm0AChsPMCoFGBRZARYbDpFTBRB+CBiPBVJTLH1CmSkXCyU4owcPHBAQHA9cCxgwBCkODgYOHoZImyQOEQa0wodTDrMdHjbLh7McmtLLcsQkIQA7', 'data-uri from file';
 
 my $image1;
-##if lives-ok({
-$image1 = t::PDFTiny.open("t/images/tiny.pdf").page(1).to-xobject;##}, "open PDF as image - lives") {
-do { 
+if lives-ok({$image1 = t::PDFTiny.open("t/images/tiny.pdf").page(1).to-xobject;}, "open PDF as image - lives") {
     is $image1.width, 48, 'PDF image width';
     is $image1.height, 60, 'PDF image height';
     @images.push: 'PDF - Form' => $image1;
