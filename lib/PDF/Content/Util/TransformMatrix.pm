@@ -137,19 +137,20 @@ module PDF::Content::Util::TransformMatrix {
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
 
     our sub transform-matrix(
+	:$matrix,
 	:$translate,
 	:$rotate,
 	:$scale,
 	:$skew,
-	:$matrix,
 	--> TransformMatrix
 	) {
-	my TransformMatrix $t = identity();
+	my TransformMatrix $t = $matrix
+            ?? [$matrix.list]
+            !! identity();
 	apply($t, translate( |vect($_) )) with $translate;
 	apply($t, rotate( $_ ))           with $rotate;
 	apply($t, scale( |vect($_) ))     with $scale;
 	apply($t, skew( |vect($_) ))      with $skew;
-	apply($t, $_)                     with $matrix;
 	[ $t.map: { round($_) } ];
     }
 
