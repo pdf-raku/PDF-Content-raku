@@ -77,10 +77,10 @@ class Build {
     }
 
     method !write-enc(Hash :$glyphs! is rw, Hash :$encodings! is rw) {
-        my $lib-dir = $*SPEC.catdir('lib', 'PDF', 'Graphics', 'Font');
+        my $lib-dir = $*SPEC.catdir('lib', 'PDF', 'Content', 'Font');
         mkdir( $lib-dir, 0o755);
 
-        my $class-name = "PDF::Graphics::Font::Encodings";
+        my $class-name = "PDF::Content::Font::Encodings";
         my $gen-path = $*SPEC.catfile($lib-dir, "Encodings.pm");
         my $*OUT = open( $gen-path, :w);
 
@@ -92,7 +92,7 @@ class Build {
         #
         # This file was auto-generated
 
-        class PDF::Graphics::Font::Encodings {
+        class PDF::Content::Font::Encodings {
 
         --CODE-GEN--
 
