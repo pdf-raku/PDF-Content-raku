@@ -47,10 +47,6 @@ role PDF::Content::Page
     }
 
     method xobject-form(*%dict) {
-        for <coerce bbox resources> {
-            die "deprecated $_ option"
-                if %dict{$_}:exists;
-        }
         %dict<Type> = :name<XObject>;
         %dict<Subtype> = :name<Form>;
         %dict<Resources> //= {};
@@ -59,8 +55,7 @@ role PDF::Content::Page
     }
 
     #| produce an XObject form for this page
-    method to-xobject($from = self, :$coerce, Array :$BBox = $from.trim-box.clone, :$bbox) {
-        die "deprecated bbox option" with $bbox;
+    method to-xobject($from = self, :$coerce, Array :$BBox = $from.trim-box.clone) {
         my $Resources = $from.Resources.clone,
 	# copy unflushed graphics
         my $xobject = self.xobject-form( :$BBox, :$Resources);
