@@ -410,7 +410,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             }
         }
 
-        unless $ok-here {
+        if !$ok-here && $.strict {
             if $!context == Text && $op ∈ SpecialGraphicOps {
                 warn "special graphics operation '$op' (%OpCode{$op}) used in a BT ... ET text block"
             }

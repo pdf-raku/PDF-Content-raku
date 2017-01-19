@@ -13,7 +13,7 @@ role PDF::Content::Graphics {
     has PDF::Content $!gfx;     #| appended graphics
 
     method !tidy-ops(@ops) {
-        my $nesting = 0;
+        my int $nesting = 0;
         my $wrap = False;
 
         for @ops {
@@ -38,11 +38,13 @@ role PDF::Content::Graphics {
         @ops;
     }
 
-    method gfx(|c) {
+    method gfx(Bool :$raw, |c) {
 	$!gfx //= do {
 	    my Pair @ops = self.contents-parse;
+            @ops = self!tidy-ops(@ops)
+                unless $raw;
 	    my PDF::Content $gfx .= new( :parent(self), |c );
-	    $gfx.ops: self!tidy-ops(@ops);
+	    $gfx.ops: @ops;
 	    $gfx;
 	}
     }

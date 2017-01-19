@@ -11,6 +11,10 @@ role PDF::Content:ver<0.0.5>
     use PDF::Content::Font;
     use PDF::Content::XObject;
 
+    method TWEAK(:$strict) {
+        self.strict = $_ with $strict;
+    }
+
     method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
 			Numeric :$opacity is copy,
 			Numeric :$transparency,
