@@ -94,12 +94,12 @@ role PDF::Content
 
     use PDF::Content::Util::TransformMatrix;
     method transform( |c ) {
-	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform-matrix( |c );
+	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform( |c );
 	$.ConcatMatrix( @matrix );
     }
 
     method text-transform( |c ) {
-	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform-matrix( |c );
+	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform( |c );
 	$.SetTextMatrix( @matrix );
     }
 

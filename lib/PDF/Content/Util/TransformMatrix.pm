@@ -133,7 +133,7 @@ module PDF::Content::Util::TransformMatrix {
     #| 3 [PDF 1.7 Section 4.2.2 Common Transforms]
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
 
-    our sub transform-matrix(
+    our sub transform(
 	:$matrix,
 	:$translate,
 	:$rotate,
