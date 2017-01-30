@@ -1,10 +1,10 @@
 use v6;
 use Test;
 use PDF::Grammar::Test :is-json-equiv;
+use lib '.';
 use PDF::Content::Image;
 use PDF::Content::Image::GIF;
 use PDF::Content::Image::PNG;
-use lib '.';
 use t::PDFTiny;
 
 # ensure consistant document ID generation

@@ -22,10 +22,10 @@ module PDF::Content::Util::TransformMatrix {
     }
 
     our sub rotate( Numeric \r --> TransformMatrix) {
-        my Numeric \cos = cos(r);
-        my Numeric \sin = sin(r);
+        my Numeric \cos-r = cos(r);
+        my Numeric \sin-r = sin(r);
 
-        [cos, sin, -sin, cos, 0, 0];
+        [cos-r, sin-r, -sin-r, cos-r, 0, 0];
     }
 
     our sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
@@ -130,9 +130,6 @@ module PDF::Content::Util::TransformMatrix {
         $r == $i ?? $i !! $r;
     }
 
-    multi sub vect(Numeric $n! --> List) {$n xx 2}
-    multi sub vect(List $v where {+$v == 2} --> List) {$v.list}
-
     #| 3 [PDF 1.7 Section 4.2.2 Common Transforms]
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
 
@@ -147,10 +144,10 @@ module PDF::Content::Util::TransformMatrix {
 	my TransformMatrix $t = $matrix
             ?? [$matrix.list]
             !! identity();
-	apply($t, translate( |vect($_) )) with $translate;
+	apply($t, translate( |$_ )) with $translate;
 	apply($t, rotate( $_ ))           with $rotate;
-	apply($t, scale( |vect($_) ))     with $scale;
-	apply($t, skew( |vect($_) ))      with $skew;
+	apply($t, scale( |$_ ))     with $scale;
+	apply($t, skew( |$_ ))      with $skew;
 	[ $t.map: { round($_) } ];
     }
 

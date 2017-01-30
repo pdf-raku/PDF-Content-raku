@@ -10,7 +10,7 @@ role PDF::Content::PageTree
 
     #| add new last page
     method add-page( $page? is copy ) {
-        my $sub-pages = self.Kids[*-1]
+        my $sub-pages = self.Kids.tail
             if self.Kids;
 
 	if $page {
@@ -30,7 +30,7 @@ role PDF::Content::PageTree
         }
         else {
             self.Kids.push: $page;
-	    $page = self.Kids[*-1];
+	    $page = self.Kids.tail;
 	    $page<Parent> = self.link;
         }
 

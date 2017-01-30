@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-role PDF::Content:ver<0.0.5>
+role PDF::Content
     does PDF::Content::Ops {
 
     use PDF::DAO;

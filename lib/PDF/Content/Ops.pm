@@ -565,7 +565,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             my @args = @_args;
             # scn & SCN have an optional trailing name
             my Str $name = @args.pop
-                if +@args && @args[*-1] ~~ Str;
+                if +@args && @args.tail ~~ Str;
 
             die "too few arguments to: $op"
                 unless $name.defined || @args;
@@ -639,7 +639,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    }
 	}
 
-        my Str $last-op = @!ops[*-1].key
+        my Str $last-op = @!ops.tail.key
 	    if @!ops;
 
 	@!ops.push(opn);
@@ -747,7 +747,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
         if arity {
             my $got = +@scn;
-            $got-- if @scn && @scn[*-1] ~~ Str;
+            $got-- if @scn && @scn.tail ~~ Str;
             die "Incorrect number of arguments in $op command, expected {arity} $cs colors, got: $got"
                 unless $got == arity;
         }

@@ -1,7 +1,7 @@
 use v6;
-use Font::AFM;
 
 module PDF::Content::Util::Font {
+    use Font::AFM:ver(v1.23.5..*);
     use PDF::Content::Font::AFM;
     # font aliases adapted from pdf.js/src/fonts.js
     BEGIN constant stdFontMap = {
@@ -69,7 +69,7 @@ module PDF::Content::Util::Font {
 
     our proto sub core-font(|c) {*};
 
-    multi sub core-font( Str :$family! is copy, Str :$weight?, Str :$style?, :$enc) {
+    multi sub core-font( Str :$family! is copy, Str :$weight?, Str :$style?, |c) {
 
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
             ?? 'bold' !! '';
@@ -87,7 +87,7 @@ module PDF::Content::Util::Font {
 
         my Str $font-name = $family.subst(/['-'.*]? $/, $sfx );
 
-        core-font( $font-name, :$enc );
+        core-font( $font-name, |c );
     }
 
     sub load-core-font($font-name, :$enc!) {
@@ -108,12 +108,11 @@ module PDF::Content::Util::Font {
         load-core-font( $font-name.lc, :enc<sym> );
     }
 
-    multi sub core-font(Str $font-name! where { stdFontMap{$font-name.lc}:exists }, :$enc) {
-        core-font( stdFontMap{$font-name.lc}, :$enc );
+    multi sub core-font(Str $font-name! where { stdFontMap{$font-name.lc}:exists }, |c) {
+        core-font( stdFontMap{$font-name.lc}, |c );
     }
 
-    multi sub core-font(Str $font-name!, :$enc is copy) is default {
-        $enc //= 'win';
+    multi sub core-font(Str $font-name!, :$enc = 'win') is default {
         load-core-font( $font-name.lc, :$enc );
     }
 
