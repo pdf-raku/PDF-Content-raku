@@ -1,5 +1,7 @@
 use v6;
 use Test;
+plan 76;
+
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
@@ -230,6 +232,20 @@ is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comm
 $g.Save;
 $g.CTM = [0, -2, 2, 0, 40, -20];
 is-deeply [ $g.CTM.list ], [0.0, -2.0, 2.0, 0.0, 40.0, -20.0], 'graphics matrix assignment';
+$g.Restore;
+
+$g.Save;
+$g.ConcatMatrix(1,0,0,1,0,792);
+$g.ConcatMatrix(2,0,0,2,0,0);
+$g.ConcatMatrix(1,0,0,1,75,-25,);
+is-deeply [ $g.CTM.list ], [2, 0, 0, 2, 150, 742], "chained matrix transforms";
+$g.Restore;
+
+$g.Save;
+$g.ConcatMatrix(1,0,0,1,0,792);
+$g.ConcatMatrix(1,0,0,1,150,-50);
+$g.ConcatMatrix(2,0,0,2,0,0);
+is-deeply [ $g.CTM.list ], [2, 0, 0, 2, 150, 742], "chained matrix transforms";
 $g.Restore;
 
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';

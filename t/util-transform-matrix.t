@@ -6,16 +6,16 @@ my @identity = PDF::Content::Util::TransformMatrix::transform();
 is-deeply @identity, [1, 0, 0, 1, 0, 0], 'null transform';
 
 my @translated = PDF::Content::Util::TransformMatrix::transform(:translate[10, 20]);
-is-deeply @translated, [1, 0, 0, 1, 10, 20], 'translate transform matrix';
+is-deeply @translated, [1, 0, 0, 1, 10, 20], 'translate transform';
 
-is-deeply PDF::Content::Util::TransformMatrix::transform(:translate(30)), [1, 0, 0, 1, 30, 30], 'translate transform matrix';
+is-deeply PDF::Content::Util::TransformMatrix::transform(:translate(30)), [1, 0, 0, 1, 30, 30], 'translate transform';
 
 my @rotated = PDF::Content::Util::TransformMatrix::transform(:rotate(pi/2) );
-is-deeply @rotated, [0, 1, -1, 0, 0, 0], 'rotate transform matrix';
+is-deeply @rotated, [0, 1, -1, 0, 0, 0], 'rotate transform';
 
 my @scaled = PDF::Content::Util::TransformMatrix::transform(:scale(1.5));
-is-deeply @scaled, [1.5e0, 0, 0, 1.5e0, 0, 0], 'scale transform matrix';
-is-deeply PDF::Content::Util::TransformMatrix::transform(:scale[1.5, 2.5]), [1.5e0, 0, 0, 2.5e0, 0, 0], 'scale transform matrix';
+is-deeply @scaled, [1.5e0, 0, 0, 1.5e0, 0, 0], 'scale transform';
+is-deeply PDF::Content::Util::TransformMatrix::transform(:scale[1.5, 2.5]), [1.5e0, 0, 0, 2.5e0, 0, 0], 'scale transform';
 
 is-deeply PDF::Content::Util::TransformMatrix::dot(@identity, 10, 20), (10, 20), 'identity dot product';
 is-deeply PDF::Content::Util::TransformMatrix::dot(@translated, 10, 20), (20, 40), 'translated dot product';
@@ -47,7 +47,7 @@ my $tform = PDF::Content::Util::TransformMatrix::transform(
     :translate[10, 20],
     :scale(2) );
 
-is-deeply [ PDF::Content::Util::TransformMatrix::dot($tform, 5, 15) ], [(10 + 5) * 2, (20 + 15) * 2], 'transform';
+is-deeply [ PDF::Content::Util::TransformMatrix::dot($tform, 5, 15) ], [(10 + 5) * 2, (20 + 15) * 2], 'dot';
 
 is-deeply [ PDF::Content::Util::TransformMatrix::dot($tform, 25, 30) ], [70, 100], 'dot';
 

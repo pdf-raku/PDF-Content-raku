@@ -711,7 +711,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
         require PDF::Content::Util::TransformMatrix;
-        @!CTM = PDF::Content::Util::TransformMatrix::multiply(@!CTM, [a, b, c, d, e, f]);
+        @!CTM = PDF::Content::Util::TransformMatrix::multiply([a, b, c, d, e, f], @!CTM);
     }
     multi method track-graphics('rg', \r, \g, \b) {
         $!FillColorSpace = 'DeviceRGB';

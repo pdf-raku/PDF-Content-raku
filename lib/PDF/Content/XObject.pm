@@ -37,7 +37,7 @@ role PDF::Content::XObject['Image'] {
                             ?? .substr(0)
                             !! .path.IO.slurp(:enc<latin-1>);
                         my $enc = encode-base64($bytes, :str);
-                        sprintf 'data:image/%s;base64,%s', $.image-type.lc, $enc;
+                        'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
                     }
                     else {
                         fail 'image is not associated with a sourxe';

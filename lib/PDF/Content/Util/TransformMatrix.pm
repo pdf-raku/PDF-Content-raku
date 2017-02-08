@@ -145,7 +145,7 @@ module PDF::Content::Util::TransformMatrix {
             ?? [$matrix.list]
             !! identity();
 	apply($t, translate( |$_ )) with $translate;
-	apply($t, rotate( $_ ))           with $rotate;
+	apply($t, rotate( $_ ))     with $rotate;
 	apply($t, scale( |$_ ))     with $scale;
 	apply($t, skew( |$_ ))      with $skew;
 	[ $t.map: { round($_) } ];
