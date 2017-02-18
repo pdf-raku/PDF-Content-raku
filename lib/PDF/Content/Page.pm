@@ -80,19 +80,18 @@ role PDF::Content::Page
         $xobject;
     }
 
-    method !pattern(*%dict) {
-        %dict<Type> = :name<Pattern>;
-        PDF::DAO.coerce( :stream{ :%dict });
-    }
-
     method tiling-pattern(List    :$BBox!,
                           Numeric :$XStep = $BBox[2] - $BBox[0],
                           Numeric :$YStep = $BBox[3] - $BBox[1],
                           Int :$PaintType = 1,
                           Int :$TilingType = 1,
-                          |c
+                          *%dict
                          ) {
-        self!pattern(:PatternType(1), :$BBox, :$XStep, :$YStep, :$PaintType, :$TilingType, |c);
+        %dict.push: $_
+                     for (:Type(:name<Pattern>), :PatternType(1),
+                          :$PaintType, :$TilingType,
+                          :$BBox, :$XStep, :$YStep);
+        PDF::DAO.coerce( :stream{ :%dict });
     }
 
     method finish {
