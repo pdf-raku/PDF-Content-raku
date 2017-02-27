@@ -4,6 +4,7 @@ class PDF::Content::Text::Block {
 
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
+    use PDF::Content::Marked :ParagraphTags;
 
     has Str     $.text;
     has         $.font is required;
@@ -22,6 +23,7 @@ class PDF::Content::Text::Block {
     has @.overflow is rw;
     has Str $.align where 'left'|'center'|'right'|'justify' = 'left';
     has Str $.valign where 'top'|'center'|'bottom' = 'top';
+    has ParagraphTags $.type = Paragraph;
 
     method !text-rise {
         given $!baseline.lc {

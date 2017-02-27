@@ -5,41 +5,10 @@ plan 76;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
+use lib '.';
+use t::GfxParent;
 
-role Parent {
-    has $!key = 'R0';
-    has Str %!keys{Any};
-    method find-resource(&match, :$type) {
-        my $entry;
-
-        with self{$type} -> $resources {
-
-            for $resources.keys {
-                my $resource = $resources{$_};
-                if &match($resource) {
-		    $entry = $resource;
-                    last;
-                }
-            }
-        }
-
-        $entry;
-     }
-    method use-resource($obj) {
-        %!keys{$obj} = ++ $!key;
-        self{$obj<Type>}{$!key} = $obj;
-        $obj;
-    }
-    method resource-key($obj) {
-        $.use-resource($obj)
-            unless %!keys{$obj}:exists;
-        %!keys{$obj};
-    }
-    method resource-entry($a,$b) {
-        self{$a}{$b};
-    }
-}
-my $parent = { :Font{ :F1{} }, } does Parent;
+my $parent = { :Font{ :F1{} }, } does t::GfxParent;
 my $g = PDF::Content.new: :$parent;
 
 $g.op(Save);
@@ -121,7 +90,7 @@ $g.TextMatrix = ( 10, 1, 15, 2, 3, 4);
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated again';
 
 $g.FillAlpha = 1.0;
-nok Parent<ExtGState>, 'FillAlpha Optimized';
+nok $parent<ExtGState>, 'FillAlpha Optimized';
 $g.FillAlpha = .4;
 is $g.ops[*-1], (:gs([:name<R1>])), 'FillAlpha op';
 is-json-equiv $parent<ExtGState><R1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';

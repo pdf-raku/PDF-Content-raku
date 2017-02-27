@@ -592,7 +592,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my List $input_vals = $raw.value;
         # validate the operation and get fallback coercements for any missing pairs
         my subset Comment of Pair where {.key eq 'comment'}
-        my @vals = $raw.value.grep({$_ !~~ Comment}).map({ from-ast($_) });
+        my @vals = $raw.value.grep(* !~~ Comment).map: { from-ast($_) };
         my \opn = op($op, |@vals);
 	my \coerced_vals = opn.value;
 
@@ -772,10 +772,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
     multi method track-graphics('BMC', Str $name!) {
-	@!tags.push: 'BMC';
+	@!tags.push: 'BMC' => $name[];
     }
-    multi method track-graphics('BDC', *@args) {
-	@!tags.push: 'BDC';
+    multi method track-graphics('BDC', Str $name, Hash $dict) {
+	@!tags.push: 'BDC' => $name[$dict];
     }
     multi method track-graphics('EMC') {
 	die "closing EMC without opening BMC or BDC in PDF content\n"

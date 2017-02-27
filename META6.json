@@ -13,6 +13,7 @@
 
         "PDF::Content::Graphics"        : "lib/PDF/Content/Graphics.pm",
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
+        "PDF::Content::Marked"          : "lib/PDF/Content/Marked.pm",
         "PDF::Content::Page"            : "lib/PDF/Content/Page.pm",
         "PDF::Content::PageNode"        : "lib/PDF/Content/PageNode.pm",
         "PDF::Content::PageTree"        : "lib/PDF/Content/PageTree.pm",

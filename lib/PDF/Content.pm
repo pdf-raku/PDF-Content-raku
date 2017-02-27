@@ -63,6 +63,18 @@ role PDF::Content
         $.op(EndText);
     }
 
+    multi method marked-content( Str $tag, Hash $dict, &do-stuff! ) {
+        $.BeginMarkedContentDict($tag, $dict);
+        &do-stuff(self);
+        $.EndMarkedContent;
+    }
+
+    multi method marked-content( Str $tag, &do-stuff! ) {
+        $.BeginMarkedContent($tag);
+        &do-stuff(self);
+        $.EndMarkedContent;
+    }
+
     method canvas( &mark-up! ) {
         my $canvas = (require HTML::Canvas).new;
         $canvas.context(&mark-up);
@@ -214,11 +226,16 @@ role PDF::Content
 		       Bool :$nl = False,
 	) {
 
-        my Numeric \font-size = $text-block.font-size;
-        my \font = $.use-font($text-block.font);
 	my Bool \in-text = $.context == GraphicsContext::Text;
 
-	self.op(BeginText) unless in-text;
+        unless in-text {
+            my Str $tag = $text-block.type.Str;
+            self.BeginMarkedContent($tag);
+	    self.BeginText;
+        }
+
+        my Numeric \font-size = $text-block.font-size;
+        my \font = $.use-font($text-block.font);
 
         my Bool $left = False;
         my Bool $top = False;
@@ -253,8 +270,10 @@ role PDF::Content
             for <CharSpacing WordSpacing HorizScaling>;
 	self.ops: $text-block.content(:$nl, :$top, :$left);
 
-	self.op(EndText) unless in-text;
-
+        unless in-text {
+	    self.EndText;
+            self.EndMarkedContent;
+        }
         $text-block;
     }
 
