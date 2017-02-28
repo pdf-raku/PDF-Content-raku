@@ -1,5 +1,6 @@
 use v6;
 
+#| simple plain-text text blocks
 class PDF::Content::Text::Block {
 
     use PDF::Content::Text::Line;
@@ -11,7 +12,8 @@ class PDF::Content::Text::Block {
     has Numeric $.font-size = 16;
     has Numeric $.leading = $!font-size * 1.1;
     has Numeric $.font-height  = $!font.height( $!font-size );
-    has Str     $.baseline is rw = 'alphabetic';
+    my subset Baseline of Str where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging';
+    has Baseline $.baseline is rw = 'alphabetic';
     has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
     has Numeric $.WordSpacing = 0;
     has Numeric $.CharSpacing = 0;
@@ -26,17 +28,13 @@ class PDF::Content::Text::Block {
     has ParagraphTags $.type = Paragraph;
 
     method !text-rise {
-        given $!baseline.lc {
+        given $!baseline {
             when 'alphabetic'  { 0 }
             when 'top'         { $!font.height( $!font-size, :from-baseline); }
             when 'bottom'      { $!font.height( $!font-size, :from-baseline) - $!font.height( $!font-size) }
             when 'middle'      { $!font.height( $!font-size, :from-baseline) - $!font.height( $!font-size)/2 }
             when 'ideographic' { $!font.height( $!font-size, :from-baseline) - $!font-size; }
             when 'hanging'     { $!font.height( $!font-size, :from-baseline, :hanging) }
-            default {
-                warn "unhandled text baseline: $_";
-                0;
-            }
         }
 
     }
@@ -52,27 +50,6 @@ class PDF::Content::Text::Block {
     multi submethod TWEAK(Str :$!text!, |c) {
         my Str @chunks = $!text.comb(/<Text::word> | <Text::space>/);
         self.TWEAK( :@chunks, |c );
-    }
-
-    sub flush-space(@words) returns Bool {
-        my \flush = ? (@words && @words[0] ~~ /<Text::space>/);
-        @words.shift if flush;
-        flush;
-    }
-
-    #| calculates actual spacing between words
-    method !word-gap {
-        my $word-gap = $!space-width + $!WordSpacing + $!CharSpacing;
-        $word-gap *= $!HorizScaling / 100
-            if $!HorizScaling != 100;
-        $word-gap;
-    }
-
-    #| calculates WordSpacing needed to achieve a given word-gap
-    method !word-spacing($word-gap is copy) {
-        $word-gap /= $!HorizScaling / 100
-            if $!HorizScaling != 100;
-        $word-gap - $!space-width - $!CharSpacing;
     }
 
     multi submethod TWEAK(Str :@chunks!, Bool :$kern = False) is default {
@@ -140,6 +117,27 @@ class PDF::Content::Text::Block {
 
         .align($!align, :$width )
             for @!lines;
+    }
+
+    sub flush-space(@words) returns Bool {
+        my \flush = ? (@words && @words[0] ~~ /<Text::space>/);
+        @words.shift if flush;
+        flush;
+    }
+
+    #| calculates actual spacing between words
+    method !word-gap returns Numeric {
+        my $word-gap = $!space-width + $!WordSpacing + $!CharSpacing;
+        $word-gap *= $!HorizScaling / 100
+            unless $!HorizScaling =~= 100;
+        $word-gap;
+    }
+
+    #| calculates WordSpacing needed to achieve a given word-gap
+    method !word-spacing($word-gap is copy) returns Numeric {
+        $word-gap /= $!HorizScaling / 100
+            if $!HorizScaling != 100;
+        $word-gap - $!space-width - $!CharSpacing;
     }
 
     method width  { $!width //= self.content-width }
