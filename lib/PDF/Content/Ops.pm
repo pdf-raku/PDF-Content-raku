@@ -28,6 +28,7 @@ my role ExtGraphicsAtt {
 role PDF::Content::Ops {
 
     use PDF::Writer;
+    use PDF::Content::Util::TransformMatrix;
 
     has &.callback is rw;
     has Pair @!ops;
@@ -303,7 +304,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         Proxy.new(
             FETCH => sub ($) {@!CTM},
             STORE => sub ($, List $gm) {
-                require PDF::Content::Util::TransformMatrix;
                 my @ctm-inv = PDF::Content::Util::TransformMatrix::inverse(@!CTM);
                 my @diff = PDF::Content::Util::TransformMatrix::multiply($gm, @ctm-inv);
                 self.ConcatMatrix( |@diff )
@@ -710,7 +710,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	Restore;
     }
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
-        require PDF::Content::Util::TransformMatrix;
         @!CTM = PDF::Content::Util::TransformMatrix::multiply([a, b, c, d, e, f], @!CTM);
     }
     multi method track-graphics('rg', \r, \g, \b) {

@@ -5,7 +5,7 @@ plan 20;
 use PDF::Content::Util::Font;
 
 my $hb-afm = PDF::Content::Util::Font::core-font( 'Helvetica-Bold' );
-isa-ok $hb-afm, ::('Font::AFM'); 
+isa-ok $hb-afm, 'Font::AFM'; 
 is $hb-afm.FontName, 'Helvetica-Bold', 'FontName';
 is $hb-afm.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
@@ -13,7 +13,7 @@ is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
 
 my $ab-afm = PDF::Content::Util::Font::core-font( 'Arial-Bold' );
-isa-ok $hb-afm, ::('Font::AFM'); 
+isa-ok $hb-afm, 'Font::AFM'; 
 is $hb-afm.FontName, 'Helvetica-Bold', 'FontName';
 
 my $hbi-afm = PDF::Content::Util::Font::core-font( :family<Helvetica>, :weight<Bold>, :style<Italic> );
@@ -37,12 +37,12 @@ for (win => "Á®ÆØ",
 }
 
 my $zapf = PDF::Content::Util::Font::core-font( 'ZapfDingbats' );
-isa-ok $zapf, ::('Font::Metrics::zapfdingbats');
+isa-ok $zapf, 'Font::Metrics::zapfdingbats';
 is $zapf.enc, 'zapf', '.enc';
 is $zapf.encode("♥♣✔").join, "ª¨4", '.encode(...)'; # /a110 /a112 /a20
 
 my $sym = PDF::Content::Util::Font::core-font( 'Symbol' );
-isa-ok $sym, ::('Font::Metrics::symbol');
+isa-ok $sym, 'Font::Metrics::symbol';
 is $sym.enc, 'sym', '.enc';
 is $sym.encode("ΑΒΓ").join, "ABG", '.encode(...)'; # /Alpha /Beta /Gamma
 
