@@ -26,6 +26,9 @@ role PDF::Content::Font::AFM {
 		$!encoding = $PDF::Content::Font::Encodings::zapf-encoding;
 	    }
 	}
+        for $!glyphs.pairs {
+            @!char-map[.key.ord] = $!encoding{.value};
+        }
     }
 
     #| compute the overall font-height
@@ -39,7 +42,7 @@ role PDF::Content::Font::AFM {
 
     #| reduce string to the displayable characters
     method filter(Str $text-in) {
-	$text-in.comb.grep({ $!glyphs{$_}:exists }).join;
+	$text-in.order.grep({ @!char-map[$_] }).join;
     }
 
     #| map ourselves to a PDF::Content object
@@ -60,14 +63,8 @@ role PDF::Content::Font::AFM {
 	nextwith( $str, $pointsize, :$kern, :$!glyphs);
     }
 
-    method !init {
-        for $!glyphs.pairs {
-            @!char-map[.key.ord] = $!encoding{.value};
-        }
-    }
 
     method encode(Str $s) {
-        self!init() unless @!char-map;
         $s.ords.map({@!char-map[$_]}).grep: {$_};
     }
 
