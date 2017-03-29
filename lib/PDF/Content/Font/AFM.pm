@@ -5,6 +5,7 @@ role PDF::Content::Font::AFM {
     has $.enc = 'win';
     has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
     has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
+    has str @char-map;
 
     submethod set-encoding( EncodingStr :$!enc = 'win') {
 	given $!enc {
@@ -59,12 +60,15 @@ role PDF::Content::Font::AFM {
 	nextwith( $str, $pointsize, :$kern, :$!glyphs);
     }
 
-    multi method encode(Str $s) {
-	$s.comb\
-	    .map({ $!glyphs{$_} })\
-	    .grep( *.defined )\
-	    .map({ $!encoding{$_} })\
-	    .grep( *.defined )\
-	    .Slip;
+    method !init {
+        for $!glyphs.pairs {
+            @!char-map[.key.ord] = $!encoding{.value};
+        }
     }
+
+    method encode(Str $s) {
+        self!init() unless @!char-map;
+        $s.ords.map({@!char-map[$_]}).grep: {$_};
+    }
+
 }
