@@ -22,20 +22,29 @@ class PDF::Content::Image {
     method network-endian { True }
 
     #| lightweight replacement for deprecated $buf.unpack
-    method unpack($buf, *@templ ) {
-	my @bytes = $buf.list;
+    method unpack(Buf $buf, *@templ ) {
         my Bool \nw = $.network-endian;
         my uint $off = 0;
 
 	@templ.map: {
 	    my uint $size = .^nativesize div 8;
 	    my uint $v = 0;
-            my uint $i = nw ?? 0 !! $size;
-            for 1 .. $size {
-                $v +<= 8;
-                $v += @bytes[$off + (nw ?? $i++ !! --$i)];
-	    }
-            $off += $size;
+            my uint8 $i;
+            if $size == 1 {
+                $v = $buf[$off++];
+            } elsif nw {
+                loop ($i = 0; $i < $size; $i++) {
+                    $v +<= 8;
+                    $v += $buf[$off++];
+	        }
+            }
+            else {
+                loop ($i = $size; $i > 0; ) {
+                    $v +<= 8;
+                    $v += $buf[$off + --$i];
+	        }
+                $off += $size;
+            }
 
 	    $v;
 	}
