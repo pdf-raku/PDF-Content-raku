@@ -9,13 +9,12 @@ class PDF::Content::Image::PNG
     use PDF::DAO;
     use PDF::DAO::Stream;
     use PDF::IO::Filter;
+    use PDF::IO::Util :resample;
 
     method network-endian { True }
 
     sub network-words(Buf $buf) {
-        $buf.map: -> \hi, \lo {
-            hi +< 0x08  +  lo;
-        }
+        resample($buf, 8, 16);
     }
 
     method read($fh!, Bool :$alpha=True --> PDF::DAO::Stream) {
@@ -97,8 +96,8 @@ class PDF::Content::Image::PNG
 	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
 
 	if $alpha && $trns && +$trns {
-	    my @vals = network-words($trns);
-	    %dict<Mask> = [ @vals.min, @vals.max ]
+	    my $vals = network-words($trns);
+	    %dict<Mask> = [ $vals.min, $vals.max ]
 	}
 	my $encoded = $stream.decode: 'latin-1';
 	PDF::DAO.coerce: :stream{ :%dict, :$encoded };
@@ -119,11 +118,11 @@ class PDF::Content::Image::PNG
 	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
 
 	if $alpha && $trns && +$trns {
-	    my @vals = network-words($trns);
+	    my $vals = network-words($trns);
 	    my @rgb = [], [], [];
 
 	    @rgb[.key mod 3].push(.val)
-		for @vals.pairs;
+		for $vals.pairs;
 
 	    %dict<Mask> = [ @rgb.map: { (*.min, *.max) } ];
 	}
