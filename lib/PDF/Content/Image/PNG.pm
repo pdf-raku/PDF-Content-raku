@@ -1,7 +1,7 @@
 use v6;
 
 # adapted from Perl 5's PDF::API2::Resource::XObject::Image::PNG
-use PDF::Content::Image;
+use PDF::Content::Image :Endian;
 
 class PDF::Content::Image::PNG
     is PDF::Content::Image {
@@ -9,23 +9,32 @@ class PDF::Content::Image::PNG
     use PDF::DAO;
     use PDF::DAO::Stream;
     use PDF::IO::Filter;
-    use PDF::IO::Util :resample;
+    use PDF::IO::Util :pack;
 
     method network-endian { True }
 
     sub network-words(Buf $buf) {
-        resample($buf, 8, 16);
+        pack($buf, 16);
     }
 
     method read($fh!, Bool :$alpha=True --> PDF::DAO::Stream) {
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
-        my uint ($w,$h,$bpc,$cs);
         my Buf $palette;
         my Buf $trns;
         my Buf $crc;
         my buf8 $stream .= new;
+        my class Header does PDF::Content::Image::Struct[Network] {
+            has uint32 $.w;
+            has uint32 $.h;
+            has uint8  $.bpc;
+            has uint8  $.cs;
+            has uint8  $.cm;
+            has uint8  $.fm;
+            has uint8  $.im;
+        }
+        my Header $hdr;
 
         constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
         my Str $header = $fh.read(8).decode('latin-1');
@@ -40,12 +49,10 @@ class PDF::Content::Image::PNG
             given $blk {
 
                 when 'IHDR' {
-                    my Buf $buf = $fh.read($l);
-                    ($w, $h, $bpc, $cs,
-                     my $cm, my $fm, my $im) = $.unpack($buf, uint32, uint32, uint8, uint8, uint8, uint8, uint8);
-                    die "Unsupported Compression($cm) Method" if $cm;
-                    die "Unsupported Interlace($im) Method" if $im;
-                    die "Unsupported Filter($fm) Method" if $fm;
+                    $hdr = Header.unpack( $fh.read($l));
+                    die "Unsupported Compression($hdr.cm) Method" if $hdr.cm;
+                    die "Unsupported Interlace($hdr.im) Method" if $hdr.im;
+                    die "Unsupported Filter($hdr.fm) Method" if $hdr.fm;
                 }
                 when 'PLTE' {
                     $palette = $fh.read($l);
@@ -68,13 +75,13 @@ class PDF::Content::Image::PNG
         }
         $fh.close;
 
-        %dict<Width>  = $w;
-        %dict<Height> = $h;
+        %dict<Width>  = $hdr.w;
+        %dict<Height> = $hdr.h;
 
-	my %opts = :$w, :$h, :%dict, :$stream, :$alpha;
+	my %opts = :w($hdr.w), :h($hdr.h), :%dict, :$stream, :$alpha;
 	%opts<trns> = $_ with $trns;
 	%opts<palette> = $_ with $palette;
-	png-to-stream($cs, $bpc, |%opts);
+	png-to-stream($hdr.cs, $hdr.bpc, |%opts);
     }
 
     enum PNG-CS « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
@@ -82,9 +89,9 @@ class PDF::Content::Image::PNG
     proto sub png-to-stream(uint $cs, uint $bpc, *%o --> PDF::DAO::Stream) {*}
 
     multi sub png-to-stream($ where PNG-CS::Gray,
-			    uint $bpc where 1|2|4|8|16,
-			    uint :$w!,
-			    uint :$h!,
+			    $bpc where 1|2|4|8|16,
+			    UInt :$w!,
+			    UInt :$h!,
 			    :%dict!,
 			    Buf :$stream!,
 			    Buf :$trns,
@@ -104,9 +111,9 @@ class PDF::Content::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::RGB,
-			    uint $bpc where 8|16,
-			    uint :$w!,
-			    uint :$h!,
+			    $bpc where 8|16,
+			    UInt :$w!,
+			    UInt :$h!,
 			    :%dict!,
 			    Buf :$stream!,
 			    Buf :$trns,
@@ -131,9 +138,9 @@ class PDF::Content::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::RGB-Palette,
-			    uint $bpc is copy where 1|2|4|8,
-			    uint :$w!,
-			    uint :$h!,
+			    $bpc where 1|2|4|8,
+			    UInt :$w!,
+			    UInt :$h!,
 			    :%dict!,
 			    Buf :$stream!,
 			    Buf :$trns,
@@ -172,9 +179,9 @@ class PDF::Content::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::Gray-Alpha,
-			    uint $bpc where 8|16,
-			    uint :$w!,
-			    uint :$h!,
+			    $bpc where 8|16,
+			    UInt :$w!,
+			    UInt :$h!,
 			    :%dict!,
 			    :$stream! is copy,
 			    Bool :$alpha,
@@ -220,9 +227,9 @@ class PDF::Content::Image::PNG
     }
     
     multi sub png-to-stream($ where PNG-CS::RGB-Alpha,
-			    uint $bpc where 8|16,
-			    uint :$w!,
-			    uint :$h!,
+			    $bpc where 8|16,
+			    UInt :$w!,
+			    UInt :$h!,
 			    :%dict!,
 			    :$stream! is copy,
 			    Buf :$trns,
@@ -266,10 +273,6 @@ class PDF::Content::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
     
-    multi sub png-to-stream($cs, $bpc) is default {
-	die "unable to hangle PNG image cs=$cs, bpc=$bpc";
-    }
-
 }
 
 =begin rfc

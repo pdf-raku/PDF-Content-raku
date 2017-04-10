@@ -16,6 +16,8 @@ class X::PDF::Image::UnknownType is Exception {
     }
 }
 
+enum Endian is export(:Endian) <Network Vax>;
+
 class PDF::Content::Image {
     use PDF::DAO;
     use PDF::Content::XObject;
@@ -48,6 +50,38 @@ class PDF::Content::Image {
 
 	    $v;
 	}
+    }
+
+    role Struct[\endian] {
+        
+        method unpack(Buf $buf ) {
+            my uint $off = 0;
+
+	    my %vals = self.^attributes.map: {
+                my str $name = .name.substr(2);
+	        my uint $size = .type.^nativesize div 8;
+	        my uint $v = 0;
+                my uint8 $i;
+                if $size == 1 {
+                    $v = $buf[$off++];
+                } elsif endian == Network {
+                    loop ($i = 0; $i < $size; $i++) {
+                        $v +<= 8;
+                        $v += $buf[$off++];
+	            }
+                }
+                else {
+                    loop ($i = $size; $i > 0; ) {
+                        $v +<= 8;
+                        $v += $buf[$off + --$i];
+	            }
+                    $off += $size;
+                }
+
+	        $name => $v;
+	    }
+            self.new: |%vals;
+        }
     }
 
     method !image-type($_, :$path!) {

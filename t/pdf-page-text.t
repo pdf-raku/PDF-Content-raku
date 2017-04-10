@@ -1,8 +1,8 @@
 use v6;
 use Test;
 plan 1;
-use PDF::Content::Ops :OpCode;
 use lib '.';
+use PDF::Content::Ops :OpCode;
 use t::PDFTiny;
 # ensure consistant document ID generation
 srand(123456);

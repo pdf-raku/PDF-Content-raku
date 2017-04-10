@@ -1,13 +1,25 @@
 use v6;
-use PDF::Content::Image;
+use PDF::Content::Image :Endian;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::JPEG
 
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
 
+    # work-around for Rakudo RT #131122 - sign handling
+    sub u8(uint8 $v) { $v }
+
     method read($fh!) {
-        my uint ($bpc, $height, $width, $cs);
+       my class Atts does PDF::Content::Image::Struct[Network] {
+            has uint8 $.bpc;
+            has uint16 ($.height, $.width);
+            has uint8 $.cs
+        }
+        my class Hdr does PDF::Content::Image::Struct[Network] {
+            has uint8 ($.ff, $.mark);
+            has uint16 $.len
+        }
+        my Atts $atts;
         my Bool $is-dct;
 
         $fh.seek(0, SeekFromBeginning);
@@ -16,35 +28,41 @@ class PDF::Content::Image::JPEG
             unless $header ~~ "\xFF\xD8";
 
         loop {
-            my Blob \block-hdr = $fh.read(4);
-            my uint (\ff, \mark, \len) = $.unpack(block-hdr, uint8, uint8, uint16);
-            last if ff != 0xFF;
-            last if mark == 0xDA | 0xD9;  # SOS/EOI
-            last if len < 2;
+            my Hdr $hdr .= unpack: $fh.read(4);
+            last if u8($hdr.ff) != 0xFF;
+            last if u8($hdr.mark) == 0xDA | 0xD9;  # SOS/EOI
+            last if $hdr.len < 2;
             last if $fh.eof;
 
-            my Blob \buf = $fh.read: len - 2;
-            if 0xC0 <= mark <= 0xCF
-            && mark != 0xC4 | 0xC8 | 0xCC {
-                $is-dct = ?( mark == 0xC0 | 0xC2);
-                ($bpc, $height, $width, $cs) = $.unpack(buf, uint8, uint16, uint16, uint8);
-                last;
+            my $buf = $fh.read: $hdr.len - 2;
+            with $hdr.mark -> uint8 $mark {
+                if 0xC0 <= $mark <= 0xCF
+                && $mark != 0xC4 | 0xC8 | 0xCC {
+                    $is-dct = ?( $mark == 0xC0 | 0xC2);
+                    $atts = Atts.unpack($buf);
+                    last;
+                }
             }
         }
 
-        my Str \color-space = do given $cs {
-            when 3 {'DeviceRGB'}
-            when 4 {'DeviceCMYK'}
-            when 1 {'DeviceGray'}
-            default {warn "JPEG has unknown color-space: $_";
-                     'DeviceGray'}
-        }
-
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
-        %dict<Width> = $width;
-        %dict<Height> = $height;
-        %dict<BitsPerComponent> = $bpc;
-        %dict<ColorSpace> = :name(color-space);
+        with $atts {
+            my Str \color-space = do given .cs {
+                when 3 {'DeviceRGB'}
+                when 4 {'DeviceCMYK'}
+                when 1 {'DeviceGray'}
+                default {warn "JPEG has unknown color-space: $_";
+                         'DeviceGray'}
+            }
+
+            %dict<ColorSpace> = :name(color-space);
+            %dict<Width> = .width;
+            %dict<Height> = .height;
+            %dict<BitsPerComponent> = .bpc;
+        }
+        else {
+            die "unable to read JPEG attributes";
+        }
         %dict<Filter> = :name<DCTDecode>
             if $is-dct;
 
@@ -56,3 +74,4 @@ class PDF::Content::Image::JPEG
         PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
 }
+

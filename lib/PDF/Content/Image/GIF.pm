@@ -1,5 +1,5 @@
 use v6;
-use PDF::Content::Image;
+use PDF::Content::Image :Endian;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::GIF
 
@@ -84,10 +84,26 @@ class PDF::Content::Image::GIF
             unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
         my $buf = $fh.read: 7; # logical descr.
-        my ($wg, $hg, $flags, $bgColorIndex, $aspect) = $.unpack($buf, uint16, uint16, uint8, uint8, uint8);
+        my class LogicalDescriptor does PDF::Content::Image::Struct[Vax] {
+            has uint16 $.wg;
+            has uint16 $.hg;
+            has uint8 $.flags;
+            has uint8 $.bgColorIndex;
+            has uint8 $.aspect;
+        }
+        my class ImageDescriptor does PDF::Content::Image::Struct[Vax] {
+            has uint16 $.left;
+            has uint16 $.top;
+            has uint16 $.w;
+            has uint16 $.h;
+            has uint8 $.flags;
+        }
+        my LogicalDescriptor $descr .= unpack: $buf;
 
-        self!read-colorspace($fh, $flags, %dict)
-            if $flags +& 0x80;
+        with $descr.flags -> uint8 $flags {
+            self!read-colorspace($fh, $flags, %dict)
+                if $flags +& 0x80;
+        }
 
         while !$fh.eof {
             my ($sep) = $.unpack( $fh.read(1), uint8); # tag.
@@ -95,17 +111,19 @@ class PDF::Content::Image::GIF
             given $sep {
                 when 0x2C {
                     $buf = $fh.read(9); # image-descr.
-                    my ($left,$top,$w,$h,$flags) = $.unpack($buf, uint16, uint16, uint16, uint16, uint8);
+                    my ImageDescriptor $img .= unpack: $buf;
 
-                    %dict<Width>  = $w || $wg;
-                    %dict<Height> = $h || $hg;
+                    %dict<Width>  = $img.w || $descr.wg;
+                    %dict<Height> = $img.h || $descr.hg;
                     %dict<BitsPerComponent> = 8;
 
-                    self!read-colorspace($fh, $flags, %dict)
-                        if $flags +& 0x80; # local colormap
+                    with $img.flags -> uint8 $flags {
+                        self!read-colorspace($fh, $flags, %dict)
+                            if $flags +& 0x80; # local colormap
 
-                    $interlaced = True  # need de-interlace
-                        if $flags &+ 0x40;
+                        $interlaced = True  # need de-interlace
+                            if $flags &+ 0x40;
+                    }
 
                     my ($sep, $len) = $.unpack( $fh.read(2), uint8, uint8); # image-lzw-start (should be 9) + length.
                     my $stream = buf8.new;
@@ -141,9 +159,18 @@ class PDF::Content::Image::GIF
                         ($len,) = $.unpack($fh.read(1), uint8);
                     }
 
-                    my ($cFlags,$delay,$transIndex) = $.unpack($stream, uint8, uint16, uint8);
-                    if ($cFlags +& 0x01) && $trans {
-                        %dict<Mask> = [$transIndex, $transIndex];
+                    if $trans {
+                        my class GCDescriptor does PDF::Content::Image::Struct[Vax] {
+                            has uint8 $.cFlags;
+                            has uint16 $.delay;
+                            has uint8 $.transIndex
+                        }
+                        my GCDescriptor $gc .= unpack($stream);
+                        with $gc.cFlags -> uint8 $cFlags {
+                            my uint8 $transIndex = $gc.transIndex;
+                            %dict<Mask> = [$transIndex, $transIndex]
+                                if $cFlags +& 0x01;
+                        }
                     }
                 }
 
