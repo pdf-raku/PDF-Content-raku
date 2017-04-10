@@ -1,21 +1,22 @@
 use v6;
-use PDF::Content::Image :Endian;
+use PDF::Content::Image;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::JPEG
 
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
 
+    use Native::Packing :Endian;
     # work-around for Rakudo RT #131122 - sign handling
     sub u8(uint8 $v) { $v }
 
     method read($fh!) {
-       my class Atts does PDF::Content::Image::Struct[Network] {
+       my class Atts does Native::Packing[Network] {
             has uint8 $.bpc;
             has uint16 ($.height, $.width);
             has uint8 $.cs
         }
-        my class Hdr does PDF::Content::Image::Struct[Network] {
+        my class Hdr does Native::Packing[Network] {
             has uint8 ($.ff, $.mark);
             has uint16 $.len
         }

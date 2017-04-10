@@ -1,7 +1,7 @@
 use v6;
 
 # adapted from Perl 5's PDF::API2::Resource::XObject::Image::PNG
-use PDF::Content::Image :Endian;
+use PDF::Content::Image;
 
 class PDF::Content::Image::PNG
     is PDF::Content::Image {
@@ -10,6 +10,7 @@ class PDF::Content::Image::PNG
     use PDF::DAO::Stream;
     use PDF::IO::Filter;
     use PDF::IO::Util :pack;
+    use Native::Packing :Endian;
 
     method network-endian { True }
 
@@ -25,7 +26,7 @@ class PDF::Content::Image::PNG
         my Buf $trns;
         my Buf $crc;
         my buf8 $stream .= new;
-        my class Header does PDF::Content::Image::Struct[Network] {
+        my class Header does Native::Packing[Network] {
             has uint32 $.w;
             has uint32 $.h;
             has uint8  $.bpc;
@@ -49,7 +50,8 @@ class PDF::Content::Image::PNG
             given $blk {
 
                 when 'IHDR' {
-                    $hdr = Header.unpack( $fh.read($l));
+                    my $buf = $fh.read($l);
+                    $hdr = Header.unpack: $buf;
                     die "Unsupported Compression($hdr.cm) Method" if $hdr.cm;
                     die "Unsupported Interlace($hdr.im) Method" if $hdr.im;
                     die "Unsupported Filter($hdr.fm) Method" if $hdr.fm;

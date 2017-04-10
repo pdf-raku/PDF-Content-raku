@@ -1,11 +1,12 @@
 use v6;
-use PDF::Content::Image :Endian;
+use PDF::Content::Image;
 
 # adapted from Perl 5's PDF::API::Resource::XObject::Image::GIF
 
 class PDF::Content::Image::GIF
     is PDF::Content::Image {
 
+    use Native::Packing :Endian;
     method network-endian { False }
 
     method !read-colorspace($fh,  UInt $flags, %dict) {
@@ -83,22 +84,21 @@ class PDF::Content::Image::GIF
         die X::PDF::Image::WrongHeader.new( :type<GIF>, :$header, :path($fh.path) )
             unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
-        my $buf = $fh.read: 7; # logical descr.
-        my class LogicalDescriptor does PDF::Content::Image::Struct[Vax] {
+        my class LogicalDescriptor does Native::Packing[Vax] {
             has uint16 $.wg;
             has uint16 $.hg;
             has uint8 $.flags;
             has uint8 $.bgColorIndex;
             has uint8 $.aspect;
         }
-        my class ImageDescriptor does PDF::Content::Image::Struct[Vax] {
+        my class ImageDescriptor does Native::Packing[Vax] {
             has uint16 $.left;
             has uint16 $.top;
             has uint16 $.w;
             has uint16 $.h;
             has uint8 $.flags;
         }
-        my LogicalDescriptor $descr .= unpack: $buf;
+        my LogicalDescriptor $descr .= read: $fh;
 
         with $descr.flags -> uint8 $flags {
             self!read-colorspace($fh, $flags, %dict)
@@ -110,8 +110,7 @@ class PDF::Content::Image::GIF
 
             given $sep {
                 when 0x2C {
-                    $buf = $fh.read(9); # image-descr.
-                    my ImageDescriptor $img .= unpack: $buf;
+                    my ImageDescriptor $img .= read: $fh;
 
                     %dict<Width>  = $img.w || $descr.wg;
                     %dict<Height> = $img.h || $descr.hg;
@@ -160,7 +159,7 @@ class PDF::Content::Image::GIF
                     }
 
                     if $trans {
-                        my class GCDescriptor does PDF::Content::Image::Struct[Vax] {
+                        my class GCDescriptor does Native::Packing[Vax] {
                             has uint8 $.cFlags;
                             has uint16 $.delay;
                             has uint8 $.transIndex
@@ -176,7 +175,7 @@ class PDF::Content::Image::GIF
 
                 default {
                     # misc extension
-                    my ($tag, $len) = $.unpack( $fh.read(1), uint8, uint8);
+                    my ($tag, $len) = $.unpack( $fh.read(2), uint8, uint8);
 
                     # skip ahead
                     while $len {
