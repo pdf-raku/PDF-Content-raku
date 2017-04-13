@@ -21,35 +21,6 @@ class PDF::Content::Image {
     use PDF::Content::XObject;
     method network-endian { True }
 
-    #| lightweight replacement for deprecated $buf.unpack
-    method unpack(Buf $buf, *@templ ) {
-        my Bool \nw = $.network-endian;
-        my uint $off = 0;
-
-	@templ.map: {
-	    my uint $size = .^nativesize div 8;
-	    my uint $v = 0;
-            my uint8 $i;
-            if $size == 1 {
-                $v = $buf[$off++];
-            } elsif nw {
-                loop ($i = 0; $i < $size; $i++) {
-                    $v +<= 8;
-                    $v += $buf[$off++];
-	        }
-            }
-            else {
-                loop ($i = $size; $i > 0; ) {
-                    $v +<= 8;
-                    $v += $buf[$off + --$i];
-	        }
-                $off += $size;
-            }
-
-	    $v;
-	}
-    }
-
     method !image-type($_, :$path!) {
         when m:i/^ jpe?g $/    { 'JPEG' }
         when m:i/^ gif $/      { 'GIF' }

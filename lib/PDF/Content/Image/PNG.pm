@@ -12,20 +12,12 @@ class PDF::Content::Image::PNG
     use PDF::IO::Util :pack;
     use Native::Packing :Endian;
 
-    method network-endian { True }
-
     sub network-words(Buf $buf) {
         pack($buf, 16);
     }
 
     method read($fh!, Bool :$alpha=True --> PDF::DAO::Stream) {
 
-        my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
-
-        my Buf $palette;
-        my Buf $trns;
-        my Buf $crc;
-        my buf8 $stream .= new;
         my class Header does Native::Packing[Network] {
             has uint32 $.w;
             has uint32 $.h;
@@ -35,7 +27,16 @@ class PDF::Content::Image::PNG
             has uint8  $.fm;
             has uint8  $.im;
         }
+        my class Quad does Native::Packing[Network] {
+            has uint32 $.Numeric;
+        }
         my Header $hdr;
+        my Quad $crc;
+        my Buf $palette;
+        my Buf $trns;
+        my buf8 $stream .= new;
+
+        my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
 
         constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
         my Str $header = $fh.read(8).decode('latin-1');
@@ -44,36 +45,36 @@ class PDF::Content::Image::PNG
             unless $header eq PNG-Header;
 
         while !$fh.eof {
-            my uint ($l) = $.unpack( $fh.read(4), uint32 );
+            my Quad $len .= read($fh);
             my $blk = $fh.read(4).decode('latin-1');
 
             given $blk {
 
                 when 'IHDR' {
-                    my $buf = $fh.read($l);
+                    my $buf = $fh.read(+$len);
                     $hdr = Header.unpack: $buf;
                     die "Unsupported Compression($hdr.cm) Method" if $hdr.cm;
                     die "Unsupported Interlace($hdr.im) Method" if $hdr.im;
                     die "Unsupported Filter($hdr.fm) Method" if $hdr.fm;
                 }
                 when 'PLTE' {
-                    $palette = $fh.read($l);
+                    $palette = $fh.read(+$len);
                 }
                 when 'IDAT' {
-                    $stream.append: $fh.read($l).list;
+                    $stream.append: $fh.read(+$len).list;
                 }
                 when 'tRNS' {
-                    $trns = $fh.read($l);
+                    $trns = $fh.read(+$len);
                 }
                 when 'IEND' {
                     last;
                 }
                 default {
                     # skip ahead
-                    $fh.seek($l, SeekFromCurrent);
+                    $fh.seek(+$len, SeekFromCurrent);
                 }
             }
-            $crc = $fh.read(4);
+            $crc = Quad.read($fh);
         }
         $fh.close;
 

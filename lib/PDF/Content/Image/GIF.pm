@@ -7,7 +7,6 @@ class PDF::Content::Image::GIF
     is PDF::Content::Image {
 
     use Native::Packing :Endian;
-    method network-endian { False }
 
     method !read-colorspace($fh,  UInt $flags, %dict) {
         my UInt $col-size = 2 ** (($flags +& 0x7) + 1);
@@ -106,7 +105,7 @@ class PDF::Content::Image::GIF
         }
 
         while !$fh.eof {
-            my ($sep) = $.unpack( $fh.read(1), uint8); # tag.
+            my uint8 $sep = $fh.read(1)[0]; # tag.
 
             given $sep {
                 when 0x2C {
@@ -124,12 +123,12 @@ class PDF::Content::Image::GIF
                             if $flags &+ 0x40;
                     }
 
-                    my ($sep, $len) = $.unpack( $fh.read(2), uint8, uint8); # image-lzw-start (should be 9) + length.
+                    my uint8 ($sep, $len) = $fh.read(2).list; # image-lzw-start (should be 9) + length.
                     my $stream = buf8.new;
 
                     while $len {
                         $stream.append: $fh.read($len).list;
-                        ($len,) = $.unpack($fh.read(1), uint8);
+                        $len = $fh.read(1)[0];
                     }
 
                     my Buf $data = self!decompress($sep+1, $stream);
@@ -147,7 +146,7 @@ class PDF::Content::Image::GIF
 
                 when 0x21 {
                     # Graphic Control Extension
-                    my ($tag, $len) = $.unpack( $fh.read(2), uint8, uint8);
+                    my uint8 ($tag, $len) = $fh.read(2).list;
                     die "unsupported graphic control extension ($tag)"
                         unless $tag == 0xF9;
 
@@ -155,7 +154,7 @@ class PDF::Content::Image::GIF
 
                     while $len {
                         $stream.append: $fh.read($len).list;
-                        ($len,) = $.unpack($fh.read(1), uint8);
+                        $len = $fh.read(1)[0];
                     }
 
                     if $trans {
@@ -175,12 +174,12 @@ class PDF::Content::Image::GIF
 
                 default {
                     # misc extension
-                    my ($tag, $len) = $.unpack( $fh.read(2), uint8, uint8);
+                    my uint8 ($tag, $len) = $fh.read(2).list;
 
                     # skip ahead
                     while $len {
                         $fh.seek($len, SeekFromCurrent);
-                        ($len,) = $.unpack($fh.read(1), uint8);
+                        $len = $fh.read(1)[0];
                     }
                 }
             }
