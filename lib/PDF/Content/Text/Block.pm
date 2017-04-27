@@ -6,19 +6,15 @@ class PDF::Content::Text::Block {
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
     use PDF::Content::Marked :ParagraphTags;
+    use PDF::Content::Replaced;
 
-    has Str     $.text;
     has         $.font is required;
     has Numeric $.font-size = 16;
     has Numeric $.leading = $!font-size * 1.1;
-    has Numeric $.font-height  = $!font.height( $!font-size );
+    has Numeric $.font-height = $!font.height( $!font-size );
     my subset Baseline of Str where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging';
     has Baseline $.baseline is rw = 'alphabetic';
     has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
-    has Numeric $.WordSpacing = 0;
-    has Numeric $.CharSpacing = 0;
-    subset Percentage of Numeric where * > 0;
-    has Percentage $.HorizScaling = 100;
     has Numeric $.width;
     has Numeric $.height;
     has @.lines;
@@ -26,6 +22,13 @@ class PDF::Content::Text::Block {
     has Str $.align where 'left'|'center'|'right'|'justify' = 'left';
     has Str $.valign where 'top'|'center'|'bottom' = 'top';
     has ParagraphTags $.type = Paragraph;
+    has @.replaced;
+
+    # current graphics state
+    has Numeric $.WordSpacing = 0;
+    has Numeric $.CharSpacing = 0;
+    subset Percentage of Numeric where * > 0;
+    has Percentage $.HorizScaling = 100;
 
     method !text-rise {
         given $!baseline {
@@ -41,59 +44,74 @@ class PDF::Content::Text::Block {
     method content-width  { @!lines.map( *.content-width ).max }
     method content-height { max( (+@!lines - 1) * $!leading  +  $!font-height, 0) }
 
-    grammar Text {
+    my grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
         token space { [\s <!after <nbsp> >]+ }
         token word  { [ <![ - ]> <!before <space>> . ]+ '-'? | '-' }
     }
 
-    multi submethod TWEAK(Str :$!text!, |c) {
-        my Str @chunks = $!text.comb(/<Text::word> | <Text::space>/);
+    method comb(Str $_) {
+        .comb(/<Text::word> | <Text::space>/);
+    }
+
+    multi submethod TWEAK(Str :$text!, |c) {
+        my Str @chunks = self.comb: $text;
         self.TWEAK( :@chunks, |c );
     }
 
-    multi submethod TWEAK(Str :@chunks!, Bool :$kern = False) is default {
+    multi submethod TWEAK(:@chunks!, Bool :$kern = False) is default {
 
-        $!text //= @chunks.join;
+        my @atoms = @chunks; # copy
         my Bool $follows-ws = False;
         my $word-gap = self!word-gap;
 
         my PDF::Content::Text::Line $line .= new: :$word-gap;
         @!lines.push: $line;
 
-        flush-space(@chunks);
+        flush-space(@atoms);
   
-        while @chunks {
-            my Str $text = @chunks.shift;
-
-            my $word;
+        while @atoms {
+            my subset StrOrReplaced where Str | PDF::Content::Replaced;
+            my StrOrReplaced $atom = @atoms.shift;
+            my Bool $replacing = False;
 	    my $word-width;
+            my $word;
+            my $pre-word-gap = $follows-ws ?? $word-gap !! 0.0;
 
-            if ($kern) {
-                ($word, $word-width) = $!font.kern($text);
-            }
-            else {
-                $word = [ $text, ];
-                $word-width = $!font.stringwidth($text);
-            }
-            $word-width *= $!font-size * $!HorizScaling / 100000;
-            $word-width += ($text.chars - 1) * $!CharSpacing
-                if $!CharSpacing > -$!font-size;
-
-            for $word.list {
+            given $atom {
                 when Str {
-                    $_ = $!font.encode($_).join;
+                    if ($kern) {
+                        ($word, $word-width) = $!font.kern($atom);
+                    }
+                    else {
+                        $word = [ $atom, ];
+                        $word-width = $!font.stringwidth($atom);
+                    }
+                    $word-width *= $!font-size * $!HorizScaling / 100000;
+                    $word-width += ($atom.chars - 1) * $!CharSpacing
+                        if $!CharSpacing > -$!font-size;
+
+                    for $word.list {
+                        when Str {
+                            $_ = $!font.encode($_).join;
+                        }
+                        when Numeric {
+                            $_ = -$_;
+                        }
+                    }
                 }
-                when Numeric {
-                    $_ = - $_;
+                when PDF::Content::Replaced {
+                    $replacing = True;
+                    $word = [-$atom.width * $!HorizScaling * 10 / $!font-size, ];
+                    $word-width = $atom.width;
                 }
             }
 
-            if $!width && $line.words && $line.content-width + $word-gap + $word-width > $!width {
+            if $!width && $line.words && $line.content-width + $pre-word-gap + $word-width > $!width {
                 # line break
                 if $!height && self.content-height + $!leading > $!height {
                     # height exceeded
-                    @!overflow.push: $text;
+                    @!overflow.push: $atom;
                     last;
                 }
                 else {
@@ -101,16 +119,21 @@ class PDF::Content::Text::Block {
                     @!lines.push: $line ;
                 }
                 $follows-ws = False;
+                $pre-word-gap = 0;
             }
 
+            @!replaced.push( { :left($line.content-width + $pre-word-gap),
+                               :bottom(-((@!lines)*$!leading)),
+                               :source($atom.source) } )
+                if $replacing;
             $line.word-boundary[+$line.words] = $follows-ws;
             $line.words.push: $word;
             $line.word-width += $word-width;
 
-            $follows-ws = flush-space(@chunks);
+            $follows-ws = flush-space(@atoms);
         }
 
-        @!overflow.append: @chunks;
+        @!overflow.append: @atoms;
 
         my $width = $!width // self.content-width
             if $!align eq 'justify';
@@ -169,19 +192,21 @@ class PDF::Content::Text::Block {
 
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 
-        {
-            my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
-            $y-shift -= self!text-rise;
-            @content.push( OpCode::TextMove => [0, $y-shift ] )
-                unless $y-shift =~= 0.0;
-        }
+        my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
+        $y-shift -= self!text-rise;
+        @content.push( OpCode::TextMove => [0, $y-shift ] )
+            unless $y-shift =~= 0.0;
 
         my $dx = do given $!align {
             when 'center' { 0.5 }
             when 'right'  { 1.0 }
-            default       { 0 }
+            default       { 0.0 }
         }
-        my $x-shift = $left ?? $dx * $.width !! 0;
+        my $x-shift = $left ?? $dx * $.width !! 0.0;
+
+        # compute absolute text positions of replaced content
+        .<offset> = [$x-shift, $y-shift]
+            for @!replaced;
 
         my $word-spacing = $!WordSpacing;
 
