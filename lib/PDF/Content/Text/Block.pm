@@ -22,6 +22,7 @@ class PDF::Content::Text::Block {
     has Str $.valign where 'top'|'center'|'bottom' = 'top';
     has ParagraphTags $.type = Paragraph;
     has @.replaced;
+    has Str $.text;
 
     # current graphics state
     has Numeric $.WordSpacing = 0;
@@ -58,8 +59,8 @@ class PDF::Content::Text::Block {
         .comb(/<Text::word> | <Text::space>/);
     }
 
-    multi submethod TWEAK(Str :$text!, |c) {
-        my Str @chunks = self.comb: $text;
+    multi submethod TWEAK(Str :$!text!, |c) {
+        my Str @chunks = self.comb: $!text;
         self.TWEAK( :@chunks, |c );
     }
 
@@ -69,6 +70,7 @@ class PDF::Content::Text::Block {
         my @line-atoms;
         my Bool $follows-ws = False;
         my $word-gap = self!word-gap;
+        $!text //= @atoms.map(*.Str).join;
 
         my PDF::Content::Text::Line $line .= new: :$word-gap, :$!leading;
         @!lines.push: $line;
