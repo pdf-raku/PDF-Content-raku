@@ -5,6 +5,7 @@ class PDF::Content::Text::Line {
     use PDF::Content::Ops :OpCode;
 
     has @.words;
+    has Numeric $.leading is rw is required;
     has Numeric $.word-width is rw = 0; #| sum of word widths
     has Numeric $.word-gap = 0;
     has Numeric $.indent is rw = 0;

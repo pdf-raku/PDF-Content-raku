@@ -91,7 +91,7 @@ is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated agai
 
 $g.FillAlpha = 1.0;
 nok $parent<ExtGState>, 'FillAlpha Optimized';
-$g.FillAlpha = .4;
+$g.FillAlpha = 0.4;
 is $g.ops[*-1], (:gs([:name<R1>])), 'FillAlpha op';
 is-json-equiv $parent<ExtGState><R1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';
 $g.FillAlpha = 1.0;

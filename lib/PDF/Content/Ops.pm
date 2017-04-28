@@ -805,6 +805,15 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!TextLeading = - $ty;
         $.track-graphics(TextMove, $tx, $ty);
     }
+    multi method track-graphics('T*') {
+        @!TextMatrix[5] -= $!TextLeading;
+    }
+    multi method track-graphics("'", $) {
+        @!TextMatrix[5] -= $!TextLeading;
+    }
+    multi method track-graphics('"', $!WordSpacing, $!CharSpacing, $) {
+        @!TextMatrix[5] -= $!TextLeading;
+    }
     multi method track-graphics($op, *@args) is default {
         .(self,|@args) with %PostOp{$op};
     }

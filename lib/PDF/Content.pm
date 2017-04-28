@@ -203,9 +203,7 @@ role PDF::Content
 	my Numeric $font-size = $.font-size // self!current-font[1];
 
         my PDF::Content::Text::Block $text-block .= new(
-            :$text, :$font, :$font-size,
-	    :$.WordSpacing, :$.HorizScaling, :$.CharSpacing,
-	    |c );
+            :$text, :$font, :$font-size, |c );
 
 	$.print( $text-block, |c)
 	    unless $stage;
@@ -221,28 +219,10 @@ role PDF::Content
         && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
     }
 
-    multi method print(PDF::Content::Text::Block $text-block,
-		       Text-Position :$position,
-		       Bool :$nl = False,
-	) {
-
-	my Bool \in-text = $.context == GraphicsContext::Text;
-
-        unless in-text {
-            my Str $tag = $text-block.type.Str;
-            self.BeginMarkedContent($tag);
-	    self.BeginText;
-        }
-
-        my Numeric \font-size = $text-block.font-size;
-        my \font = $.use-font($text-block.font);
-
-        my Bool $left = False;
-        my Bool $top = False;
-
+    method !set-position($text-block, :$position,
+                         Bool :$left! is rw,
+                         Bool :$top! is rw) {
 	with $position {
-            die "illegal text position: $_"
-                unless $_ ~~ Text-Position;
             my $x;
             with $position[0] {
                 when Numeric {$x = $_}
@@ -265,9 +245,33 @@ role PDF::Content
 	    self.text-position = [$x, $y];
         }
 
+    }
+
+    multi method print(PDF::Content::Text::Block $text-block,
+		       Text-Position :$position,
+		       Bool :$nl = False,
+	) {
+
+        my Bool $left = False;
+        my Bool $top = False;
+
+	my Bool \in-text = $.context == GraphicsContext::Text;
+
+        unless in-text {
+            my Str $tag = $text-block.type.Str;
+            self.BeginMarkedContent($tag);
+	    self.BeginText;
+        }
+
+        self!set-position($text-block, :$position, :$left, :$top);
+	$text-block.sync-graphics: :$.WordSpacing, :$.HorizScaling, :$.CharSpacing, :@.TextMatrix, :$.TextLeading;
+
+        my Numeric \font-size = $text-block.font-size;
+        my \font = $.use-font($text-block.font);
+
         self.set-font(font, font-size);
         self."$_"() = $text-block."$_"()
-            for <CharSpacing WordSpacing HorizScaling>;
+            for <CharSpacing WordSpacing HorizScaling TextLeading>;
 	self.ops: $text-block.content(:$nl, :$top, :$left);
 
         unless in-text {

@@ -11,7 +11,6 @@ class PDF::Content::Text::Block {
     has         $.font is required;
     has Numeric $.font-size = 16;
     has Numeric $.leading = $!font-size * 1.1;
-    has Numeric $.font-height = $!font.height( $!font-size );
     my subset Baseline of Str where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging';
     has Baseline $.baseline is rw = 'alphabetic';
     has Numeric $!space-width = $!font.stringwidth(' ', $!font-size );
@@ -27,9 +26,12 @@ class PDF::Content::Text::Block {
     # current graphics state
     has Numeric $.WordSpacing = 0;
     has Numeric $.CharSpacing = 0;
+    has Numeric $.TextLeading = 0;
+    has Numeric @.TextMatrix = [1, 0, 0, 1, 0, 0];
     subset Percentage of Numeric where * > 0;
     has Percentage $.HorizScaling = 100;
 
+    method sync-graphics(:$!WordSpacing, :$!HorizScaling, :$!CharSpacing, :@!TextMatrix, :$!TextLeading) { }
     method !text-rise {
         given $!baseline {
             when 'alphabetic'  { 0 }
@@ -42,7 +44,9 @@ class PDF::Content::Text::Block {
 
     }
     method content-width  { @!lines.map( *.content-width ).max }
-    method content-height { max( (+@!lines - 1) * $!leading  +  $!font-height, 0) }
+    method content-height {
+        sum @!lines.map( *.leading )
+    }
 
     my grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
@@ -62,10 +66,11 @@ class PDF::Content::Text::Block {
     multi submethod TWEAK(:@chunks!, Bool :$kern = False) is default {
 
         my @atoms = @chunks; # copy
+        my @line-atoms;
         my Bool $follows-ws = False;
         my $word-gap = self!word-gap;
 
-        my PDF::Content::Text::Line $line .= new: :$word-gap;
+        my PDF::Content::Text::Line $line .= new: :$word-gap, :$!leading;
         @!lines.push: $line;
 
         flush-space(@atoms);
@@ -109,23 +114,31 @@ class PDF::Content::Text::Block {
 
             if $!width && $line.words && $line.content-width + $pre-word-gap + $word-width > $!width {
                 # line break
-                if $!height && self.content-height + $!leading > $!height {
-                    # height exceeded
-                    @!overflow.push: $atom;
-                    last;
-                }
-                else {
-                    $line = $line.new( :$word-gap );
-                    @!lines.push: $line ;
-                }
+                $line = $line.new: :$word-gap, :$!leading;
+                @!lines.push: $line;
+                @line-atoms = [];
                 $follows-ws = False;
                 $pre-word-gap = 0;
             }
+            if $replacing {
+                my $leading = $atom.height * 1.1; # review this
+                $line.leading = $leading
+                    if $leading > $line.leading;
+            }
+            if $!height && self.content-height > $!height {
+                # height exceeded
+                @!lines.pop if @!lines;
+                @!overflow.append: @line-atoms;
+                last;
+            }
 
-            @!replaced.push( { :left($line.content-width + $pre-word-gap),
-                               :bottom(-((@!lines)*$!leading)),
-                               :source($atom.source) } )
-                if $replacing;
+            if $replacing {
+                my $Tx = $line.content-width + $pre-word-gap;
+                my $Ty = $line.leading - self.content-height;
+                @!replaced.push( { :$Tx, :$Ty, :source($atom.source) } )
+            }
+
+            @line-atoms.push: $atom;
             $line.word-boundary[+$line.words] = $follows-ws;
             $line.words.push: $word;
             $line.word-width += $word-width;
@@ -159,7 +172,7 @@ class PDF::Content::Text::Block {
     #| calculates WordSpacing needed to achieve a given word-gap
     method !word-spacing($word-gap is copy) returns Numeric {
         $word-gap /= $!HorizScaling / 100
-            if $!HorizScaling != 100;
+            unless $!HorizScaling =~= 100;
         $word-gap - $!space-width - $!CharSpacing;
     }
 
@@ -187,9 +200,6 @@ class PDF::Content::Text::Block {
                   ) {
 
         my @content;
-        @content.push: ( OpCode::SetTextLeading => [ $!leading ] )
-            if $nl || +@!lines > 1;
-
 	my $space-size = -(1000 * $!space-width / $!font-size).round.Int;
 
         my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
@@ -203,10 +213,13 @@ class PDF::Content::Text::Block {
             default       { 0.0 }
         }
         my $x-shift = $left ?? $dx * $.width !! 0.0;
-
-        # compute absolute text positions of replaced content
-        .<offset> = [$x-shift, $y-shift]
-            for @!replaced;
+        # compute text positions of replaced content
+        for @!replaced {
+            my @Tm = @!TextMatrix;
+            @Tm[4] += $x-shift + .<Tx>;
+            @Tm[5] += $y-shift + .<Ty>;
+            .<Tm> = @Tm;
+        }
 
         my $word-spacing = $!WordSpacing;
 
@@ -215,6 +228,10 @@ class PDF::Content::Text::Block {
                 @content.push( OpCode::SetWordSpacing => [ $word-spacing = $_ ])
                     unless $_ =~= $word-spacing || +line.words <= 1;
             }
+            my $lead =  ($nl || +@!lines > 1)
+                     && (!$!TextLeading.defined || $!TextLeading !=~= line.leading);
+            @content.push: ( OpCode::SetTextLeading => [ $!TextLeading = line.leading ] )
+                if $lead;
             @content.push: line.content(:$.font-size, :$x-shift);
             @content.push: OpCode::TextNextLine;
         }
