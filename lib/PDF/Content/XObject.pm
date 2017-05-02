@@ -44,7 +44,7 @@ role PDF::Content::XObject['Image'] {
 				sub ($_) { &enc($_).decode } }
 			    !! sub ($_) {
 				use Base64;
-				buf8.new: encode-base64($_, :str) };
+				encode-base64($_, :str) };
                         my $enc = &b64-encoder($bytes);
                         'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
                     }
