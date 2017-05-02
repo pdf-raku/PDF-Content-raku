@@ -19,7 +19,8 @@ class X::PDF::Image::UnknownType is Exception {
 class PDF::Content::Image {
     use PDF::DAO;
     use PDF::Content::XObject;
-    method network-endian { True }
+    use PDF::IO;
+    use PDF::IO::Util;
 
     method !image-type($_, :$path!) {
         when m:i/^ jpe?g $/    { 'JPEG' }
@@ -32,8 +33,6 @@ class PDF::Content::Image {
     }
 
     multi method open(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
-        use Base64;
-        use PDF::IO;
         my $path = ~ $0;
         my Str \mime-type = ( $0<t> // '(missing)').lc;
         my Str \mime-subtype = ( $0<s> // '').lc;
@@ -44,8 +43,14 @@ class PDF::Content::Image {
             unless mime-type eq (mime-subtype eq 'pdf' ?? 'application' !! 'image');
         my $image-type = self!image-type(mime-subtype, :$path);
         my $data = substr($data-uri, start);
-        $data = decode-base64($data, :bin).decode("latin-1")
-            if base64;
+	if base64 {
+	    state &b64-decoder = PDF::IO::Util::libpdf-available()
+		?? PDF::IO::Util::xs('Lib::PDF::Encode', 'base64-decode')
+		!! sub ($_) {
+		    use Base64;
+		    decode-base64($_, :bin) };
+	    $data = &b64-decoder($data).decode("latin-1")
+	}
 
         my $fh = PDF::IO.coerce($data, :$path);
         self!open($image-type, $fh, :$data-uri);

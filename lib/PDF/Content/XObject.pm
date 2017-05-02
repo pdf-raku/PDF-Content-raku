@@ -1,3 +1,5 @@
+use v6;
+
 role PDF::Content::XObject['Form'] {
     has Numeric $.width;
     has Numeric $.height;
@@ -32,15 +34,22 @@ role PDF::Content::XObject['Image'] {
             FETCH => sub ($) {
                 $!data-uri //= do {
                     with $!source {
-                        use Base64;
+			use PDF::IO::Util;
                         my Str $bytes = .isa(Str)
                             ?? .substr(0)
                             !! .path.IO.slurp(:enc<latin-1>);
-                        my $enc = encode-base64($bytes, :str);
+			state &b64-encoder = PDF::IO::Util::libpdf-available()
+			    ?? do {
+				my &enc = PDF::IO::Util::xs('Lib::PDF::Encode', 'base64-encode');
+				sub ($_) { &enc($_).decode } }
+			    !! sub ($_) {
+				use Base64;
+				buf8.new: encode-base64($_, :str) };
+                        my $enc = &b64-encoder($bytes);
                         'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
                     }
                     else {
-                        fail 'image is not associated with a sourxe';
+                        fail 'image is not associated with a source';
                     }
                 }
             },
