@@ -35,6 +35,7 @@
 
         "PDF::Content::Text::Block"     : "lib/PDF/Content/Text/Block.pm",
         "PDF::Content::Text::Line"      : "lib/PDF/Content/Text/Line.pm",
+        "PDF::Content::Text::Style"     : "lib/PDF/Content/Text/Style.pm",
 
         "PDF::Content::Util::Font"      : "lib/PDF/Content/Util/Font.pm",
         "PDF::Content::Util::TransformMatrix" : "lib/PDF/Content/Util/TransformMatrix.pm"

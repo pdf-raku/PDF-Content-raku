@@ -292,7 +292,7 @@ endobj
 endobj
 
 8 0 obj <<
-  /Length 6961
+  /Length 6713
 >> stream
 BT
   /F1 10 Tf
@@ -383,34 +383,26 @@ BT
   50 Tz
   0 Ts
   1 0 0 1 350 700 Tm
-  2.78 Tw
-  (*** HorizScaling 50 ***) Tj
+  (*** HorizScaling 50 *** Lorem ipsum dolor sit) Tj
   T*
-  (Lorem ipsum dolor sit) Tj
+  (amet, consectetur adipiscing elit, sed do) Tj
   T*
-  (amet, consectetur) Tj
+  (eiusmod tempor incididunt ut labore et) Tj
   T*
-  (adipiscing elit, sed do) Tj
+  (dolore magna aliqua. Ut enim ad minim) Tj
   T*
-  (eiusmod tempor) Tj
+  (veniam, quis nostrud exercitation ullamco) Tj
   T*
-  (incididunt ut labore et) Tj
+  (laboris nisi ut aliquip ex ea commodo) Tj
+  T*
+  (consequat. Duis aute irure dolor in) Tj
+  T*
+  (reprehenderit in voluptate velit esse cillum) Tj
+  T*
+  (dolore eu fugiat nulla pariatur. ut labore et) Tj
   T*
   (dolore magna aliqua.) Tj
   T*
-  (Ut enim ad minim) Tj
-  T*
-  (veniam, quis nostrud) Tj
-  T*
-  (exercitation ullamco) Tj
-  T*
-  (laboris nisi ut aliquip) Tj
-  T*
-  (ex ea commodo) Tj
-  T*
-  (consequat. Duis aute) Tj
-  T*
-  0 Tw
   100 Tz
   1 0 0 1 460 700 Tm
   (*** *** Lorem ipsum) Tj
@@ -441,38 +433,35 @@ BT
   T*
   150 Tz
   1 0 0 1 20 530 Tm
-  -0.926667 Tw
-  (*** HorizScaling 150) Tj
+  (***) Tj
   T*
-  (*** Lorem ipsum dolor) Tj
+  (HorizScaling) Tj
   T*
-  (sit amet, consectetur) Tj
+  (150 *** Lorem) Tj
   T*
-  (adipiscing elit, sed do) Tj
+  (ipsum dolor sit) Tj
   T*
-  (eiusmod tempor) Tj
+  (amet,) Tj
   T*
-  (incididunt ut labore et) Tj
+  (consectetur) Tj
   T*
-  (dolore magna aliqua.) Tj
+  (adipiscing elit,) Tj
   T*
-  (Ut enim ad minim) Tj
+  (sed do) Tj
   T*
-  (veniam, quis nostrud) Tj
+  (eiusmod) Tj
   T*
-  (exercitation ullamco) Tj
+  (tempor) Tj
   T*
-  (laboris nisi ut aliquip) Tj
+  (incididunt ut) Tj
   T*
-  (ex ea commodo) Tj
+  (labore et) Tj
   T*
-  (consequat. Duis aute) Tj
+  (dolore magna) Tj
   T*
-  0 Tw
   100 Tz
   -1 Tc
   1 0 0 1 130 530 Tm
-  1 Tw
   (*** CharSpacing -1 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -481,33 +470,31 @@ BT
   T*
   (adipiscing elit, sed do) Tj
   T*
-  (eiusmod tempor) Tj
+  (eiusmod tempor incididunt) Tj
   T*
-  (incididunt ut labore et) Tj
+  (ut labore et dolore magna) Tj
   T*
-  (dolore magna aliqua.) Tj
-  T*
-  (Ut enim ad minim) Tj
+  (aliqua. Ut enim ad minim) Tj
   T*
   (veniam, quis nostrud) Tj
   T*
-  (exercitation ullamco) Tj
+  (exercitation ullamco laboris) Tj
   T*
-  (laboris nisi ut aliquip) Tj
+  (nisi ut aliquip ex ea) Tj
   T*
-  (ex ea commodo) Tj
+  (commodo consequat. Duis) Tj
   T*
-  (consequat. Duis aute) Tj
+  (aute irure dolor in) Tj
   T*
-  0 Tw
+  (reprehenderit in voluptate) Tj
+  T*
   -0.5 Tc
   1 0 0 1 240 530 Tm
-  0.5 Tw
-  (*** CharSpacing -0.5) Tj
+  (*** CharSpacing -0.5 ***) Tj
   T*
-  (*** Lorem ipsum dolor) Tj
+  (Lorem ipsum dolor sit) Tj
   T*
-  (sit amet, consectetur) Tj
+  (amet, consectetur) Tj
   T*
   (adipiscing elit, sed do) Tj
   T*
@@ -515,116 +502,80 @@ BT
   T*
   (incididunt ut labore et) Tj
   T*
-  (dolore magna aliqua.) Tj
+  (dolore magna aliqua. Ut) Tj
   T*
-  (Ut enim ad minim) Tj
+  (enim ad minim veniam,) Tj
   T*
-  (veniam, quis nostrud) Tj
+  (quis nostrud exercitation) Tj
   T*
-  (exercitation ullamco) Tj
+  (ullamco laboris nisi ut) Tj
   T*
-  (laboris nisi ut aliquip) Tj
-  T*
-  (ex ea commodo) Tj
+  (aliquip ex ea commodo) Tj
   T*
   (consequat. Duis aute) Tj
   T*
-  0 Tw
+  (irure dolor in) Tj
+  T*
   0.5 Tc
   1 0 0 1 350 530 Tm
-  -0.5 Tw
   (*** CharSpacing 0.5) Tj
   T*
-  (*** Lorem ipsum dolor) Tj
+  (*** Lorem ipsum) Tj
   T*
-  (sit amet, consectetur) Tj
+  (dolor sit amet,) Tj
   T*
-  (adipiscing elit, sed do) Tj
+  (consectetur) Tj
   T*
-  (eiusmod tempor) Tj
+  (adipiscing elit, sed) Tj
   T*
-  (incididunt ut labore et) Tj
+  (do eiusmod tempor) Tj
   T*
-  (dolore magna aliqua.) Tj
+  (incididunt ut labore) Tj
   T*
-  (Ut enim ad minim) Tj
+  (et dolore magna) Tj
   T*
-  (veniam, quis nostrud) Tj
+  (aliqua. Ut enim ad) Tj
   T*
-  (exercitation ullamco) Tj
+  (minim veniam, quis) Tj
   T*
-  (laboris nisi ut aliquip) Tj
+  (nostrud exercitation) Tj
   T*
-  (ex ea commodo) Tj
+  (ullamco laboris nisi) Tj
   T*
-  (consequat. Duis aute) Tj
+  (ut aliquip ex ea) Tj
   T*
-  0 Tw
   1.5 Tc
   1 0 0 1 460 530 Tm
-  -1.5 Tw
-  (*** CharSpacing 1.5) Tj
+  (*** CharSpacing) Tj
   T*
-  (*** Lorem ipsum dolor) Tj
+  (1.5 *** Lorem) Tj
   T*
-  (sit amet, consectetur) Tj
+  (ipsum dolor sit) Tj
   T*
-  (adipiscing elit, sed do) Tj
+  (amet,) Tj
   T*
-  (eiusmod tempor) Tj
+  (consectetur) Tj
   T*
-  (incididunt ut labore et) Tj
+  (adipiscing elit,) Tj
   T*
-  (dolore magna aliqua.) Tj
+  (sed do eiusmod) Tj
   T*
-  (Ut enim ad minim) Tj
+  (tempor incididunt) Tj
   T*
-  (veniam, quis nostrud) Tj
+  (ut labore et) Tj
   T*
-  (exercitation ullamco) Tj
+  (dolore magna) Tj
   T*
-  (laboris nisi ut aliquip) Tj
+  (aliqua. Ut enim) Tj
   T*
-  (ex ea commodo) Tj
+  (ad minim veniam,) Tj
   T*
-  (consequat. Duis aute) Tj
+  (quis nostrud) Tj
   T*
-  0 Tw
   -2 Tw
   0 Tc
   1 0 0 1 20 360 Tm
-  0 Tw
-  (*** WordSpacing -2) Tj
-  T*
-  (*** Lorem ipsum dolor) Tj
-  T*
-  (sit amet, consectetur) Tj
-  T*
-  (adipiscing elit, sed do) Tj
-  T*
-  (eiusmod tempor) Tj
-  T*
-  (incididunt ut labore et) Tj
-  T*
-  (dolore magna aliqua.) Tj
-  T*
-  (Ut enim ad minim) Tj
-  T*
-  (veniam, quis nostrud) Tj
-  T*
-  (exercitation ullamco) Tj
-  T*
-  (laboris nisi ut aliquip) Tj
-  T*
-  (ex ea commodo) Tj
-  T*
-  (consequat. Duis aute) Tj
-  T*
-  -2 Tw
-  5 Tw
-  1 0 0 1 130 360 Tm
-  0 Tw
-  (*** WordSpacing 5 ***) Tj
+  (*** WordSpacing -2 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
   T*
@@ -644,13 +595,40 @@ BT
   T*
   (exercitation ullamco) Tj
   T*
-  (laboris nisi ut aliquip) Tj
+  (laboris nisi ut aliquip ex) Tj
   T*
-  (ex ea commodo) Tj
+  (ea commodo) Tj
   T*
   (consequat. Duis aute) Tj
   T*
   5 Tw
+  1 0 0 1 130 360 Tm
+  (*** WordSpacing 5) Tj
+  T*
+  (*** Lorem ipsum) Tj
+  T*
+  (dolor sit amet,) Tj
+  T*
+  (consectetur) Tj
+  T*
+  (adipiscing elit, sed) Tj
+  T*
+  (do eiusmod tempor) Tj
+  T*
+  (incididunt ut labore) Tj
+  T*
+  (et dolore magna) Tj
+  T*
+  (aliqua. Ut enim ad) Tj
+  T*
+  (minim veniam, quis) Tj
+  T*
+  (nostrud exercitation) Tj
+  T*
+  (ullamco laboris nisi) Tj
+  T*
+  (ut aliquip ex ea) Tj
+  T*
   0 Tw
   1 0 0 1 240 360 Tm
   8 TL
@@ -758,10 +736,10 @@ xref
 0000004630 00000 n 
 trailer
 <<
-  /ID [ <7b414e434c76e98433305507f6a9720f> <7b414e434c76e98433305507f6a9720f> ]
+  /ID [ <867b4841444e1643c74ca7767ce9dd84> <867b4841444e1643c74ca7767ce9dd84> ]
   /Root 1 0 R
   /Size 9
 >>
 startxref
-11646
+11398
 %%EOF

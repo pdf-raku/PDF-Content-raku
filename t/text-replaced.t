@@ -2,7 +2,6 @@ use v6;
 use Test;
 plan 3;
 use lib '.';
-use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Block;
 use PDF::Content::Util::Font;
 use PDF::Content::Replaced;

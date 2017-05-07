@@ -18,10 +18,10 @@ my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold
 my $font-size = 16;
 my $text = " Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my $pdf = t::PDFTiny.new;
-my $text-block = PDF::Content::Text::Block.new( :$text, :$font, :$font-size );
+my $gfx = $pdf.add-page.gfx;
+my $text-block = PDF::Content::Text::Block.new( :$gfx, :$text, :$font, :$font-size );
 is-approx $text-block.content-width, 360.88, '$.content-width';
 is-approx $text-block.content-height, 17.6, '$.content-height';
-my $gfx = $pdf.add-page.gfx;
 $gfx.Save;
 $gfx.BeginText;
 $gfx.text-position = [100, 350];

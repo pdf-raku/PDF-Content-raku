@@ -203,7 +203,7 @@ role PDF::Content
 	my Numeric $font-size = $.font-size // self!current-font[1];
 
         my PDF::Content::Text::Block $text-block .= new(
-            :$text, :$font, :$font-size, |c );
+	    :gfx(self), :$text, :$font, :$font-size, |c );
 
 	$.print( $text-block, |c)
 	    unless $stage;
@@ -254,8 +254,10 @@ role PDF::Content
 
         my Bool $left = False;
         my Bool $top = False;
-
 	my Bool \in-text = $.context == GraphicsContext::Text;
+
+	warn "foreign text block"
+	    unless $text-block.gfx === self;
 
         unless in-text {
             my Str $tag = $text-block.type.Str;
@@ -264,15 +266,12 @@ role PDF::Content
         }
 
         self!set-position($text-block, :$position, :$left, :$top);
-	$text-block.sync-graphics: :$.WordSpacing, :$.HorizScaling, :$.CharSpacing, :@.TextMatrix, :$.TextLeading;
 
         my Numeric \font-size = $text-block.font-size;
         my \font = $.use-font($text-block.font);
 
         self.set-font(font, font-size);
-        self."$_"() = $text-block."$_"()
-            for <CharSpacing WordSpacing HorizScaling TextLeading>;
-	self.ops: $text-block.content(:$nl, :$top, :$left);
+	$text-block.render(self, :$nl, :$top, :$left);
 
         unless in-text {
 	    self.EndText;
