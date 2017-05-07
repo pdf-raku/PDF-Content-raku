@@ -193,21 +193,22 @@ role PDF::Content
         };
     }
 
-    #! output text leave the text position at the end of the current line
-    multi method print(Str $text,
-		       Bool :$stage = False,
-		       :$font = self!current-font[0],
-		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height, :$baseline
-        ) {
+    method text-block($font = self!current-font[0], |c) {
 	# detect and use the current text-state font
 	my Numeric $font-size = $.font-size // self!current-font[1];
+        PDF::Content::Text::Block.new(
+	    :gfx(self), :$font, :$font-size,
+	    |c,
+	    );
+    }
 
-        my PDF::Content::Text::Block $text-block .= new(
-	    :gfx(self), :$text, :$font, :$font-size, |c );
+    #! output text leave the text position at the end of the current line
+    multi method print(Str $text,
+		       |c,  #| :$align, :$kern, :$line-height, :$width, :$height, :$baseline
+        ) {
 
-	$.print( $text-block, |c)
-	    unless $stage;
-
+	my $text-block = self.text-block( :$text, |c);
+	$.print( $text-block, |c);
 	$text-block;
     }
 

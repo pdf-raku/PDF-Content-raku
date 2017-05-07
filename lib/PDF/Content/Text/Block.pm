@@ -199,7 +199,7 @@ class PDF::Content::Text::Block {
         my $x-shift = $left ?? $dx * $.width !! 0.0;
         # compute text positions of replaced content
         for @!replaced {
-            my @Tm = $gfx.TextMatrix;
+            my Numeric @Tm[6] = $gfx.TextMatrix.list;
             @Tm[4] += $x-shift + .<Tx>;
             @Tm[5] += $y-shift + .<Ty>;
             .<Tm> = @Tm;
