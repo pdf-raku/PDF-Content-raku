@@ -9,7 +9,7 @@ class PDF::Content::Text::Block {
     use PDF::Content::Marked :ParagraphTags;
     use PDF::Content::Replaced;
 
-    has PDF::Content::Text::Style $!style handles <font font-size leading valign kern text-rise space-width baseline>; 
+    has PDF::Content::Text::Style $!style handles <font font-size leading valign kern text-rise space-width baseline CharSpacing WordSpacing HorizScaling>; 
     has Numeric $.width;
     has Numeric $.height;
     has @.lines;
@@ -17,11 +17,6 @@ class PDF::Content::Text::Block {
     has ParagraphTags $.type = Paragraph;
     has @.replaced;
     has Str $.text;
-
-    # current graphics state
-    has Numeric $.WordSpacing;
-    has Numeric $.CharSpacing;
-    has Numeric $.HorizScaling;
 
     method content-width  { @!lines.map( *.content-width ).max }
     method content-height {
@@ -43,26 +38,24 @@ class PDF::Content::Text::Block {
         self.TWEAK( :@chunks, |c );
     }
 
-    multi submethod TWEAK(:@chunks!, Bool :$kern = False,
-			  :$gfx, |c) is default {
-
-        $!CharSpacing  //= do with $gfx {.CharSpacing}  else {0.0};
-	$!WordSpacing  //= do with $gfx {.WordSpacing}  else {0.0};
-	$!HorizScaling //= do with $gfx {.HorizScaling} else {100};
-
-	$!style .= new(|c);
+    method add-text(@chunks) {
         my @atoms = @chunks; # copy
         my @line-atoms;
-        my Bool $follows-ws = False;
+        my Bool $follows-ws = flush-space(@atoms);
         my $word-gap = self!word-gap;
         $!text //= @atoms.map(*.Str).join;
 	my $height = $!style.font-size;
-
-        my PDF::Content::Text::Line $line .= new: :$word-gap, :$height;
-        @!lines.push: $line;
-
-        flush-space(@atoms);
   
+        my PDF::Content::Text::Line $line;
+
+	if @!lines {
+	    $line = @!lines.tail;
+	}
+	else {
+	    $line .= new: :$word-gap, :$height;
+	    @!lines.push: $line;
+	}
+
         while @atoms {
             my subset StrOrReplaced where Str | PDF::Content::Replaced;
             my StrOrReplaced $atom = @atoms.shift;
@@ -73,16 +66,16 @@ class PDF::Content::Text::Block {
 
             given $atom {
                 when Str {
-                    if ($kern) {
+                    if ($!style.kern) {
                         ($word, $word-width) = $!style.font.kern($atom);
                     }
                     else {
                         $word = [ $atom, ];
                         $word-width = $!style.font.stringwidth($atom);
                     }
-                    $word-width *= $!style.font-size * $!HorizScaling / 100000;
-                    $word-width += ($atom.chars - 1) * $!CharSpacing
-                        if $!CharSpacing > -$!style.font-size;
+                    $word-width *= $!style.font-size * $.HorizScaling / 100000;
+                    $word-width += ($atom.chars - 1) * $.CharSpacing
+                        if $.CharSpacing > -$!style.font-size;
 
                     for $word.list {
                         when Str {
@@ -95,7 +88,7 @@ class PDF::Content::Text::Block {
                 }
                 when PDF::Content::Replaced {
                     $replacing = True;
-                    $word = [-$atom.width * $!HorizScaling * 10 / $!style.font-size, ];
+                    $word = [-$atom.width * $.HorizScaling * 10 / $!style.font-size, ];
                     $word-width = $atom.width;
                 }
             }
@@ -130,17 +123,19 @@ class PDF::Content::Text::Block {
             $line.word-boundary[+$line.words] = $follows-ws;
             $line.words.push: $word;
             $line.word-width += $word-width;
+	    $line.height = $height
+		if $height > $line.height;
 
             $follows-ws = flush-space(@atoms);
         }
 
         @!overflow.append: @atoms;
 
-        my $width = $!width // self.content-width
-            if $!style.align eq 'justify';
+    }
 
-        .align($!style.align, :$width )
-            for @!lines;
+    multi submethod TWEAK(:@chunks!, |c) is default {
+	$!style .= new(|c);
+	self.add-text(@chunks);
     }
 
     sub flush-space(@words) returns Bool {
@@ -151,17 +146,17 @@ class PDF::Content::Text::Block {
 
     #| calculates actual spacing between words
     method !word-gap returns Numeric {
-        my $word-gap = $.space-width + $!WordSpacing + $!CharSpacing;
-        $word-gap *= $!HorizScaling / 100
-            unless $!HorizScaling =~= 100;
+        my $word-gap = $.space-width + $.WordSpacing + $.CharSpacing;
+        $word-gap *= $.HorizScaling / 100
+            unless $.HorizScaling =~= 100;
         $word-gap;
     }
 
     #| calculates WordSpacing needed to achieve a given word-gap
     method !word-spacing($word-gap is copy) returns Numeric {
-        $word-gap /= $!HorizScaling / 100
-            unless $!HorizScaling =~= 100;
-        $word-gap - $.space-width - $!CharSpacing;
+        $word-gap /= $.HorizScaling / 100
+            unless $.HorizScaling =~= 100;
+        $word-gap - $.space-width - $.CharSpacing;
     }
 
     method width  { $!width  // self.content-width }
@@ -190,10 +185,16 @@ class PDF::Content::Text::Block {
 	Bool :$left, # position from left;
 	) {
 	my %saved;
-	for :$!WordSpacing, :$!CharSpacing, :$!HorizScaling {
+	for :$.WordSpacing, :$.CharSpacing, :$.HorizScaling {
 	    %saved{.key} = $gfx."{.key}"();
 	    $gfx."{.key}"() = .value;
 	}
+
+        my $width = $!width // self.content-width
+            if $!style.align eq 'justify';
+
+        .align($!style.align, :$width )
+            for @!lines;
 
         my @content;
 	my $space-size = -(1000 * $.space-width / $.font-size).round.Int;

@@ -16,7 +16,7 @@ is-deeply @chunks, ["z80", " ", "a-", "b.", " ", "-", "3", "   ", "{nbsp}A{nbsp}
 
 my $font = PDF::Content::Util::Font::core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
-my $text = " Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
+my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my $pdf = t::PDFTiny.new;
 my $gfx = $pdf.add-page.gfx;
 my $text-block = PDF::Content::Text::Block.new( :$gfx, :$text, :$font, :$font-size );

@@ -13,6 +13,17 @@ class PDF::Content::Text::Style {
     has Bool $.kern;
     has Numeric $.space-width = $!font.stringwidth(' ', $!font-size );
 
+    # current graphics state
+    has Numeric $.WordSpacing;
+    has Numeric $.CharSpacing;
+    has Numeric $.HorizScaling;
+
+    multi submethod TWEAK(:$gfx) is default {
+        $!CharSpacing  //= do with $gfx {.CharSpacing}  else {0.0};
+	$!WordSpacing  //= do with $gfx {.WordSpacing}  else {0.0};
+	$!HorizScaling //= do with $gfx {.HorizScaling} else {100};
+    }
+
     method text-rise {
         given $!baseline {
             when 'alphabetic'  { 0 }
