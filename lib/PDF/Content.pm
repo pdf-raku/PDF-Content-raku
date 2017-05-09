@@ -257,9 +257,6 @@ role PDF::Content
         my Bool $top = False;
 	my Bool \in-text = $.context == GraphicsContext::Text;
 
-	warn "foreign text block"
-	    unless $text-block.gfx === self;
-
         unless in-text {
             my Str $tag = $text-block.type.Str;
             self.BeginMarkedContent($tag);

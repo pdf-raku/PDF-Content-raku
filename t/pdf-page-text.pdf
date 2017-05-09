@@ -33,8 +33,8 @@ endobj
 BT
   50 100 Td
   /F1 18 Tf
-  19.8 TL
   (Hello,) Tj
+  19.8 TL
   T*
   [ (W) 60 (orld!) ] TJ
   T*
@@ -43,8 +43,8 @@ BT
   /F2 10 Tf
   1 0 0 1 110 700 Tm
   0 -9.31 Td
-  11 TL
   (*** top left*** Lorem) Tj
+  11 TL
   T*
   (ipsum dolor sit amet,) Tj
   T*
@@ -292,13 +292,13 @@ endobj
 endobj
 
 8 0 obj <<
-  /Length 6713
+  /Length 6722
 >> stream
 BT
   /F1 10 Tf
   1 0 0 1 20 700 Tm
-  11 TL
   (*** *** Lorem ipsum) Tj
+  11 TL
   T*
   (dolor sit amet,) Tj
   T*
@@ -324,7 +324,6 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
-  3 Ts
   1 0 0 1 130 700 Tm
   (*** TextRise 3 ***) Tj
   T*
@@ -352,7 +351,6 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
-  -3 Ts
   1 0 0 1 240 700 Tm
   (*** TextRise -3 ***) Tj
   T*
@@ -380,9 +378,8 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
-  50 Tz
-  0 Ts
   1 0 0 1 350 700 Tm
+  50 Tz
   (*** HorizScaling 50 *** Lorem ipsum dolor sit) Tj
   T*
   (amet, consectetur adipiscing elit, sed do) Tj
@@ -431,8 +428,8 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
-  150 Tz
   1 0 0 1 20 530 Tm
+  150 Tz
   (***) Tj
   T*
   (HorizScaling) Tj
@@ -460,8 +457,8 @@ BT
   (dolore magna) Tj
   T*
   100 Tz
-  -1 Tc
   1 0 0 1 130 530 Tm
+  -1 Tc
   (*** CharSpacing -1 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -488,8 +485,9 @@ BT
   T*
   (reprehenderit in voluptate) Tj
   T*
-  -0.5 Tc
+  0 Tc
   1 0 0 1 240 530 Tm
+  -0.5 Tc
   (*** CharSpacing -0.5 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -516,8 +514,9 @@ BT
   T*
   (irure dolor in) Tj
   T*
-  0.5 Tc
+  0 Tc
   1 0 0 1 350 530 Tm
+  0.5 Tc
   (*** CharSpacing 0.5) Tj
   T*
   (*** Lorem ipsum) Tj
@@ -544,8 +543,9 @@ BT
   T*
   (ut aliquip ex ea) Tj
   T*
-  1.5 Tc
+  0 Tc
   1 0 0 1 460 530 Tm
+  1.5 Tc
   (*** CharSpacing) Tj
   T*
   (1.5 *** Lorem) Tj
@@ -572,9 +572,9 @@ BT
   T*
   (quis nostrud) Tj
   T*
-  -2 Tw
   0 Tc
   1 0 0 1 20 360 Tm
+  -2 Tw
   (*** WordSpacing -2 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -601,8 +601,9 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
-  5 Tw
+  0 Tw
   1 0 0 1 130 360 Tm
+  5 Tw
   (*** WordSpacing 5) Tj
   T*
   (*** Lorem ipsum) Tj
@@ -631,8 +632,8 @@ BT
   T*
   0 Tw
   1 0 0 1 240 360 Tm
+  (*** leading 0.8 ***) Tj
   8 TL
-  (*** leading 8 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
   T*
@@ -669,8 +670,8 @@ BT
   (nulla pariatur. ut) Tj
   T*
   1 0 0 1 350 360 Tm
+  (*** leading 1.5 ***) Tj
   15 TL
-  (*** leading 15 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
   T*
@@ -692,8 +693,8 @@ BT
   T*
   1 0 0 1 460 360 Tm
   0 -9.31 Td
-  11 TL
   (*** baseline top ***) Tj
+  11 TL
   T*
   (Lorem ipsum dolor sit) Tj
   T*
@@ -741,5 +742,5 @@ trailer
   /Size 9
 >>
 startxref
-11398
+11407
 %%EOF

@@ -19,11 +19,13 @@ class PDF::Content::Text::Block {
     has Str $.text;
 
     # current graphics state
-    has PDF::Content::Ops $.gfx is required;
+    has Numeric $.WordSpacing;
+    has Numeric $.CharSpacing;
+    has Numeric $.HorizScaling;
 
     method content-width  { @!lines.map( *.content-width ).max }
     method content-height {
-        sum @!lines.map( *.leading )
+        sum @!lines.map( *.height * $.leading )
     }
 
     my grammar Text {
@@ -41,7 +43,12 @@ class PDF::Content::Text::Block {
         self.TWEAK( :@chunks, |c );
     }
 
-    multi submethod TWEAK(:@chunks!, Bool :$kern = False, |c) is default {
+    multi submethod TWEAK(:@chunks!, Bool :$kern = False,
+			  :$gfx, |c) is default {
+
+        $!CharSpacing  //= do with $gfx {.CharSpacing}  else {0.0};
+	$!WordSpacing  //= do with $gfx {.WordSpacing}  else {0.0};
+	$!HorizScaling //= do with $gfx {.HorizScaling} else {100};
 
 	$!style .= new(|c);
         my @atoms = @chunks; # copy
@@ -49,9 +56,9 @@ class PDF::Content::Text::Block {
         my Bool $follows-ws = False;
         my $word-gap = self!word-gap;
         $!text //= @atoms.map(*.Str).join;
-	my $leading = $!style.leading;
+	my $height = $!style.font-size;
 
-        my PDF::Content::Text::Line $line .= new: :$word-gap, :$leading;
+        my PDF::Content::Text::Line $line .= new: :$word-gap, :$height;
         @!lines.push: $line;
 
         flush-space(@atoms);
@@ -73,9 +80,9 @@ class PDF::Content::Text::Block {
                         $word = [ $atom, ];
                         $word-width = $!style.font.stringwidth($atom);
                     }
-                    $word-width *= $!style.font-size * $!gfx.HorizScaling / 100000;
-                    $word-width += ($atom.chars - 1) * $!gfx.CharSpacing
-                        if $!gfx.CharSpacing > -$!style.font-size;
+                    $word-width *= $!style.font-size * $!HorizScaling / 100000;
+                    $word-width += ($atom.chars - 1) * $!CharSpacing
+                        if $!CharSpacing > -$!style.font-size;
 
                     for $word.list {
                         when Str {
@@ -88,23 +95,23 @@ class PDF::Content::Text::Block {
                 }
                 when PDF::Content::Replaced {
                     $replacing = True;
-                    $word = [-$atom.width * $!gfx.HorizScaling * 10 / $!style.font-size, ];
+                    $word = [-$atom.width * $!HorizScaling * 10 / $!style.font-size, ];
                     $word-width = $atom.width;
                 }
             }
 
             if $!width && $line.words && $line.content-width + $pre-word-gap + $word-width > $!width {
                 # line break
-                $line = $line.new: :$word-gap, :$leading;
+                $line = $line.new: :$word-gap, :$height;
                 @!lines.push: $line;
                 @line-atoms = [];
                 $follows-ws = False;
                 $pre-word-gap = 0;
             }
             if $replacing {
-                my $lead = $atom.height * 1.1; # review this
-                $line.leading = $lead
-                    if $lead > $line.leading;
+                my $height = $atom.height * 1.1; # review this
+                $line.height = $height
+                    if $height > $line.height;
             }
             if $!height && self.content-height > $!height {
                 # height exceeded
@@ -115,7 +122,7 @@ class PDF::Content::Text::Block {
 
             if $replacing {
                 my $Tx = $line.content-width + $pre-word-gap;
-                my $Ty = $line.leading - self.content-height;
+                my $Ty = $line.height * $!style.leading  -  self.content-height;
                 @!replaced.push( { :$Tx, :$Ty, :source($atom.source) } )
             }
 
@@ -144,17 +151,17 @@ class PDF::Content::Text::Block {
 
     #| calculates actual spacing between words
     method !word-gap returns Numeric {
-        my $word-gap = $.space-width + $!gfx.WordSpacing + $!gfx.CharSpacing;
-        $word-gap *= $!gfx.HorizScaling / 100
-            unless $!gfx.HorizScaling =~= 100;
+        my $word-gap = $.space-width + $!WordSpacing + $!CharSpacing;
+        $word-gap *= $!HorizScaling / 100
+            unless $!HorizScaling =~= 100;
         $word-gap;
     }
 
     #| calculates WordSpacing needed to achieve a given word-gap
     method !word-spacing($word-gap is copy) returns Numeric {
-        $word-gap /= $!gfx.HorizScaling / 100
-            unless $!gfx.HorizScaling =~= 100;
-        $word-gap - $.space-width - $!gfx.CharSpacing;
+        $word-gap /= $!HorizScaling / 100
+            unless $!HorizScaling =~= 100;
+        $word-gap - $.space-width - $!CharSpacing;
     }
 
     method width  { $!width  // self.content-width }
@@ -177,11 +184,16 @@ class PDF::Content::Text::Block {
     }
 
     method render(
-	PDF::Content::Ops $gfx = $!gfx,
+	PDF::Content::Ops $gfx,
 	Bool :$nl,   # add trailing line 
 	Bool :$top,  # position from top
 	Bool :$left, # position from left;
 	) {
+	my %saved;
+	for :$!WordSpacing, :$!CharSpacing, :$!HorizScaling {
+	    %saved{.key} = $gfx."{.key}"();
+	    $gfx."{.key}"() = .value;
+	}
 
         my @content;
 	my $space-size = -(1000 * $.space-width / $.font-size).round.Int;
@@ -208,27 +220,36 @@ class PDF::Content::Text::Block {
         my $word-spacing = $gfx.WordSpacing;
         my $leading = $gfx.TextLeading;
 
-        for @!lines -> \line {
+        for @!lines.pairs {
+	    my \line = .value;
+
+	    if .key {
+		@content.push: ( OpCode::SetTextLeading => [ $leading = line.height * $.leading ] )
+		    if $leading !=~= line.height * $.leading;
+		@content.push: OpCode::TextNextLine;
+	    }
+
             with self!word-spacing(line.word-gap) {
                 @content.push( OpCode::SetWordSpacing => [ $word-spacing = $_ ])
                     unless $_ =~= $word-spacing || +line.words <= 1;
             }
-            my Bool $lead = ? ($nl || +@!lines > 1)
-		&& (!$gfx.TextLeading.defined || $leading !=~= line.leading);
-            @content.push: ( OpCode::SetTextLeading => [ $leading = line.leading ] )
-                if $lead;
             @content.push: line.content(:$.font-size, :$x-shift);
-            @content.push: OpCode::TextNextLine;
         }
 
-        @content.pop
-            if !$nl && @content;
-
-        # restore original values
-        @content.push( OpCode::SetWordSpacing => [ $gfx.WordSpacing ])
-            unless $gfx.WordSpacing =~= $word-spacing;
+	if $nl {
+	    my $height = @!lines ?? @!lines[*-1].height !! $.font-size;
+	    @content.push: ( OpCode::SetTextLeading => [ $leading = $height * $.leading ] )
+                unless $.font-size * $.leading =~= $leading;
+	    @content.push: OpCode::TextNextLine;
+	}
 
         $gfx.ops: @content;
+        # restore original values
+	for %saved.pairs {
+	    $gfx."Set{.key}"(.value)
+                unless $gfx."{.key}"() == .value;
+	}
+
 	@content;
     }
 

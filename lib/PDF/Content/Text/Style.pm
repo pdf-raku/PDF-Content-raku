@@ -3,7 +3,7 @@ use v6;
 class PDF::Content::Text::Style {
     has         $.font is rw is required;
     has Numeric $.font-size is rw = 16;
-    has Numeric $.leading is rw = $!font-size * 1.1;
+    has Numeric $.leading is rw = 1.1;
     my subset Baseline of Str is export(:BaseLine) where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging';
     has Baseline $.baseline is rw = 'alphabetic';
     my subset Alignment of Str is export(:Alignment) where 'left'|'center'|'right'|'justify';

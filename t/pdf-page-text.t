@@ -26,8 +26,8 @@ is-deeply $gfx.content-dump, $(
     "BT",
     "50 100 Td", 
     "/F1 18 Tf",
-    "19.8 TL",
     "(Hello,) Tj",
+    "19.8 TL",
     "T*",
     "[ (W) 60 (orld!) ] TJ",
     "T*",
@@ -84,26 +84,26 @@ for (
     :TextRise(0), :TextRise(3), :TextRise(-3),
     :HorizScaling(50), :HorizScaling(100), :HorizScaling(150),
     :CharSpacing(-1.0), :CharSpacing(-.5), :CharSpacing(.5), :CharSpacing(1.5),
-    :WordSpacing(-2), :WordSpacing(5), :leading(8), :leading(15),
+    :WordSpacing(-2), :WordSpacing(5), :leading(.8), :leading(1.5),
     :baseline<top>,
     ) {
-    my %settings = %default-settings;
-    %settings{.key} = .value;
-    my %opts;
+    my %opts = %default-settings;
+    %opts{.key} = .value;
 
-    for %settings.keys {
-        if /^<[A..Z]>/ {
-            $gfx."$_"() = %settings{$_};
-            %settings{$_}:delete
-                if %settings{$_} == %default-settings{$_}
+    for %opts.keys {
+	if $_ ~~ /^[A..Z]/
+        && $_ ne 'CharSpacing'|'WordSpacing'|'HorizScaling' {
+            $gfx."$_"() = %opts{$_};
         }
-        else {
-            %opts{$_} = %settings{$_};
+
+        if %default-settings{$_}:exists {
+            %opts{$_}:delete
+                if %opts{$_} == %default-settings{$_}
         }
     }
 
     $gfx.text-position = ($x, $y);
-    $gfx.say( ("*** {%settings} *** ", $sample, $sample2).join(' '), :$width, :$height, |%opts);
+    $gfx.say( ("*** {%opts} *** ", $sample, $sample2).join(' '), :$width, :$height, |%opts);
 
     if $x < 400 {
         $x += 110;
