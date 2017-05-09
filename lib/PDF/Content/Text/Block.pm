@@ -9,7 +9,7 @@ class PDF::Content::Text::Block {
     use PDF::Content::Marked :ParagraphTags;
     use PDF::Content::Replaced;
 
-    has PDF::Content::Text::Style $!style handles <font font-size leading valign kern text-rise space-width baseline CharSpacing WordSpacing HorizScaling>; 
+    has PDF::Content::Text::Style $!style handles <font font-size leading valign kern space-width baseline CharSpacing WordSpacing HorizScaling TextRise>; 
     has Numeric $.width;
     has Numeric $.height;
     has @.lines;
@@ -102,7 +102,7 @@ class PDF::Content::Text::Block {
                 $pre-word-gap = 0;
             }
             if $replacing {
-                my $height = $atom.height * 1.1; # review this
+                my $height = $atom.height;
                 $line.height = $height
                     if $height > $line.height;
             }
@@ -185,7 +185,7 @@ class PDF::Content::Text::Block {
 	Bool :$left, # position from left;
 	) {
 	my %saved;
-	for :$.WordSpacing, :$.CharSpacing, :$.HorizScaling {
+	for :$.WordSpacing, :$.CharSpacing, :$.HorizScaling, :$.TextRise {
 	    %saved{.key} = $gfx."{.key}"();
 	    $gfx."{.key}"() = .value;
 	}
@@ -200,7 +200,6 @@ class PDF::Content::Text::Block {
 	my $space-size = -(1000 * $.space-width / $.font-size).round.Int;
 
         my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
-        $y-shift -= self.text-rise;
         @content.push( OpCode::TextMove => [0, $y-shift ] )
             unless $y-shift =~= 0.0;
 
@@ -216,6 +215,7 @@ class PDF::Content::Text::Block {
             @Tm[4] += $x-shift + .<Tx>;
             @Tm[5] += $y-shift + .<Ty>;
             .<Tm> = @Tm;
+	    .<Tr> = $.TextRise;
         }
 
         my $word-spacing = $gfx.WordSpacing;

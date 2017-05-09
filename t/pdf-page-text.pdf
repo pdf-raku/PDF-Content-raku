@@ -28,7 +28,7 @@ endobj
 endobj
 
 4 0 obj <<
-  /Length 3892
+  /Length 4032
 >> stream
 BT
   50 100 Td
@@ -42,7 +42,7 @@ ET
 BT
   /F2 10 Tf
   1 0 0 1 110 700 Tm
-  0 -9.31 Td
+  -9.31 Ts
   (*** top left*** Lorem) Tj
   11 TL
   T*
@@ -58,8 +58,9 @@ BT
   T*
   (magna aliqua.) Tj
   T*
+  0 Ts
   1 0 0 1 110 530 Tm
-  0 -9.31 Td
+  -9.31 Ts
   [ 3530 (*** top center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -74,8 +75,9 @@ BT
   T*
   [ 4669 (dolore magna aliqua.) ] TJ
   T*
+  0 Ts
   1 0 0 1 110 360 Tm
-  0 -9.31 Td
+  -9.31 Ts
   [ 9337 (*** top right*** Lorem) ] TJ
   T*
   [ 9225 (ipsum dolor sit amet,) ] TJ
@@ -90,8 +92,9 @@ BT
   T*
   [ 6281 (magna aliqua.) ] TJ
   T*
+  0 Ts
   1 0 0 1 110 190 Tm
-  0 -9.31 Td
+  -9.31 Ts
   0.173333 Tw
   (*** top justify*** Lorem) Tj
   T*
@@ -113,9 +116,11 @@ BT
   37.19 Tw
   (magna aliqua.) Tj
   T*
+  0 Ts
   0 Tw
   1 0 0 1 235 700 Tm
-  0 30.69 Td
+  -9.31 Ts
+  0 40 Td
   (*** center left***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -130,8 +135,10 @@ BT
   T*
   (dolore magna aliqua.) Tj
   T*
+  0 Ts
   1 0 0 1 235 530 Tm
-  0 30.69 Td
+  -9.31 Ts
+  0 40 Td
   [ 4224 (*** center center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -146,8 +153,10 @@ BT
   T*
   [ 4669 (dolore magna aliqua.) ] TJ
   T*
+  0 Ts
   1 0 0 1 235 360 Tm
-  0 30.69 Td
+  -9.31 Ts
+  0 40 Td
   [ 7614 (*** center right***) ] TJ
   T*
   [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -162,8 +171,10 @@ BT
   T*
   [ 9338 (dolore magna aliqua.) ] TJ
   T*
+  0 Ts
   1 0 0 1 235 190 Tm
-  0 30.69 Td
+  -9.31 Ts
+  0 40 Td
   8.875 Tw
   (*** center justify***) Tj
   T*
@@ -185,9 +196,11 @@ BT
   3.31 Tw
   (dolore magna aliqua.) Tj
   T*
+  0 Ts
   0 Tw
   1 0 0 1 360 700 Tm
-  0 70.69 Td
+  -9.31 Ts
+  0 80 Td
   (*** bottom left***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -202,8 +215,10 @@ BT
   T*
   (dolore magna aliqua.) Tj
   T*
+  0 Ts
   1 0 0 1 360 530 Tm
-  0 70.69 Td
+  -9.31 Ts
+  0 80 Td
   [ 4363 (*** bottom center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -218,8 +233,10 @@ BT
   T*
   [ 4669 (dolore magna aliqua.) ] TJ
   T*
+  0 Ts
   1 0 0 1 360 360 Tm
-  0 70.69 Td
+  -9.31 Ts
+  0 80 Td
   [ 7892 (*** bottom right***) ] TJ
   T*
   [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -234,8 +251,10 @@ BT
   T*
   [ 9338 (dolore magna aliqua.) ] TJ
   T*
+  0 Ts
   1 0 0 1 360 190 Tm
-  0 70.69 Td
+  -9.31 Ts
+  0 80 Td
   7.485 Tw
   (*** bottom justify***) Tj
   T*
@@ -257,6 +276,7 @@ BT
   3.31 Tw
   (dolore magna aliqua.) Tj
   T*
+  0 Ts
   0 Tw
 ET
 endstream
@@ -292,7 +312,7 @@ endobj
 endobj
 
 8 0 obj <<
-  /Length 6722
+  /Length 6756
 >> stream
 BT
   /F1 10 Tf
@@ -325,6 +345,7 @@ BT
   (consequat. Duis aute) Tj
   T*
   1 0 0 1 130 700 Tm
+  3 Ts
   (*** TextRise 3 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -351,7 +372,9 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
+  0 Ts
   1 0 0 1 240 700 Tm
+  -3 Ts
   (*** TextRise -3 ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
@@ -378,6 +401,7 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
+  0 Ts
   1 0 0 1 350 700 Tm
   50 Tz
   (*** HorizScaling 50 *** Lorem ipsum dolor sit) Tj
@@ -692,7 +716,7 @@ BT
   (exercitation ullamco) Tj
   T*
   1 0 0 1 460 360 Tm
-  0 -9.31 Td
+  -9.31 Ts
   (*** baseline top ***) Tj
   11 TL
   T*
@@ -720,6 +744,7 @@ BT
   T*
   (consequat. Duis aute) Tj
   T*
+  0 Ts
 ET
 endstream
 endobj
@@ -731,10 +756,10 @@ xref
 0000000068 00000 n 
 0000000140 00000 n 
 0000000311 00000 n 
-0000004258 00000 n 
-0000004369 00000 n 
-0000004475 00000 n 
-0000004630 00000 n 
+0000004398 00000 n 
+0000004509 00000 n 
+0000004615 00000 n 
+0000004770 00000 n 
 trailer
 <<
   /ID [ <867b4841444e1643c74ca7767ce9dd84> <867b4841444e1643c74ca7767ce9dd84> ]
@@ -742,5 +767,5 @@ trailer
   /Size 9
 >>
 startxref
-11407
+11581
 %%EOF

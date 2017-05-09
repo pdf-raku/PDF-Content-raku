@@ -38,8 +38,8 @@ $page.text: -> $gfx {
     is-approx $text-block.content-height, $unreplaced-height, '$.content-height';
 
     is-json-equiv $text-block.replaced, [
-        {:Tm[1, 0, 0, 1, 241.344, 464.8], :Tx(141.344), :Ty(<0/1>), :source("the")},
-        {:Tm[1, 0, 0, 1, 100.0, 447.2], :Tx(0.0), :Ty(-17.6), :source("aga")}
+        {:Tm[1, 0, 0, 1, 241.344, 464.8], :Tx(141.344), :Ty(<0/1>), :Tr(0), :source("the")},
+        {:Tm[1, 0, 0, 1, 100.0, 447.2], :Tx(0.0), :Ty(-17.6), :Tr(0), :source("aga")}
     ], 'replacements';
 }
 

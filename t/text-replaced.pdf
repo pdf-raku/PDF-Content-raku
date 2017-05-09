@@ -28,7 +28,7 @@ endobj
 endobj
 
 4 0 obj <<
-  /Length 1209
+  /Length 1202
 >> stream
 BT
   1 0 0 1 100 500 Tm
@@ -58,7 +58,7 @@ q
     [ (To be, or not to be, that is ) -1500 ] TJ
     T*
     (question: Whether \222tis nobler in) Tj
-    29.04 TL
+    26.4 TL
     T*
     [ -1500 ( mind to suffer The slings) ] TJ
     17.6 TL
@@ -72,7 +72,7 @@ q
     (opposing end them: to die, to) Tj
     T*
     (sleep No more; and by a sleep,) Tj
-    29.04 TL
+    26.4 TL
     T*
     [ (to say we end ) -1500 ( heart-ache,) ] TJ
     T*
@@ -90,11 +90,11 @@ q
     BT
       1 0 0 1 300.032 400 Tm
       (the) Tj
-      1 0 0 1 100 353.36 Tm
+      1 0 0 1 100 356 Tm
       (the) Tj
-      1 0 0 1 209.376 236.32 Tm
+      1 0 0 1 209.376 241.6 Tm
       (the) Tj
-      1 0 0 1 132.896 207.28 Tm
+      1 0 0 1 132.896 215.2 Tm
       (the) Tj
     ET
   Q
@@ -125,8 +125,8 @@ xref
 0000000068 00000 n 
 0000000134 00000 n 
 0000000305 00000 n 
-0000001569 00000 n 
-0000001673 00000 n 
+0000001562 00000 n 
+0000001666 00000 n 
 trailer
 <<
   /ID [ <867b4841444e1643c74ca7767ce9dd84> <867b4841444e1643c74ca7767ce9dd84> ]
@@ -134,5 +134,5 @@ trailer
   /Size 7
 >>
 startxref
-1784
+1777
 %%EOF

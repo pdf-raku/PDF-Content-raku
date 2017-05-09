@@ -92,7 +92,7 @@ for (
 
     for %opts.keys {
 	if $_ ~~ /^[A..Z]/
-        && $_ ne 'CharSpacing'|'WordSpacing'|'HorizScaling' {
+        && $_ ne 'CharSpacing'|'WordSpacing'|'HorizScaling'|'TextRise' {
             $gfx."$_"() = %opts{$_};
         }
 
