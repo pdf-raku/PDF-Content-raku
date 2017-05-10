@@ -3,15 +3,19 @@ use v6;
 #| simple plain-text text blocks
 class PDF::Content::Text::Block {
 
-    use PDF::Content::Text::Style :Alignment;
+    use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
     use PDF::Content::Marked :ParagraphTags;
     use PDF::Content::Replaced;
 
-    has PDF::Content::Text::Style $!style handles <font font-size leading valign kern space-width baseline CharSpacing WordSpacing HorizScaling TextRise>; 
     has Numeric $.width;
     has Numeric $.height;
+    my subset Alignment of Str is export(:Alignment) where 'left'|'center'|'right'|'justify';
+    has Alignment $.align = 'left';
+    my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
+    has VerticalAlignment $.valign = 'top';
+    has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRise baseline-shift space-width>; 
     has @.lines;
     has @.overflow is rw;
     has ParagraphTags $.type = Paragraph;
@@ -38,23 +42,21 @@ class PDF::Content::Text::Block {
         self.TWEAK( :@chunks, |c );
     }
 
-    method add-text(@chunks) {
+    multi submethod TWEAK(:@chunks!, |c) is default {
+	$!style .= new(|c);
+        $!text = @chunks.map(*.Str).join;
+	self!layup(@chunks);
+    }
+
+    method !layup(@chunks, :$resume, :$next-line) is default {
         my @atoms = @chunks; # copy
         my @line-atoms;
         my Bool $follows-ws = flush-space(@atoms);
         my $word-gap = self!word-gap;
-        $!text //= @atoms.map(*.Str).join;
 	my $height = $!style.font-size;
-  
-        my PDF::Content::Text::Line $line;
 
-	if @!lines {
-	    $line = @!lines.tail;
-	}
-	else {
-	    $line .= new: :$word-gap, :$height;
-	    @!lines.push: $line;
-	}
+        my PDF::Content::Text::Line $line .= new: :$word-gap, :$height;
+	@!lines = [ $line ];
 
         while @atoms {
             my subset StrOrReplaced where Str | PDF::Content::Replaced;
@@ -133,11 +135,6 @@ class PDF::Content::Text::Block {
 
     }
 
-    multi submethod TWEAK(:@chunks!, |c) is default {
-	$!style .= new(|c);
-	self.add-text(@chunks);
-    }
-
     sub flush-space(@words) returns Bool {
         my Bool \flush = ? (@words && @words[0] ~~ /<Text::space>/);
         @words.shift if flush;
@@ -162,7 +159,7 @@ class PDF::Content::Text::Block {
     method width  { $!width  // self.content-width }
     method height { $!height // self.content-height }
     method !dy {
-        given $.valign {
+        given $!valign {
             when 'center' { 0.5 }
             when 'bottom' { 1.0 }
             default       { 0 }
@@ -172,28 +169,26 @@ class PDF::Content::Text::Block {
         self!dy * ($.height - $.content-height);
     }
 
-    method align(Alignment $align) {
-        $!style.align = $align;
-        .align($align)
-            for self.lines;
-    }
-
     method render(
 	PDF::Content::Ops $gfx,
 	Bool :$nl,   # add trailing line 
 	Bool :$top,  # position from top
-	Bool :$left, # position from left;
+	Bool :$left, # position from left
+	Bool :$tidy = True, # restore text state
 	) {
 	my %saved;
 	for :$.WordSpacing, :$.CharSpacing, :$.HorizScaling, :$.TextRise {
-	    %saved{.key} = $gfx."{.key}"();
-	    $gfx."{.key}"() = .value;
+	    my $gfx-val = $gfx."{.key}"();
+	    %saved{.key} = $gfx-val
+		if $tidy;
+	    $gfx."Set{.key}"(.value)
+		unless .value =~= $gfx-val;
 	}
 
         my $width = $!width // self.content-width
-            if $!style.align eq 'justify';
+            if $!align eq 'justify';
 
-        .align($!style.align, :$width )
+        .align($!align, :$width )
             for @!lines;
 
         my @content;
@@ -203,7 +198,7 @@ class PDF::Content::Text::Block {
         @content.push( OpCode::TextMove => [0, $y-shift ] )
             unless $y-shift =~= 0.0;
 
-        my $dx = do given $!style.align {
+        my $dx = do given $!align {
             when 'center' { 0.5 }
             when 'right'  { 1.0 }
             default       { 0.0 }

@@ -28,8 +28,8 @@ $gfx.text-position = [100, 350];
 is-deeply $gfx.text-position, (100, 350), 'text position';
 $gfx.say( $text-block );
 is-deeply $gfx.text-position, (100, 350 - 17.6), 'text position';
-$text-block.baseline = 'bottom';
-$gfx.print( $text-block );
+$text-block.TextRise = $text-block.baseline-shift('bottom');
+$gfx.print( $text-block, :!tidy );
 $gfx.EndText;
 $gfx.Restore;
 
@@ -43,7 +43,7 @@ is-json-equiv [ $gfx.ops ], [
     :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
     :TL[:real(17.6)],
     'T*' => [],
-    :Td[ :real(0), :real(3.648) ],
+    :Ts[ :real(3.648) ],
     :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
     :ET[],
     :Q[],
