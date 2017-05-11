@@ -232,7 +232,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                             .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
                         }
                         my $gs = .find-resource(&grepper, :type<ExtGState>)
-                            //  PDF::DAO.coerce({ :Type{ :name<ExtGState> }, $key => v });
+                            // PDF::DAO.coerce({ :Type{ :name<ExtGState> }, $key => v });
                         my Str $gs-entry = .resource-key($gs, :eqv);
 	                self.SetGraphicsState($gs-entry);
                     }
@@ -587,11 +587,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     proto sub op(|c) returns Pair {*}
     #| semi-raw and a little dwimmy e.g:  op('TJ' => [[:literal<a>, :hex-string<b>, 'c']])
     #|                                     --> :TJ( :array[ :literal<a>, :hex-string<b>, :literal<c> ] )
+    my subset Comment of Pair where {.key eq 'comment'}
+    multi sub op(Comment $comment!) { $comment }
     multi sub op(Pair $raw!) {
         my Str $op = $raw.key;
         my List $input_vals = $raw.value;
         # validate the operation and get fallback coercements for any missing pairs
-        my subset Comment of Pair where {.key eq 'comment'}
         my @vals = $raw.value.grep(* !~~ Comment).map: { from-ast($_) };
         my \opn = op($op, |@vals);
 	my \coerced_vals = opn.value;
@@ -618,7 +619,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $op-name ∈ GraphicsOps;
     }
 
-    method op(*@args is copy) {
+    multi method op(Comment $_) { $_ }
+    multi method op(*@args is copy) {
         my \opn = op(|@args);
 	my Str $op-name;
 
@@ -662,6 +664,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 		for .list
 	}
         @!ops;
+    }
+
+    method add-comment(Str $_) {
+        @!ops.push: (:comment[$_]);
     }
 
     method parse(Str $content) {

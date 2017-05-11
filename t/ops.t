@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 76;
+plan 77;
 
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
@@ -178,12 +178,14 @@ is-json-equiv [ $g.ops[*-4..*] ], [
 $g = PDF::Content.new :comment-ops;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
+$g.add-comment("That's all!");
 is-json-equiv $g.ops, [
     :m[:int(175), :int(720), :comment<MoveTo>, ],
     :l[:int(175), :int(700), :comment<LineTo>, ],
     :v[:int(300), :int(800), :int(400), :int(720), :comment<CurveToInitial>, ],
     :h[ :comment<ClosePath>, ],
     :S[ :comment<Stroke>, ],
+    :comment["That's all!"],
 ], 'parse and comment';
 
 is-deeply $g.content-dump, $(
@@ -191,12 +193,14 @@ is-deeply $g.content-dump, $(
     '175 700 l % LineTo',
     '300 800 400 720 v % CurveToInitial',
     'h % ClosePath',
-    'S % Stroke'
+    'S % Stroke',
+    "% That's all!",
 ), 'content with comments';
 
 my $g1 = PDF::Content.new;
-lives-ok {$g1.ops: $g.ops}, "comments import";
-is-json-equiv $g1.ops[0], (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import';
+lives-ok {$g1.ops: $g.ops;}, "comments import - lives";
+is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import - head';
+is-json-equiv $g1.ops.tail, (:S[ :comment<Stroke> ]), 'comments import - tail';
 
 $g.Save;
 $g.CTM = [0, -2, 2, 0, 40, -20];
