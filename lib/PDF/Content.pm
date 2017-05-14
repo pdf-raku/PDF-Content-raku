@@ -15,42 +15,6 @@ role PDF::Content
         self.strict = $_ with $strict;
     }
 
-    method set-graphics($gs = PDF::DAO.coerce({ :Type{ :name<ExtGState> } }),
-			Numeric :$opacity is copy,
-			Numeric :$transparency,
-			*%settings,
-	) {
-
-	my constant %Entries = %( ExtGState.enums.invert );
-
-	with $transparency {
-	    $opacity = 1 - $_
-        }
-
-	with $opacity {
-	    %settings<FillAlpha> //= $_;
-	    %settings<StrokeAlpha> //= $_;
-	}
-
-	for %settings.keys.sort {
-	    if $gs.can($_) {
-		$gs."$_"() = %settings{$_}
-	    }
-	    elsif %Entries{$_}:exists {
-		$gs{ $_ } = %settings{$_};
-	    }
-	    elsif ExtGState.enums{$_}:exists {
-		$gs{ ExtGState.enums{$_} } = %settings{$_};
-	    }
-	    else {
-		warn "ignoring graphics state option: $_";
-	    }
-	}
-
-	my Str $gs-entry = self.resource-key($gs, :eqv);
-	self.SetGraphicsState($gs-entry);
-    }
-
     method graphics( &do-stuff! ) {
         $.op(Save);
         &do-stuff(self);
