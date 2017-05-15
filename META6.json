@@ -1,7 +1,7 @@
 {
     "perl"        : "6.*",
     "name"        : "PDF::Content",
-    "version"     : "0.0.4",
+    "version"     : "0.0.5",
     "api"         : "PDF-1.7",
     "auth"        : "github:p6-pdf",
     "description" : "Basic PDF content authoring; including text, images, fonts and graphics",

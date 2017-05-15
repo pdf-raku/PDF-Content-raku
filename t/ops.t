@@ -199,8 +199,8 @@ is-deeply $g.content-dump, $(
 
 my $g1 = PDF::Content.new;
 lives-ok {$g1.ops: $g.ops;}, "comments import - lives";
-is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), :comment<MoveTo>, ]), 'comments import - head';
-is-json-equiv $g1.ops.tail, (:S[ :comment<Stroke> ]), 'comments import - tail';
+is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), ]), 'comments import - head';
+is-json-equiv $g1.ops.tail, (:S[ ]), 'comments import - tail';
 
 $g.Save;
 $g.CTM = [0, -2, 2, 0, 40, -20];

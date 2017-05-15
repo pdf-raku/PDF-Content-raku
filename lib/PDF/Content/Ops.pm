@@ -25,7 +25,7 @@ my role ExtGraphicsAtt {
     }
 }
 
-role PDF::Content::Ops {
+class PDF::Content::Ops {
 
     use PDF::Writer;
     use PDF::Content::Util::TransformMatrix;
@@ -591,16 +591,16 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     multi sub op(Comment $comment!) { $comment }
     multi sub op(Pair $raw!) {
         my Str $op = $raw.key;
-        my List $input_vals = $raw.value;
+        my @raw-vals = $raw.value.grep(* !~~ Comment);
         # validate the operation and get fallback coercements for any missing pairs
-        my @vals = $raw.value.grep(* !~~ Comment).map: { from-ast($_) };
+        my @vals = @raw-vals.map: { from-ast($_) };
         my \opn = op($op, |@vals);
-	my \coerced_vals = opn.value;
+	my \coerced-vals = opn.value;
 
-	my @ast-values = $input_vals.pairs.map({
+	my @ast-values = @raw-vals.pairs.map({
 	    .value ~~ Pair
 		?? .value
-		!! coerced_vals[.key]
+		!! coerced-vals[.key]
 	});
 	$op => [ @ast-values ];
     }
