@@ -21,14 +21,16 @@ role PDF::Content::Resourced {
     multi method resources('ProcSet') {
 	my @entries;
 	my $resource-entries = .ProcSet with self.Resources;
-	@entries = .keys.map( -> $k { .[$k] } )
+	@entries = .keys.map( { $resource-entries[$_] } )
 	    with $resource-entries;
 	@entries;	
     }
     multi method resources(Str $type) is default {
 	my %entries;
-	my $resource-entries = .{$type} with self.Resources;
-	%entries = .keys.map( -> $k { $k => .{$k} } )
+	my $resources = self.Resources;
+	my Hash $resource-entries = $resources{$type}
+	    if $resources && ($resources{$type}:exists);
+	%entries = .keys.map( { $_ => $resource-entries{$_} } )
 	    with $resource-entries;
 	%entries;
     }
@@ -38,7 +40,13 @@ role PDF::Content::Resourced {
     }
 
     method find-resource(|c ) {
-	.find-resource(|c) with self.Resources;
+        # work around rakudo RT#130798
+        with self.Resources {
+	    .find-resource(|c);
+        }
+        else {
+            Mu
+        }
     }
 
     method images(Bool :$inline = True) {
