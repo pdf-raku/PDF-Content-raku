@@ -426,12 +426,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     my Routine %Ops = BEGIN %(
 
         # BI dict ID stream EI
-        'BI' => sub ($op, Hash $dict = {}) {
-            $op => [ :$dict ];
+        'BI' => sub (Str, Hash $dict = {}) {
+            [ :$dict ];
         },
 
-        'ID' => sub ($op, Str $encoded = '') {
-            $op => [ :$encoded ];
+        'ID' => sub (Str, Str $encoded = '') {
+            [ :$encoded ];
         },
 
         'EI' => sub ($op) { $op => [] },
@@ -442,20 +442,20 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
         'BT'|'ET'|'EMC'|'BX'|'EX'|'b*'|'b'|'B*'|'B'|'f*'|'F'|'f'
             |'h'|'n'|'q'|'Q'|'s'|'S'|'T*'|'W*'|'W' => sub ($op) {
-            $op => [];
+            [];
         },
 
         # tag                     BMC | MP
         # name                    cs | CS | Do | sh
         # dictname                gs
         # intent                  ri
-        'BMC'|'cs'|'CS'|'Do'|'gs'|'MP'|'ri'|'sh' => sub ($op, Str $name!) {
-            $op => [ :$name ]
+        'BMC'|'cs'|'CS'|'Do'|'gs'|'MP'|'ri'|'sh' => sub (Str, Str $name!) {
+            [ :$name ]
         },
 
         # string                  Tj | '
-        'Tj'|"'" => sub ($op, Str $literal!) {
-            $op => [ :$literal ]
+        'Tj'|"'" => sub (Str, Str $literal!) {
+            [ :$literal ]
          },
 
         # array                   TJ
@@ -466,17 +466,17 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 when Pair    { $_ }
                 default {die "invalid entry in $op array: {.perl}"}
             });
-            $op => [ :@array ];
+            [ :@array ];
         },
 
         # name num                Tf
-        'Tf' => sub (Str $op, Str $name!, Numeric $real!) {
-            $op => [ :$name, :$real ]
+        'Tf' => sub (Str, Str $name!, Numeric $real!) {
+            [ :$name, :$real ]
         },
 
         # name dict              BDC | DP
-        'BDC'|'DP' => sub (Str $op, Str $name!, Hash $dict!) {
-            $op => [ :$name, :$dict ]
+        'BDC'|'DP' => sub (Str, Str $name!, Hash $dict!) {
+            [ :$name, :$dict ]
         },
 
         # dashArray dashPhase    d
@@ -486,7 +486,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 when Pair    { $_ }
                 default {die "invalid entry in $op array: {.perl}"}
             });
-            $op => [ :@array, :$real ];
+            [ :@array, :$real ];
         },
 
         # flatness               i
@@ -498,49 +498,49 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         # wordSpace              Tw
         # scale                  Tz
         # lineWidth              w
-        'i'|'g'|'G'|'M'|'Tc'|'TL'|'Ts'|'Tw'|'Tz'|'w' => sub ($op, Numeric $real!) {
-            $op => [ :$real ]
+        'i'|'g'|'G'|'M'|'Tc'|'TL'|'Ts'|'Tw'|'Tz'|'w' => sub (Str, Numeric $real!) {
+            [ :$real ]
         },
 
         # lineCap                J
         # lineJoin               j
         # render                 Tr
-        'j'|'J'|'Tr' => sub ($op, UInt $int!) {
-            $op => [ :$int ]
+        'j'|'J'|'Tr' => sub (Str, UInt $int!) {
+            [ :$int ]
         },
 
         # x y                    m l
         # wx wy                  d0
         # tx ty                  Td TD
-        'd0'|'l'|'m'|'Td'|'TD' => sub ($op, Numeric $n1!, Numeric $n2!) {
-            $op => [ :real($n1), :real($n2) ]
+        'd0'|'l'|'m'|'Td'|'TD' => sub (Str, Numeric $n1!, Numeric $n2!) {
+            [ :real($n1), :real($n2) ]
         },
 
         # aw ac string           "
-        '"' => sub (Str $op, Numeric $n1!, Numeric $n2!, Str $literal! ) {
-            $op => [ :real($n1), :real($n2), :$literal ]
+        '"' => sub (Str, Numeric $n1!, Numeric $n2!, Str $literal! ) {
+            [ :real($n1), :real($n2), :$literal ]
         },
 
         # r g b                  rg | RG
-        'rg'|'RG' => sub (Str $op, Numeric $n1!,
+        'rg'|'RG' => sub (Str, Numeric $n1!,
                           Numeric $n2!, Numeric $n3!) {
-            $op => [ :real($n1), :real($n2), :real($n3) ]
+            [ :real($n1), :real($n2), :real($n3) ]
         },
 
         # c m y k                k | K
         # x y width height       re
         # x2 y2 x3 y3            v y
-        'k'|'K'|'re'|'v'|'y' => sub (Str $op, Numeric $n1!,
-                                             Numeric $n2!, Numeric $n3!, Numeric $n4!) {
-            $op => [ :real($n1), :real($n2), :real($n3), :real($n4) ]
+        'k'|'K'|'re'|'v'|'y' => sub (Str, Numeric $n1!, Numeric $n2!,
+                                          Numeric $n3!, Numeric $n4!) {
+            [ :real($n1), :real($n2), :real($n3), :real($n4) ]
         },
 
         # x1 y1 x2 y2 x3 y3      c | cm
         # wx wy llx lly urx ury  d1
         # a b c d e f            Tm
-        'c'|'cm'|'d1'|'Tm' => sub (Str $op,
+        'c'|'cm'|'d1'|'Tm' => sub (Str,
             Numeric $n1!, Numeric $n2!, Numeric $n3!, Numeric $n4!, Numeric $n5!, Numeric $n6!) {
-            $op => [ :real($n1), :real($n2), :real($n3), :real($n4), :real($n5), :real($n6) ]
+            [ :real($n1), :real($n2), :real($n3), :real($n4), :real($n5), :real($n6) ]
         },
 
         # c1, ..., cn             sc | SC
@@ -557,7 +557,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 }
             });
 
-            $op => [ @args ]
+            @args
         },
 
         # c1, ..., cn [name]      scn | SCN
@@ -581,7 +581,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
             @args.push: (:$name) if $name.defined;
 
-            $op => [ @args ]
+            @args
         },
      );
 
@@ -608,7 +608,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     multi sub op(Str $op, |c) is default {
         with %Ops{$op} {
-            .($op,|c);
+            $op => .($op,|c);
         }
         else {
             die "unknown content operator: '$op'";
