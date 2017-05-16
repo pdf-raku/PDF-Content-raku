@@ -126,7 +126,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
 =end pod
 
-    #| some convenient mnemomic names
+    # some convenient mnemomic names
     my Str enum OpCode is export(:OpCode) «
         :BeginImage<BI> :ImageData<ID> :EndImage<EI>
         :BeginMarkedContent<BMC> :BeginMarkedContentDict<BDC>
@@ -198,7 +198,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	:TextKnockout<TK>
     »;
 
-    #| [PDF 1.7 TABLE 5.3 Text rendering modes]
+    # [PDF 1.7 TABLE 5.3 Text rendering modes]
     my Int enum TextMode is export(:TextMode) «
 	:FillText(0) :OutlineText(1) :FillOutlineText(2)
         :InvisableText(3) :FillClipText(4) :OutlineClipText(5)
@@ -299,7 +299,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method font-size {$!Font[1]}
 
     # *** Graphics STATE ***
-    has Numeric @!CTM is graphics = [ 1, 0, 0, 1, 0, 0, ];     #| graphics matrix;
+    has Numeric @.CTM is graphics = [ 1, 0, 0, 1, 0, 0, ];      # graphics matrix;
     method CTM is rw {
         Proxy.new(
             FETCH => sub ($) {@!CTM},
@@ -425,7 +425,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     my Routine %Ops = BEGIN %(
 
-        #| BI dict ID stream EI
+        # BI dict ID stream EI
         'BI' => sub ($op, Hash $dict = {}) {
             $op => [ :$dict ];
         },
@@ -445,20 +445,20 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             $op => [];
         },
 
-        #| tag                     BMC | MP
-        #| name                    cs | CS | Do | sh
-        #| dictname                gs
-        #| intent                  ri
+        # tag                     BMC | MP
+        # name                    cs | CS | Do | sh
+        # dictname                gs
+        # intent                  ri
         'BMC'|'cs'|'CS'|'Do'|'gs'|'MP'|'ri'|'sh' => sub ($op, Str $name!) {
             $op => [ :$name ]
         },
 
-        #| string                  Tj | '
+        # string                  Tj | '
         'Tj'|"'" => sub ($op, Str $literal!) {
             $op => [ :$literal ]
          },
 
-        #| array                   TJ
+        # array                   TJ
         'TJ' => sub (Str $op, Array $args!) {
             my @array = $args.map({
                 when Str     { :literal($_) }
@@ -469,16 +469,17 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             $op => [ :@array ];
         },
 
+        # name num                Tf
         'Tf' => sub (Str $op, Str $name!, Numeric $real!) {
             $op => [ :$name, :$real ]
         },
 
-        #| name dict              BDC | DP
+        # name dict              BDC | DP
         'BDC'|'DP' => sub (Str $op, Str $name!, Hash $dict!) {
             $op => [ :$name, :$dict ]
         },
 
-        #| dashArray dashPhase    d
+        # dashArray dashPhase    d
         'd' => sub (Str $op, Array $args!, Numeric $real!) {
             my @array = $args.map({
                 when Numeric { :real($_) }
@@ -488,55 +489,55 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             $op => [ :@array, :$real ];
         },
 
-        #| flatness               i
-        #| gray                   g | G
-        #| miterLimit             m
-        #| charSpace              Tc
-        #| leading                TL
-        #| rise                   Ts
-        #| wordSpace              Tw
-        #| scale                  Tz
-        #| lineWidth              w
+        # flatness               i
+        # gray                   g | G
+        # miterLimit             m
+        # charSpace              Tc
+        # leading                TL
+        # rise                   Ts
+        # wordSpace              Tw
+        # scale                  Tz
+        # lineWidth              w
         'i'|'g'|'G'|'M'|'Tc'|'TL'|'Ts'|'Tw'|'Tz'|'w' => sub ($op, Numeric $real!) {
             $op => [ :$real ]
         },
 
-        #| lineCap                J
-        #| lineJoin               j
-        #| render                 Tr
+        # lineCap                J
+        # lineJoin               j
+        # render                 Tr
         'j'|'J'|'Tr' => sub ($op, UInt $int!) {
             $op => [ :$int ]
         },
 
-        #| x y                    m l
-        #| wx wy                  d0
-        #| tx ty                  Td TD
+        # x y                    m l
+        # wx wy                  d0
+        # tx ty                  Td TD
         'd0'|'l'|'m'|'Td'|'TD' => sub ($op, Numeric $n1!, Numeric $n2!) {
             $op => [ :real($n1), :real($n2) ]
         },
 
-        #| aw ac string           "
+        # aw ac string           "
         '"' => sub (Str $op, Numeric $n1!, Numeric $n2!, Str $literal! ) {
             $op => [ :real($n1), :real($n2), :$literal ]
         },
 
-        #| r g b                  rg | RG
+        # r g b                  rg | RG
         'rg'|'RG' => sub (Str $op, Numeric $n1!,
                           Numeric $n2!, Numeric $n3!) {
             $op => [ :real($n1), :real($n2), :real($n3) ]
         },
 
-        #| c m y k                k | K
-        #| x y width height       re
-        #| x2 y2 x3 y3            v y
+        # c m y k                k | K
+        # x y width height       re
+        # x2 y2 x3 y3            v y
         'k'|'K'|'re'|'v'|'y' => sub (Str $op, Numeric $n1!,
                                              Numeric $n2!, Numeric $n3!, Numeric $n4!) {
             $op => [ :real($n1), :real($n2), :real($n3), :real($n4) ]
         },
 
-        #| x1 y1 x2 y2 x3 y3      c | cm
-        #| wx wy llx lly urx ury  d1
-        #| a b c d e f            Tm
+        # x1 y1 x2 y2 x3 y3      c | cm
+        # wx wy llx lly urx ury  d1
+        # a b c d e f            Tm
         'c'|'cm'|'d1'|'Tm' => sub (Str $op,
             Numeric $n1!, Numeric $n2!, Numeric $n3!, Numeric $n4!, Numeric $n5!, Numeric $n6!) {
             $op => [ :real($n1), :real($n2), :real($n3), :real($n4), :real($n5), :real($n6) ]
@@ -585,8 +586,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
      );
 
     proto sub op(|c) returns Pair {*}
-    #| semi-raw and a little dwimmy e.g:  op('TJ' => [[:literal<a>, :hex-string<b>, 'c']])
-    #|                                     --> :TJ( :array[ :literal<a>, :hex-string<b>, :literal<c> ] )
+    # semi-raw and a little dwimmy e.g:  op('TJ' => [[:literal<a>, :hex-string<b>, 'c']])
+    #                                     --> :TJ( :array[ :literal<a>, :hex-string<b>, :literal<c> ] )
     my subset Comment of Pair where {.key eq 'comment'}
     multi sub op(Comment $comment!) { $comment }
     multi sub op(Pair $raw!) {
@@ -833,8 +834,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    unless $!context == Page;
     }
 
-    #| serialize content. indent blocks for readability
-    method content {
+    #| serialize content into a string. indent blocks for readability
+    method content returns Str {
 	my constant Openers = 'q'|'BT'|'BMC'|'BDC'|'BX';
 	my constant Closers = 'Q'|'ET'|'EMC'|'EX';
         my PDF::Writer $writer .= new;
@@ -856,7 +857,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	}).join: "\n";
     }
 
-    #| dump of serialized content - for debugging/testing
+    #| serialized current content as an array of strings - for debugging/testing
     method content-dump {
         my PDF::Writer $writer .= new;
 
