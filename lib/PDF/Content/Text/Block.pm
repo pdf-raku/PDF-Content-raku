@@ -5,9 +5,9 @@ class PDF::Content::Text::Block {
 
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
+    use PDF::Content::Text::Reserved;
     use PDF::Content::Ops :OpCode, :TextMode;
     use PDF::Content::Marked :ParagraphTags;
-    use PDF::Content::Replaced;
 
     has Numeric $.width;
     has Numeric $.height;
@@ -19,7 +19,7 @@ class PDF::Content::Text::Block {
     has @.lines;
     has @.overflow is rw;
     has ParagraphTags $.type = Paragraph;
-    has @.replaced;
+    has @.reserved;
     has Str $.text;
 
     method content-width  { @!lines.map( *.content-width ).max }
@@ -59,9 +59,9 @@ class PDF::Content::Text::Block {
 	@!lines = [ $line ];
 
         while @atoms {
-            my subset StrOrReplaced where Str | PDF::Content::Replaced;
-            my StrOrReplaced $atom = @atoms.shift;
-            my Bool $replacing = False;
+            my subset StrOrReserved where Str | PDF::Content::Text::Reserved;
+            my StrOrReserved $atom = @atoms.shift;
+            my Bool $reserving = False;
 	    my $word-width;
             my $word;
             my $pre-word-gap = $follows-ws ?? $word-gap !! 0.0;
@@ -88,8 +88,8 @@ class PDF::Content::Text::Block {
                         }
                     }
                 }
-                when PDF::Content::Replaced {
-                    $replacing = True;
+                when PDF::Content::Text::Reserved {
+                    $reserving = True;
                     $word = [-$atom.width * $.HorizScaling * 10 / $!style.font-size, ];
                     $word-width = $atom.width;
                 }
@@ -103,7 +103,7 @@ class PDF::Content::Text::Block {
                 $follows-ws = False;
                 $pre-word-gap = 0;
             }
-            if $replacing {
+            if $reserving {
                 my $height = $atom.height;
                 $line.height = $height
                     if $height > $line.height;
@@ -115,10 +115,12 @@ class PDF::Content::Text::Block {
                 last;
             }
 
-            if $replacing {
+            if $reserving {
                 my $Tx = $line.content-width + $pre-word-gap;
-                my $Ty = $line.height * $!style.leading  -  self.content-height;
-                @!replaced.push( { :$Tx, :$Ty, :source($atom.source) } )
+                my $Ty = @!lines
+                    ?? @!lines[0].height * $.leading  -  self.content-height
+                    !! 0.0;
+                @!reserved.push( { :$Tx, :$Ty, :source($atom.source) } )
             }
 
             @line-atoms.push: $atom;
@@ -204,8 +206,8 @@ class PDF::Content::Text::Block {
             default       { 0.0 }
         }
         my $x-shift = $left ?? $dx * $.width !! 0.0;
-        # compute text positions of replaced content
-        for @!replaced {
+        # compute text positions of reserved content
+        for @!reserved {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
             @Tm[4] += $x-shift + .<Tx>;
             @Tm[5] += $y-shift + .<Ty>;

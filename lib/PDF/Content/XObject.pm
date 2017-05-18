@@ -27,31 +27,30 @@ role PDF::Content::XObject['Image'] {
     my subset Str-or-IOHandle where Str|IO::Handle;
     has Str-or-IOHandle $.source;
     has Str $.image-type;
-    method set-source(Str-or-IOHandle :$!source, :$!image-type, :$data-uri) {}
+    method set-source(Str-or-IOHandle :$!source!, :$!image-type!) {
+    }
 
     method data-uri is rw {
         Proxy.new(
             FETCH => sub ($) {
-                $!data-uri //= do {
-                    with $!source {
-			use PDF::IO::Util;
-                        my Str $bytes = .isa(Str)
-                            ?? .substr(0)
-                            !! .path.IO.slurp(:enc<latin-1>);
-			state &b64-encoder = PDF::IO::Util::libpdf-available()
-			    ?? do {
-				my &enc = PDF::IO::Util::xs('Lib::PDF::Encode', 'base64-encode');
-				sub ($_) { &enc($_).decode } }
-			    !! sub ($_) {
-				use Base64;
-				encode-base64($_, :str) };
-                        my $enc = &b64-encoder($bytes);
-                        'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
-                    }
-                    else {
-                        fail 'image is not associated with a source';
-                    }
-                }
+                $!data-uri //= do with $!source {
+		    use PDF::IO::Util;
+		    my Str $bytes = .isa(Str)
+			?? .substr(0)
+			!! .path.IO.slurp(:enc<latin-1>);
+		    state &b64-encoder = PDF::IO::Util::libpdf-available()
+			?? do {
+			    my &enc = PDF::IO::Util::xs('Lib::PDF::Encode', 'base64-encode');
+			    sub ($_) { &enc($_).decode } }
+		    !! sub ($_) {
+			use Base64;
+			encode-base64($_, :str) };
+		    my $enc = &b64-encoder($bytes);
+		    'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
+		}
+		else {
+		    fail 'image is not associated with a source';
+		}
             },
             STORE => sub ($, $!data-uri) {},
         )
