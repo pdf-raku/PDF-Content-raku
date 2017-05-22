@@ -38,7 +38,7 @@ role PDF::Content::XObject['Image'] {
 		    my Str $bytes = .isa(Str)
 			?? .substr(0)
 			!! .path.IO.slurp(:enc<latin-1>);
-		    my $enc = base64-encode($bytes);
+		    my $enc = base64-encode($bytes, :str, :enc<latin-1>);
 		    'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
 		}
 		else {
