@@ -374,7 +374,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has GraphicsContext $.context = Page;
 
-    method !track-context(Str $op, $last-op) {
+    method !track-context(Str $op) {
 
         my constant %Transition = %(
             'BT'     => ( (Page) => Text ),
@@ -418,7 +418,18 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 warn "text operation '$op' (%OpCode{$op}) outside of a BT ... ET text block\n";
             }
             else {
-                warn "unexpected '$op' (%OpCode{$op}) operation" ~ ($last-op ?? ", in $!context context, following '$last-op' (%OpCode{$last-op})" !! ' (first operation)')
+                my $more-info = ' (first operation)';
+
+                loop (my int $n = +@!ops-2; $n >= 0; $n--) {
+                    with @!ops[$n].key {
+                        unless $_ ~~ 'comment' {
+                            $more-info = ", in $!context context, following '$_' (%OpCode{$_})";
+                            last;
+                        }
+                    }
+                }
+
+                warn "unexpected '$op' (%OpCode{$op}) operation" ~ $more-info;
             }
         }
     }
@@ -642,16 +653,15 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    }
 	}
 
-        my Str $last-op = @!ops.tail.key
-	    if @!ops;
-
 	@!ops.push(opn);
-        self!track-context($op-name, $last-op);
-        self.track-graphics($op-name, |@args );
-        .($op-name, |@args, :obj(self) )
-	    with self.callback;
-        opn.value.push: (:comment(%OpCode{$op-name}))
-            if $!comment-ops;
+        unless $op-name ~~ Comment { 
+            self!track-context($op-name);
+            self.track-graphics($op-name, |@args );
+            .($op-name, |@args, :obj(self) )
+	        with self.callback;
+            opn.value.push: (:comment(%OpCode{$op-name}))
+                if $!comment-ops;
+        }
 	opn;
     }
 
