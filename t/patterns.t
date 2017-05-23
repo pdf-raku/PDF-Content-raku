@@ -2,6 +2,10 @@ use v6;
 use Test;
 use lib '.';
 use t::PDFTiny;
+
+# ensure consistant document ID generation
+srand(123456);
+
 my $pdf = t::PDFTiny.new;
 my $page = $pdf.add-page;
 
