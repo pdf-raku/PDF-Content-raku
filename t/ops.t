@@ -2,10 +2,10 @@ use v6;
 use Test;
 plan 77;
 
+use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
-use lib '.';
 use t::GfxParent;
 
 my $parent = { :Font{ :F1{} }, } does t::GfxParent;
