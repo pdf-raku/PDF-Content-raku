@@ -19,13 +19,13 @@ class PDF::Content::Image::PNG
     method read($fh!, Bool :$alpha=True --> PDF::DAO::Stream) {
 
         my class Header does Native::Packing[Network] {
-            has uint32 $.w;
-            has uint32 $.h;
-            has uint8  $.bpc;
-            has uint8  $.cs;
-            has uint8  $.cm;
-            has uint8  $.fm;
-            has uint8  $.im;
+            has uint32 $.width;
+            has uint32 $.height;
+            has uint8  $.bit-depth;
+            has uint8  $.color-type;
+            has uint8  $.compression-type;
+            has uint8  $.filter-type;
+            has uint8  $.interlace-type;
         }
         my class Quad does Native::Packing[Network] {
             has uint32 $.Numeric;
@@ -53,9 +53,9 @@ class PDF::Content::Image::PNG
                 when 'IHDR' {
                     my $buf = $fh.read(+$len);
                     $hdr = Header.unpack: $buf;
-                    die "Unsupported Compression($hdr.cm) Method" if $hdr.cm;
-                    die "Unsupported Interlace($hdr.im) Method" if $hdr.im;
-                    die "Unsupported Filter($hdr.fm) Method" if $hdr.fm;
+                    die "Unsupported Compression($hdr.cm) Method" if $hdr.compression-type;
+                    die "Unsupported Filter($hdr.fm) Method" if $hdr.filter-type;
+                    die "Unsupported Interlace($hdr.im) Method" if $hdr.interlace-type;
                 }
                 when 'PLTE' {
                     $palette = $fh.read(+$len);
@@ -78,13 +78,13 @@ class PDF::Content::Image::PNG
         }
         $fh.close;
 
-        %dict<Width>  = $hdr.w;
-        %dict<Height> = $hdr.h;
+        %dict<Width>  = $hdr.width;
+        %dict<Height> = $hdr.height;
 
-	my %opts = :w($hdr.w), :h($hdr.h), :%dict, :$stream, :$alpha;
+	my %opts = :w($hdr.width), :h($hdr.height), :%dict, :$stream, :$alpha;
 	%opts<trns> = $_ with $trns;
 	%opts<palette> = $_ with $palette;
-	png-to-stream($hdr.cs, $hdr.bpc, |%opts);
+	png-to-stream($hdr.color-type, $hdr.bit-depth, |%opts);
     }
 
     enum PNG-CS « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;

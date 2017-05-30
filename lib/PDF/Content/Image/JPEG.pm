@@ -12,9 +12,9 @@ class PDF::Content::Image::JPEG
 
     method read($fh!) {
        my class Atts does Native::Packing[Network] {
-            has uint8 $.bpc;
+            has uint8 $.bit-depth;
             has uint16 ($.height, $.width);
-            has uint8 $.cs
+            has uint8 $.color-type
         }
         my class Hdr does Native::Packing[Network] {
             has uint8 ($.ff, $.mark);
@@ -48,7 +48,7 @@ class PDF::Content::Image::JPEG
 
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
         with $atts {
-            my Str \color-space = do given .cs {
+            my Str \color-space = do given .color-type {
                 when 3 {'DeviceRGB'}
                 when 4 {'DeviceCMYK'}
                 when 1 {'DeviceGray'}
@@ -59,7 +59,7 @@ class PDF::Content::Image::JPEG
             %dict<ColorSpace> = :name(color-space);
             %dict<Width> = .width;
             %dict<Height> = .height;
-            %dict<BitsPerComponent> = .bpc;
+            %dict<BitsPerComponent> = .bit-depth;
         }
         else {
             die "unable to read JPEG attributes";

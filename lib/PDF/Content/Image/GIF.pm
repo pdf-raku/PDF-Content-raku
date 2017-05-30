@@ -84,8 +84,8 @@ class PDF::Content::Image::GIF
             unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
         my class LogicalDescriptor does Native::Packing[Vax] {
-            has uint16 $.wg;
-            has uint16 $.hg;
+            has uint16 $.width;
+            has uint16 $.height;
             has uint8 $.flags;
             has uint8 $.bgColorIndex;
             has uint8 $.aspect;
@@ -93,8 +93,8 @@ class PDF::Content::Image::GIF
         my class ImageDescriptor does Native::Packing[Vax] {
             has uint16 $.left;
             has uint16 $.top;
-            has uint16 $.w;
-            has uint16 $.h;
+            has uint16 $.width;
+            has uint16 $.height;
             has uint8 $.flags;
         }
         my LogicalDescriptor $descr .= read: $fh;
@@ -111,8 +111,8 @@ class PDF::Content::Image::GIF
                 when 0x2C {
                     my ImageDescriptor $img .= read: $fh;
 
-                    %dict<Width>  = $img.w || $descr.wg;
-                    %dict<Height> = $img.h || $descr.hg;
+                    %dict<Width>  = $img.width || $descr.width;
+                    %dict<Height> = $img.height || $descr.height;
                     %dict<BitsPerComponent> = 8;
 
                     with $img.flags -> uint8 $flags {
