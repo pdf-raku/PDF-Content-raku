@@ -319,12 +319,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                                            }) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
     has ColorSpace $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
-    has $!StrokeColor is graphics;
+    has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
         Proxy.new(
-            FETCH => sub ($) {$!StrokeColorSpace => $!StrokeColor},
+            FETCH => sub ($) {$!StrokeColorSpace => @!StrokeColor},
             STORE => sub ($, Pair $_) {
-                unless .key eq $!StrokeColorSpace && .value eqv $!StrokeColor {
+                unless .key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
                     if .key ~~ /^ Device(RGB|Gray|CMYK) $/ {
                         my $cs = ~ $0;
                         self."SetStroke$cs"(|.value);
@@ -341,10 +341,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     has ColorSpace $.FillColorSpace is graphics(method ($!FillColorSpace) {}) is rw = 'DeviceGray';
-    has $!FillColor is graphics;
+    has @!FillColor is graphics = [0.0];
     method FillColor is rw {
         Proxy.new(
-            FETCH => sub ($) {$!FillColorSpace => $!FillColor},
+            FETCH => sub ($) {$!FillColorSpace => @!FillColor},
             STORE => sub ($, Pair $color) {
                 unless $color eqv self.FillColor {
                     if $color.key ~~ /^ Device(RGB|Gray|CMYK) $/ {
@@ -694,7 +694,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my @Tm = @!TextMatrix;
         my @CTM = @!CTM;
         my @Dp = @!DashPattern;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :$!StrokeColor, :$!FillColor, :$!StrokeAlpha, :$!FillAlpha;
+        my @Sc = @!StrokeColor;
+        my @Fc = @!FillColor;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :@Sc, :@Fc, :$!StrokeAlpha, :$!FillAlpha;
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -718,10 +720,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!TextMatrix   = %gstate<Tm>.list;
         @!CTM          = %gstate<CTM>.list;
         @!DashPattern  = %gstate<Dp>.list;
+        @!StrokeColor  = %gstate<Sc>.list;
+        @!FillColor   = %gstate<Fc>.list;
         $!StrokeColorSpace = %gstate<StrokeColorSpace>;
         $!FillColorSpace = %gstate<FillColorSpace>;
-        $!StrokeColor  = %gstate<StrokeColor>;
-        $!FillColor   = %gstate<FillColor>;
         $!StrokeAlpha = %gstate<StrokeAlpha>;
         $!FillAlpha = %gstate<FillAlpha>;
 	Restore;
@@ -731,27 +733,27 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('rg', \r, \g, \b) {
         $!FillColorSpace = 'DeviceRGB';
-        $!FillColor = [r, g, b];
+        @!FillColor = [r, g, b];
     }
     multi method track-graphics('RG', \r, \g, \b) {
         $!StrokeColorSpace = 'DeviceRGB';
-        $!StrokeColor = [r, g, b]
+        @!StrokeColor = [r, g, b]
     }
     multi method track-graphics('g', \gray) {
         $!FillColorSpace = 'DeviceGray';
-        $!FillColor = [ gray, ];
+        @!FillColor = [ gray, ];
     }
     multi method track-graphics('G', \gray) {
         $!StrokeColorSpace = 'DeviceGray';
-        $!StrokeColor = [ gray, ];
+        @!StrokeColor = [ gray, ];
     }
     multi method track-graphics('k', \c, \m, \y, \k) {
         $!FillColorSpace = 'DeviceCMYK';
-        $!FillColor = [ c, m, y, k ];
+        @!FillColor = [ c, m, y, k ];
     }
     multi method track-graphics('K', \c, \m, \y, \k) {
         $!StrokeColorSpace = 'DeviceCMYK';
-        $!StrokeColor = [ c, m, y, k ];
+        @!StrokeColor = [ c, m, y, k ];
     }
 
     method !check-color-args($op, $cs, @scn) {
@@ -770,19 +772,19 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     multi method track-graphics('scn', *@colors) {
         self!check-color-args('scn', $!FillColorSpace, @colors);
-        $!FillColor = @colors;
+        @!FillColor = @colors;
     }
     multi method track-graphics('SCN', *@colors) {
         self!check-color-args('SCN', $!StrokeColorSpace, @colors);
-        $!StrokeColor = @colors;
+        @!StrokeColor = @colors;
     }
     multi method track-graphics('sc', *@colors) {
         self!check-color-args('sc', $!FillColorSpace, @colors);
-        $!FillColor = @colors;
+        @!FillColor = @colors;
     }
     multi method track-graphics('SC', *@colors) {
         self!check-color-args('SC', $!StrokeColorSpace, @colors);
-        $!StrokeColor = @colors;
+        @!StrokeColor = @colors;
     }
     multi method track-graphics('ET') {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
