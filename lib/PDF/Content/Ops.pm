@@ -657,8 +657,11 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         unless $op-name ~~ Comment { 
             self!track-context($op-name);
             self.track-graphics($op-name, |@args );
-            .($op-name, |@args, :obj(self) )
-	        with self.callback;
+	    with self.callback {
+                 # cook a little more
+                 my @params = @args.map: { .isa(List) ?? [ .map: *.value ] !! $_ };
+                .($op-name, |@params, :obj(self) );
+            }
             opn.value.push: (:comment(%OpCode{$op-name}))
                 if $!comment-ops;
         }
