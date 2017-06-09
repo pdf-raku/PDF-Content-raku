@@ -80,7 +80,7 @@ class Build {
         my $lib-dir = $*SPEC.catdir('lib', 'PDF', 'Content', 'Font');
         mkdir( $lib-dir, 0o755);
 
-        my $class-name = "PDF::Content::Font::Encodings";
+        my $module-name = "PDF::Content::Font::Encodings";
         my $gen-path = $*SPEC.catfile($lib-dir, "Encodings.pm");
         my $*OUT = open( $gen-path, :w);
 
@@ -92,14 +92,14 @@ class Build {
         #
         # This file was auto-generated
 
-        class PDF::Content::Font::Encodings {
+        module PDF::Content::Font::Encodings {
 
         --CODE-GEN--
 
         for $glyphs.keys.sort -> $type {
             say "    #-- {$type.uc} encoding --#"; 
-            say "    BEGIN our \${$type}-glyphs = {$glyphs{$type}.perl};";
-            say "    BEGIN our \${$type}-encoding = {$encodings{$type}.perl};";
+            say "    constant \${$type}-glyphs = {$glyphs{$type}.perl};";
+            say "    constant \${$type}-encoding = {$encodings{$type}.perl};";
             say "";
         }
 

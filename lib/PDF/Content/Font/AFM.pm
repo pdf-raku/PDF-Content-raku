@@ -1,13 +1,14 @@
 role PDF::Content::Font::AFM {
 
     use PDF::Content::Font::Encodings;
-    my subset EncodingStr of Str where 'mac'|'win'|'sym'|'zapf';
-    has $.enc = 'win';
+    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
+    has EncodingScheme $.enc = 'win';
     has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
     has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
-    has str @char-map;
+    has uint8 @!from-unicode;
+    has uint32 @!to-unicode[256];
 
-    submethod set-encoding( EncodingStr :$!enc = 'win') {
+    submethod set-encoding(:$!enc = 'win') {
 	given $!enc {
 	    when 'mac' {
 		$!glyphs = $PDF::Content::Font::Encodings::mac-glyphs;
@@ -26,8 +27,12 @@ role PDF::Content::Font::AFM {
 		$!encoding = $PDF::Content::Font::Encodings::zapf-encoding;
 	    }
 	}
+
         for $!glyphs.pairs {
-            @!char-map[.key.ord] = $!encoding{.value};
+            my uint32 $code-point = .key.ord;
+            my uint8 $encoding = $!encoding{.value}.ord;
+            @!from-unicode[$code-point] = $encoding;
+            @!to-unicode[$encoding] = $code-point;
         }
     }
 
@@ -42,7 +47,7 @@ role PDF::Content::Font::AFM {
 
     #| reduce string to the displayable characters
     method filter(Str $text-in) {
-	$text-in.order.grep({ @!char-map[$_] }).join;
+	$text-in.order.grep({ @!from-unicode[$_] }).join;
     }
 
     #| map ourselves to a PDF::Content object
@@ -63,9 +68,18 @@ role PDF::Content::Font::AFM {
 	nextwith( $str, $pointsize, :$kern, :$!glyphs);
     }
 
+    multi method encode(Str $s, :$str! --> Str) {
+        self.encode($s).decode: 'latin-1';
+    }
+    multi method encode(Str $s --> buf8) is default {
+        buf8.new: $s.ords.map({@!from-unicode[$_]}).grep: {$_};
+    }
 
-    method encode(Str $s) {
-        $s.ords.map({@!char-map[$_]}).grep: {$_};
+    multi method decode(Str $s, :$str! --> Str) {
+        $s.ords.map({@!to-unicode[$_]}).grep({$_}).map({.chr}).join;
+    }
+    multi method decode(Str $s --> buf32) {
+        buf32.new: $s.ords.map({@!to-unicode[$_]}).grep: {$_};
     }
 
 }

@@ -81,7 +81,7 @@ class PDF::Content::Text::Block {
 
                     for $word.list {
                         when Str {
-                            $_ = $!style.font.encode($_).join;
+                            $_ = $!style.font.encode($_, :str);
                         }
                         when Numeric {
                             $_ = -$_;
