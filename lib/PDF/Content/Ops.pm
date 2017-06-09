@@ -318,7 +318,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                                                @!DashPattern = [ [$a.map: *.value], $p]; 
                                            }) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
-    has ColorSpace $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
+    method !custom-colorspace($cs) {
+        self.resources('ColorSpace'){$cs};
+    }
+    has Str $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
     has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
         Proxy.new(
@@ -329,7 +332,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                         my $cs = ~ $0;
                         self."SetStroke$cs"(|.value);
                     }
-                    elsif .key ~~ ColorSpace {
+                    elsif .key ~~ ColorSpace || self!custom-colorspace(.key) {
                         self.SetStrokeColorSpace(.key);
                         self.SetStrokeColorN(|.value);
                     }
@@ -340,7 +343,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
-    has ColorSpace $.FillColorSpace is graphics(method ($!FillColorSpace) {}) is rw = 'DeviceGray';
+    has Str $.FillColorSpace is graphics(method ($!FillColorSpace) {}) is rw = 'DeviceGray';
     has @!FillColor is graphics = [0.0];
     method FillColor is rw {
         Proxy.new(
@@ -351,7 +354,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                         my $cs = ~ $0;
                         self."SetFill$cs"(|$color.value);
                     }
-                    elsif $color.key ~~ ColorSpace {
+                    elsif $color.key ~~ ColorSpace || self!custom-colorspace($color.key) {
                         self.SetFillColorSpace($color.key);
                         self.SetFillColorN(|$color.value);
                     }
@@ -367,7 +370,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     has @.gsave;
-    has @.tags;
+    has Pair @.tags;
 
     # States and transitions in [PDF 1.4 FIGURE 4.1 Graphics objects]
     my enum GraphicsContext is export(:GraphicsContext) <Path Text Clipping Page Shading External Image>;
@@ -793,10 +796,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
     multi method track-graphics('BMC', Str $name!) {
-	@!tags.push: 'BMC' => $name[];
+	@!tags.push: 'BMC' => [$name];
     }
     multi method track-graphics('BDC', Str $name, Hash $dict) {
-	@!tags.push: 'BDC' => $name[$dict];
+	@!tags.push: 'BDC' => [$name, $dict];
     }
     multi method track-graphics('EMC') {
 	die "closing EMC without opening BMC or BDC in PDF content\n"
