@@ -42,10 +42,6 @@ module PDF::Content::Util::Font {
         :helvetica-bolditalic<helvetica-boldoblique>,
         :helvetica-italic<helvetica-oblique>,
 
-        :symbol-bold<symbol>,
-        :symbol-bolditalic<symbol>,
-        :symbol-italic<symbol>,
-
         :times<times-roman>,
         :timesnewroman<times-roman>,
         :timesnewroman-bold<times-bold>,
@@ -100,12 +96,12 @@ module PDF::Content::Util::Font {
         }
     }
 
-    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^ ZapfDingbats $/ }) {
-        load-core-font( $font-name.lc, :enc<zapf> );
+    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^[ZapfDingbats|WebDings]/ }) {
+        load-core-font('zapfdingbats', :enc<zapf> );
     }
 
-    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^ Symbol $/ }) {
-        load-core-font( $font-name.lc, :enc<sym> );
+    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^Symbol/ }) {
+        load-core-font('symbol', :enc<sym> );
     }
 
     multi sub core-font(Str $font-name! where { stdFontMap{$font-name.lc}:exists }, |c) {

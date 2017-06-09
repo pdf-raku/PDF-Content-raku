@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 20;
+plan 22;
 
 use PDF::Content::Util::Font;
 
@@ -11,10 +11,12 @@ is $hb-afm.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
 is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
+is $hb-afm.encode("A♥♣✔B").join, "AB", '.encode(...) sanity';
 
 my $ab-afm = PDF::Content::Util::Font::core-font( 'Arial-Bold' );
 isa-ok $hb-afm, 'Font::AFM'; 
 is $hb-afm.FontName, 'Helvetica-Bold', 'FontName';
+is $hb-afm.encode("A♥♣✔B").join, "AB", '.encode(...) sanity';
 
 my $hbi-afm = PDF::Content::Util::Font::core-font( :family<Helvetica>, :weight<Bold>, :style<Italic> );
 is $hbi-afm.FontName, 'Helvetica-BoldOblique', ':font-family => FontName';
