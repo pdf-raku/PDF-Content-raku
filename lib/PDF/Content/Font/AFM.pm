@@ -6,7 +6,7 @@ role PDF::Content::Font::AFM {
     has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
     has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
     has uint8 @!from-unicode;
-    has uint32 @!to-unicode[256];
+    has uint16 @!to-unicode[256];
 
     submethod set-encoding(:$!enc = 'win') {
 	given $!enc {
@@ -29,7 +29,7 @@ role PDF::Content::Font::AFM {
 	}
 
         for $!glyphs.pairs {
-            my uint32 $code-point = .key.ord;
+            my uint16 $code-point = .key.ord;
             my uint8 $encoding = $!encoding{.value}.ord;
             @!from-unicode[$code-point] = $encoding;
             @!to-unicode[$encoding] = $code-point;
@@ -78,8 +78,8 @@ role PDF::Content::Font::AFM {
     multi method decode(Str $s, :$str! --> Str) {
         $s.ords.map({@!to-unicode[$_]}).grep({$_}).map({.chr}).join;
     }
-    multi method decode(Str $s --> buf32) {
-        buf32.new: $s.ords.map({@!to-unicode[$_]}).grep: {$_};
+    multi method decode(Str $s --> buf16) {
+        buf16.new: $s.ords.map({@!to-unicode[$_]}).grep: {$_};
     }
 
 }
