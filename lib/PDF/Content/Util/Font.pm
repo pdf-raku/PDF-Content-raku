@@ -90,8 +90,8 @@ module PDF::Content::Util::Font {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
             my \font = (Font::AFM.metrics-class( $font-name )
-                        but PDF::Content::Font::AFM).new(:$enc);
-            font.set-encoding(:$enc);
+                        but PDF::Content::Font::AFM[$enc]).new;
+            font.set-encoding;
             font;
         }
     }

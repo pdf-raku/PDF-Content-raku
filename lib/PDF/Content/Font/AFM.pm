@@ -1,15 +1,16 @@
-role PDF::Content::Font::AFM {
+my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
+role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
 
     use PDF::Content::Font::Encodings;
-    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
-    has EncodingScheme $.enc = 'win';
     has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
     has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
     has uint8 @!from-unicode;
     has uint16 @!to-unicode[256];
 
-    submethod set-encoding(:$!enc = 'win') {
-	given $!enc {
+    method enc{ $enc }
+
+    submethod set-encoding {
+	given $enc {
 	    when 'mac' {
 		$!glyphs = $PDF::Content::Font::Encodings::mac-glyphs;
 		$!encoding = $PDF::Content::Font::Encodings::mac-encoding;
