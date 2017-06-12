@@ -63,10 +63,7 @@ module PDF::Content::Util::Font {
         :timesnewromanpsmt-italic<times-italic>,
     };
 
-    our proto sub core-font(|c) {*};
-
-    multi sub core-font( Str :$family! is copy, Str :$weight?, Str :$style?, |c) {
-
+    our sub font-name(Str $family! is copy, Str :$weight?, Str :$style?, ) {
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
             ?? 'bold' !! '';
 
@@ -81,35 +78,54 @@ module PDF::Content::Util::Font {
             ?? '-' ~ $bold ~ $italic
             !! '';
 
-        my Str $font-name = $family.subst(/['-'.*]? $/, $sfx );
+       $family.subst(/['-'.*]? $/, $sfx );
+    }
 
+    our proto sub core-font(|c) {*};
+
+    multi sub core-font( Str :$family!, |c) {
+        my Str $font-name = font-name($family, |c);
         core-font( $font-name, |c );
+    }
+
+    role Encoded[$encoder] is export(:Encoded) {
+        method enc { $encoder.enc }
+        method encode(|c) { $encoder.encode(|c) }
+        method decode(|c) { $encoder.decode(|c) }
+        method filter($s) { $encoder.filter($s); }
+        method to-dict    { $encoder.to-dict(self.FontName) }
+        method height(|c) {
+            my List $bbox = $.FontBBox;
+            $encoder.height(:$bbox, |c);
+        }
+        method stringwidth(Str $str, Numeric $pointsize=0, Bool :$kern=False) {
+            my $glyphs = $encoder.glyphs;
+            nextwith( $str, $pointsize, :$kern, :$glyphs);
+        }
+
     }
 
     sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
-            my \font = (Font::AFM.metrics-class( $font-name )
-                        but PDF::Content::Font::AFM[$enc]).new;
-            font.set-encoding;
-            font;
+            my $encoder = PDF::Content::Font::AFM.new: :$enc;
+            (Font::AFM.metrics-class( $font-name )
+             but Encoded[$encoder]).new;
         }
     }
 
-    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^[ZapfDingbats|WebDings]/ }) {
-        load-core-font('zapfdingbats', :enc<zapf> );
+    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^[ZapfDingbats|WebDings]/ }, :$enc='zapf') {
+        load-core-font('zapfdingbats', :$enc );
     }
 
-    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^Symbol/ }) {
-        load-core-font('symbol', :enc<sym> );
+    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^Symbol/ }, :$enc='sym') {
+        load-core-font('symbol', :$enc );
     }
 
-    multi sub core-font(Str $font-name! where { stdFontMap{$font-name.subst(',','-').lc}:exists }, |c) {
-        core-font( stdFontMap{$font-name.subst(',','-').lc}, |c );
-    }
-
-    multi sub core-font(Str $font-name!, :$enc = 'win') is default {
-        load-core-font( $font-name.lc, :$enc );
+    multi sub core-font(Str $font-name! is copy, :$enc = 'win', |c) is default {
+        $font-name = $font-name.subst(',','-').lc;
+        $font-name = $_ with stdFontMap{$font-name};
+        load-core-font( $font-name, :$enc );
     }
 
 }

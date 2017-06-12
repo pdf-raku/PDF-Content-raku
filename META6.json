@@ -31,6 +31,7 @@
 
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
         "PDF::Content::Font::AFM"       : "lib/PDF/Content/Font/AFM.pm",
+        "PDF::Content::Font::CMAP"      : "lib/PDF/Content/Font/CMAP.pm",
         "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
 
         "PDF::Content::Text::Block"     : "lib/PDF/Content/Text/Block.pm",

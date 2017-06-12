@@ -1,17 +1,16 @@
-my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
-role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
+class PDF::Content::Font::AFM {
 
     use PDF::DAO::Dict;
     use PDF::Content::Font::Encodings;
-    has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
+    has $.glyphs = $PDF::Content::Font::Encodings::win-glyphs;
     has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
     has uint8 @!from-unicode;
     has uint16 @!to-unicode[256];
+    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
+    has EncodingScheme $.enc = 'win';
 
-    method enc{ $enc }
-
-    submethod set-encoding {
-	given $enc {
+    submethod TWEAK {
+	given $!enc {
 	    when 'mac' {
 		$!glyphs = $PDF::Content::Font::Encodings::mac-glyphs;
 		$!encoding = $PDF::Content::Font::Encodings::mac-encoding;
@@ -39,8 +38,7 @@ role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
     }
 
     #| compute the overall font-height
-    method height($pointsize?, Bool :$from-baseline, Bool :$hanging) {
-	my List $bbox = $.FontBBox;
+    method height($pointsize?, List :$bbox!, Bool :$from-baseline, Bool :$hanging) {
 	my Numeric $height = $bbox[3];
         $height *= .75 if $hanging;  # not applicable to core fonts - approximate
 	$height -= $bbox[1] unless $from-baseline;
@@ -53,10 +51,10 @@ role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
     }
 
     #| map ourselves to a PDF::Content object
-    method to-dict {
+    method to-dict($font-name) {
 	my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
 	my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
-		     :BaseFont( :name( self.FontName ) ),
+		     :BaseFont( :name( $font-name ) ),
 	};
 
 	with %enc-name{self.enc} -> $name {
@@ -64,10 +62,6 @@ role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
 	}
 
 	PDF::DAO::Dict.coerce: $dict;
-    }
-
-    method stringwidth(Str $str, Numeric $pointsize=0, Bool :$kern=False) {
-	nextwith( $str, $pointsize, :$kern, :$!glyphs);
     }
 
     multi method encode(Str $s, :$str! --> Str) {
