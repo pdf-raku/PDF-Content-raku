@@ -215,7 +215,7 @@ class PDF::Content
     multi method print(PDF::Content::Text::Block $text-block,
 		       Text-Position :$position,
 		       Bool :$nl = False,
-		       Bool :$tidy = True,
+		       Bool :$preserve = True,
 	) {
 
         my Bool $left = False;
@@ -234,7 +234,7 @@ class PDF::Content
         my \font = $.use-font($text-block.font);
 
         self.set-font(font, font-size);
-	$text-block.render(self, :$nl, :$top, :$left, :$tidy);
+	$text-block.render(self, :$nl, :$top, :$left, :$preserve);
 
         unless in-text {
 	    self.EndText;
