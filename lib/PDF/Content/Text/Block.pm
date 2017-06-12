@@ -176,13 +176,13 @@ class PDF::Content::Text::Block {
 	Bool :$nl,   # add trailing line 
 	Bool :$top,  # position from top
 	Bool :$left, # position from left
-	Bool :$tidy = True, # restore text state
+	Bool :$preserve = True, # restore text state
 	) {
 	my %saved;
 	for :$.WordSpacing, :$.CharSpacing, :$.HorizScaling, :$.TextRise {
 	    my $gfx-val = $gfx."{.key}"();
 	    %saved{.key} = $gfx-val
-		if $tidy;
+		if $preserve;
 	    $gfx."Set{.key}"(.value)
 		unless .value =~= $gfx-val;
 	}

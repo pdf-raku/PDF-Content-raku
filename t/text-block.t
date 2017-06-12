@@ -29,7 +29,7 @@ is-deeply $gfx.text-position, (100, 350), 'text position';
 $gfx.say( $text-block );
 is-deeply $gfx.text-position, (100, 350 - 17.6), 'text position';
 $text-block.TextRise = $text-block.baseline-shift('bottom');
-$gfx.print( $text-block, :!tidy );
+$gfx.print( $text-block, :!preserve );
 $gfx.EndText;
 $gfx.Restore;
 
