@@ -1,7 +1,8 @@
 use v6;
 use Test;
-plan 28;
-
+plan 31;
+use PDF::Grammar::Test :is-json-equiv;
+use PDF::Content::Font;
 use PDF::Content::Util::Font;
 
 my $hb-afm = PDF::Content::Util::Font::core-font( 'Helvetica-Bold' );
@@ -22,8 +23,12 @@ my $hbi-afm = PDF::Content::Util::Font::core-font( :family<Helvetica>, :weight<B
 is $hbi-afm.FontName, 'Helvetica-BoldOblique', ':font-family => FontName';
 
 my $hb-afm-again = PDF::Content::Util::Font::core-font( 'Helvetica-Bold' );
-
 ok $hb-afm-again === $hb-afm, 'font caching';
+
+my $hbi-afm-dict = $hbi-afm.to-dict;
+is-json-equiv $hbi-afm-dict, { :BaseFont<Helvetica-BoldOblique>, :Encoding<WinAnsiEncoding>, :Subtype<Type1>, :Type<Font>}, "to-dict";
+my $hbi-afm-again = PDF::Content::Font.from-dict: $hbi-afm-dict;
+is $hbi-afm-again.FontName, 'Helvetica-BoldOblique', '.from-dict';
 
 my $tr-afm = PDF::Content::Util::Font::core-font( 'Times-Roman' );
 is $tr-afm.stringwidth("RVX", :!kern), 2111, 'stringwidth :!kern';
@@ -46,6 +51,8 @@ my $zapf = PDF::Content::Util::Font::core-font( 'ZapfDingbats' );
 isa-ok $zapf, 'Font::Metrics::zapfdingbats';
 is $zapf.enc, 'zapf', '.enc';
 is $zapf.encode("♥♣✔", :str), "ª¨4", '.encode(...)'; # /a110 /a112 /a20
+
+isa-ok PDF::Content::Util::Font::core-font('CourierNew,Bold'), 'Font::Metrics::courier-bold';
 
 my $sym = PDF::Content::Util::Font::core-font( 'Symbol' );
 isa-ok $sym, 'Font::Metrics::symbol';

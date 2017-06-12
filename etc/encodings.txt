@@ -1,5 +1,4 @@
 # source: http://eclecticgeek.com/dompdf/debug_tests/charsetsupport.htm
-# Reference purposes only. Should correspond to definitions in Font::Encoding::Util;
 # CHAR  NAME    STD     MAC     WIN     PDF
 A	A	101	101	101	101
 Æ	AE	341	256	306	306

@@ -1,6 +1,7 @@
 my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
 role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
 
+    use PDF::DAO::Dict;
     use PDF::Content::Font::Encodings;
     has $!glyphs = $PDF::Content::Font::Encodings::win-glyphs;
     has $!encoding = $PDF::Content::Font::Encodings::mac-encoding;
@@ -62,7 +63,7 @@ role PDF::Content::Font::AFM[EncodingScheme $enc = 'win'] {
 	    $dict<Encoding> = :$name;
 	}
 
-	$dict;
+	PDF::DAO::Dict.coerce: $dict;
     }
 
     method stringwidth(Str $str, Numeric $pointsize=0, Bool :$kern=False) {

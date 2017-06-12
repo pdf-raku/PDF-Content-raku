@@ -6,12 +6,12 @@ class Build {
 
     method !save-glyph(Str $glyph-name, $chr, $ord, Hash :$encoding, Hash :$glyphs) {
 
-            $encoding{$glyph-name} //= $ord.chr
-                if $encoding.defined;
+            .{$glyph-name} //= $ord.chr
+                with $encoding;
 
             # $chr.ord isn't unique? use NFD as index
-            $glyphs{$chr} //= $glyph-name
-                if $glyphs.defined;
+            .{$chr} //= $glyph-name
+                with $glyphs;
     }
 
     method !build-enc(IO::Path $encoding-path, Hash :$glyphs! is rw, Hash :$encodings! is rw) {

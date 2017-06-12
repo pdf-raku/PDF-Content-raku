@@ -74,8 +74,8 @@ module PDF::Content::Util::Font {
         my Str $italic = $style && $style ~~ m:i/italic|oblique/
             ?? 'italic' !! '';
 
-        $bold ||= 'bold' if $family ~~ s/:i:s '-'? bold //;
-        $italic ||= $0.lc if $family ~~ s/:i:s '-'? (italic|oblique) //;
+        $bold ||= 'bold' if $family ~~ s/:i:s ['-'|',']? bold //;
+        $italic ||= $0.lc if $family ~~ s/:i:s ['-'|',']? (italic|oblique) //;
 
         my Str $sfx = $bold || $italic
             ?? '-' ~ $bold ~ $italic
@@ -104,8 +104,8 @@ module PDF::Content::Util::Font {
         load-core-font('symbol', :enc<sym> );
     }
 
-    multi sub core-font(Str $font-name! where { stdFontMap{$font-name.lc}:exists }, |c) {
-        core-font( stdFontMap{$font-name.lc}, |c );
+    multi sub core-font(Str $font-name! where { stdFontMap{$font-name.subst(',','-').lc}:exists }, |c) {
+        core-font( stdFontMap{$font-name.subst(',','-').lc}, |c );
     }
 
     multi sub core-font(Str $font-name!, :$enc = 'win') is default {
