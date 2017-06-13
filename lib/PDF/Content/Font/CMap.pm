@@ -23,7 +23,7 @@ class PDF::Content::Font::CMap {
     multi method decode(Str $s, :$str! --> Str) {
         $s.ords.map({@!to-unicode[$_]}).grep({$_}).map({.chr}).join;
     }
-    multi method decode(Str $s --> buf16) {
-        buf16.new: $s.ords.map({@!to-unicode[$_]}).grep: {$_};
+    multi method decode(Str $s --> buf32) {
+        buf32.new: $s.ords.map({@!to-unicode[$_]}).grep: {$_};
     }
 }

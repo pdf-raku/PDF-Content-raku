@@ -9,12 +9,12 @@ role PDF::Content::Font {
     method from-dict(Hash $font) {
         my subset CoreFontName where
           /^('Times−Roman'|'Helvetica'|'Courier'
-             |'Times−Bold'|'Helvetica−Bold'|'Courier−Bold'
-             |'Times−Italic'|'Helvetica−Oblique'|'Courier−Oblique'
-             |'Times−BoldItalic'|'Helvetica−BoldOblique'|'Courier−BoldOblique'
-             |'Symbol'|'ZapfDingbats'
-             |[CourierNew|Arial|TimesNewRoman][\,[Bold|Italic|BoldItalic]]?
-             )$/;
+            |'Times−Bold'|'Helvetica−Bold'|'Courier−Bold'
+            |'Times−Italic'|'Helvetica−Oblique'|'Courier−Oblique'
+            |'Times−BoldItalic'|'Helvetica−BoldOblique'|'Courier−BoldOblique'
+            |'Symbol'|'ZapfDingbats'
+            |[CourierNew|Arial|TimesNewRoman][\,[Bold|Italic|BoldItalic]]?
+            )$/;
 
         my $base-font = PDF::Content::Util::Font::font-name($font<BaseFont>);
         $base-font = 'courier' unless $base-font ~~ CoreFontName;

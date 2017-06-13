@@ -124,5 +124,6 @@ my $cmap = $ind-obj.object;
 
 my $cmap-obj = PDF::Content::Font::CMap.new: :$cmap;
 
-pass;
+is-deeply $cmap-obj.decode("\x5\xF"), Buf[uint32].new(0x22, 0x2c), "decode";
+is $cmap-obj.decode("\x24\x25\x26", :str), 'ABC', "decode:str";
 done-testing;
