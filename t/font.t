@@ -1,9 +1,17 @@
 use v6;
 use Test;
-plan 31;
+plan 36;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Util::Font;
+
+is PDF::Content::Util::Font::core-font-name('Helvetica,Bold'), 'helvetica-bold', 'core-font-name';
+is PDF::Content::Util::Font::core-font-name('Helvetica-BoldOblique'), 'helvetica-boldoblique', 'core-font-name';
+is PDF::Content::Util::Font::core-font-name('Arial,Bold'), 'helvetica-bold', 'core-font-name';
+is-deeply PDF::Content::Util::Font::core-font-name('Blah'), Nil, 'core-font-name';
+
+my $tr-bold = PDF::Content::Util::Font::core-font( :family<Times-Roman>, :weight<bold>);
+is $tr-bold.FontName, 'Times-Bold', 'FontName';
 
 my $hb-afm = PDF::Content::Util::Font::core-font( 'Helvetica-Bold' );
 isa-ok $hb-afm, 'Font::AFM'; 

@@ -3,8 +3,13 @@ use v6;
 module PDF::Content::Util::Font {
     use Font::AFM:ver(v1.23.5..*);
     use PDF::Content::Font::AFM;
+    constant coreFonts = set <courier courier-oblique courier-bold courier-boldoblique
+                  helvetica helvetica-oblique helvetica-bold helvetica-boldoblique
+                  times-roman times-italic times-bold times-bolditalic
+                  symbol zapfdingbats>;
+
     # font aliases adapted from pdf.js/src/fonts.js
-    BEGIN constant stdFontMap = {
+    constant stdFontMap = {
 
         :arialnarrow<helvetica>,
         :arialnarrow-bold<helvetica-bold>,
@@ -63,7 +68,7 @@ module PDF::Content::Util::Font {
         :timesnewromanpsmt-italic<times-italic>,
     };
 
-    our sub font-name(Str $family! is copy, Str :$weight?, Str :$style?, ) {
+    our sub core-font-name(Str $family! is copy, Str :$weight?, Str :$style?, ) {
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
             ?? 'bold' !! '';
 
@@ -71,21 +76,23 @@ module PDF::Content::Util::Font {
         my Str $italic = $style && $style ~~ m:i/italic|oblique/
             ?? 'italic' !! '';
 
-        $bold ||= 'bold' if $family ~~ s/:i:s ['-'|',']? bold //;
-        $italic ||= $0.lc if $family ~~ s/:i:s ['-'|',']? (italic|oblique) //;
+        $bold ||= 'bold' if $family ~~ s/:i ['-'|',']? bold //;
+        $italic ||= $0.lc if $family ~~ s/:i ['-'|',']? (italic|oblique) //;
 
         my Str $sfx = $bold || $italic
             ?? '-' ~ $bold ~ $italic
             !! '';
 
-       $family.subst(/['-'.*]? $/, $sfx );
+        my $face = $family.subst(/[['-'|','].*]? $/, $sfx).lc;
+
+        $face = $_ with stdFontMap{$face};
+        $face ∈ coreFonts ?? $face !! Nil;
     }
 
     our proto sub core-font(|c) {*};
 
     multi sub core-font( Str :$family!, |c) {
-        my Str $font-name = font-name($family, |c);
-        core-font( $font-name, |c );
+        core-font( $family, |c );
     }
 
     role Encoded[$encoder] is export(:Encoded) {
@@ -123,9 +130,7 @@ module PDF::Content::Util::Font {
     }
 
     multi sub core-font(Str $font-name! is copy, :$enc = 'win', |c) is default {
-        $font-name = $font-name.subst(',','-').lc;
-        $font-name = $_ with stdFontMap{$font-name};
-        load-core-font( $font-name, :$enc );
+        load-core-font( core-font-name($font-name, |c), :$enc );
     }
 
 }
