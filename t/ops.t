@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 77;
+plan 81;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -45,6 +45,8 @@ is-deeply $g.StrokeColor, (:DeviceRGB[.4, .5, .6]), '$g.StrokeColor - updated ag
 
 lives-ok { $g.op('SCN', .2, .3, .4) }, 'SCN (/DeviceRGB)';
 
+is-deeply $g.MoveShowText("move-show-text"), ("'" => [ :literal<move-show-text> ] ), 'MoveShowText';
+
 $g.StrokeColor = :DeviceN[.7, .8];
 is-deeply $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';
 
@@ -88,6 +90,11 @@ $g.TextMatrix = [ 10, 1, 15, 2, 3, 4];
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated';
 $g.TextMatrix = ( 10, 1, 15, 2, 3, 4);
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated again';
+
+is-deeply $g.MoveSetShowText(10.0, 20.0, "move-show-text"), ('"' => [ :real(10.0), :real(20.0), :literal<move-show-text> ] ), 'MoveSetShowText';
+
+is $g.WordSpacing, 10.0, '$g.WordSpacing - MoveSetShow';
+is $g.CharSpacing, 20.0, '$g.CharSpacing - MoveSetShow';
 
 $g.FillAlpha = 1.0;
 nok $parent<ExtGState>, 'FillAlpha Optimized';
