@@ -61,9 +61,11 @@ role PDF::Content::Graphics {
     }
 
     method render(&callback) {
-	die "too late to install render callback"
-	    if $!gfx;
-	self.gfx(:&callback);
+        with $!gfx {
+            die "too late to install render callback"
+                if .ops;
+        }
+	$.gfx.callback.push: &callback;
     }
 
     method finish {

@@ -30,7 +30,7 @@ class PDF::Content::Ops {
     use PDF::Writer;
     use PDF::Content::Util::TransformMatrix;
 
-    has &.callback is rw;
+    has Routine @.callback;
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict is rw = True;
@@ -660,10 +660,11 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         unless $op-name ~~ Comment { 
             self!track-context($op-name);
             self.track-graphics($op-name, |@args );
-	    with self.callback {
+	    if @!callback {
                  # cook a little more
                  my @params = @args.map: { .isa(List) ?? [ .map: *.value ] !! $_ };
-                .($op-name, |@params, :obj(self) );
+                .($op-name, |@params, :obj(self) )
+                    for @!callback;
             }
             opn.value.push: (:comment(%OpCode{$op-name}))
                 if $!comment-ops;
