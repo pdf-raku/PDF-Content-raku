@@ -66,6 +66,19 @@ module PDF::Content::Util::Font {
         :timesnewromanpsmt-bold<times-bold>,
         :timesnewromanpsmt-bolditalic<times-bolditalic>,
         :timesnewromanpsmt-italic<times-italic>,
+
+        :symbol-bold<symbol>,
+        :symbol-italic<symbol>,
+        :symbol-bolditalic<symbol>,
+
+        :webdings<zapfdingbats>,
+        :webdings-bold<zapfdingbats>,
+        :webdings-italic<zapfdingbats>,
+        :webdings-bolditalic<zapfdingbats>,
+
+        :zapfdingbats-bold<zapfdingbats>,
+        :zapfdingbats-italic<zapfdingbats>,
+        :zapfdingbats-bolditalic<zapfdingbats>,
     };
 
     our sub core-font-name(Str $family! is copy, Str :$weight?, Str :$style?, ) {
@@ -92,6 +105,7 @@ module PDF::Content::Util::Font {
     our proto sub core-font(|c) {*};
 
     multi sub core-font( Str :$family!, |c) {
+        warn :$family.perl;
         core-font( $family, |c );
     }
 
@@ -115,6 +129,7 @@ module PDF::Content::Util::Font {
     sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
+            warn :$font-name.perl;
             my $encoder = PDF::Content::Font::AFM.new: :$enc;
             (Font::AFM.metrics-class( $font-name )
              but Encoded[$encoder]).new;
