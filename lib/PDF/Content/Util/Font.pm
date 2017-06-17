@@ -105,7 +105,6 @@ module PDF::Content::Util::Font {
     our proto sub core-font(|c) {*};
 
     multi sub core-font( Str :$family!, |c) {
-        warn :$family.perl;
         core-font( $family, |c );
     }
 
@@ -129,22 +128,21 @@ module PDF::Content::Util::Font {
     sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
-            warn :$font-name.perl;
             my $encoder = PDF::Content::Font::AFM.new: :$enc;
             (Font::AFM.metrics-class( $font-name )
              but Encoded[$encoder]).new;
         }
     }
 
-    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^[ZapfDingbats|WebDings]/ }, :$enc='zapf') {
+    multi sub core-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
         load-core-font('zapfdingbats', :$enc );
     }
 
-    multi sub core-font(Str $font-name! where { $font-name ~~ m:i/^Symbol/ }, :$enc='sym') {
+    multi sub core-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
         load-core-font('symbol', :$enc );
     }
 
-    multi sub core-font(Str $font-name! is copy, :$enc = 'win', |c) is default {
+    multi sub core-font(Str $font-name!, :$enc = 'win', |c) is default {
         load-core-font( core-font-name($font-name, |c), :$enc );
     }
 

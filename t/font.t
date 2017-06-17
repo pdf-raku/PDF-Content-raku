@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 37;
+plan 38;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Util::Font;
@@ -15,6 +15,7 @@ is $tr-bold.FontName, 'Times-Bold', 'FontName';
 
 my $tsym = PDF::Content::Util::Font::core-font( :family<Symbol>, :weight<bold>);
 is $tsym.FontName, 'Symbol', 'FontName';
+is $tsym.enc, 'sym', 'enc';
 
 my $hb-afm = PDF::Content::Util::Font::core-font( 'Helvetica-Bold' );
 isa-ok $hb-afm, 'Font::AFM'; 
