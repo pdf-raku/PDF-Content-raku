@@ -663,7 +663,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	    if @!callback {
                  # cook a little more
                  my @params = @args.map: { .isa(List) ?? [ .map: *.value ] !! $_ };
-                .($op-name, |@params, :obj(self) )
+                .($op-name, |@params )
                     for @!callback;
             }
             opn.value.push: (:comment(%OpCode{$op-name}))

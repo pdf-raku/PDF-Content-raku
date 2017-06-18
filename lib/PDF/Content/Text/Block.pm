@@ -146,9 +146,7 @@ class PDF::Content::Text::Block {
     #| calculates actual spacing between words
     method !word-gap returns Numeric {
         my $word-gap = $.space-width + $.WordSpacing + $.CharSpacing;
-        $word-gap *= $.HorizScaling / 100
-            unless $.HorizScaling =~= 100;
-        $word-gap;
+        $word-gap * $.HorizScaling / 100;
     }
 
     #| calculates WordSpacing needed to achieve a given word-gap

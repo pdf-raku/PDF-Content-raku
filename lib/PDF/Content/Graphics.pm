@@ -9,7 +9,6 @@ role PDF::Content::Graphics {
     has PDF::Content $!pre-gfx; #| prepended graphics
     method pre-gfx { $!pre-gfx //= PDF::Content.new( :parent(self) ) }
     method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
-
     has PDF::Content $!gfx;     #| appended graphics
 
     method !tidy-ops(@ops) {
@@ -60,12 +59,16 @@ role PDF::Content::Graphics {
 	$.decoded // '';
     }
 
-    method render(&callback) {
+    method add-callback(&callback) {
         with $!gfx {
             die "too late to install render callback"
                 if .ops;
         }
 	$.gfx.callback.push: &callback;
+    }
+
+    method new-gfx {
+        $.gfx.new( :parent(self) );
     }
 
     method finish {

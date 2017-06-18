@@ -111,9 +111,9 @@ class PDF::Content::Image {
 
         # for serialization to content stream ops: BI dict ID data EI
         use PDF::Content::Ops :OpCode;
-        use PDF::DAO::Util :to-ast-native;
+        use PDF::DAO::Util :ast-coerce;
         # serialize to content ops
-        my %dict = to-ast-native(self).value.list;
+        my %dict = ast-coerce(self).value.list;
         %dict<Type Subtype Length>:delete;
         %dict = self.inline-to-xobject( %dict, :invert );
 
