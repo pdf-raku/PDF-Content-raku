@@ -37,38 +37,35 @@ role PDF::Content::Graphics {
         @ops;
     }
 
-    method gfx(Bool :$raw, |c) {
+    method gfx(Bool :$render = True, |c) {
 	$!gfx //= do {
-	    my Pair @ops = self.contents-parse;
-            @ops = self!tidy-ops(@ops)
-                unless $raw;
-	    my PDF::Content $gfx .= new( :parent(self), |c );
-	    $gfx.ops: @ops;
-	    $gfx;
-	}
+            my $gfx = self.new-gfx(|c);;
+            self.render($gfx, |c) if $render;
+            $gfx;
+        }
     }
     method graphics(&code) { self.gfx.graphics( &code ) }
     method text(&code) { self.gfx.text( &code ) }
     method canvas(&code) { self.gfx.canvas( &code ) }
 
-    method contents-parse(Str $contents = $.contents ) {
-        PDF::Content.parse($contents);
+    method contents-parse {
+        PDF::Content.parse($.contents);
     }
 
     method contents returns Str {
 	$.decoded // '';
     }
 
-    method add-callback(&callback) {
-        with $!gfx {
-            die "too late to install render callback"
-                if .ops;
-        }
-	$.gfx.callback.push: &callback;
+    method new-gfx(|c) { 
+        PDF::Content.new( :parent(self), |c );
     }
 
-    method new-gfx {
-        $.gfx.new( :parent(self) );
+    method render($gfx, Bool :$raw) {
+        my Pair @ops = self.contents-parse;
+        @ops = self!tidy-ops(@ops)
+            unless $raw;
+        $gfx.ops: @ops;
+        $gfx;
     }
 
     method finish {
