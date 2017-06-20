@@ -79,25 +79,6 @@ class PDF::Content
 	$.SetTextMatrix( @matrix );
     }
 
-    my subset Vector of List where {.elems == 2 && all(.[0], .[1]) ~~ Numeric}
-    #| set the current text position on the page/form
-    method text-position is rw returns Vector {
-        warn '$.text-position accessor used outside of a text-block'
-            unless $.context == GraphicsContext::Text;
-
-	Proxy.new(
-	    FETCH => sub (\p) {
-	        $.TextMatrix[4, 5];
-	    },
-	    STORE => sub (\p, Vector \v) {
-	        my Numeric @tm = @.TextMatrix;
-                @tm[4] = $_ with v[0];
-                @tm[5] = $_ with v[1];
-		self.op(SetTextMatrix, @tm);
-		v.list;
-	    },
-	    );
-    }
 
     my subset Align of Str where 'left' | 'center' | 'right';
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
@@ -207,7 +188,7 @@ class PDF::Content
                 }
             }
                     
-	    self.text-position = [$x, $y];
+	    self.TextMove = [$x, $y];
         }
 
     }

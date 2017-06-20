@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 81;
+plan 83;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -86,6 +86,12 @@ $g.DashPattern = [[3, 5], 6];
 is $g.DashPattern, [[3, 5], 6], 'DashPattern - updated';
 
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0], '$g.TextMatrix - initial';
+
+$g.TextMove(10,20);
+is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 10, 20], '$g.TextMatrix - moved';
+$g.TextMove = (15,25);
+is-deeply $g.TextMove, $(15, 25), '$g.TextMove - rw accessors';
+
 $g.TextMatrix = [ 10, 1, 15, 2, 3, 4];
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated';
 $g.TextMatrix = ( 10, 1, 15, 2, 3, 4);
