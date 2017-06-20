@@ -2,6 +2,7 @@
     "perl"        : "6.*",
     "name"        : "PDF::Content",
     "version"     : "0.0.5",
+    "license"     : "Artistic-2.0",
     "api"         : "PDF-1.7",
     "auth"        : "github:p6-pdf",
     "description" : "Basic PDF content authoring; including text, images, fonts and graphics",
@@ -31,7 +32,7 @@
 
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
         "PDF::Content::Font::AFM"       : "lib/PDF/Content/Font/AFM.pm",
-        "PDF::Content::Font::CMAP"      : "lib/PDF/Content/Font/CMAP.pm",
+        "PDF::Content::Font::CMap"      : "lib/PDF/Content/Font/CMap.pm",
         "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
 
         "PDF::Content::Text::Block"     : "lib/PDF/Content/Text/Block.pm",

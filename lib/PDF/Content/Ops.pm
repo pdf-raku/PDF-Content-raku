@@ -30,7 +30,7 @@ class PDF::Content::Ops {
     use PDF::Writer;
     use PDF::Content::Util::TransformMatrix;
 
-    has Routine @.callback;
+    has Routine @.callback is rw;
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict is rw = True;
