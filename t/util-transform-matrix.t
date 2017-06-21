@@ -1,21 +1,21 @@
 use v6;
 use Test;
-use PDF::Content::Util::TransformMatrix;
+use PDF::Content::Util::TransformMatrix :transform;
 
-my @identity = PDF::Content::Util::TransformMatrix::transform();
+my @identity = transform();
 is-deeply @identity, [1, 0, 0, 1, 0, 0], 'null transform';
 
-my @translated = PDF::Content::Util::TransformMatrix::transform(:translate[10, 20]);
+my @translated =transform(:translate[10, 20]);
 is-deeply @translated, [1, 0, 0, 1, 10, 20], 'translate transform';
 
-is-deeply PDF::Content::Util::TransformMatrix::transform(:translate(30)), [1, 0, 0, 1, 30, 30], 'translate transform';
+is-deeply transform(:translate(30)), [1, 0, 0, 1, 30, 30], 'translate transform';
 
-my @rotated = PDF::Content::Util::TransformMatrix::transform(:rotate(pi/2) );
+my @rotated = transform(:rotate(pi/2) );
 is-deeply @rotated, [0, 1, -1, 0, 0, 0], 'rotate transform';
 
-my @scaled = PDF::Content::Util::TransformMatrix::transform(:scale(1.5));
+my @scaled = transform(:scale(1.5));
 is-deeply @scaled, [1.5e0, 0, 0, 1.5e0, 0, 0], 'scale transform';
-is-deeply PDF::Content::Util::TransformMatrix::transform(:scale[1.5, 2.5]), [1.5e0, 0, 0, 2.5e0, 0, 0], 'scale transform';
+is-deeply transform(:scale[1.5, 2.5]), [1.5e0, 0, 0, 2.5e0, 0, 0], 'scale transform';
 
 is-deeply PDF::Content::Util::TransformMatrix::dot(@identity, 10, 20), (10, 20), 'identity dot product';
 is-deeply PDF::Content::Util::TransformMatrix::dot(@translated, 10, 20), (20, 40), 'translated dot product';
@@ -26,15 +26,15 @@ sub deg2rad(Numeric \deg) {
     return deg * pi / 180;
 }
 
-my $skew = PDF::Content::Util::TransformMatrix::transform( :skew(deg2rad(10)));
+my $skew = transform( :skew(deg2rad(10)));
 is-approx $skew[1], 0.176327, 'skew transform';
 is-approx $skew[2], 0.176327, 'skew transform';
 
-$skew = PDF::Content::Util::TransformMatrix::transform(:skew[deg2rad(10), deg2rad(20)]);
+$skew = transform(:skew[deg2rad(10), deg2rad(20)]);
 is-approx $skew[1], 0.176327, 'skew transform';
 is-approx $skew[2], 0.36397, 'skew transform';
 
-my $chained = PDF::Content::Util::TransformMatrix::transform(
+my $chained = transform(
     :translate[10, 20],
     :rotate(1.5 * pi),
     :scale(2) );
@@ -43,7 +43,7 @@ is-deeply $chained, [0, -2, 2, 0, 40, -20], 'chained transforms';
 
 is-deeply PDF::Content::Util::TransformMatrix::multiply([1,2,3,4,5,6], [10,20,30,40,50,60]), [70, 100, 150, 220, 280, 400], 'multiply matrix';
 
-my $tform = PDF::Content::Util::TransformMatrix::transform(
+my $tform = transform(
     :translate[10, 20],
     :scale(2) );
 

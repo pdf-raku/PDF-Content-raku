@@ -23,7 +23,7 @@ my $font-size = 16;
 my $text-block;
 
 $page.text: -> $gfx {
-    $gfx.text-position = [100, 500];
+    $gfx.TextMove = [100, 500];
     $text-block = $gfx.text-block( :@chunks, :$font, :$font-size, :width(220) );
     $gfx.say($text-block);
     my $unreserved-width  = $text-block.content-width;
@@ -39,7 +39,7 @@ $page.text: -> $gfx {
     is-approx $text-block.content-height, $unreserved-height, '$.content-height';
 
     is-json-equiv $text-block.reserved, [
-        {:Tm[1, 0, 0, 1, 241.344, 464.8], :Tx(141.344), :Ty(<0/1>), :Tr(0), :source("the")},
+        {:Tm[1, 0, 0, 1, 241.344, 464.8], :Tx(141.344), :Ty(0), :Tr(0), :source("the")},
         {:Tm[1, 0, 0, 1, 100.0, 447.2], :Tx(0.0), :Ty(-17.6), :Tr(0), :source("aga")}
     ], 'reservations';
 }

@@ -68,14 +68,14 @@ class PDF::Content
 	@images;
     }
 
-    use PDF::Content::Util::TransformMatrix;
+    use PDF::Content::Util::TransformMatrix :transform;
     method transform( |c ) {
-	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform( |c );
+	my Numeric @matrix = transform( |c );
 	$.ConcatMatrix( @matrix );
     }
 
     method text-transform( |c ) {
-	my Numeric @matrix = PDF::Content::Util::TransformMatrix::transform( |c );
+	my Numeric @matrix = transform( |c );
 	$.SetTextMatrix( @matrix );
     }
 

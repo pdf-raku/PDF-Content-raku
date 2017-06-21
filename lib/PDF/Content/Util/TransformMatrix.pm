@@ -13,31 +13,31 @@ module PDF::Content::Util::TransformMatrix {
     subset TransformMatrix of List where {.elems == 6}
     my Int enum TransformMatrixElem « :a(0) :b(1) :c(2) :d(3) :e(4) :f(5) »;
 
-    our sub identity returns TransformMatrix {
+    our sub identity returns TransformMatrix is export(:identity) {
         [1, 0, 0, 1, 0, 0];
     }
 
-    our sub translate(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
+    our sub translate(Numeric $x!, Numeric $y = $x --> TransformMatrix) is export(:translate) {
         [1, 0, 0, 1, $x, $y];
     }
 
-    our sub rotate( Numeric \r --> TransformMatrix) {
+    our sub rotate( Numeric \r --> TransformMatrix) is export(:rotate) {
         my Numeric \cos-r = cos(r);
         my Numeric \sin-r = sin(r);
 
         [cos-r, sin-r, -sin-r, cos-r, 0, 0];
     }
 
-    our sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) {
+    our sub scale(Numeric $x!, Numeric $y = $x --> TransformMatrix) is export(:scale)  {
         [$x, 0, 0, $y, 0, 0];
     }
 
-    our sub skew(Numeric $x, Numeric $y = $x --> TransformMatrix) {
+    our sub skew(Numeric $x, Numeric $y = $x --> TransformMatrix) is export(:skew) {
         [1, tan($x), tan($y), 1, 0, 0];
     }
 
     #| multiply transform matrix x X y
-    our sub multiply(TransformMatrix \x, TransformMatrix \y --> TransformMatrix) {
+    our sub multiply(TransformMatrix \x, TransformMatrix \y --> TransformMatrix) is export(:multiply) {
 
         [ y[a] * x[a]  +  y[c] * x[b],
           y[b] * x[a]  +  y[d] * x[b],
@@ -61,7 +61,7 @@ module PDF::Content::Util::TransformMatrix {
         }
     } 
     #| calculate an inverse, if possible
-    our sub inverse(TransformMatrix \m --> TransformMatrix) {
+    our sub inverse(TransformMatrix \m --> TransformMatrix) is export(:inverse) {
 
         my Bool $div-err;
         my \Ib = mdiv( m[b], m[c] * m[b] - m[d] * m[a], $div-err);
@@ -85,7 +85,7 @@ module PDF::Content::Util::TransformMatrix {
     #| Coordinate transform (or dot product) of x, y
     #|    x' = a.x  + c.y + e; y' = b.x + d.y +f
     #| See [PDF 1.7 Section 4.2.3 Transformation Matrices]
-    our sub dot(TransformMatrix \m, Numeric \x, Numeric \y) {
+    our sub dot(TransformMatrix \m, Numeric \x, Numeric \y) is export(:dot) {
 	my \tx = m[a] * x  +  m[c] * y  +  m[e];
 	my \ty = m[b] * x  +  m[d] * y  +  m[f];
         (tx, ty);
@@ -114,12 +114,12 @@ module PDF::Content::Util::TransformMatrix {
     }
 
     #| Compute: $a = $a X $b
-    our sub apply(TransformMatrix $a! is rw, TransformMatrix $b! --> TransformMatrix) {
+    our sub apply(TransformMatrix $a! is rw, TransformMatrix $b! --> TransformMatrix) is export(:apply) {
 	$a = multiply($a, $b);
     }
 
     # return true of this is the identity matrix =~= [1, 0, 0, 1, 0, 0 ]
-    our sub is-identity(TransformMatrix \m) {
+    our sub is-identity(TransformMatrix \m) is export(:is-identity) {
         ! (m.list Z identity()).first: { .[0] !=~= .[1] };
     }
 
@@ -140,7 +140,7 @@ module PDF::Content::Util::TransformMatrix {
 	:$scale,
 	:$skew,
 	--> TransformMatrix
-	) {
+	) is export(:transform) {
 	my TransformMatrix $t = $matrix
             ?? [$matrix.list]
             !! identity();
