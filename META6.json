@@ -15,6 +15,7 @@
         "PDF::Content::Graphics"        : "lib/PDF/Content/Graphics.pm",
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
         "PDF::Content::Marked"          : "lib/PDF/Content/Marked.pm",
+        "PDF::Content::Matrix" : "lib/PDF/Content/Matrix.pm",
         "PDF::Content::Page"            : "lib/PDF/Content/Page.pm",
         "PDF::Content::PageNode"        : "lib/PDF/Content/PageNode.pm",
         "PDF::Content::PageTree"        : "lib/PDF/Content/PageTree.pm",
@@ -40,7 +41,6 @@
         "PDF::Content::Text::Reserved"  : "lib/PDF/Content/Text/Reserved.pm",
         "PDF::Content::Text::Style"     : "lib/PDF/Content/Text/Style.pm",
 
-        "PDF::Content::Util::Font"      : "lib/PDF/Content/Util/Font.pm",
-        "PDF::Content::Util::TransformMatrix" : "lib/PDF/Content/Util/TransformMatrix.pm"
+        "PDF::Content::Util::Font"      : "lib/PDF/Content/Util/Font.pm"
      }
 }

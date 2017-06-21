@@ -28,7 +28,7 @@ my role ExtGraphicsAtt {
 class PDF::Content::Ops {
 
     use PDF::Writer;
-    use PDF::Content::Util::TransformMatrix;
+    use PDF::Content::Matrix;
 
     has Routine @.callback is rw;
     has Pair @!ops;
@@ -304,10 +304,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         Proxy.new(
             FETCH => sub ($) {@!CTM},
             STORE => sub ($, List $gm) {
-                my @ctm-inv = PDF::Content::Util::TransformMatrix::inverse(@!CTM);
-                my @diff = PDF::Content::Util::TransformMatrix::multiply($gm, @ctm-inv);
+                my @ctm-inv = PDF::Content::Matrix::inverse(@!CTM);
+                my @diff = PDF::Content::Matrix::multiply($gm, @ctm-inv);
                 self.ConcatMatrix( |@diff )
-                    unless PDF::Content::Util::TransformMatrix::is-identity(@diff);
+                    unless PDF::Content::Matrix::is-identity(@diff);
                 @!CTM;
             });
     }
@@ -760,7 +760,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	Restore;
     }
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
-        @!CTM = PDF::Content::Util::TransformMatrix::multiply([a, b, c, d, e, f], @!CTM);
+        @!CTM = PDF::Content::Matrix::multiply([a, b, c, d, e, f], @!CTM);
     }
     multi method track-graphics('rg', \r, \g, \b) {
         $!FillColorSpace = 'DeviceRGB';

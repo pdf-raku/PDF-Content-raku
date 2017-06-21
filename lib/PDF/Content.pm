@@ -68,7 +68,7 @@ class PDF::Content
 	@images;
     }
 
-    use PDF::Content::Util::TransformMatrix :transform;
+    use PDF::Content::Matrix :transform;
     method transform( |c ) {
 	my Numeric @matrix = transform( |c );
 	$.ConcatMatrix( @matrix );
