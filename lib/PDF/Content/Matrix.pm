@@ -92,7 +92,7 @@ module PDF::Content::Matrix {
     }
 
     #| inverse of the above. Convert from untransformed to transformed space
-    our sub inverse-dot(TransformMatrix \m, Numeric \tx, Numeric \ty) {
+    our sub inverse-dot(TransformMatrix \m, Numeric \tx, Numeric \ty) is export(:inverse-dot) {
         # nb two different simultaneous equations for the above.
         my ($x, $y);
         my \div1 = m[d] * m[a]  -  m[c] * m[b];
