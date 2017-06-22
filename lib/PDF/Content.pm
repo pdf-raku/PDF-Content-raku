@@ -17,26 +17,30 @@ class PDF::Content
 
     method graphics( &do-stuff! ) {
         $.op(Save);
-        &do-stuff(self);
+        my \ret = &do-stuff(self);
         $.op(Restore);
+        ret;
     }
 
     method text( &do-stuff! ) {
         $.op(BeginText);
-        &do-stuff(self);
+        my \ret = &do-stuff(self);
         $.op(EndText);
+        ret
     }
 
     multi method marked-content( Str $tag, Hash $dict, &do-stuff! ) {
         $.BeginMarkedContentDict($tag, $dict);
-        &do-stuff(self);
+        my \ret = &do-stuff(self);
         $.EndMarkedContent;
+        ret;
     }
 
     multi method marked-content( Str $tag, &do-stuff! ) {
         $.BeginMarkedContent($tag);
-        &do-stuff(self);
+        my \ret = &do-stuff(self);
         $.EndMarkedContent;
+        ret;
     }
 
     method canvas( &mark-up! ) {
