@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 38;
+plan 41;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Util::Font;
@@ -63,6 +63,8 @@ my $zapf = PDF::Content::Util::Font::core-font( 'ZapfDingbats' );
 isa-ok $zapf, 'Font::Metrics::zapfdingbats';
 is $zapf.enc, 'zapf', '.enc';
 is $zapf.encode("♥♣✔", :str), "ª¨4", '.encode(...)'; # /a110 /a112 /a20
+is $zapf.decode("ª¨4", :str), "♥♣✔", '.decode(...)';
+is $zapf.decode("\o251\o252", :str), "♦♥", '.decode(...)';
 
 isa-ok PDF::Content::Util::Font::core-font('CourierNew,Bold'), 'Font::Metrics::courier-bold';
 
@@ -70,5 +72,6 @@ my $sym = PDF::Content::Util::Font::core-font( 'Symbol' );
 isa-ok $sym, 'Font::Metrics::symbol';
 is $sym.enc, 'sym', '.enc';
 is $sym.encode("ΑΒΓ", :str), "ABG", '.encode(...)'; # /Alpha /Beta /Gamma
+is $sym.decode("ABG", :str), "ΑΒΓ", '.decode(...)';
 
 done-testing;

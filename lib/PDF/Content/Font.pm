@@ -19,8 +19,8 @@ role PDF::Content::Font {
             my $enc = do given $font<Encoding> {
                 when 'WinAnsiEncoding' { 'win' }
                 when 'MacRomanEncoding' { 'mac' }
-                when $base-font ~~ /^Symbol/ { 'sym' }
-                when $base-font ~~ /^ZapfDingbats/ { 'zapf' }
+                when $base-font ~~ /^symbol/ { 'sym' }
+                when $base-font ~~ /^zapfdingbats/ { 'zapf' }
                 default { 'win' }
             }
             PDF::Content::Font::AFM.new: :$enc;
