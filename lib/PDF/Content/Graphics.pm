@@ -7,6 +7,7 @@ role PDF::Content::Graphics {
     use PDF::Content::Ops :OpCode;
 
     has PDF::Content $!pre-gfx; #| prepended graphics
+    method has-pre-gfx { ? .ops with $!pre-gfx }
     method pre-gfx { $!pre-gfx //= PDF::Content.new( :parent(self) ) }
     method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
     has PDF::Content $!gfx;     #| appended graphics

@@ -180,8 +180,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	:OverPrintStroke<op>
 	:OverPrintMode<OPM>
 	:Font<Font>
-	:BlackGeneration-old<BG>
-	:BlackGeneration<BG2>
+	:BlackGenerationFunction-old<BG>
+	:BlackGenerationFunction<BG2>
 	:UnderCoverRemovalFunction-old<UCR>
 	:UnderCoverRemovalFunction<UCR2>
 	:TransferFunction-old<TR>
