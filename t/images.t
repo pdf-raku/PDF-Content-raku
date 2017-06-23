@@ -173,14 +173,18 @@ for (
 sub save-images(@images) {
     my $doc = t::PDFTiny.new;
     my $page = $doc.add-page;
+    $page.MediaBox = [0,0,612,792];
     my $x = 45;
     my $y = 650;
     my $n = 0;
 
     $page.graphics: -> $gfx {
+        $gfx.FillColor = :DeviceRGB[ .9, .9, .95 ];
+        $gfx.Rectangle: |$page.MediaBox;
+        $gfx.Fill;
 	$gfx.font = $page.core-font( :family<Times-Roman>, :weight<bold>);
 	$gfx.print( "PDF::Content [t/images.t] - assorted images",
-		    :position[30, 750] );
+                    :position[30, 750] );
 
 	$gfx.font = ($page.core-font( :family<Times-Roman>), 12);
     
