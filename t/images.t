@@ -7,7 +7,6 @@ use PDF::Content::Image;
 use PDF::Content::Image::GIF;
 use PDF::Content::Image::PNG;
 use t::PDFTiny;
-
 # ensure consistant document ID generation
 srand(123456);
 
@@ -178,10 +177,13 @@ sub save-images(@images) {
     my $y = 650;
     my $n = 0;
 
+    $page.graphics: {
+        .FillColor = :DeviceRGB[ .9, .9, .95 ];
+        .Rectangle: |$page.MediaBox;
+        .Fill;
+    }
+
     $page.graphics: -> $gfx {
-        $gfx.FillColor = :DeviceRGB[ .9, .9, .95 ];
-        $gfx.Rectangle: |$page.MediaBox;
-        $gfx.Fill;
 	$gfx.font = $page.core-font( :family<Times-Roman>, :weight<bold>);
 	$gfx.print( "PDF::Content [t/images.t] - assorted images",
                     :position[30, 750] );

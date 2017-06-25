@@ -5,31 +5,34 @@ use PDF::Content::Image;
 
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
-
     use Native::Packing :Endian;
+    class Atts does Native::Packing[Network] {
+        has uint8 $.bit-depth;
+        has uint16 ($.height, $.width);
+        has uint8 $.color-channels
+    }
+    class BlockHeader does Native::Packing[Network] {
+        has uint8 ($.ff, $.mark);
+        has uint16 $.len
+    }
+    # work-around for Rakudo RT #131122 - sign handling\
+    has Atts $!atts;
+    has Bool $!is-dct;
+    has Str $!encoded;
+
     # work-around for Rakudo RT #131122 - sign handling
     sub u8(uint8 $v) { $v }
 
     method read($fh!) {
-       my class Atts does Native::Packing[Network] {
-            has uint8 $.bit-depth;
-            has uint16 ($.height, $.width);
-            has uint8 $.color-type
-        }
-        my class Hdr does Native::Packing[Network] {
-            has uint8 ($.ff, $.mark);
-            has uint16 $.len
-        }
-        my Atts $atts;
         my Bool $is-dct;
 
         $fh.seek(0, SeekFromBeginning);
-        my $header = $fh.read(2).decode: 'latin-1';
+        my Str $header = $fh.read(2).decode: 'latin-1';
         die X::PDF::Image::WrongHeader.new( :type<JPEG>, :$header, :path($fh.path) )
             unless $header ~~ "\xFF\xD8";
 
         loop {
-            my Hdr $hdr .= unpack: $fh.read(4);
+            my BlockHeader $hdr .= unpack: $fh.read(4);
             last if u8($hdr.ff) != 0xFF;
             last if u8($hdr.mark) == 0xDA | 0xD9;  # SOS/EOI
             last if $hdr.len < 2;
@@ -39,19 +42,26 @@ class PDF::Content::Image::JPEG
             with $hdr.mark -> uint8 $mark {
                 if 0xC0 <= $mark <= 0xCF
                 && $mark != 0xC4 | 0xC8 | 0xCC {
-                    $is-dct = ?( $mark == 0xC0 | 0xC2);
-                    $atts = Atts.unpack($buf);
+                    $!is-dct = ?( $mark == 0xC0 | 0xC2);
+                    $!atts = Atts.unpack($buf);
                     last;
                 }
             }
         }
 
+        $fh.seek(0, SeekFromBeginning);
+        $!encoded = $fh.slurp-rest;
+        $fh.close;
+        self;
+    }
+
+    method to-dict {
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
-        with $atts {
-            my Str \color-space = do given .color-type {
+        with $!atts {
+            my Str \color-space = do given .color-channels {
+                when 1 {'DeviceGray'}
                 when 3 {'DeviceRGB'}
                 when 4 {'DeviceCMYK'}
-                when 1 {'DeviceGray'}
                 default {warn "JPEG has unknown color-space: $_";
                          'DeviceGray'}
             }
@@ -65,14 +75,14 @@ class PDF::Content::Image::JPEG
             die "unable to read JPEG attributes";
         }
         %dict<Filter> = :name<DCTDecode>
-            if $is-dct;
+            if $!is-dct;
 
-        $fh.seek(0, SeekFromBeginning);
-        my $encoded = $fh.slurp-rest;
-        $fh.close;
+        need PDF::DAO;
+        PDF::DAO.coerce: :stream{ :%dict, :$!encoded };
+    }
 
-        use PDF::DAO;
-        PDF::DAO.coerce: :stream{ :%dict, :$encoded };
+    method open($fh) {
+        self.new.read($fh).to-dict;
     }
 }
 

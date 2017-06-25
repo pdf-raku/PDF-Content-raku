@@ -14,115 +14,117 @@ class PDF::Content::Image::PNG
 
     enum PNG-CS « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
 
-    my class PNG {
-        use NativeCall;
-        need Compress::Zlib::Raw;
+    use NativeCall;
+    need Compress::Zlib::Raw;
 
-        class Header does Native::Packing[Network] {
-            has uint32 $.width;
-            has uint32 $.height;
-            has uint8  $.bit-depth;
-            has uint8  $.color-type;
-            has uint8  $.compression-type;
-            has uint8  $.filter-type;
-            has uint8  $.interlace-type;
-        }
-        class Quad does Native::Packing[Network] {
-            has uint32 $.Numeric;
-        }
-        has Header $.hdr;
-        has Buf $.palette;
-        has Buf $.trns;
-        has buf8 $.stream .= new;
-        constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
-        constant \NullPointer = nativecast(CArray,Pointer.new(0));
+    class Header does Native::Packing[Network] {
+        has uint32 $.width;
+        has uint32 $.height;
+        has uint8  $.bit-depth;
+        has uint8  $.color-type;
+        has uint8  $.compression-type;
+        has uint8  $.filter-type;
+        has uint8  $.interlace-type;
+    }
+    class Quad does Native::Packing[Network] {
+        has uint32 $.Numeric;
+    }
+    has Header $.hdr;
+    has buf8 $.palette;
+    has buf8 $.trns;
+    has buf8 $.stream .= new;
+    constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
+    constant \NullPointer = nativecast(CArray,Pointer.new(0));
 
-        method !crc($hdr, $buf) {
-            my uint32 $crc = Compress::Zlib::Raw::crc32(0, NullPointer, 0);
-            $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $hdr), 4);
-            Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $buf), $buf.elems);
-        }
+    method !crc($hdr, $buf) {
+        my uint32 $crc = Compress::Zlib::Raw::crc32(0, NullPointer, 0);
+        $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $hdr), 4);
+        $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $buf), $buf.elems)
+            if $buf.elems;
+        $crc;
+    }
 
-        method read($fh!) {
+    method read($fh!) is default {
 
-            my Str $header = $fh.read(8).decode('latin-1');
+        my Str $header = $fh.read(8).decode('latin-1');
 
-            die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :path($fh.path) )
-                unless $header eq PNG-Header;
+        die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :path($fh.path) )
+            unless $header eq PNG-Header;
 
-            while !$fh.eof {
-                my Quad $len .= read($fh);
-                my buf8 $hdr = $fh.read(4);
-                my buf8 $buf = $fh.read(+$len);
-                my Quad $crc = Quad.read($fh);
-                if +$len {
-                    my uint32 $crc-got = +$crc;
-                    my uint32 $crc-calc = self!crc($hdr,$buf);
-                    die "crc check failed: expected $crc-calc, got $crc-got"
-                        unless $crc-calc == $crc-got;
+        while !$fh.eof {
+            my Quad $len .= read($fh);
+            my buf8 $hdr = $fh.read(4);
+            my buf8 $buf = $fh.read(+$len);
+            my Quad $crc = Quad.read($fh);
+            if +$len {
+                my uint32 $crc-got = +$crc;
+                my uint32 $crc-calc = self!crc($hdr,$buf);
+                die "crc check failed: expected $crc-calc, got $crc-got"
+                    unless $crc-calc == $crc-got;
+            }
+
+            given $hdr.decode('latin-1') {
+
+                when 'IHDR' {
+                    $!hdr = Header.unpack: $buf;
+                    die "Unsupported Compression($!hdr.cm) Method" if $!hdr.compression-type;
+                    die "Unsupported Filter($!hdr.fm) Method" if $!hdr.filter-type;
+                    die "Unsupported Interlace($!hdr.im) Method" if $!hdr.interlace-type;
                 }
-
-                given $hdr.decode('latin-1') {
-
-                    when 'IHDR' {
-                        $!hdr = Header.unpack: $buf;
-                        die "Unsupported Compression($!hdr.cm) Method" if $!hdr.compression-type;
-                        die "Unsupported Filter($!hdr.fm) Method" if $!hdr.filter-type;
-                        die "Unsupported Interlace($!hdr.im) Method" if $!hdr.interlace-type;
-                    }
-                    when 'PLTE' {
-                        $!palette = $buf;
-                    }
-                    when 'IDAT' {
-                        $!stream.append: $buf.list;
-                    }
-                    when 'tRNS' {
-                        $!trns = $buf;
-                    }
-                    when 'IEND' {
-                        last;
-                    }
+                when 'PLTE' {
+                    $!palette = $buf;
+                }
+                when 'IDAT' {
+                    $!stream.append: $buf.list;
+                }
+                when 'tRNS' {
+                    $!trns = $buf;
+                }
+                when 'IEND' {
+                    last;
                 }
             }
-            $fh.close;
-            self;
         }
+        $fh.close;
+        self;
+    }
 
-        method !pack(buf8, $buf, Str $hdr, buf8 $data = buf8.new) {
-            with $data {
-                $buf.append: $hdr.codes;
-                my Quad $len .= new($!hdr.bytes);
-                $len.pack($buf);
-                $buf.append: $data;
-                my Quad $crc .= new(42); # todo crc
-                $crc.pack($buf);
-            }
+    method !pack(buf8 $buf, Str $hdr, buf8 $data = buf8.new) {
+        with $data {
+            $buf.append: $hdr.encode.list;
+            my Quad $len .= new: :Numeric($data.bytes);
+            $len.pack($buf);
+            $buf.append: $data.list;
+            my Quad $crc .= new: :Numeric(self!crc($hdr.encode, $data));
+            $crc.pack($buf);
+            warn { :$buf, :$hdr, :$crc, :$data }.perl;
         }
+    }
 
-        method Buf {
-            my $buf = buf8.new: PNG-Header.codes;
-            self!pack($buf, 'IHDR', $!hdr.pack);
-            self!pack($buf, 'PLTE', $!hdr.palette);
-            self!pack($buf, 'tRNS', $!trns);
-            self!pack($buf, 'IDAT', $!stream);
-            self!pack($buf, 'IEND');
-        }
+    method Buf {
+        my $buf = buf8.new: PNG-Header.codes;
+        self!pack($buf, 'IHDR', $!hdr.pack);
+        self!pack($buf, 'PLTE', $!palette);
+        self!pack($buf, 'tRNS', $!trns);
+        self!pack($buf, 'IDAT', $!stream);
+        self!pack($buf, 'IEND');
+        $buf;
     }
 
     sub network-words(Buf $buf) {
         pack($buf, 16);
     }
 
-    sub to-dict(PNG $_, Bool :$alpha!) {
+    method to-dict(Bool :$alpha = True) {
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
-        %dict<Width>  = .hdr.width;
-        %dict<Height> = .hdr.height;
-        my $stream = .stream;
+        %dict<Width>  = $!hdr.width;
+        %dict<Height> = $!hdr.height;
+        my $stream = $!stream;
 
-        my %opts = :w(.hdr.width), :h(.hdr.height), :%dict, :$stream, :$alpha;
-        %opts<trns> = $_ with .trns;
-        %opts<palette> = $_ with .palette;
-        png-to-stream(PNG-CS(.hdr.color-type), .hdr.bit-depth, |%opts);
+        my %opts = :w($!hdr.width), :h($!hdr.height), :%dict, :$stream, :$alpha;
+        %opts<trns> = $_ with $!trns;
+        %opts<palette> = $_ with $!palette;
+        png-to-stream(PNG-CS($!hdr.color-type), $!hdr.bit-depth, |%opts);
     }
 
     proto sub png-to-stream(uint $cs, uint $bpc, *%o --> PDF::DAO::Stream) {*}
@@ -307,9 +309,8 @@ class PDF::Content::Image::PNG
 	PDF::DAO.coerce: :stream{ :%dict, :$decoded };
     }
 
-    method read($fh, Bool :$alpha=True --> PDF::DAO::Stream) {
-        my PNG $png .= new.read($fh);
-        to-dict($png, :$alpha);
+    method open($fh) {
+        self.new.read($fh).to-dict;
     }
 }
 

@@ -33,6 +33,7 @@ class PDF::Content::Image {
     }
 
     multi method open(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
+        warn;
         my $path = ~ $0;
         my Str \mime-type = ( $0<t> // '(missing)').lc;
         my Str \mime-subtype = ( $0<s> // '').lc;
@@ -67,13 +68,12 @@ class PDF::Content::Image {
     }
 
     method !open(Str $image-type, $fh, |c) {
-        use PDF::DAO::Stream;
-        my PDF::DAO::Stream \image = (require ::('PDF::Content::Image')::($image-type)).read($fh);
-        image does PDF::Content::XObject[image<Subtype>]
-            unless image ~~ PDF::Content::XObject;
+        my Hash $image-dict = (require ::('PDF::Content::Image')::($image-type)).open($fh);
+        $image-dict does PDF::Content::XObject[$image-dict<Subtype>]
+            unless $image-dict ~~ PDF::Content::XObject;
 
-        image.?set-source(:source($fh), :$image-type, |c);
-        image;
+        $image-dict.?set-source(:source($fh), :$image-type, |c);
+        $image-dict;
     }
 
     method inline-to-xobject(Hash $inline-dict, Bool :$invert) {
@@ -94,7 +94,7 @@ class PDF::Content::Image {
             :RGB<DeviceRGB>,
             :CMYK<DeviceCMYK>,
             # Notes:
-            # 1. Ambiguous 'Indexed' entry seems to be a typo in the spec
+            # 1. ambiguous 'Indexed' entry seems to be a typo in the spec
             # 2. filter abbreviations are handled in PDF::IO::Filter
             );
 

@@ -6,15 +6,39 @@ use PDF::Content::Image;
 class PDF::Content::Image::GIF
     is PDF::Content::Image {
 
+        use trace;
     use Native::Packing :Endian;
 
-    method !read-colorspace($fh,  UInt $flags, %dict) {
-        my UInt $col-size = 2 ** (($flags +& 0x7) + 1);
-        my Str $encoded = $fh.read( 3 * $col-size).decode('latin-1');
-        my $color-table = $col-size > 64
-            ?? PDF::DAO.coerce( :stream{ :$encoded } )
-            !! :hex-string($encoded);
-        %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, :int($col-size-1), $color-table ];
+    class LogicalDescriptor does Native::Packing[Vax] {
+        has uint16 $.width;
+        has uint16 $.height;
+        has uint8 $.flags;
+        has uint8 $.bgColorIndex;
+        has uint8 $.aspect;
+    }
+    has LogicalDescriptor $!descr;
+
+    class ImageDescriptor does Native::Packing[Vax] {
+        has uint16 $.left;
+        has uint16 $.top;
+        has uint16 $.width;
+        has uint16 $.height;
+        has uint8 $.flags;
+    }
+    has ImageDescriptor $!img;
+
+    class GCDescriptor does Native::Packing[Vax] {
+        has uint8 $.cFlags;
+        has uint16 $.delay;
+        has uint8 $.transIndex
+    }
+    has GCDescriptor $!gc;
+    has buf8 $!color-table;
+    has buf8 $!data;
+
+    method !read-colorspace($fh,  UInt $flags) {
+        my $cols = 2 ** (($flags +& 0x7) + 1);
+        $!color-table = $fh.read( 3 * $cols);
     }
 
     sub vec(buf8 \buf, UInt \off) {
@@ -52,55 +76,44 @@ class PDF::Content::Image::GIF
             }
         }
 
-        Buf.new(@out);
+        buf8.new(@out);
     }
 
-    method !deinterlace(Buf $data, UInt $width, UInt $height) {
-        my UInt $row;
-        my Buf @result;
-        my UInt $idx = 0;
+    method !deinterlace {
+        my uint $row;
+        my buf8 @result;
+        my uint $idx = 0;
+        my uint $width = self.width;
+        my uint $height = self.height;
 
         for [ 0 => 8, 4 => 8, 2 => 4, 1 => 2] {
             my $row = .key;
             my \incr = .value;
             while $row < $height {
-                @result[$row] = $data.subbuf( $idx*$width, $width);
+                @result[$row] = $!data.subbuf( $idx*$width, $width);
                 $row += incr;
                 $idx++;
             }
         }
 
-        [~] @result.map: *.decode('latin-1');
+        flat @result.map: *.list;
     }
 
-    method read($fh!, Bool :$trans = True) {
+    method width { ($!img // $!descr).width; }
+    method height { ($!img // $!descr).height; }
 
-        my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
-        my Bool $interlaced = False;
+    method read($fh!) {
+
         my Str $encoded = '';
 
         my $header = $fh.read(6).decode: 'latin-1';
         die X::PDF::Image::WrongHeader.new( :type<GIF>, :$header, :path($fh.path) )
             unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
-        my class LogicalDescriptor does Native::Packing[Vax] {
-            has uint16 $.width;
-            has uint16 $.height;
-            has uint8 $.flags;
-            has uint8 $.bgColorIndex;
-            has uint8 $.aspect;
-        }
-        my class ImageDescriptor does Native::Packing[Vax] {
-            has uint16 $.left;
-            has uint16 $.top;
-            has uint16 $.width;
-            has uint16 $.height;
-            has uint8 $.flags;
-        }
-        my LogicalDescriptor $descr .= read: $fh;
+        $!descr .= read: $fh;
 
-        with $descr.flags -> uint8 $flags {
-            self!read-colorspace($fh, $flags, %dict)
+        with $!descr.flags -> uint8 $flags {
+            self!read-colorspace($fh, $flags)
                 if $flags +& 0x80;
         }
 
@@ -109,14 +122,11 @@ class PDF::Content::Image::GIF
 
             given $sep {
                 when 0x2C {
-                    my ImageDescriptor $img .= read: $fh;
+                    my Bool $interlaced = False;
+                    $!img .= read: $fh;
 
-                    %dict<Width>  = $img.width || $descr.width;
-                    %dict<Height> = $img.height || $descr.height;
-                    %dict<BitsPerComponent> = 8;
-
-                    with $img.flags -> uint8 $flags {
-                        self!read-colorspace($fh, $flags, %dict)
+                    with $!img.flags -> uint8 $flags {
+                        self!read-colorspace($fh, $flags)
                             if $flags +& 0x80; # local colormap
 
                         $interlaced = True  # need de-interlace
@@ -131,12 +141,8 @@ class PDF::Content::Image::GIF
                         $len = $fh.read(1)[0];
                     }
 
-                    my Buf $data = self!decompress($sep+1, $stream);
-                    $encoded = $interlaced
-                        ?? self!deinterlace($encoded, %dict<Width>, %dict<Height> )
-                        !! $data.decode: 'latin-1';
-
-                    %dict<Length> = $encoded.codes;
+                    $!data = self!decompress($sep+1, $stream);
+                    $!data .= new: self!deinterlace if $interlaced;
                     last;
                 }
 
@@ -157,19 +163,7 @@ class PDF::Content::Image::GIF
                         $len = $fh.read(1)[0];
                     }
 
-                    if $trans {
-                        my class GCDescriptor does Native::Packing[Vax] {
-                            has uint8 $.cFlags;
-                            has uint16 $.delay;
-                            has uint8 $.transIndex
-                        }
-                        my GCDescriptor $gc .= unpack($stream);
-                        with $gc.cFlags -> uint8 $cFlags {
-                            my uint8 $transIndex = $gc.transIndex;
-                            %dict<Mask> = [$transIndex, $transIndex]
-                                if $cFlags +& 0x01;
-                        }
-                    }
+                    $!gc .= unpack($stream);
                 }
 
                 default {
@@ -185,9 +179,41 @@ class PDF::Content::Image::GIF
             }
         }
         $fh.close;
+        self;
+    }
 
-        use PDF::DAO;
+    method to-dict(Bool :$trans = True) {
+        need PDF::DAO;
+        my %dict = ( :Type( :name<XObject> ),
+                     :Subtype( :name<Image> ),
+                     :Width( self.width),
+                     :Height( self.height),
+                     :BitsPerComponent(8),
+            );
+        with $!color-table {
+            my $cols = .elems div 3;
+            my $encoded = $!color-table.decode("latin-1");
+            my $color-data = $cols > 64
+                ?? PDF::DAO.coerce( :stream{ :$encoded } )
+                !! :hex-string($encoded);
+
+            %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>,
+                                  :int($cols - 1), $color-data ];
+        }
+
+        if $trans & $!gc.defined {
+            with $!gc.cFlags -> uint8 $cFlags {
+                my uint8 $transIndex = $!gc.transIndex;
+                %dict<Mask> = [$transIndex, $transIndex]
+                    if $cFlags +& 0x01;
+            }
+        }
+
+        my Str $encoded = $!data.decode: 'latin-1';
         PDF::DAO.coerce: :stream{ :%dict, :$encoded };
     }
 
+    method open($fh) {
+        self.new.read($fh).to-dict;
+    }
 }
