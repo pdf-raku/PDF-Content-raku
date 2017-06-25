@@ -229,7 +229,7 @@ class PDF::Content::Image::PNG
 
 	$stream = PDF::IO::Filter.decode( $stream, :%dict );
 
-	# Strip alpha (transparency channel)
+	# Extract alpha (transparency channel)
 	%dict<DecodeParms><Colors>--;
 
 	my uint $n = $bpc div 8;
@@ -310,6 +310,46 @@ class PDF::Content::Image::PNG
 
     method open($fh) {
         self.new.read($fh).to-dict;
+    }
+
+    my subset ImageStream of PDF::DAO::Stream where .<Subtype> ~~ 'Image';
+    my subset PNGPredictor of Int where 10 .. 15;
+
+    method from-dict(ImageStream $dict) {
+        my UInt $Colors;
+        given $dict<ColorSpace> {
+            when 'DeviceGray' { $Colors = 1;}
+            when 'DeviceRGB'  { $Colors = 3;}
+        }
+        # things we can't handle yet
+        return Nil
+            if !$Colors;
+
+        # may degrade rendering
+        warn "ignoring image SMask" with $dict<SMask>;
+
+        my PNG-CS $color-type =  $dict<ColorSpace> ~~ 'DeviceGray'
+            ?? Gray !! RGB;
+        my $bit-depth = $dict<BitsPerComponent> || 8;
+        my UInt $width = $dict<Width>;
+        my UInt $height = $dict<Height>;
+        my Header $hdr .= new: :$width, :$height, :$bit-depth, :$color-type;
+        my buf8 $stream;
+        my $decode-parms = $dict<DecodeParms>;
+        if $decode-parms
+            && $dict<Filter> ~~ 'FlateDecode'
+            && $decode-parms<Predictor> ~~ PNGPredictor
+            && $decode-parms<BitsPerComponent> ~~ $bit-depth
+            && $decode-parms<Colors> ~~ $Colors {
+                # stream is good to go
+                $stream = buf8.new: $dict.encoded.encode: "latin-1";
+        }
+        else {
+            # could reencode stream. use case?
+            return Nil;
+        }
+        
+        self.new: :$hdr, :$stream;
     }
 }
 
