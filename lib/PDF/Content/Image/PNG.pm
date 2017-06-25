@@ -91,18 +91,17 @@ class PDF::Content::Image::PNG
 
     method !pack(buf8 $buf, Str $hdr, buf8 $data = buf8.new) {
         with $data {
-            $buf.append: $hdr.encode.list;
             my Quad $len .= new: :Numeric($data.bytes);
             $len.pack($buf);
+            $buf.append: $hdr.encode.list;
             $buf.append: $data.list;
             my Quad $crc .= new: :Numeric(self!crc($hdr.encode, $data));
             $crc.pack($buf);
-            warn { :$buf, :$hdr, :$crc, :$data }.perl;
         }
     }
 
     method Buf {
-        my $buf = buf8.new: PNG-Header.codes;
+        my $buf = buf8.new: PNG-Header.encode: "latin-1";
         self!pack($buf, 'IHDR', $!hdr.pack);
         self!pack($buf, 'PLTE', $!palette);
         self!pack($buf, 'tRNS', $!trns);
