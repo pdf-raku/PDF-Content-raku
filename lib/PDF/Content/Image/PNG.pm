@@ -12,7 +12,7 @@ class PDF::Content::Image::PNG
     use PDF::IO::Util :pack;
     use Native::Packing :Endian;
 
-    enum PNG-CS « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
+    enum PNG-CS is export(:PNG-CS) « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
 
     use NativeCall;
     need Compress::Zlib::Raw;
@@ -21,7 +21,7 @@ class PDF::Content::Image::PNG
         has uint32 $.width;
         has uint32 $.height;
         has uint8  $.bit-depth;
-        has uint8  $.color-type;
+        has uint8  $.color-type is rw;
         has uint8  $.compression-type;
         has uint8  $.filter-type;
         has uint8  $.interlace-type;
@@ -30,8 +30,8 @@ class PDF::Content::Image::PNG
         has uint32 $.Numeric;
     }
     has Header $.hdr;
-    has buf8 $.palette;
-    has buf8 $.trns;
+    has buf8 $.palette is rw;
+    has buf8 $.trns is rw;
     has buf8 $.stream .= new;
     constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
     constant \NullPointer = nativecast(CArray,Pointer.new(0));
@@ -312,45 +312,6 @@ class PDF::Content::Image::PNG
         self.new.read($fh).to-dict;
     }
 
-    my subset ImageStream of PDF::DAO::Stream where .<Subtype> ~~ 'Image';
-    my subset PNGPredictor of Int where 10 .. 15;
-
-    method from-dict(ImageStream $dict) {
-        my UInt $Colors;
-        given $dict<ColorSpace> {
-            when 'DeviceGray' { $Colors = 1;}
-            when 'DeviceRGB'  { $Colors = 3;}
-        }
-        # things we can't handle yet
-        return Nil
-            if !$Colors;
-
-        # may degrade rendering
-        warn "ignoring image SMask" with $dict<SMask>;
-
-        my PNG-CS $color-type =  $dict<ColorSpace> ~~ 'DeviceGray'
-            ?? Gray !! RGB;
-        my $bit-depth = $dict<BitsPerComponent> || 8;
-        my UInt $width = $dict<Width>;
-        my UInt $height = $dict<Height>;
-        my Header $hdr .= new: :$width, :$height, :$bit-depth, :$color-type;
-        my buf8 $stream;
-        my $decode-parms = $dict<DecodeParms>;
-        if $decode-parms
-            && $dict<Filter> ~~ 'FlateDecode'
-            && $decode-parms<Predictor> ~~ PNGPredictor
-            && $decode-parms<BitsPerComponent> ~~ $bit-depth
-            && $decode-parms<Colors> ~~ $Colors {
-                # stream is good to go
-                $stream = buf8.new: $dict.encoded.encode: "latin-1";
-        }
-        else {
-            # could reencode stream. use case?
-            return Nil;
-        }
-        
-        self.new: :$hdr, :$stream;
-    }
 }
 
 =begin rfc

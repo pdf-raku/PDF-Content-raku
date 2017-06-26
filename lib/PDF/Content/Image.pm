@@ -33,7 +33,6 @@ class PDF::Content::Image {
     }
 
     multi method open(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
-        warn;
         my $path = ~ $0;
         my Str \mime-type = ( $0<t> // '(missing)').lc;
         my Str \mime-subtype = ( $0<s> // '').lc;
