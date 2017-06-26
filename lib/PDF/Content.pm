@@ -88,7 +88,7 @@ class PDF::Content
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
 
     #| place an image, or form object
-    method do(PDF::DAO::Stream $obj! where .<Type> eq 'XObject',
+    method do(PDF::DAO::Stream $obj! where .<Subtype> eq 'Image'|'Form',
               Numeric $x = 0,
               Numeric $y = 0,
               Numeric :$width is copy,
@@ -124,6 +124,7 @@ class PDF::Content
 
         with $obj<Subtype> {
             when 'Form' {
+                $obj.finish;
                 $width /= $obj-width;
                 $height /= $obj-height;
             }
@@ -140,6 +141,11 @@ class PDF::Content
 		$.op(XObject, $key);
 	    }
         };
+    }
+
+    method use-pattern(PDF::DAO::Stream $pat! where .<Type> eq 'Pattern' --> Pair) {
+        $pat.finish;
+        :Pattern(self.resource-key($pat));
     }
 
     method text-block($font = self!current-font[0], |c) {

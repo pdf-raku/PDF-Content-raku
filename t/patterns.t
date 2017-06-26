@@ -19,8 +19,7 @@ lives-ok {
             my $img = .load-image("t/images/lightbulb.gif");
             .do($img, 5, 5 );
         }
-        $pattern.finish;
-        $gfx.FillColor = :Pattern($page.resource-key($pattern));
+        $gfx.FillColor = $gfx.use-pattern($pattern);
         $gfx.Rectangle(0, 20, 100, 250);
         $gfx.Fill;
         $gfx.transform: :translate[110, 10];

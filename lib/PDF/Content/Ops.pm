@@ -34,7 +34,7 @@ class PDF::Content::Ops {
     has Pair @!ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict is rw = True;
-    has $.parent handles <resource-key resource-entry core-font use-font>;
+    has $.parent handles <resource-key resource-entry core-font use-font xobject-form tiling-pattern use-pattern>;
 
 =begin pod
 
@@ -666,6 +666,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     multi method op(Comment $_) { $_ }
     multi method op(*@args is copy) {
+        $!content-cache = Nil;
         my \opn = op(|@args);
 	my Str $op-name;
 
@@ -884,7 +885,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     #| serialize content into a string. indent blocks for readability
-    method content returns Str {
+    has Str $!content-cache;
+    method content { $!content-cache //= self!content }
+    method !content returns Str {
 	my constant Openers = 'q'|'BT'|'BMC'|'BDC'|'BX';
 	my constant Closers = 'Q'|'ET'|'EMC'|'EX';
         my PDF::Writer $writer .= new;
