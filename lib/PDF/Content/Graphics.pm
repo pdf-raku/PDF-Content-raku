@@ -5,6 +5,7 @@ role PDF::Content::Graphics {
 
     use PDF::Content;
     use PDF::Content::Ops :OpCode;
+    use PDF::DAO;
 
     has PDF::Content $!pre-gfx; #| prepended graphics
     method has-pre-gfx { ? .ops with $!pre-gfx }
@@ -78,4 +79,27 @@ role PDF::Content::Graphics {
     }
 
     method cb-finish { $.finish }
+
+    method xobject-form(*%dict) {
+        %dict<Type> = :name<XObject>;
+        %dict<Subtype> = :name<Form>;
+        %dict<Resources> //= {};
+        %dict<BBox> //= PageSizes::Letter;
+        PDF::DAO.coerce( :stream{ :%dict });
+    }
+
+    method tiling-pattern(List    :$BBox!,
+                          Numeric :$XStep = $BBox[2] - $BBox[0],
+                          Numeric :$YStep = $BBox[3] - $BBox[1],
+                          Int :$PaintType = 1,
+                          Int :$TilingType = 1,
+                          *%dict
+                         ) {
+        %dict.push: $_
+                     for (:Type(:name<Pattern>), :PatternType(1),
+                          :$PaintType, :$TilingType,
+                          :$BBox, :$XStep, :$YStep);
+        PDF::DAO.coerce( :stream{ :%dict });
+    }
+
 }

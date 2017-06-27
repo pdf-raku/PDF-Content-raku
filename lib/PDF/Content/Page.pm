@@ -46,14 +46,6 @@ role PDF::Content::Page
 	$streams.keys.map({ $streams[$_].decoded }).join: '';
     }
 
-    method xobject-form(*%dict) {
-        %dict<Type> = :name<XObject>;
-        %dict<Subtype> = :name<Form>;
-        %dict<Resources> //= {};
-        %dict<BBox> //= PageSizes::Letter;
-        PDF::DAO.coerce( :stream{ :%dict });
-    }
-
     #| produce an XObject form for this page
     method to-xobject($from = self, :$coerce, Array :$BBox = $from.trim-box.clone) {
         my $Resources = $from.Resources.clone,
@@ -78,20 +70,6 @@ role PDF::Content::Page
         }
 
         $xobject;
-    }
-
-    method tiling-pattern(List    :$BBox!,
-                          Numeric :$XStep = $BBox[2] - $BBox[0],
-                          Numeric :$YStep = $BBox[3] - $BBox[1],
-                          Int :$PaintType = 1,
-                          Int :$TilingType = 1,
-                          *%dict
-                         ) {
-        %dict.push: $_
-                     for (:Type(:name<Pattern>), :PatternType(1),
-                          :$PaintType, :$TilingType,
-                          :$BBox, :$XStep, :$YStep);
-        PDF::DAO.coerce( :stream{ :%dict });
     }
 
     method finish {
