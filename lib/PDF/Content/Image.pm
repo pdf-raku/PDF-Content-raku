@@ -96,8 +96,9 @@ class PDF::Content::Image {
             # 1. ambiguous 'Indexed' entry seems to be a typo in the spec
             # 2. filter abbreviations are handled in PDF::IO::Filter
             );
+        my constant %Expansions = %( %Abbreviations.invert );
 
-        my $alias = $invert ?? %Abbreviations.invert.Hash !! %Abbreviations;
+        my $alias = $invert ?? %Expansions !! %Abbreviations;
 
         my %xobject-dict = $inline-dict.pairs.map: {
             ($alias{.key} // .key) => .value

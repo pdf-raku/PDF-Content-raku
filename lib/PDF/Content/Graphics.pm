@@ -84,7 +84,7 @@ role PDF::Content::Graphics {
         %dict<Type> = :name<XObject>;
         %dict<Subtype> = :name<Form>;
         %dict<Resources> //= {};
-        %dict<BBox> //= PageSizes::Letter;
+        %dict<BBox> //= [0,0,612,792];
         PDF::DAO.coerce( :stream{ :%dict });
     }
 

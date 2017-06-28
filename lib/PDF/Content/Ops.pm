@@ -648,7 +648,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         with %Ops{$op} {
             CATCH {
                 default {
-                   note "error processing '$op' (%OpCode{$op}) operator";
+                   warn "error processing '$op' (%OpCode{$op}) operator\n";
                    die $_;
                 }
             }
