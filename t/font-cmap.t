@@ -26,10 +26,12 @@ begincmap
 1 begincodespacerange
 <0000><FFFF>
 endcodespacerange
+1 beginbfchar
+<0005><0022>
+endbfchar
 79 beginbfrange
 <0003><0003><0020>
 <0004><0004><0021>
-<0005><0005><0022>
 <0009><0009><0026>
 <000a><000a><0027>
 <000b><000b><0028>

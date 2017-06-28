@@ -17,6 +17,12 @@ class PDF::Content::Font::CMap {
                     }
                 }
             }
+            if /:s^ \d+ beginbfchar/ ff /^endbfchar/ {
+                if /:s [ '<' $<r>=[<xdigit>+] '>' ] ** 2 / {
+                    my uint ($from, $code-point) = @<r>.map: { :16(.Str) };
+                    @!to-unicode[$from] = $code-point;
+                }
+            }
         }
     }
 

@@ -21,7 +21,7 @@ role PDF::Content::Font {
                 when 'MacRomanEncoding' { 'mac' }
                 when $base-font ~~ /^symbol/ { 'sym' }
                 when $base-font ~~ /^zapfdingbats/ { 'zapf' }
-                default { 'win' }
+                default { 'std' }
             }
             PDF::Content::Font::AFM.new: :$enc;
         }
