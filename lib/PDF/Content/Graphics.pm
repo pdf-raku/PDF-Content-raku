@@ -80,11 +80,13 @@ role PDF::Content::Graphics {
 
     method cb-finish { $.finish }
 
-    method xobject-form(*%dict) {
+    method xobject-form(:$group = True, *%dict) {
         %dict<Type> = :name<XObject>;
         %dict<Subtype> = :name<Form>;
         %dict<Resources> //= {};
         %dict<BBox> //= [0,0,612,792];
+        %dict<Group> //= %( :S( :name<Transparency> ) )
+            if $group;
         PDF::DAO.coerce( :stream{ :%dict });
     }
 
