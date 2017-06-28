@@ -20,7 +20,6 @@ class PDF::Content::Image {
     use PDF::DAO;
     use PDF::Content::XObject;
     use PDF::IO;
-    use PDF::IO::Util;
 
     method !image-type($_, :$path!) {
         when m:i/^ jpe?g $/    { 'JPEG' }
