@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 41;
+plan 40;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Util::Font;
@@ -39,8 +39,6 @@ ok $hb-afm-again === $hb-afm, 'font caching';
 
 my $hbi-afm-dict = $hbi-afm.to-dict;
 is-json-equiv $hbi-afm-dict, { :BaseFont<Helvetica-BoldOblique>, :Encoding<WinAnsiEncoding>, :Subtype<Type1>, :Type<Font>}, "to-dict";
-my $hbi-afm-again = PDF::Content::Font.from-dict: $hbi-afm-dict;
-is $hbi-afm-again.FontName, 'Helvetica-BoldOblique', '.from-dict';
 
 my $tr-afm = PDF::Content::Util::Font::core-font( 'Times-Roman' );
 is $tr-afm.stringwidth("RVX", :!kern), 2111, 'stringwidth :!kern';

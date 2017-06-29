@@ -116,7 +116,7 @@ role PDF::Content::ResourceDict {
             // self!register-resource( $font );
     }
 
-    method !build-font($font-obj) {
+    method !vivify-font($font-obj) {
         my $dict = $font-obj.to-dict;
         my $font-dict = PDF::DAO.coerce( :$dict );
 	PDF::DAO.coerce($font-dict, PDF::Content::Font);
@@ -127,7 +127,7 @@ role PDF::Content::ResourceDict {
     multi method use-font($font-obj) is default {
         self.find-resource(sub ($_){ .?font-obj === $font-obj },
 			   :type<Font>)
-            // self!register-resource( self!build-font($font-obj) );
+            // self!register-resource( self!vivify-font($font-obj) );
     }
 
 }

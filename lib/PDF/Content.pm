@@ -8,7 +8,6 @@ class PDF::Content
     use PDF::DAO::Stream;
     use PDF::Content::Image;
     use PDF::Content::Text::Block;
-    use PDF::Content::Font;
     use PDF::Content::XObject;
 
     method TWEAK(:$strict) {
