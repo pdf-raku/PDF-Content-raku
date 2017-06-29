@@ -6,14 +6,7 @@ It is centered around implementing a graphics state machine and
 provding support for the operators and graphics state variables
 as listed in the appendix.
 
-Please see
-
-- [PDF::Lite](https://github.com/p6-pdf/PDF-Lite-p6) implements minimal classess for creating and manipulating PDF documents.
-
-- [PDF::Content::Cairo](https://github.com/p6-pdf/PDF-Content-Cairo-p6)  under construction as a lightweight PDF renderer to Cairo supported formats including PNG and SVG.
-
-- [PDF::Doc](https://github.com/p6-pdf/PDF-Doc-p6) experimental fully
-featured PDF Library, based on PDF::Content.
+It does just enough to be able to read and edit PDF files.
 
 ## Graphic Operators
 
@@ -67,3 +60,14 @@ TransferFunction | TR2 |  A function that adjusts device gray or colour componen
 Halftone dictionary | HT |  A halftone screen for gray and colour rendering
 FlatnessTolerance | FT | The precision with which curves shall be rendered on the output device. The value of this parameter gives the maximum error tolerance, measured in output device pixels; smaller numbers give smoother curves at the expense of more computation | 1.0 
 SmoothnessTolerance | ST | The precision with which colour gradients are to be rendered on the output device. The value of this parameter (0 to 1.0) gives the maximum error tolerance, expressed as a fraction of the range of each colour component; smaller numbers give smoother colour transitions at the expense of more computation and memory use.
+
+
+## See Also
+
+- [PDF::Lite](https://github.com/p6-pdf/PDF-Lite-p6) implements minimal classess for creating and manipulating PDF documents.
+
+- [PDF::Render::Cairo](https://github.com/p6-pdf/PDF-Render-Cairo-p6)  experimental lightweight PDF renderer to Cairo supported formats including PNG and SVG.
+
+- [PDF::Zen](https://github.com/p6-pdf/PDF-Zen-p6) experimental fully
+featured PDF Reader.
+
