@@ -2,7 +2,7 @@ use v6;
 
 module PDF::Content::Util::Font {
     use Font::AFM:ver(v1.23.5..*);
-    use PDF::Content::Font::AFM;
+    use PDF::Content::Font::Enc::Type1;
     constant coreFonts = set <courier courier-oblique courier-bold courier-boldoblique
                   helvetica helvetica-oblique helvetica-bold helvetica-boldoblique
                   times-roman times-italic times-bold times-bolditalic
@@ -128,7 +128,7 @@ module PDF::Content::Util::Font {
     sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
-            my $encoder = PDF::Content::Font::AFM.new: :$enc;
+            my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
             (Font::AFM.metrics-class( $font-name )
              but Encoded[$encoder]).new;
         }

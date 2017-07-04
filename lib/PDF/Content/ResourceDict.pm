@@ -15,16 +15,16 @@ role PDF::Content::ResourceDict {
        %!resource-key{$object.WHICH};
     }
     
-    method !type( PDF::DAO $_ ) is default {
+    method !resource-type( PDF::DAO $_ ) is default {
         when Hash {
             when .<Type>:exists {
                 given .<Type> {
-                    when 'ExtGState' | 'Font' | 'XObject' | 'Pattern' { $_ }
+                    when 'ExtGState'|'Font'|'XObject'|'Pattern' { $_ }
                 }
             }
             when .<PatternType>:exists { 'Pattern' }
             when .<ShadingType>:exists { 'Shading' }
-            when .<Subtype>:exists && .<Subtype> ~~ 'Form' | 'Image' | 'PS' {
+            when .<Subtype>:exists && .<Subtype> ~~ 'Form'|'Image'|'PS' {
                 # XObject with /Type defaulted
                 'XObject'
             }
@@ -60,7 +60,7 @@ role PDF::Content::ResourceDict {
     #| ensure that the object is registered as a page resource. Return a unique
     #| name for it.
     method !register-resource(PDF::DAO $object,
-                             Str :$type = self!type($object),
+                             Str :$type = self!resource-type($object),
 	) {
 
 	my constant %Prefix = %(
@@ -90,7 +90,7 @@ role PDF::Content::ResourceDict {
     }
 
     multi method resource(PDF::DAO $object, Bool :$eqv=False ) is default {
-        my Str $type = self!type($object)
+        my Str $type = self!resource-type($object)
             // die "not a resource object: {$object.WHAT}";
 
 	my &match = $eqv
@@ -127,7 +127,7 @@ role PDF::Content::ResourceDict {
     multi method use-font($font-obj) is default {
         self.find-resource(sub ($_){ .?font-obj === $font-obj },
 			   :type<Font>)
-            // self!register-resource( self!vivify-font($font-obj) );
+            // self!register-resource: self!vivify-font($font-obj);
     }
 
 }

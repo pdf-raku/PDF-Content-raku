@@ -1,4 +1,4 @@
-class PDF::Content::Font::AFM {
+class PDF::Content::Font::Enc::Type1 {
 
     use PDF::DAO::Dict;
     use PDF::Content::Font::Encodings;

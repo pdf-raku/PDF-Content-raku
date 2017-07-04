@@ -5,7 +5,7 @@ use PDF::DAO::Stream;
 use PDF::IO::IndObj;
 use PDF::Grammar::PDF;
 use PDF::Grammar::PDF::Actions;
-use PDF::Content::Font::CMap;
+use PDF::Content::Font::Enc::CMap;
 
 my $actions = PDF::Grammar::PDF::Actions.new;
 
@@ -124,7 +124,7 @@ my %ast = $/.ast;
 my $ind-obj = PDF::IO::IndObj.new( :$input, |%ast );
 my $cmap = $ind-obj.object;
 
-my $cmap-obj = PDF::Content::Font::CMap.new: :$cmap;
+my $cmap-obj = PDF::Content::Font::Enc::CMap.new: :$cmap;
 
 is-deeply $cmap-obj.decode("\x5\xF"), Buf[uint32].new(0x22, 0x2c), "decode";
 is $cmap-obj.decode("\x24\x25\x26", :str), 'ABC', "decode:str";

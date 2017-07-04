@@ -1,7 +1,7 @@
 use v6;
 use PDF::DAO::Stream;
 
-class PDF::Content::Font::CMap {
+class PDF::Content::Font::Enc::CMap {
     has uint32 @!to-unicode;
     has UInt %ligatures;
 
