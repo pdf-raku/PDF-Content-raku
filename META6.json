@@ -1,12 +1,12 @@
 {
     "perl"        : "6.*",
     "name"        : "PDF::Content",
-    "version"     : "0.0.5",
+    "version"     : "0.0.6",
     "license"     : "Artistic-2.0",
     "api"         : "PDF-1.7",
     "auth"        : "github:p6-pdf",
     "description" : "Basic PDF content authoring; including text, images, fonts and graphics",
-    "depends"     : [ "PDF", "PDF::Grammar", "Lib::PDF", "Font::AFM", "Base64::Native", "Native::Packing", "Compress::Zlib::Raw" ],
+    "depends"     : [ "PDF", "PDF::Grammar", "Font::AFM", "Base64::Native", "Native::Packing", "Compress::Zlib::Raw" ],
     "source-url"  : "git://github.com/p6-pdf/PDF-Content-p6.git",
     "provides"    : {
 
@@ -15,7 +15,7 @@
         "PDF::Content::Graphics"        : "lib/PDF/Content/Graphics.pm",
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
         "PDF::Content::Marked"          : "lib/PDF/Content/Marked.pm",
-        "PDF::Content::Matrix" : "lib/PDF/Content/Matrix.pm",
+        "PDF::Content::Matrix"          : "lib/PDF/Content/Matrix.pm",
         "PDF::Content::Page"            : "lib/PDF/Content/Page.pm",
         "PDF::Content::PageNode"        : "lib/PDF/Content/PageNode.pm",
         "PDF::Content::PageTree"        : "lib/PDF/Content/PageTree.pm",
@@ -32,8 +32,8 @@
         "PDF::Content::XObject"         : "lib/PDF/Content/XObject.pm",
 
         "PDF::Content::Font"            : "lib/PDF/Content/Font.pm",
-        "PDF::Content::Font::AFM"       : "lib/PDF/Content/Font/AFM.pm",
-        "PDF::Content::Font::CMap"      : "lib/PDF/Content/Font/CMap.pm",
+        "PDF::Content::Font::Enc::Type1": "lib/PDF/Content/Font/Enc/Type1.pm",
+        "PDF::Content::Font::Enc::CMap" : "lib/PDF/Content/Font/Enc/CMap.pm",
         "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
 
         "PDF::Content::Text::Block"     : "lib/PDF/Content/Text/Block.pm",
