@@ -10,11 +10,24 @@ It does just enough to be able to read and edit PDF files.
 
 ## Graphic Operators
 
-...
+### Text Operators
+
+Method | OpCode | Description
+--- | --- | ---
+BeginText() | BT | Begin a text object, initializing $.TextMatrix, to the identity matrix. Text objects shall not be nested.
+EndText() | ET | End a text object, discarding the text matrix.
+TextMove(tx, ty) | Td | Move to the start of the next line, offset from the start of the current line by (tx, ty ); where tx and ty are expressed in unscaled text space units.
+TextMoveSet(tx, ty) | TD | Move to the start of the next line, offset from the start of the current line by (tx, ty ). Set $.TextLeading to ty.
+SetTextMatrix(a, b, c, d, e, f) | Tm | Set $.TextMatrix
+TextNextLine| T* | Move to the start of the next line
+ShowText(string) | Tj | Show a text string
+MoveShowText(string) | ' | Move to the next line and show a text string.
+MoveSetShowText(aw, ac, string) | " | Move to the next line and show a text string, after setting $.WordSpacing to  aw and $.CharSpacing to ac
+ShowSpacetext(array) |  TJ | Show one or more text strings, allowing individual glyph positioning. Each element of array shall be either a string or a number. If the element is a string, show it. If it is a number, adjust the text position by that amount
 
 ## Graphics Variables
 
-### Text
+### Text Variables
 
 Accessor | Code | Description | Default | Example Setters
 -------- | ------ | ----------- | ------- | -------

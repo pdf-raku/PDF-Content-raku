@@ -766,6 +766,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!FillAlpha = %gstate<FillAlpha>;
 	Restore;
     }
+    multi method track-graphics('BT') {
+        @!TextMatrix =  [ 1, 0, 0, 1, 0, 0, ];
+    }
+    multi method track-graphics('ET') {
+        @!TextMatrix =  [ 1, 0, 0, 1, 0, 0, ];
+    }
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
         @!CTM = multiply([a, b, c, d, e, f], @!CTM);
     }
