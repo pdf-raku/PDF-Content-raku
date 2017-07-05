@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 83;
+plan 86;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -131,6 +131,12 @@ is $g.TextLeading, 0, '$g.TextLeading - restored';
 is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - restored';
 
 lives-ok {$g.content}, 'content with matching BT ... ET  q ... Q - lives';
+
+$g.Save;
+is $g.RenderingIntent, 'RelativeColormetric', 'RenderingIntent, initial';
+lives-ok  { $g.RenderingIntent = 'Perceptual' };
+is $g.ops.tail, 'ri' => :name<Perceptual>, 'rendering intent - updated';
+$g.Restore;
 
 $g = PDF::Content.new;
 

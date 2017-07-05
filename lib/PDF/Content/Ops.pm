@@ -365,6 +365,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             });
     }
 
+    my subset RenderingIntention of Str where 'AbsoluteColorimetric'|'RelativeColormetric'|'Saturation'|'Perceptual';
+    has RenderingIntention $.RenderingIntent is graphics is rw = 'RelativeColormetric';
+
     # *** Extended Graphics STATE ***
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
     has $.FillAlpha   is ext-graphics is rw = 1.0;
@@ -848,13 +851,14 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     multi method track-graphics('gs', Str $key) {
         with self.parent {
             with .resource-entry('ExtGState', $key) {
+                with .<CA>   { $!StrokeAlpha = $_ }
+                with .<ca>   { $!FillAlpha = $_ }
                 with .<D>    { @!DashPattern = .list }
                 with .<Font> { $!Font = $_ }
                 with .<LC>   { $!LineCap = $_ }
                 with .<LJ>   { $!LineJoin = $_ }
                 with .<LW>   { $!LineWidth = $_ }
-                with .<CA>   { $!StrokeAlpha = $_ }
-                with .<ca>   { $!FillAlpha = $_ }
+                with .<RI>   { $!RenderingIntent = $_ }
             }
             else {
                 die "unknown extended graphics state: /$key"
