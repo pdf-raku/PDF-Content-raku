@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 86;
+plan 92;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -136,7 +136,14 @@ $g.Save;
 is $g.RenderingIntent, 'RelativeColormetric', 'RenderingIntent, initial';
 lives-ok  { $g.RenderingIntent = 'Perceptual' };
 is $g.ops.tail, 'ri' => :name<Perceptual>, 'rendering intent - updated';
+is $g.Flatness, 0, 'Flatness, initial';
+lives-ok  { $g.Flatness = 50 };
+is $g.ops.tail, 'i' => :real(50), 'rendering intent - updated';
+is $g.Flatness, 50, 'Flatness, updated';
 $g.Restore;
+
+is $g.RenderingIntent, 'RelativeColormetric', 'RenderingIntent, restored';
+is $g.Flatness, 0, 'Flatness, restored';
 
 $g = PDF::Content.new;
 

@@ -77,7 +77,7 @@ G | SetStrokeGray | gray | Set gray level for stroking operations
 g | SetFillGray | gray | Set gray level for nonstroking operations
 gs | SetGraphicsState | dictName | (PDF 1.2) Set parameters from graphics state parameter dictionary
 h | ClosePath | — | Close subpath
-i | SetFlat | flatness | Set flatness tolerance
+i | SetFlatness | flatness | Set flatness tolerance
 ID | ImageData | — | Begin inline image data
 j | SetLineJoin | lineJoin| Set line join style
 J | SetLineCap | lineCap | Set line cap style
@@ -138,7 +138,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         :SetCharWidthBBox<d1> :XObject<Do> :MarkPointDict<DP>
         :EOFill<f*> :Fill<f> :FillObsolete<F> :SetStrokeGray<G>
         :SetFillGray<g> :SetGraphicsState<gs> :ClosePath<h>
-        :SetFlat<i> :SetLineJoin<j> :SetLineCap<J> :SetFillCMYK<k>
+        :SetFlatness<i> :SetLineJoin<j> :SetLineCap<J> :SetFillCMYK<k>
         :SetStrokeCMYK<K> :LineTo<l> :MoveTo<m> :SetMiterLimit<M>
         :MarkPoint<MP> :EndPath<n> :Save<q> :Restore<Q> :Rectangle<re>
         :SetFillRGB<rg> :SetStrokeRGB<RG> :SetRenderingIntent<ri>
@@ -187,8 +187,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	:TransferFunction-old<TR>
 	:TransferFunction<TR2>
 	:Halftone<HT>
-	:FlatnessTolerance<FT>
-	:SmoothnessTolerance<ST>
+	:Flatness<FT>
+	:Smoothness<ST>
         :StrokeAdjust<SA>
         :BlendMode<BM>
         :SoftMask<SMask>
@@ -366,7 +366,10 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     my subset RenderingIntention of Str where 'AbsoluteColorimetric'|'RelativeColormetric'|'Saturation'|'Perceptual';
-    has RenderingIntention $.RenderingIntent is graphics is rw = 'RelativeColormetric';
+    has RenderingIntention $.RenderingIntent is graphics(method ($!RenderingIntent)  {}) is rw = 'RelativeColormetric';
+
+    my subset FlatnessTolerance of Int where 0 .. 100;
+    has FlatnessTolerance $.Flatness is graphics(method ($!Flatness)  {}) is rw = 0;
 
     # *** Extended Graphics STATE ***
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
@@ -738,7 +741,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my @Dp = @!DashPattern;
         my @Sc = @!StrokeColor;
         my @Fc = @!FillColor;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :@Sc, :@Fc, :$!StrokeAlpha, :$!FillAlpha;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :@Sc, :@Fc, :$!StrokeAlpha, :$!FillAlpha, :$!RenderingIntent, :$!Flatness;
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -768,6 +771,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         $!FillColorSpace = %gstate<FillColorSpace>;
         $!StrokeAlpha = %gstate<StrokeAlpha>;
         $!FillAlpha = %gstate<FillAlpha>;
+        $!RenderingIntent = %gstate<RenderingIntent>;
+        $!Flatness = %gstate<Flatness>;
 	Restore;
     }
     multi method track-graphics('BT') {
@@ -855,6 +860,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
                 with .<ca>   { $!FillAlpha = $_ }
                 with .<D>    { @!DashPattern = .list }
                 with .<Font> { $!Font = $_ }
+                with .<FT>   { $!Flatness = $_ }
                 with .<LC>   { $!LineCap = $_ }
                 with .<LJ>   { $!LineJoin = $_ }
                 with .<LW>   { $!LineWidth = $_ }
