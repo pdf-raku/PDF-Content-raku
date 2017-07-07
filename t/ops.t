@@ -115,14 +115,14 @@ is-json-equiv $g.op('TJ', $[ 'hello', 42, 'world']), (:TJ[ :array[ :literal<hell
 is-json-equiv $g.SetStrokeColorSpace('DeviceGray'), (:CS[ :name<DeviceGray> ]), 'Named operator';
 dies-ok {$g.op('Tf', 42, 125)}, 'invalid argument dies';
 dies-ok {$g.op('Junk', 42)}, 'invalid operator dies';
-dies-ok {$g.content}, 'content with unclosed "BT" - dies';
+dies-ok {$g.Str}, 'content with unclosed "BT" - dies';
 
 is-json-equiv $g.op(EndText), (:ET[]), 'EndText';
 
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0, ], '$g.TextMatrix - outside of text block';
 is-json-equiv $g.CTM, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix - outside of text block';
 
-dies-ok {$g.content}, 'content with unclosed "q" (gsave) - dies';
+dies-ok {$g.Str}, 'content with unclosed "q" (gsave) - dies';
 $g.Restore;
 
 is-json-equiv $g.CTM, [1, 0, 0, 1, 0, 0, ], '$g.GraphicMatrix - restored';
@@ -130,7 +130,7 @@ is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0], '$g.TextMatrix - restored';
 is $g.TextLeading, 0, '$g.TextLeading - restored';
 is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - restored';
 
-lives-ok {$g.content}, 'content with matching BT ... ET  q ... Q - lives';
+lives-ok {$g.Str}, 'content with matching BT ... ET  q ... Q - lives';
 
 $g.Save;
 is $g.RenderingIntent, 'RelativeColormetric', 'RenderingIntent, initial';

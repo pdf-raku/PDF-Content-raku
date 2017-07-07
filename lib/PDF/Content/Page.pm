@@ -74,9 +74,9 @@ role PDF::Content::Page
 
     method finish {
 	self.MediaBox //= [0, 0, 612, 792];
-	my $decoded = $.pre-gfx.content;
+	my $decoded = $.pre-gfx.Str;
         $decoded ~= "\n" if $decoded;
-	$decoded ~= $.gfx.content;
+	$decoded ~= $.gfx.Str;
 
 	if self<Contents> ~~ PDF::DAO::Stream {
 	    self<Contents>.decoded = $decoded;

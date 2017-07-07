@@ -71,9 +71,9 @@ role PDF::Content::Graphics {
     }
 
     method finish {
-        my $decoded = do with $!pre-gfx { .content } else { '' };
+        my $decoded = do with $!pre-gfx { .Str } else { '' };
         $decoded ~= "\n" if $decoded;
-        $decoded ~= do with $!gfx { .content } else { '' };
+        $decoded ~= do with $!gfx { .Str } else { '' };
 
         self.decoded = $decoded;
     }

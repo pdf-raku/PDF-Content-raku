@@ -388,7 +388,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         self.op(OpCode(TextMove), $tx, $ty);
     }
     #| also allow TextMove as a rw accessor
-    my subset Vector of List where {.elems == 2 && all(.[0], .[1]) ~~ Numeric}
+    my subset Vector of List where {.elems == 2 && all(.list) ~~ Numeric}
     multi method TextMove is rw returns Vector {
         warn '$.TextMove accessor used outside of a text-block'
             unless $.context == GraphicsContext::Text;
@@ -903,7 +903,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     #| serialize content into a string. indent blocks for readability
     has Str $!content-cache;
-    method content { $!content-cache //= self!content }
+    method Str { $!content-cache //= self!content }
     method !content returns Str {
 	my constant Openers = 'q'|'BT'|'BMC'|'BDC'|'BX';
 	my constant Closers = 'Q'|'ET'|'EMC'|'EX';

@@ -24,7 +24,7 @@ is-json-equiv $gfx.ops, [
     :Q[],
     ], 'content ops';
 
-my $content = $gfx.content;
+my $content = $gfx.Str;
 
 is-json-equiv [$content.lines], [
 	      'q',
