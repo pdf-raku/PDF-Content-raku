@@ -22,7 +22,7 @@ role PDF::Content::Graphics {
                 when OpCode::Save {$nesting++}
                 when OpCode::Restore {$nesting--}
                 default {
-                    $wrap = True
+                    $needed = True
                         if $nesting <= 0
                         && PDF::Content::Ops.is-graphics-op: $_;
                 }
