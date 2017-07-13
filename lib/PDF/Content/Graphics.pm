@@ -13,9 +13,9 @@ role PDF::Content::Graphics {
     method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
     has PDF::Content $!gfx;     #| appended graphics
 
-    method !tidy-ops(@ops) {
+    method !encapsulate(@ops) {
         my int $nesting = 0;
-        my $wrap = False;
+        my $needed = False;
 
         for @ops {
             given .key {
@@ -32,7 +32,7 @@ role PDF::Content::Graphics {
         @ops.push: OpCode::Restore => []
             while $nesting-- > 0;
 
-	if $wrap {
+	if $needed {
 	    @ops.unshift: OpCode::Save => [];
 	    @ops.push: OpCode::Restore => [];
 	}
@@ -62,10 +62,10 @@ role PDF::Content::Graphics {
         PDF::Content.new( :parent(self), |c );
     }
 
-    method render($gfx, Bool :$raw) {
+    method render($gfx, Bool :$encap = True) {
         my Pair @ops = self.contents-parse;
-        @ops = self!tidy-ops(@ops)
-            unless $raw;
+        @ops = self!encapsulate(@ops)
+            if $encap;
         $gfx.ops: @ops;
         $gfx;
     }
