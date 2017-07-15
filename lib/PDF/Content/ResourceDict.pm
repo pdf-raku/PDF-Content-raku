@@ -119,8 +119,13 @@ role PDF::Content::ResourceDict {
     method !vivify-font($font-obj) {
         my $dict = $font-obj.to-dict;
         my $font-dict = PDF::DAO.coerce( :$dict );
-	PDF::DAO.coerce($font-dict, PDF::Content::Font);
-	$font-dict.font-obj = $font-obj;
+        PDF::DAO.coerce($font-dict, PDF::Content::Font);
+        if $font-dict.can('set-font-obj') {
+            $font-dict.set-font-obj: $font-obj;
+        }
+        else {
+            $font-dict.font-obj = $font-obj;
+        }
         $font-dict;
     }
 

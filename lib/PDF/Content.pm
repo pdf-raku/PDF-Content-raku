@@ -59,7 +59,7 @@ class PDF::Content
 	    my $v = $.ops[$i];
 	    my $v1 = $.ops[$i+1];
 	    die "'BI' op not followed by 'ID' in content stream"
-		unless $v1 && $v1.key eq 'ID';
+		unless $v1 ~~ Pair && $v1.key eq 'ID';
 
 	    my %dict = ( :Type( :name<XObject> ), :Subtype( :name<Image> ),
 			 PDF::Content::Image.inline-to-xobject($v.value[0]<dict>),
@@ -174,32 +174,29 @@ class PDF::Content
         && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
     }
 
-    method !set-position($text-block, :$position,
+    method !set-position($text-block, $position,
                          Bool :$left! is rw,
                          Bool :$top! is rw) {
-	with $position {
-            my $x;
-            with $position[0] {
-                when Numeric {$x = $_}
-                when XPos-Pair {
-                    my constant Dx = %( :left(0.0), :center(0.5), :right(1.0) );
-                    $x = .value  +  Dx{.key} * $text-block.width;
-                    $left = True; # position from left
-                }
+        my $x;
+        with $position[0] {
+            when Numeric {$x = $_}
+            when XPos-Pair {
+                my constant Dx = %( :left(0.0), :center(0.5), :right(1.0) );
+                $x = .value  +  Dx{.key} * $text-block.width;
+                $left = True; # position from left
             }
-            my $y;
-            with $position[1] {
-                when Numeric {$y = $_}
-                when YPos-Pair {
-                    my constant Dy = %( :top(0.0), :center(0.5), :bottom(1.0) );
-                    $y = .value  -  Dy{.key} * $text-block.height;
-                    $top = True; # position from top
-                }
+        }
+        my $y;
+        with $position[1] {
+            when Numeric {$y = $_}
+            when YPos-Pair {
+                my constant Dy = %( :top(0.0), :center(0.5), :bottom(1.0) );
+                $y = .value  -  Dy{.key} * $text-block.height;
+                $top = True; # position from top
             }
-                    
-	    self.TextMove = [$x, $y];
         }
 
+        self.TextMove = [$x, $y];
     }
 
     multi method print(PDF::Content::Text::Block $text-block,
@@ -218,7 +215,8 @@ class PDF::Content
 	    self.BeginText;
         }
 
-        self!set-position($text-block, :$position, :$left, :$top);
+        self!set-position($text-block, $_, :$left, :$top)
+            with $position;
 
         my Numeric \font-size = $text-block.font-size;
         my \font = $.use-font($text-block.font);
@@ -234,7 +232,7 @@ class PDF::Content
     }
 
     #| output text; move the text position down one line
-    method say($text, |c) {
+    method say($text = '', |c) {
         $.print($text, :nl, |c);
     }
 

@@ -15,7 +15,7 @@ role PDF::Content::PageTree
 
 	if $page {
 	    unless $page<Resources>:exists {
-		# import resources, if inherited and outside our heirarchy
+		# import resources, if inherited and outside our hierarchy
 		my $resources = $page.Resources;
 		$page<Resources> = $resources.clone
 		    if $resources && $resources !=== self.Resources;

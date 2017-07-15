@@ -81,7 +81,8 @@ module PDF::Content::Util::Font {
         :zapfdingbats-bolditalic<zapfdingbats>,
     };
 
-    our sub core-font-name(Str $family! is copy, Str :$weight?, Str :$style?, ) {
+    our sub core-font-name(Str $family!, Str :$weight?, Str :$style?, ) {
+        my Str $face = $family.lc;
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
             ?? 'bold' !! '';
 
@@ -89,15 +90,14 @@ module PDF::Content::Util::Font {
         my Str $italic = $style && $style ~~ m:i/italic|oblique/
             ?? 'italic' !! '';
 
-        $bold ||= 'bold' if $family ~~ s/:i ['-'|',']? bold //;
-        $italic ||= $0.lc if $family ~~ s/:i ['-'|',']? (italic|oblique) //;
+        $bold ||= 'bold' if $face ~~ s/ ['-'|',']? bold //;
+        $italic ||= $0.lc if $face ~~ s/ ['-'|',']? (italic|oblique) //;
 
         my Str $sfx = $bold || $italic
             ?? '-' ~ $bold ~ $italic
             !! '';
 
-        my $face = $family.subst(/[['-'|','].*]? $/, $sfx).lc;
-
+        $face ~~ s/[['-'|','].*]? $/$sfx/;
         $face = $_ with stdFontMap{$face};
         $face ∈ coreFonts ?? $face !! Nil;
     }
