@@ -1,7 +1,7 @@
 use v6;
 
 module PDF::Content::Util::Font {
-    use Font::AFM:ver(v1.23.5..*);
+    use Font::AFM:ver(v1.23.5+);
     use PDF::Content::Font::Enc::Type1;
     constant coreFonts = set <courier courier-oblique courier-bold courier-boldoblique
                   helvetica helvetica-oblique helvetica-bold helvetica-boldoblique

@@ -1,6 +1,4 @@
 use v6;
-# rakudo 2016.11 read invocation: No such symbol 'PDF::Lite'
-use PDF:ver(v0.2.3..*);
 
 class PDF::Content::Image::PDF {
     method read($fh) {

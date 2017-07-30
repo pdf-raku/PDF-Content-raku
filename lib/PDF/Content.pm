@@ -82,7 +82,6 @@ class PDF::Content
 	$.SetTextMatrix( @matrix );
     }
 
-
     my subset Align of Str where 'left' | 'center' | 'right';
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
 
@@ -130,15 +129,15 @@ class PDF::Content
         }
 
         self.graphics: {
-	    $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
-	    if $inline && $obj.Subtype eq 'Image' {
-		# serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]
-		$.ops( $obj.inline-content );
-	    }
-	    else {
+            $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
+            if $inline && $obj.Subtype eq 'Image' {
+                # serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]
+                $.ops( $obj.inline-content );
+            }
+            else {
                 my Str:D $key = $.resource-key($obj),
-		$.op(XObject, $key);
-	    }
+                $.op(XObject, $key);
+            }
         };
     }
 
@@ -147,23 +146,45 @@ class PDF::Content
         :Pattern(self.resource-key($pat));
     }
 
+    multi method paint(Bool :$fill! where .so, Bool :$even-odd,
+                       Bool :$close, Bool :$stroke) {
+        my constant @FillOps = [
+            [[<Fill>,         <FillStroke>],
+             [<EOFill>,       <EOFillStroke>],
+            ],
+            [[<Close Fill>,   <CloseFillStroke>],
+             [<Close EOFill>, <CloseEOFillStroke>],
+            ]];
+
+        self."$_"()
+            for @FillOps[?$close][?$even-odd][?$stroke].list;
+    }
+
+    multi method paint(Bool :$stroke! where .so, Bool :$close) {
+        $close ?? self.CloseStroke !! self.Stroke
+    }
+
+    multi method paint() is default {
+        self.EndPath;
+    }
+
     method text-block($font = self!current-font[0], |c) {
-	# detect and use the current text-state font
-	my Numeric $font-size = $.font-size // self!current-font[1];
+        # detect and use the current text-state font
+        my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Block.new(
-	    :gfx(self), :$font, :$font-size,
-	    |c,
-	    );
+            :gfx(self), :$font, :$font-size,
+            |c,
+            );
     }
 
     #| output text leave the text position at the end of the current line
     multi method print(Str $text,
-		       |c,  # :$align, :$kern, :$line-height, :$width, :$height, :$baseline
+                       |c,  # :$align, :$kern, :$line-height, :$width, :$height, :$baseline
         ) {
 
-	my $text-block = self.text-block( :$text, |c);
-	$.print( $text-block, |c);
-	$text-block;
+        my $text-block = self.text-block( :$text, |c);
+        $.print( $text-block, |c);
+        $text-block;
     }
 
     my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
@@ -200,19 +221,19 @@ class PDF::Content
     }
 
     multi method print(PDF::Content::Text::Block $text-block,
-		       Text-Position :$position,
-		       Bool :$nl = False,
-		       Bool :$preserve = True,
-	) {
+                       Text-Position :$position,
+                       Bool :$nl = False,
+                       Bool :$preserve = True,
+        ) {
 
         my Bool $left = False;
         my Bool $top = False;
-	my Bool \in-text = $.context == GraphicsContext::Text;
+        my Bool \in-text = $.context == GraphicsContext::Text;
 
         unless in-text {
             my Str $tag = $text-block.type.Str;
             self.BeginMarkedContent($tag);
-	    self.BeginText;
+            self.BeginText;
         }
 
         self!set-position($text-block, $_, :$left, :$top)
@@ -222,10 +243,10 @@ class PDF::Content
         my \font = $.use-font($text-block.font);
 
         self.set-font(font, font-size);
-	$text-block.render(self, :$nl, :$top, :$left, :$preserve);
+        $text-block.render(self, :$nl, :$top, :$left, :$preserve);
 
         unless in-text {
-	    self.EndText;
+            self.EndText;
             self.EndMarkedContent;
         }
         $text-block;
@@ -247,17 +268,17 @@ class PDF::Content
     }
 
     method font is rw returns Array {
-	Proxy.new(
-	    FETCH => sub (\p) {
-		$.Font;
-	    },
-	    STORE => sub (\p, $v) {
-		my @v = $v.isa(List) ?? @$v !! [ $v, ];
-		self.set-font(|@v);
-	    },
-	    );
+        Proxy.new(
+            FETCH => sub (\p) {
+                $.Font;
+            },
+            STORE => sub (\p, $v) {
+                my @v = $v.isa(List) ?? @$v !! [ $v, ];
+                self.set-font(|@v);
+            },
+            );
     }
-    
+
     multi method print(Str $text, :$font = self!current-font[0], |c) {
         nextwith( $text, :$font, |c);
     }
