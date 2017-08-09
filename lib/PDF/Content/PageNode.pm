@@ -7,19 +7,18 @@ role PDF::Content::PageNode {
     #| source: http://www.gnu.org/software/gv/
     my subset Box of Array;# where {.elems == 4}
 
-    #| e.g. $.landscape(PagesSizes::A4)
+    #| e.g. $.to-landscape(PagesSizes::A4)
     method to-landscape(Box $p --> Box) {
 	[ $p[1], $p[0], $p[3], $p[2] ]
     }
 
-    my subset BoxName of Str where 'media' | 'crop' | 'bleed' | 'trim' | 'art';
-
-    method !bbox-name(BoxName $box) {
-	{ :media<MediaBox>, :crop<CropBox>, :bleed<BleedBox>, :trim<TrimBox>, :art<ArtBox> }{$box}
-    }
+    my constant %BBoxEntry = %(
+	:media<MediaBox>, :crop<CropBox>, :bleed<BleedBox>, :trim<TrimBox>, :art<ArtBox>
+    );
+    my subset BoxName of Str where %%BBoxEntry{$_}:exists;
 
     method !get-prop(BoxName $box) is rw {
-	my $bbox = self!bbox-name($box);
+	my $bbox = %BBoxEntry{$box};
         self."$bbox"();
     }
 

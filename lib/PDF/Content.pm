@@ -179,7 +179,7 @@ class PDF::Content
 
     #| output text leave the text position at the end of the current line
     multi method print(Str $text,
-                       |c,  # :$align, :$kern, :$line-height, :$width, :$height, :$baseline
+                       |c,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
         ) {
 
         my $text-block = self.text-block( :$text, |c);
