@@ -872,8 +872,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         }
     }
     multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
-        @!TextMatrix[4] += $tx;
-        @!TextMatrix[5] += $ty;
+        @!TextMatrix = multiply([1, 0, 0, 1, $tx, $ty], @!TextMatrix); 
     }
     multi method track-graphics('TD', Numeric $tx!, Numeric $ty) {
         $!TextLeading = - $ty;
