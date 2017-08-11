@@ -269,10 +269,10 @@ class PDF::Content
 
     method font is rw returns Array {
         Proxy.new(
-            FETCH => sub (\p) {
+            FETCH => sub ($) {
                 $.Font;
             },
-            STORE => sub (\p, $v) {
+            STORE => sub ($, $v) {
                 my @v = $v.isa(List) ?? @$v !! [ $v, ];
                 self.set-font(|@v);
             },
