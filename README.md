@@ -4,7 +4,7 @@ This Perl 6 module is a library of rules and classes for basic PDF content creat
 
 It is centered around implementing a graphics state machine and
 provding support for the operators and graphics variables
-as listed in the appendix.
+as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PDF-API6#appendix-i-graphics).
 
 ## Key roles and classes:
 
