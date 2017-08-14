@@ -36,7 +36,7 @@ class PDF::Content::Image::GIF
     has buf8 $!color-table;
     has buf8 $!data;
 
-    method !read-colorspace($fh,  UInt $flags) {
+    method !read-colorspace($fh, UInt $flags) {
         my $cols = 2 ** (($flags +& 0x7) + 1);
         $!color-table = $fh.read( 3 * $cols);
     }
@@ -79,9 +79,9 @@ class PDF::Content::Image::GIF
         buf8.new(@out);
     }
 
-    method !deinterlace {
+    method !deinterlace returns buf8 {
         my uint $row;
-        my buf8 @result;
+        my buf8 $result = buf8.allocate($!data.bytes);
         my uint $idx = 0;
         my uint $width = self.width;
         my uint $height = self.height;
@@ -90,20 +90,19 @@ class PDF::Content::Image::GIF
             my $row = .key;
             my \incr = .value;
             while $row < $height {
-                @result[$row] = $!data.subbuf( $idx*$width, $width);
+                $result.subbuf-rw($row*$width, $width) = $!data.subbuf( $idx*$width, $width);
                 $row += incr;
                 $idx++;
             }
         }
 
-        flat @result.map: *.list;
+        $result;
     }
 
     method width { ($!img // $!descr).width; }
     method height { ($!img // $!descr).height; }
 
     method read($fh!) {
-
         my Str $encoded = '';
 
         my $header = $fh.read(6).decode: 'latin-1';
@@ -142,7 +141,7 @@ class PDF::Content::Image::GIF
                     }
 
                     $!data = self!decompress($sep+1, $stream);
-                    $!data .= new: self!deinterlace if $interlaced;
+                    $!data = self!deinterlace if $interlaced;
                     last;
                 }
 
