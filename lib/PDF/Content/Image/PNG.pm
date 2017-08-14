@@ -89,24 +89,22 @@ class PDF::Content::Image::PNG
         self;
     }
 
-    method !pack(buf8 $buf, Str $hdr, buf8 $data = buf8.new) {
-        with $data {
-            my Quad $len .= new: :Numeric($data.bytes);
-            $len.pack($buf);
-            $buf.append: $hdr.encode.list;
-            $buf.append: $data.list;
-            my Quad $crc .= new: :Numeric(self!crc($hdr.encode, $data));
-            $crc.pack($buf);
-        }
+    method !add-chunk(buf8 $buf, Str $hdr, buf8:D $data) {
+        my Quad $len .= new: :Numeric($data.bytes);
+        $len.pack($buf);
+        $buf.append: $hdr.encode.list;
+        $buf.append: $data.list;
+        my Quad $crc .= new: :Numeric(self!crc($hdr.encode, $data));
+        $crc.pack($buf);
     }
 
     method Buf {
         my $buf = buf8.new: PNG-Header.encode: "latin-1";
-        self!pack($buf, 'IHDR', $!hdr.pack);
-        self!pack($buf, 'PLTE', $!palette);
-        self!pack($buf, 'tRNS', $!trns);
-        self!pack($buf, 'IDAT', $!stream);
-        self!pack($buf, 'IEND');
+        self!add-chunk($buf, 'IHDR', $!hdr.pack);
+        self!add-chunk($buf, 'PLTE', $_) with $!palette;
+        self!add-chunk($buf, 'tRNS', $_) with $!trns;
+        self!add-chunk($buf, 'IDAT', $!stream);
+        self!add-chunk($buf, 'IEND', buf8.new);
         $buf;
     }
 
