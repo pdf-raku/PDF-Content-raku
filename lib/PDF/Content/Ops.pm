@@ -395,14 +395,11 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
 	Proxy.new(
 	    FETCH => sub (\p) {
-	        self.TextMatrix[4, 5];
+                my $tm = self.TextMatrix;
+	        $tm[4] / $tm[0], $tm[5] / $tm[3];
 	    },
 	    STORE => sub (\p, Vector \v) {
-                my Numeric @tm = @.TextMatrix;
-                @tm[4] = $_ with v[0];
-                @tm[5] = $_ with v[1];
-		self.op(SetTextMatrix, @tm);
-		v.list;
+               self.TextMove(|v);
 	    },
 	    );
     }

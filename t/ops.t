@@ -1,11 +1,12 @@
 use v6;
 use Test;
-plan 92;
+plan 93;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
+use PDF::Content::Matrix :scale;
 use t::GfxParent;
 
 my $parent = { :Font{ :F1{} }, } does t::GfxParent;
@@ -89,8 +90,10 @@ is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 0, 0], '$g.TextMatrix - initial';
 
 $g.TextMove(10,20);
 is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 10, 20], '$g.TextMatrix - moved';
-$g.TextMove = (15,25);
-is-deeply $g.TextMove, $(15, 25), '$g.TextMove - rw accessors';
+$g.TextMatrix = scale(2,3);
+$g.TextMove(15,25);
+is-json-equiv $g.TextMatrix, [2, 0, 0, 3, 30, 75], '$g.TextMatrix - moved';
+is-deeply $g.TextMove, $(15.0, 25.0), '$g.TextMove - rw accessors';
 
 $g.TextMatrix = [ 10, 1, 15, 2, 3, 4];
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated';
