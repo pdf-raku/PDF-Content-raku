@@ -383,27 +383,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has GraphicsContext $.context = Page;
 
-    #| advance `ty` and `ty`
-    multi method TextMove(Numeric $tx, Numeric $ty) {
-        self.op(OpCode(TextMove), $tx, $ty);
-    }
-    #| also allow TextMove as a rw accessor
-    my subset Vector of List where {.elems == 2 && all(.list) ~~ Numeric}
-    multi method TextMove is rw returns Vector {
-        warn '$.TextMove accessor used outside of a text-block'
-            unless $.context == GraphicsContext::Text;
-
-	Proxy.new(
-	    FETCH => sub (\p) {
-                my $tm = self.TextMatrix;
-	        $tm[4] / $tm[0], $tm[5] / $tm[3];
-	    },
-	    STORE => sub (\p, Vector \v) {
-               self.TextMove(|v);
-	    },
-	    );
-    }
-
     method !track-context(Str $op) {
 
         my constant %Transition = %(

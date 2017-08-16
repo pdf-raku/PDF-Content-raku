@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 93;
+plan 96;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -93,7 +93,15 @@ is-json-equiv $g.TextMatrix, [1, 0, 0, 1, 10, 20], '$g.TextMatrix - moved';
 $g.TextMatrix = scale(2,3);
 $g.TextMove(15,25);
 is-json-equiv $g.TextMatrix, [2, 0, 0, 3, 30, 75], '$g.TextMatrix - moved';
-is-deeply $g.TextMove, $(15.0, 25.0), '$g.TextMove - rw accessors';
+is-deeply $g.text-position, $(15.0, 25.0), 'text-position';
+$g.TextMove(5,10);
+is-deeply $g.text-position, $(20.0, 35.0), 'text-position';
+
+$g.text-position = (5,10);
+is-deeply $g.text-position, $(5.0, 10.0), '$g.text-position - rw accessors';
+
+$g.text-position = (15,20);
+is-deeply $g.text-position, $(15.0, 20.0), '$g.text-position - rw accessors';
 
 $g.TextMatrix = [ 10, 1, 15, 2, 3, 4];
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated';

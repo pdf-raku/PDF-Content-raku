@@ -217,7 +217,26 @@ class PDF::Content
             }
         }
 
-        self.TextMove = [$x, $y];
+        self.text-position = [$x, $y];
+    }
+
+    my subset Vector of List where {.elems == 2 && all(.list) ~~ Numeric}
+    method text-position is rw returns Vector {
+        warn '$.text-position accessor used outside of a text-block'
+            unless $.context == GraphicsContext::Text;
+
+	Proxy.new(
+	    FETCH => sub (\p) {
+                my @tm = @.TextMatrix;
+	        @tm[4] / @tm[0], @tm[5] / @tm[3];
+	    },
+	    STORE => sub (\p, Vector \v) {
+                my @tm = @.TextMatrix;
+                @tm[4] = $_ * @tm[0] with v[0];
+                @tm[5] = $_ * @tm[3] with v[1];
+		self.op(SetTextMatrix, @tm);
+	    },
+	    );
     }
 
     multi method print(PDF::Content::Text::Block $text-block,

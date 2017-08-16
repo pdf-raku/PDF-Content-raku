@@ -23,7 +23,7 @@ my $font-size = 16;
 my $text-block;
 
 $page.text: -> $gfx {
-    $gfx.TextMove = [100, 500];
+    $gfx.TextMove(100, 500);
     $text-block = $gfx.text-block( :@chunks, :$font, :$font-size, :width(220) );
     $gfx.say($text-block);
     my $unreserved-width  = $text-block.content-width;

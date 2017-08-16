@@ -14,13 +14,13 @@ use PDF::Content;
 my PDF::Content $gfx .= new;
 $gfx.BeginText;
 $gfx.Font = 'F1', 16;
-$gfx.TextMove = 10, 20;
+$gfx.TextMove(10, 20);
 $gfx.ShowText('Hello World');
 $gfx.EndText;
 say $gfx.Str;
 # BT
 #  /F1 16 Tf
-#  1 0 0 1 10 20 Tm
+#  10 20 Td
 #  (Hello World) Tj
 # ET
 ```

@@ -27,7 +27,7 @@ endobj
 endobj
 
 4 0 obj <<
-  /Length 3944
+  /Length 3938
 >> stream
 BT
   /F1 10 Tf
@@ -85,10 +85,10 @@ BT
   0 Ts
   1 0 0 1 110 190 Tm
   -9.31 Ts
-  0.173333 Tw
+  0.17333 Tw
   (*** top justify*** Lorem) Tj
   T*
-  2.583333 Tw
+  2.58333 Tw
   (ipsum dolor sit amet,) Tj
   T*
   1.07 Tw
@@ -168,13 +168,13 @@ BT
   8.875 Tw
   (*** center justify***) Tj
   T*
-  1.473333 Tw
+  1.47333 Tw
   (Lorem ipsum dolor sit) Tj
   T*
   20.52 Tw
   (amet, consectetur) Tj
   T*
-  1.466667 Tw
+  1.46667 Tw
   (adipiscing elit, sed do) Tj
   T*
   28.31 Tw
@@ -248,13 +248,13 @@ BT
   7.485 Tw
   (*** bottom justify***) Tj
   T*
-  1.473333 Tw
+  1.47333 Tw
   (Lorem ipsum dolor sit) Tj
   T*
   20.52 Tw
   (amet, consectetur) Tj
   T*
-  1.466667 Tw
+  1.46667 Tw
   (adipiscing elit, sed do) Tj
   T*
   28.31 Tw
@@ -287,7 +287,7 @@ xref
 0000000068 00000 n 
 0000000134 00000 n 
 0000000289 00000 n 
-0000004288 00000 n 
+0000004282 00000 n 
 trailer
 <<
   /ID [ <867b4841444e1643c74ca7767ce9dd84> <867b4841444e1643c74ca7767ce9dd84> ]
@@ -295,5 +295,5 @@ trailer
   /Size 6
 >>
 startxref
-4394
+4388
 %%EOF

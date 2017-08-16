@@ -34,7 +34,7 @@ for <top center bottom> -> $valign {
     my $y = 700;
 
     for <left center right justify> -> $align {
-        $gfx.TextMove = ($x, $y);
+        $gfx.text-position = ($x, $y);
         $gfx.say( "*** $valign $align*** " ~ $sample, :$width, :$height, :$valign, :$align, :$baseline );
         $y -= 170;
     }

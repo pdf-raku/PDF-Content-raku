@@ -76,7 +76,7 @@ for (
         }
     }
 
-    $gfx.TextMove = ($x, $y);
+    $gfx.text-position = ($x, $y);
     $gfx.say("*** {%opts} *** " ~ $sample, :$width, :$height, |%opts);
 
     if $x < 400 {
