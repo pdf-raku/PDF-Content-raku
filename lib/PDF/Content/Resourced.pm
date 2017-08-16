@@ -54,6 +54,7 @@ role PDF::Content::Resourced {
 	my @images = %forms.values.grep( *.<Subtype> eq 'Image');
 	@images.append: self.gfx.inline-images
 	    if $inline;
+        @images;
     }
 
 }
