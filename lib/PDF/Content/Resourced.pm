@@ -40,13 +40,8 @@ role PDF::Content::Resourced {
     }
 
     method find-resource(|c ) {
-        # work around rakudo RT#130798
-        with self.Resources {
-	    .find-resource(|c);
-        }
-        else {
-            Mu
-        }
+        .find-resource(|c)
+            with self.Resources;
     }
 
     method images(Bool :$inline = True) {
