@@ -815,9 +815,6 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         self!check-color-args('SC', $!StrokeColorSpace, @colors);
         @!StrokeColor = @colors;
     }
-    multi method track-graphics('ET') {
-        @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
-    }
     multi method track-graphics('BMC', Str $name!) {
 	@!tags.push: 'BMC' => [$name];
     }
