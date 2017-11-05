@@ -18,7 +18,7 @@ is $tsym.FontName, 'Symbol', 'FontName';
 is $tsym.enc, 'sym', 'enc';
 
 my $hb-afm = PDF::Content::Util::CoreFont::load-font( 'Helvetica-Bold' );
-isa-ok $hb-afm, 'Font::AFM'; 
+isa-ok $hb-afm.metrics, 'Font::AFM'; 
 is $hb-afm.FontName, 'Helvetica-Bold', 'FontName';
 is $hb-afm.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
@@ -27,7 +27,7 @@ is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
 is $hb-afm.encode("A♥♣✔B", :str), "AB", '.encode(...) sanity';
 
 my $ab-afm = PDF::Content::Util::CoreFont::load-font( 'Arial-Bold' );
-isa-ok $hb-afm, 'Font::AFM'; 
+isa-ok $hb-afm.metrics, 'Font::AFM'; 
 is $hb-afm.FontName, 'Helvetica-Bold', 'FontName';
 is $hb-afm.encode("A♥♣✔B", :str), "AB", '.encode(...) sanity';
 
@@ -58,16 +58,16 @@ for (win => "Á®ÆØ",
 }
 
 my $zapf = PDF::Content::Util::CoreFont::load-font( 'ZapfDingbats' );
-isa-ok $zapf, 'Font::Metrics::zapfdingbats';
+isa-ok $zapf.metrics, 'Font::Metrics::zapfdingbats';
 is $zapf.enc, 'zapf', '.enc';
 is $zapf.encode("♥♣✔", :str), "ª¨4", '.encode(...)'; # /a110 /a112 /a20
 is $zapf.decode("ª¨4", :str), "♥♣✔", '.decode(...)';
 is $zapf.decode("\o251\o252", :str), "♦♥", '.decode(...)';
 
-isa-ok PDF::Content::Util::CoreFont::load-font('CourierNew,Bold'), 'Font::Metrics::courier-bold';
+isa-ok PDF::Content::Util::CoreFont::load-font('CourierNew,Bold').metrics, 'Font::Metrics::courier-bold';
 
 my $sym = PDF::Content::Util::CoreFont::load-font( 'Symbol' );
-isa-ok $sym, 'Font::Metrics::symbol';
+isa-ok $sym.metrics, 'Font::Metrics::symbol';
 is $sym.enc, 'sym', '.enc';
 is $sym.encode("ΑΒΓ", :str), "ABG", '.encode(...)'; # /Alpha /Beta /Gamma
 is $sym.decode("ABG", :str), "ΑΒΓ", '.decode(...)';

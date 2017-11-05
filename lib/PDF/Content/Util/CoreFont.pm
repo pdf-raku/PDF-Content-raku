@@ -110,29 +110,41 @@ module PDF::Content::Util::CoreFont {
         load-font( $family, |c );
     }
 
-    role Encoded[$encoder] is export(:Encoded) {
-        method enc { $encoder.enc }
-        method encode(|c) { $encoder.encode(|c) }
-        method decode(|c) { $encoder.decode(|c) }
-        method filter($s) { $encoder.filter($s); }
-        method to-dict    { $encoder.to-dict(self.FontName) }
+    my class CoreFontEncoded {
+        use PDF::DAO::Dict;
+        has Font::AFM $.metrics handles <FontName FontBBox kern>;
+        has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode filter enc>;
+
         method height(|c) {
             my List $bbox = $.FontBBox;
-            $encoder.height(:$bbox, |c);
+            $!encoder.height(:$bbox, |c);
         }
         method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False) {
-            my $glyphs = $encoder.glyphs;
-            nextwith( $str, $pointsize, :$kern, :$glyphs);
+            my $glyphs = $!encoder.glyphs;
+            $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
+        }
+        #| map ourselves to a PDF::Content object
+        method to-dict {
+            my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
+            my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
+                         :BaseFont( :name( self.FontName ) ),
+            };
+
+            with %enc-name{self.enc} -> $name {
+                $dict<Encoding> = :$name;
+            }
+
+            PDF::DAO::Dict.coerce: $dict;
         }
 
     }
-
+   
     sub load-core-font($font-name, :$enc!) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
             my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
-            (Font::AFM.metrics-class( $font-name )
-             but Encoded[$encoder]).new;
+            my $metrics = Font::AFM.core-font( $font-name );
+            CoreFontEncoded.new: :$encoder, :$metrics;
         }
     }
 
