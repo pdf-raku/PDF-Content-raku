@@ -105,8 +105,7 @@ role PDF::Content::ResourceDict {
     }
     
     method core-font(|c) {
-	use PDF::Content::Util::CoreFont;
-        self.use-font: PDF::Content::Util::CoreFont::load-font( |c );
+        self.use-font: (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
     }
 
     multi method use-font(PDF::Content::Font $font) {

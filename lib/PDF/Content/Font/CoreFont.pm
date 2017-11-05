@@ -1,8 +1,12 @@
 use v6;
 
-module PDF::Content::Util::CoreFont {
+class PDF::Content::Font::CoreFont {
     use Font::AFM:ver(v1.23.5+);
     use PDF::Content::Font::Enc::Type1;
+    use PDF::DAO::Dict;
+    has Font::AFM $.metrics handles <kern>;
+    has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode filter enc>;
+
     constant coreFonts = set <
         courier courier-oblique courier-bold courier-boldoblique
         helvetica helvetica-oblique helvetica-bold helvetica-boldoblique
@@ -83,7 +87,7 @@ module PDF::Content::Util::CoreFont {
         :zapfdingbats-bolditalic<zapfdingbats>,
     };
 
-    our sub core-font-name(Str $family!, Str :$weight?, Str :$style?, ) is export(:core-font-name) {
+    method core-font-name(Str $family!, Str :$weight?, Str :$style?, ) is export(:core-font-name) {
         my Str $face = $family.lc;
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
             ?? 'bold' !! '';
@@ -104,60 +108,55 @@ module PDF::Content::Util::CoreFont {
         $face ∈ coreFonts ?? $face !! Nil;
     }
 
-    our proto sub load-font(|c) {*};
+    our proto method load-font(|c) {*};
 
-    multi sub load-font( Str :$family!, |c) {
-        load-font( $family, |c );
+    multi method load-font( Str :$family!, |c) {
+        $.load-font( $family, |c );
     }
 
-    my class CoreFontEncoded {
-        use PDF::DAO::Dict;
-        has Font::AFM $.metrics handles <FontName FontBBox kern>;
-        has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode filter enc>;
-
-        method height(|c) {
-            my List $bbox = $.FontBBox;
-            $!encoder.height(:$bbox, |c);
-        }
-        method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False) {
-            my $glyphs = $!encoder.glyphs;
-            $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
-        }
-        #| map ourselves to a PDF::Content object
-        method to-dict {
-            my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
-            my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
-                         :BaseFont( :name( self.FontName ) ),
-            };
-
-            with %enc-name{self.enc} -> $name {
-                $dict<Encoding> = :$name;
-            }
-
-            PDF::DAO::Dict.coerce: $dict;
-        }
-
+    method height(|c) {
+        my List $bbox = $!metrics.FontBBox;
+        $!encoder.height(:$bbox, |c);
     }
-   
-    sub load-core-font($font-name, :$enc!) {
+    method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False) {
+        my $glyphs = $!encoder.glyphs;
+        $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
+    }
+    #| map ourselves to a PDF::Content object
+    method to-dict {
+        my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
+        my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
+                     :BaseFont( :name( $!metrics.FontName ) ),
+        };
+
+        with %enc-name{self.enc} -> $name {
+            $dict<Encoding> = :$name;
+        }
+
+        PDF::DAO::Dict.coerce: $dict;
+    }
+
+    method font-name { $!metrics.FontName }
+
+    method !load-core-font($font-name, :$enc!) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
             my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
             my $metrics = Font::AFM.core-font( $font-name );
-            CoreFontEncoded.new: :$encoder, :$metrics;
+            self.new: :$encoder, :$metrics;
         }
     }
 
-    multi sub load-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
-        load-core-font('zapfdingbats', :$enc );
+    multi method load-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
+        self!load-core-font('zapfdingbats', :$enc );
     }
 
-    multi sub load-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
-        load-core-font('symbol', :$enc );
+    multi method load-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
+        self!load-core-font('symbol', :$enc );
     }
 
-    multi sub load-font(Str $font-name!, :$enc = 'win', |c) is default {
-        load-core-font( core-font-name($font-name, |c), :$enc );
+    multi method load-font(Str $font-name!, :$enc = 'win', |c) is default {
+        self!load-core-font( $.core-font-name($font-name, |c), :$enc );
     }
 
 }
