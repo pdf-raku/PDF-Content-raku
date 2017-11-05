@@ -1,7 +1,7 @@
 {
     "perl"        : "6.*",
     "name"        : "PDF::Content",
-    "version"     : "0.0.7",
+    "version"     : "0.0.8",
     "license"     : "Artistic-2.0",
     "api"         : "PDF-1.7",
     "auth"        : "github:p6-pdf",
@@ -41,6 +41,6 @@
         "PDF::Content::Text::Reserved"  : "lib/PDF/Content/Text/Reserved.pm",
         "PDF::Content::Text::Style"     : "lib/PDF/Content/Text/Style.pm",
 
-        "PDF::Content::Util::Font"      : "lib/PDF/Content/Util/Font.pm"
+        "PDF::Content::Util::CoreFont"      : "lib/PDF/Content/Util/CoreFont.pm"
      }
 }

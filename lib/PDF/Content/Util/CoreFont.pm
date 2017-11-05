@@ -1,12 +1,14 @@
 use v6;
 
-module PDF::Content::Util::Font {
+module PDF::Content::Util::CoreFont {
     use Font::AFM:ver(v1.23.5+);
     use PDF::Content::Font::Enc::Type1;
-    constant coreFonts = set <courier courier-oblique courier-bold courier-boldoblique
-                  helvetica helvetica-oblique helvetica-bold helvetica-boldoblique
-                  times-roman times-italic times-bold times-bolditalic
-                  symbol zapfdingbats>;
+    constant coreFonts = set <
+        courier courier-oblique courier-bold courier-boldoblique
+        helvetica helvetica-oblique helvetica-bold helvetica-boldoblique
+        times-roman times-italic times-bold times-bolditalic
+        symbol zapfdingbats
+        >;
 
     # font aliases adapted from pdf.js/src/fonts.js
     constant stdFontMap = {
@@ -102,10 +104,10 @@ module PDF::Content::Util::Font {
         $face ∈ coreFonts ?? $face !! Nil;
     }
 
-    our proto sub core-font(|c) {*};
+    our proto sub load-font(|c) {*};
 
-    multi sub core-font( Str :$family!, |c) {
-        core-font( $family, |c );
+    multi sub load-font( Str :$family!, |c) {
+        load-font( $family, |c );
     }
 
     role Encoded[$encoder] is export(:Encoded) {
@@ -118,7 +120,7 @@ module PDF::Content::Util::Font {
             my List $bbox = $.FontBBox;
             $encoder.height(:$bbox, |c);
         }
-        method stringwidth(Str $str, Numeric $pointsize=0, Bool :$kern=False) {
+        method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False) {
             my $glyphs = $encoder.glyphs;
             nextwith( $str, $pointsize, :$kern, :$glyphs);
         }
@@ -134,15 +136,15 @@ module PDF::Content::Util::Font {
         }
     }
 
-    multi sub core-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
+    multi sub load-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
         load-core-font('zapfdingbats', :$enc );
     }
 
-    multi sub core-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
+    multi sub load-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
         load-core-font('symbol', :$enc );
     }
 
-    multi sub core-font(Str $font-name!, :$enc = 'win', |c) is default {
+    multi sub load-font(Str $font-name!, :$enc = 'win', |c) is default {
         load-core-font( core-font-name($font-name, |c), :$enc );
     }
 
