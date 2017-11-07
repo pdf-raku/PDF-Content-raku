@@ -36,19 +36,6 @@ class PDF::Content::Font::Enc::Type1 {
         }
     }
 
-    #| compute the overall font-height
-    method height($pointsize?, List :$bbox!, Bool :$from-baseline, Bool :$hanging) {
-	my Numeric $height = $bbox[3];
-        $height *= .75 if $hanging;  # not applicable to core fonts - approximate
-	$height -= $bbox[1] unless $from-baseline;
-	$pointsize ?? $height * $pointsize / 1000 !! $height;
-    }
-
-    #| reduce string to the displayable characters
-    method filter(Str $text-in) {
-	$text-in.order.grep({ @!from-unicode[$_] }).join;
-    }
-
     multi method encode(Str $s, :$str! --> Str) {
         self.encode($s).decode: 'latin-1';
     }
