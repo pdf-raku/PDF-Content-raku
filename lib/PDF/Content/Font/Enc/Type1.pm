@@ -36,18 +36,18 @@ class PDF::Content::Font::Enc::Type1 {
         }
     }
 
-    multi method encode(Str $s, :$str! --> Str) {
-        self.encode($s).decode: 'latin-1';
+    multi method encode(Str $text, :$str! --> Str) {
+        self.encode($text).decode: 'latin-1';
     }
-    multi method encode(Str $s --> buf8) is default {
-        buf8.new: $s.ords.map({@!from-unicode[$_]}).grep: {$_};
+    multi method encode(Str $text --> buf8) is default {
+        buf8.new: $text.ords.map({@!from-unicode[$_]}).grep: {$_};
     }
 
-    multi method decode(Str $s, :$str! --> Str) {
-        $s.ords.map({@!to-unicode[$_]}).grep({$_}).map({.chr}).join;
+    multi method decode(Str $encoded, :$str! --> Str) {
+        $encoded.ords.map({@!to-unicode[$_]}).grep({$_}).map({.chr}).join;
     }
-    multi method decode(Str $s --> buf16) {
-        buf16.new: $s.ords.map({@!to-unicode[$_]}).grep: {$_};
+    multi method decode(Str $encoded --> buf16) {
+        buf16.new: $encoded.ords.map({@!to-unicode[$_]}).grep: {$_};
     }
 
 }

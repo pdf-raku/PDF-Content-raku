@@ -2,6 +2,7 @@ use v6;
 
 class PDF::Content::Font::CoreFont {
     use Font::AFM:ver(v1.23.5+);
+    use PDF::Content::Font;
     use PDF::Content::Font::Enc::Type1;
     use PDF::DAO::Dict;
     has Font::AFM $.metrics handles <kern>;
@@ -138,7 +139,10 @@ class PDF::Content::Font::CoreFont {
             $dict<Encoding> = :$name;
         }
 
-        PDF::DAO::Dict.coerce: $dict;
+        PDF::Content::Font.make-font(
+            PDF::DAO::Dict.coerce($dict),
+            self
+            );
     }
 
     method font-name { $!metrics.FontName }
