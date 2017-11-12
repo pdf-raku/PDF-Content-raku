@@ -108,11 +108,17 @@ role PDF::Content::ResourceDict {
         self.use-font: (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
     }
 
-    method use-font(PDF::Content::Font $font) {
+    multi method use-font(PDF::Content::Font $font) {
         my $font-obj = $font.font-obj;
         self.find-resource(sub ($_){ .?font-obj === $font-obj },
 			   :type<Font>)
             // self!register-resource( $font );
+    }
+
+    multi method use-font($font-obj) is default {
+        self.find-resource(sub ($_){ .?font-obj === $font-obj },
+			   :type<Font>)
+            // self!register-resource: $font-obj.to-dict;
     }
 
 }

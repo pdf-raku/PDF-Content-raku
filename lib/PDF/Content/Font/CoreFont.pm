@@ -155,7 +155,7 @@ class PDF::Content::Font::CoreFont {
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
             my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
             my $metrics = Font::AFM.core-font( $font-name );
-            self.new( :$encoder, :$metrics ).to-dict;
+            self.new( :$encoder, :$metrics );
         }
     }
 

@@ -783,8 +783,7 @@ class PDF::Content::Ops {
         warn "unexpected end of content stream in $!context context"
             unless $!context == Page;
         with $!parent {
-            my %fonts = .resources('Font');
-            %fonts{$_}.?cb-finish for %fonts.values;
+            .cb-finish for .resources('Font').values;
         }
     }
 

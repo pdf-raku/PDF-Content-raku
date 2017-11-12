@@ -11,8 +11,10 @@ role PDF::Content::Font {
             $dict,
             PDF::Content::Font
             );
-        $font-dict.font-obj = $font-obj;
+        $font-dict.set-font-obj($font-obj);
         $font-dict;
     }
+    # needed by PDF::Zen (PDF::Font::Type1)
+    method set-font-obj($!font-obj) { $!font-obj }
 
 }
