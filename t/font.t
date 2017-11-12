@@ -15,19 +15,19 @@ is $tr-bold.font-name, 'Times-Bold', 'font-name';
 
 my $tsym = PDF::Content::Font::CoreFont.load-font( :family<Symbol>, :weight<bold>);
 is $tsym.font-name, 'Symbol', 'font-name';
-is $tsym.enc, 'sym', 'enc';
+is $tsym.font-obj.enc, 'sym', 'enc';
 
 my $hb-afm = PDF::Content::Font::CoreFont.load-font( 'Helvetica-Bold' );
-isa-ok $hb-afm.metrics, 'Font::AFM'; 
+isa-ok $hb-afm.font-obj.metrics, 'Font::AFM'; 
 is $hb-afm.font-name, 'Helvetica-Bold', 'font-name';
-is $hb-afm.enc, 'win', '.enc';
+is $hb-afm.font-obj.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
 is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
 is $hb-afm.encode("A♥♣✔B", :str), "AB", '.encode(...) sanity';
 
 my $ab-afm = PDF::Content::Font::CoreFont.load-font( 'Arial-Bold' );
-isa-ok $hb-afm.metrics, 'Font::AFM'; 
+isa-ok $hb-afm.font-obj.metrics, 'Font::AFM'; 
 is $hb-afm.font-name, 'Helvetica-Bold', 'font-name';
 is $hb-afm.encode("A♥♣✔B", :str), "AB", '.encode(...) sanity';
 
@@ -37,7 +37,7 @@ is $hbi-afm.font-name, 'Helvetica-BoldOblique', ':font-family => font-name';
 my $hb-afm-again = PDF::Content::Font::CoreFont.load-font( 'Helvetica-Bold' );
 ok $hb-afm-again === $hb-afm, 'font caching';
 
-my $hbi-afm-dict = $hbi-afm.to-dict;
+my $hbi-afm-dict = $hbi-afm.font-obj.to-dict;
 is-json-equiv $hbi-afm-dict, { :BaseFont<Helvetica-BoldOblique>, :Encoding<WinAnsiEncoding>, :Subtype<Type1>, :Type<Font>}, "to-dict";
 
 my $tr-afm = PDF::Content::Font::CoreFont.load-font( 'Times-Roman' );
@@ -58,17 +58,17 @@ for (win => "Á®ÆØ",
 }
 
 my $zapf = PDF::Content::Font::CoreFont.load-font( 'ZapfDingbats' );
-isa-ok $zapf.metrics, 'Font::Metrics::zapfdingbats';
-is $zapf.enc, 'zapf', '.enc';
+isa-ok $zapf.font-obj.metrics, 'Font::Metrics::zapfdingbats';
+is $zapf.font-obj.enc, 'zapf', '.enc';
 is $zapf.encode("♥♣✔", :str), "ª¨4", '.encode(...)'; # /a110 /a112 /a20
 is $zapf.decode("ª¨4", :str), "♥♣✔", '.decode(...)';
 is $zapf.decode("\o251\o252", :str), "♦♥", '.decode(...)';
 
-isa-ok PDF::Content::Font::CoreFont.load-font('CourierNew,Bold').metrics, 'Font::Metrics::courier-bold';
+isa-ok PDF::Content::Font::CoreFont.load-font('CourierNew,Bold').font-obj.metrics, 'Font::Metrics::courier-bold';
 
 my $sym = PDF::Content::Font::CoreFont.load-font( 'Symbol' );
-isa-ok $sym.metrics, 'Font::Metrics::symbol';
-is $sym.enc, 'sym', '.enc';
+isa-ok $sym.font-obj.metrics, 'Font::Metrics::symbol';
+is $sym.font-obj.enc, 'sym', '.enc';
 is $sym.encode("ΑΒΓ", :str), "ABG", '.encode(...)'; # /Alpha /Beta /Gamma
 is $sym.decode("ABG", :str), "ΑΒΓ", '.decode(...)';
 
