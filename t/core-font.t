@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 40;
+plan 42;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Font::CoreFont;
@@ -22,8 +22,10 @@ isa-ok $hb-afm.metrics, 'Font::AFM';
 is $hb-afm.font-name, 'Helvetica-Bold', 'font-name';
 is $hb-afm.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
+is $hb-afm.height(:hanging), 925, 'font height hanging';
 is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
+is-approx $hb-afm.height(12, :hanging), 11.1, 'font hanging height @ 12pt';
 is $hb-afm.encode("A♥♣✔B", :str), "AB", '.encode(...) sanity';
 
 my $ab-afm = PDF::Content::Font::CoreFont.load-font( 'Arial-Bold' );
