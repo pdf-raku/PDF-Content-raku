@@ -98,7 +98,8 @@ class Build {
 
         for $glyphs.keys.sort -> $type {
             say "    #-- {$type.uc} encoding --#"; 
-            say "    constant \${$type}-glyphs = {$glyphs{$type}.perl};";
+            say "    constant \${$type}-glyphs = {$glyphs{$type}.perl};"
+                if $type eq 'zapf';
             say "    constant \${$type}-encoding = {$encodings{$type}.perl};";
             say "";
         }
