@@ -30,9 +30,11 @@ class PDF::Content::Font::Enc::Type1 {
 
         for $!glyphs.pairs {
             my uint16 $code-point = .key.ord;
-            my uint8 $encoding = $!encoding{.value}.ord;
-            @!from-unicode[$code-point] = $encoding;
-            @!to-unicode[$encoding] = $code-point;
+            with $!encoding{.value} {
+                my uint8 $encoding = .ord;
+                @!from-unicode[$code-point] = $encoding;
+                @!to-unicode[$encoding] = $code-point;
+            }
         }
     }
 
