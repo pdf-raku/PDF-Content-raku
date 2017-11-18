@@ -68,9 +68,14 @@ class PDF::Content::Font::Enc::Type1 {
     }
 
     method differences {
-        flat @!differences.map: {
-            my $name =  $!glyphs{ @!to-unicode[$_].chr };
-            ($_, :$name )
+        my @diffs;
+        my uint8 $cur-idx = 0;
+        for @!differences {
+            @diffs.push: $_
+                unless $_ == $cur-idx;
+            @diffs.push: $!glyphs{ @!to-unicode[$_].chr };
+            $cur-idx = $_ + 1;
         }
+          @diffs;
     }
 }

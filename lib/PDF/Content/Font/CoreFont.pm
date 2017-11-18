@@ -130,16 +130,19 @@ class PDF::Content::Font::CoreFont {
         $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
     }
 
-    method !make-dict {
+    method !encoding-name {
         my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
-        my $dict = { :Type( :name<Font> ), :Subtype( :name<Type1> ),
-                     :BaseFont( :name( $!metrics.FontName ) ),
-        };
-
         with %enc-name{self.enc} -> $name {
-            $dict<Encoding> = :$name;
+            :$name;
         }
-        $dict;
+    }
+
+    method !make-dict {
+        {
+            :Type( :name<Font> ), :Subtype( :name<Type1> ),
+            :BaseFont( :name( $!metrics.FontName ) ),
+            :Encoding(self!encoding-name),
+        };
     }
 
    method to-dict {
@@ -174,14 +177,11 @@ class PDF::Content::Font::CoreFont {
     method cb-finish {
         my @Differences = $!encoder.differences;
         if @Differences {
-            with self.to-dict {
-                my $Encoding = %(
-                    :Type( :name<Encoding> ),
-                    :BaseEncoding( .<Encoding> ),
-                    :@Differences,
-                );
-                .<Encoding> = $Encoding;
-            }
+            self.to-dict<Encoding> = %(
+                :Type( :name<Encoding> ),
+                :BaseEncoding(self!encoding-name),
+                :@Differences,
+            );
         }
     }
 }

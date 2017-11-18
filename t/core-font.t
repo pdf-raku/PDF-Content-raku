@@ -40,9 +40,9 @@ is $hbi-afm.font-name, 'Helvetica-BoldOblique', ':font-family => font-name';
 my $hb-afm-again = PDF::Content::Font::CoreFont.load-font( 'Helvetica-Bold' );
 ok $hb-afm-again === $hb-afm, 'font caching';
 
-my $ext-chars = "ΨΩα";
+my $ext-chars = "ΨΩαΩ";
 my $enc = $hbi-afm.encode($ext-chars, :str);
-is $enc, "\x[1]\x[2]\x[3]", "extended  chars encoding";
+is $enc, "\x[1]\x[2]\x[3]\x[2]", "extended  chars encoding";
 is $hbi-afm.decode($enc, :str), $ext-chars,  "extended  chars decoding";
 
 $hbi-afm.cb-finish;
@@ -53,9 +53,9 @@ is-json-equiv $hbi-afm-dict, {
     :BaseFont<Helvetica-BoldOblique>,
     :Encoding{
         :Type<Encoding>,
-          :BaseEncoding<WinAnsiEncoding>,
-          :Differences[1, "Psi", 2, "Omega", 3, "alpha"],
-      },
+        :BaseEncoding<WinAnsiEncoding>,
+        :Differences[1, "Psi", "Omega", "alpha"],
+    },
 }, "to-dict (extended chars)";
 
 my $tr-afm = PDF::Content::Font::CoreFont.load-font( 'Times-Roman' );
