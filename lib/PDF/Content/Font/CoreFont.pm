@@ -171,5 +171,17 @@ class PDF::Content::Font::CoreFont {
         self!load-core-font( $.core-font-name($font-name, |c), :$enc );
     }
 
-    method cb-finish {}
+    method cb-finish {
+        my @Differences = $!encoder.differences;
+        if @Differences {
+            with self.to-dict {
+                my $Encoding = %(
+                    :Type( :name<Encoding> ),
+                    :BaseEncoding( .<Encoding> ),
+                    :@Differences,
+                );
+                .<Encoding> = $Encoding;
+            }
+        }
+    }
 }
