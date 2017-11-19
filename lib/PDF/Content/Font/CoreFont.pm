@@ -138,11 +138,12 @@ class PDF::Content::Font::CoreFont {
     }
 
     method !make-dict {
-        {
+        my $dict = {
             :Type( :name<Font> ), :Subtype( :name<Type1> ),
             :BaseFont( :name( $!metrics.FontName ) ),
-            :Encoding(self!encoding-name),
         };
+        $dict<Encoding> = $_ with self!encoding-name;
+        $dict;
     }
 
    method to-dict {
@@ -177,11 +178,14 @@ class PDF::Content::Font::CoreFont {
     method cb-finish {
         my @Differences = $!encoder.differences;
         if @Differences {
-            self.to-dict<Encoding> = %(
+            my $Encoding = %(
                 :Type( :name<Encoding> ),
-                :BaseEncoding(self!encoding-name),
                 :@Differences,
-            );
+               );
+            $Encoding<BaseEncoding> = $_
+                with self!encoding-name;
+
+            self.to-dict<Encoding> = $Encoding;
         }
     }
 }
