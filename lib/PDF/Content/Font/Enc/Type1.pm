@@ -2,7 +2,7 @@ class PDF::Content::Font::Enc::Type1 {
     use Font::AFM;
     use PDF::Content::Font::Encodings;
     has $.glyphs = %Font::AFM::Glyphs;
-    has $!encoding;
+    has array $!encoding;
     has UInt %!from-unicode;
     has uint16 @.to-unicode[256];
     has uint8 @!spare-encodings;
@@ -27,17 +27,15 @@ class PDF::Content::Font::Enc::Type1 {
 	    }
 	}
 
-        for $!glyphs.pairs {
-            my uint16 $code-point = .key.ord;
-            with $!encoding{.value} {
-                my uint8 $encoding = .ord;
+        @!to-unicode = $!encoding.list;
+        for 1 .. 255 -> $encoding {
+            my uint16 $code-point = @!to-unicode[$encoding];
+            if $code-point {
                 %!from-unicode{$code-point} = $encoding;
-                @!to-unicode[$encoding] = $code-point;
             }
-        }
-        for 1 .. 255 -> uint8 $i  {
-            @!spare-encodings.push($i)
-                unless @!to-unicode{$i};
+            else {
+                @!spare-encodings.push($encoding)
+            }
         }
     }
 
