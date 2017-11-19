@@ -41,8 +41,13 @@ class PDF::Content::Font::Enc::Type1 {
         %!from-unicode{"\c[NO-BREAK SPACE]".ord} //= %!from-unicode{' '.ord};
     }
 
-    method add-encoding($chr-code) {
-        if $!glyphs{$chr-code.chr} && @!spare-encodings {
+    method lookup-glyph(UInt $chr-code) {
+          $!glyphs{$chr-code.chr}
+    }
+
+    method !add-encoding($chr-code) {
+        my $glyph-name = self.lookup-glyph($chr-code);
+        if  @!spare-encodings && $glyph-name && $glyph-name ne '.notdef' {
             my $idx = @!spare-encodings.shift;
             %!from-unicode{$chr-code} = $idx;
             @!to-unicode[$idx] = $chr-code;
@@ -57,7 +62,7 @@ class PDF::Content::Font::Enc::Type1 {
         self.encode($text).decode: 'latin-1';
     }
     multi method encode(Str $text --> buf8) is default {
-        buf8.new: $text.ords.map({%!from-unicode{$_} || self.add-encoding($_) }).grep: {$_};
+        buf8.new: $text.ords.map({%!from-unicode{$_} || self!add-encoding($_) }).grep: {$_};
     }
 
     multi method decode(Str $encoded, :$str! --> Str) {
@@ -73,7 +78,7 @@ class PDF::Content::Font::Enc::Type1 {
         for @!differences {
             @diffs.push: $_
                 unless $_ == $cur-idx;
-            @diffs.push: 'name' => $!glyphs{ @!to-unicode[$_].chr };
+            @diffs.push: 'name' => self.lookup-glyph( @!to-unicode[$_] );
             $cur-idx = $_ + 1;
         }
         @diffs;
