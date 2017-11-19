@@ -72,7 +72,7 @@ class Build {
             my uint16 $code-point = :16( ~$<code-point> );
             my uint8  $encoding = :16( $<encoding>.Str );
             %glyphs{$code-point.chr} = $glyph-name;
-            @encodings[$encoding] = $code-point;
+            @encodings[$encoding] ||= $code-point;
         }
         say "    #-- {$type.uc} encoding --#";
         say "    constant \${$type}-glyphs = {%glyphs.perl};"
