@@ -37,9 +37,11 @@ class PDF::Content::Font::Enc::Type1 {
                 @!spare-encodings.push($encoding)
             }
         }
+        # map non-breaking space to a regular space
+        %!from-unicode{"\c[NO-BREAK SPACE]".ord} //= %!from-unicode{' '.ord};
     }
 
-    method !add-encoding($chr-code) {
+    method add-encoding($chr-code) {
         if $!glyphs{$chr-code.chr} && @!spare-encodings {
             my $idx = @!spare-encodings.shift;
             %!from-unicode{$chr-code} = $idx;
@@ -55,7 +57,7 @@ class PDF::Content::Font::Enc::Type1 {
         self.encode($text).decode: 'latin-1';
     }
     multi method encode(Str $text --> buf8) is default {
-        buf8.new: $text.ords.map({%!from-unicode{$_} || self!add-encoding($_) }).grep: {$_};
+        buf8.new: $text.ords.map({%!from-unicode{$_} || self.add-encoding($_) }).grep: {$_};
     }
 
     multi method decode(Str $encoded, :$str! --> Str) {
@@ -71,9 +73,9 @@ class PDF::Content::Font::Enc::Type1 {
         for @!differences {
             @diffs.push: $_
                 unless $_ == $cur-idx;
-            @diffs.push: $!glyphs{ @!to-unicode[$_].chr };
+            @diffs.push: 'name' => $!glyphs{ @!to-unicode[$_].chr };
             $cur-idx = $_ + 1;
         }
-          @diffs;
+        @diffs;
     }
 }
