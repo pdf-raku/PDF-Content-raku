@@ -136,7 +136,7 @@ class PDF::Content::Font::CoreFont {
     }
 
     method !encoding-name {
-        my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>, :byte<WinAnsiEncoding>;
+        my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
         with %enc-name{self.enc} -> $name {
             :$name;
         }

@@ -1,4 +1,4 @@
-joRelease 0.0.9
+Release 0.0.9
 - PDF::Content::Font::Enc::Type1 - Optimised encoding to always include
 up to the maximum of 255 glyphs. Glyphs are mapped as they
   are encountered:
