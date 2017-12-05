@@ -21,6 +21,11 @@ class PDF::Content::Image {
     use PDF::Content::XObject;
     use PDF::IO;
 
+    has Str $.data-uri;
+    my subset Str-or-IOHandle where Str|IO::Handle;
+    has Str-or-IOHandle $.source;
+    has Str $.image-type;
+
     method !image-type($_, :$path!) {
         when m:i/^ jpe?g $/    { 'JPEG' }
         when m:i/^ gif $/      { 'GIF' }
@@ -65,13 +70,33 @@ class PDF::Content::Image {
         self!open($type, $fh);
     }
 
-    method !open(Str $image-type, $fh, |c) {
-        my Hash $image-dict = (require ::('PDF::Content::Image')::($image-type)).open($fh);
-        $image-dict does PDF::Content::XObject[$image-dict<Subtype>]
-            unless $image-dict ~~ PDF::Content::XObject;
+    method !open(Str $image-type, $source, |c) {
+        my $image-obj = (require ::('PDF::Content::Image')::($image-type)).new(:$image-type, :$source);
+        $image-obj.read;
+        my $image-xobject = $image-obj.to-dict;
+        $image-xobject does PDF::Content::XObject[$image-xobject<Subtype>]
+            unless $image-xobject ~~ PDF::Content::XObject;
+        $image-xobject.image-obj = $image-obj;
+        $image-xobject;
+    }
 
-        $image-dict.?set-source(:source($fh), :$image-type, |c);
-        $image-dict;
+    method data-uri is rw {
+        Proxy.new(
+            FETCH => sub ($) {
+                $!data-uri //= do with $!source {
+		    use Base64::Native;
+		    my Str $bytes = .isa(Str)
+			?? .substr(0)
+			!! .path.IO.slurp(:enc<latin-1>);
+		    my $enc = base64-encode($bytes, :str, :enc<latin-1>);
+		    'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
+		}
+		else {
+		    fail 'image is not associated with a source';
+		}
+            },
+            STORE => sub ($, $!data-uri) {},
+        )
     }
 
     method inline-to-xobject(Hash $inline-dict, Bool :$invert) {
