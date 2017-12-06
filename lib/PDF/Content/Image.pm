@@ -98,6 +98,26 @@ class PDF::Content::Image {
             },
             STORE => sub ($, $!data-uri) {},
         )
+>>>>>>> e3aeaf9db9280635ba75c2ef4c6447670171f935
+    }
+
+    method data-uri is rw {
+        Proxy.new(
+            FETCH => sub ($) {
+                $!data-uri //= do with $!source {
+		    use Base64::Native;
+		    my Str $bytes = .isa(Str)
+			?? .substr(0)
+			!! .path.IO.slurp(:enc<latin-1>);
+		    my $enc = base64-encode($bytes, :str, :enc<latin-1>);
+		    'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
+		}
+		else {
+		    fail 'image is not associated with a source';
+		}
+            },
+            STORE => sub ($, $!data-uri) {},
+        )
     }
 
 }
