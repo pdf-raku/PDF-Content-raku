@@ -6,7 +6,6 @@ use PDF::Content::Image;
 class PDF::Content::Image::GIF
     is PDF::Content::Image {
 
-    use trace;
     use Native::Packing :Endian;
 
     class LogicalDescriptor does Native::Packing[Vax] {
