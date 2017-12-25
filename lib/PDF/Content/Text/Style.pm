@@ -24,14 +24,6 @@ class PDF::Content::Text::Style is rw {
 	} else {
 	    with $gfx {.TextRise} else {0.0};
 	}
-        if $!WordSpacing && $!space.ords != 1 {
-            # Detected unreliable use of WordSpacing. From [ PDF 32000 9.3.3 - WordSpacing:
-            # "Word spacing shall be applied to every occurrence of the single-byte character code 32
-            #  in a string when using a simple font or a composite font that defines code 32 as a single-
-            #  byte code. It shall not apply to occurrences of the byte value 32 in multiple-byte codes."
-            warn "word spacing won't work with this font - ignored";
-            $!WordSpacing = 0.0;
-        }
     }
 
     method !baseline-height {  $!font.height( $!font-size, :from-baseline) }
