@@ -32,7 +32,7 @@ class PDF::Content::Image::PNG
     has Header $.hdr;
     has Blob $.palette is rw;
     has Blob $.trns is rw;
-    has Blob $.stream .= new;
+    has Blob $.stream;
     constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
     constant \NullPointer = nativecast(CArray,Pointer.new(0));
 
@@ -47,9 +47,12 @@ class PDF::Content::Image::PNG
     method read($fh = $.source) {
 
         my Str $header = $fh.read(8).decode('latin-1');
-
         die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :path($fh.path) )
             unless $header eq PNG-Header;
+
+        $!stream  = Nil;
+        $!palette = Nil;
+        $!trns    = Nil;
 
         while !$fh.eof {
             my Quad $len .= read($fh);
@@ -75,6 +78,7 @@ class PDF::Content::Image::PNG
                     $!palette = $buf;
                 }
                 when 'IDAT' {
+                    $!stream //= buf8.new;
                     $!stream.append: $buf.list;
                 }
                 when 'tRNS' {
