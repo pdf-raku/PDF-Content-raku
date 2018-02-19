@@ -137,17 +137,6 @@ class PDF::Content::Text::Block {
 
     }
 
-    method place-images($gfx) {
-        # flow any xobject images
-        for self.images {
-            $gfx.Save;
-            $gfx.ConcatMatrix(|.<Tm>);
-            .<xobject>.finish;
-            $gfx.XObject($gfx.resource-key(.<xobject>));
-            $gfx.Restore;
-        }
-    }
-
     sub flush-space(@words) returns Bool {
         my Bool \flush = ? (@words && @words[0] ~~ /<Text::space>/);
         @words.shift if flush;
@@ -225,10 +214,9 @@ class PDF::Content::Text::Block {
         # compute text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
-            @Tm[4] += $x-shift + .<Tx>;
+            @Tm[4] += $x-shift + .<Tx> + $.TextRise;
             @Tm[5] += $y-shift + .<Ty>;
             .<Tm> = @Tm;
-	    .<Tr> = $.TextRise;
         }
 
         my $leading = $gfx.TextLeading;
@@ -261,6 +249,18 @@ class PDF::Content::Text::Block {
 	}
 
 	@content;
+    }
+
+    # flow any xobject images. This needs to be done
+    # after rendering and exiting text block
+    method place-images($gfx) {
+        for self.images {
+            $gfx.Save;
+            $gfx.ConcatMatrix(|.<Tm>);
+            .<xobject>.finish;
+            $gfx.XObject($gfx.resource-key(.<xobject>));
+            $gfx.Restore;
+        }
     }
 
 }
