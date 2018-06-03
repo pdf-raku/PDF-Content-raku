@@ -117,6 +117,7 @@ class PDF::Content::Ops {
     has Bool $.comment-ops is rw = False;
     has Bool $.strict is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
+    has Bool $!checking = True;
 
     # some convenient mnemomic names
     my Str enum OpCode is export(:OpCode) «
@@ -407,10 +408,11 @@ class PDF::Content::Ops {
 
         with %Transition{$op} {
             $ok-here ||= ?(.key == $!context);
+            $!checking = True if $ok-here;
             $!context = .value;
         }
 
-        if !$ok-here && $.strict {
+        if !$ok-here && $!strict && $!checking {
             # Found an op we didn't expect. Raise a warning.
             my $type;
             my $where;
@@ -436,6 +438,7 @@ class PDF::Content::Ops {
                 }
             }
             warn X::PDF::Content::OP::Unexpected.new: :$type, :$op, :mnemonic(%OpName{$op}), :$where;
+            $!checking = False;
         }
     }
 
