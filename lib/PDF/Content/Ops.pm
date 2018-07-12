@@ -207,7 +207,7 @@ class PDF::Content::Ops {
 	:MiterJoin(0) :RoundJoin(1) :BevelJoin(2)
     »;
 
-    method graphics-accessor($att, $setter) {
+    method graphics-accessor($att, $setter) is rw {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,*@v) {
@@ -216,7 +216,7 @@ class PDF::Content::Ops {
             });
     }
 
-    method ext-graphics-accessor($att, $key) {
+    method ext-graphics-accessor($att, $key) is rw {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,\v) {
@@ -322,7 +322,7 @@ class PDF::Content::Ops {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
                     if $key ~~ /^ Device(RGB|Gray|CMYK) $/ {
-                        my $cs = ~ $0;
+                        my Str $cs = ~ $0;
                         self."SetStroke$cs"(|.value);
                     }
                     else {
@@ -343,7 +343,7 @@ class PDF::Content::Ops {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!FillColorSpace && .value eqv @!FillColor {
                     if $key ~~ /^ Device(RGB|Gray|CMYK) $/ {
-                        my $cs = ~ $0;
+                        my Str $cs = ~ $0;
                         self."SetFill$cs"(|.value);
                     }
                     else {
@@ -777,7 +777,7 @@ class PDF::Content::Ops {
         @!StrokeColor = [ c, m, y, k ];
     }
 
-    method !check-color-args($op, $cs, @scn) {
+    method !check-color-args($op, Str $cs, @scn) {
         my \arity = do given $cs {
             when 'DeviceGray'|'CalGray'|'Indexed' { 1 }
             when 'DeviceRGB'|'CalRGB'|'Lab'  { 3 }

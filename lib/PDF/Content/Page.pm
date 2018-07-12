@@ -69,7 +69,7 @@ role PDF::Content::Page
         $xobject;
     }
 
-    method decoded {
+    method decoded is rw {
         Proxy.new(
             FETCH => sub ($) { self.contents },
             STORE => sub ($,$decoded) {

@@ -100,7 +100,7 @@ class PDF::Content::Font::Enc::Type1 {
         buf16.new: $encoded.ords.map({@!to-unicode[$_]}).grep: {$_};
     }
 
-    method differences {
+    method differences is rw {
         Proxy.new(
             STORE => sub ($, @differences) {
                 my %glyph-map := self.glyph-map;
