@@ -7,6 +7,7 @@ role PDF::Content::PageTree
 
     use PDF::Content::PageNode;
     use PDF::COS;
+    my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids;
 
     #| add new last page
     method add-page( PDF::Content::PageNode $page? is copy ) {
@@ -54,7 +55,7 @@ role PDF::Content::PageTree
     }
 
     #| terminal page node - no children
-    multi method page(Int $page-num where { self.Count == + self.Kids && $_ <= + self.Kids}) {
+    multi method page(Int $page-num where { self ~~ LeafNode && $_ <= + self.Kids}) {
         self.Kids[$page-num - 1];
     }
 
@@ -86,6 +87,25 @@ role PDF::Content::PageTree
 
     multi method page(Int $page-num) is default {
 	die "no such page: $page-num";
+    }
+
+    # build an flattened index of indirect references to pages
+    method page-index {
+        my @index;
+        if self ~~ LeafNode {
+            @index = self.Kids.values
+        }
+        else {
+            my $kids = self.Kids;
+            for 0 ..^ + $kids {
+                given $kids[$_] {
+                    when PDF::Content::PageTree { @index.append: .page-index }
+                    when PDF::Content::PageNode { @index.push: .ind-ref }
+                    default { die "unexpected object in page tree: {.perl}"; }
+                }
+            }
+        }
+        @index;
     }
 
     #| delete page from page tree
