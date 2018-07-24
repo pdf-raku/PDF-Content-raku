@@ -72,7 +72,7 @@ class t::PDFTiny is PDF {
 	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], :Count(0), } };
     }
 
-    for <page add-page page-count> {
-        $?CLASS.^add_method($_,  method (|a) { self.Root.Pages."$_"(|a) });
+    method Pages handles <page add-page page-count> {
+        self.Root.Pages;
     }
 }

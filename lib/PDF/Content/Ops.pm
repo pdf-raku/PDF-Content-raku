@@ -673,7 +673,7 @@ class PDF::Content::Ops {
                     for @!callback;
             }
             opn.value.push: (:comment(%OpName{$op}))
-                if $!comment-ops;
+                if $!comment-ops && $op ne 'ID';
         }
 	opn;
     }

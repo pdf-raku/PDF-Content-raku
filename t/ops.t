@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 103;
+plan 104;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -200,6 +200,7 @@ is-json-equiv $g.ops[*-3], {:BI[:dict{
 is-json-equiv [$g.ops[*-2]<ID>[0]<encoded>.lines], @image-lines, 'Image ID';
 is-json-equiv $g.ops[*-1], (:EI[]), 'Image EI';
 
+lives-ok {$g.content-dump}, 'can write image data';
 my @inline-images = $g.inline-images;
 
 is-json-equiv @inline-images, [{:BitsPerComponent(8), :ColorSpace<RGB>, :Filter<A85 LZW>, :Height(17), :Width(17),
