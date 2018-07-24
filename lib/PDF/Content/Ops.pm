@@ -113,7 +113,7 @@ class PDF::Content::Ops {
     use PDF::COS::Util :from-ast;
 
     has Routine @.callback is rw;
-    has Pair @!ops;
+    has Pair @.ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
@@ -145,7 +145,7 @@ class PDF::Content::Ops {
         :MoveShowText<'>
     »;
 
-    my constant %OpName = OpCode.enums.invert.Hash;
+    my constant %OpName is export(:OpName) = OpCode.enums.invert.Hash;
 
     # See [PDF 1.7 TABLE 4.1 Operator categories]
     my constant GeneralGraphicOps = set <w J j M d ri i gs>;
