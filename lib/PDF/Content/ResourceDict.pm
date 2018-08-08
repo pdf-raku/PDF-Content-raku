@@ -10,8 +10,8 @@ role PDF::Content::ResourceDict {
     has Int %!counter;
 
     method resource-key($object, |c --> Str:D) {
-        $.resource($object, |c)
-            unless %!resource-key{$object.WHICH};
+        self!register-resource($object, |c)
+            unless %!resource-key{$object.WHICH}:exists;
        %!resource-key{$object.WHICH};
     }
 
@@ -84,7 +84,7 @@ role PDF::Content::ResourceDict {
         $object;
     }
 
-    multi method resource($object where %!resource-key{.WHICH} ) {
+    multi method resource($object where { %!resource-key{.WHICH}:exists }) {
 	$object;
     }
 
