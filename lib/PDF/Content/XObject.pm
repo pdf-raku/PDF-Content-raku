@@ -6,8 +6,17 @@ role PDF::Content::XObject {
 
     my subset XObjectType of Str where 'Form'|'Image'|'PS';
 
-    method open(\source = self, |c) {
-        my PDF::Content::Image $image-obj .= load(source, |c);
+    #| load from in-memory data
+    multi method open(
+        PDF::Content::Image::IOish :$source!,
+        Str :$image-type!,
+       ) {
+        self.open: PDF::Content::Image.make-data-uri( :$source, :$image-type);
+    }
+
+    #| load from a file or data-uri
+    multi method open(\fh = self, |c) is default {
+        my PDF::Content::Image $image-obj .= load(fh, |c);
         $image-obj.read;
         my PDF::COS::Stream $xobject = $image-obj.to-dict;
         my XObjectType $sub-type = $xobject<Subtype>;

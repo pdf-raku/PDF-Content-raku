@@ -80,8 +80,5 @@ class PDF::Content::Image::JPEG
         PDF::COS.coerce: :stream{ :%dict, :$!encoded };
     }
 
-    method open(PDF::Content::Image::IOish $fh) {
-        self.load-image: :$fh, :image-type<JPEG>, :class(self);
-    }
 }
 

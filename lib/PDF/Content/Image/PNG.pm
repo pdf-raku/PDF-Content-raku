@@ -309,9 +309,6 @@ class PDF::Content::Image::PNG
 	PDF::COS.coerce: :stream{ :%dict, :$decoded };
     }
 
-    method open(PDF::Content::Image::IOish $fh) {
-        self.load-image: :$fh, :image-type<PNG>, :class(self);
-    }
 }
 
 =begin rfc

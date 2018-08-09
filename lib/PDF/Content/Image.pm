@@ -83,23 +83,28 @@ class PDF::Content::Image {
         self!image-handler(:$image-type).new: :$source, :$image-type;
     }
 
+    method make-data-uri(Str :$image-type!, :$source!) {
+        with $source {
+            use Base64::Native;
+            my Blob $bytes = .isa(Str)
+                ?? .encode("latin-1")
+                !! .path.IO.slurp(:bin);
+            my $class = $image-type.lc eq 'pdf' ?? 'application' !! 'image';
+            my $enc = base64-encode($bytes.decode("latin-1"), :str, :enc<latin-1>);
+            'data:%s/%s;base64,%s'.sprintf($class, $image-type.lc, $enc);
+        }
+        else {
+            fail 'image is not associated with a source';
+        }
+    }
+
     method data-uri is rw {
         Proxy.new(
             FETCH => sub ($) {
-                $!data-uri //= do with $!source {
-		    use Base64::Native;
-		    my Blob $bytes = .isa(Str)
-			?? .encode("latin-1")
-			!! .path.IO.slurp(:bin);
-		    my $enc = base64-encode($bytes.decode("latin-1"), :str, :enc<latin-1>);
-		    'data:image/%s;base64,%s'.sprintf($.image-type.lc, $enc);
-		}
-		else {
-		    fail 'image is not associated with a source';
-		}
+                $!data-uri //= $.make-data-uri( :$.image-type, :$!source );
             },
             STORE => sub ($, $!data-uri) {},
-           )
+        )
     }
 
     method open(|c) {
