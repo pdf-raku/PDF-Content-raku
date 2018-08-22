@@ -54,11 +54,6 @@ role PDF::Content::PageTree
         self.add-page;
     }
 
-    #| terminal page node - no children
-    multi method page(Int $page-num where { self ~~ LeafNode && $_ <= + self.Kids}) {
-        self.Kids[$page-num - 1];
-    }
-
     #| traverse page tree
     multi method page(Int $page-num where { 0 < $_ <= self<Count> }) {
         my Int $page-count = 0;
