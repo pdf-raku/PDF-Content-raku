@@ -1,13 +1,14 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.2.3>
+class PDF::Content:ver<0.2.4>
     is PDF::Content::Ops {
 
     use PDF::COS;
     use PDF::COS::Stream;
     use PDF::Content::Text::Block;
     use PDF::Content::XObject;
+    use PDF::Content::Tag;
 
     method TWEAK(:$strict) {
         self.strict = $_ with $strict;
@@ -27,8 +28,14 @@ class PDF::Content:ver<0.2.3>
         ret
     }
 
-    multi method marked-content( Str $tag, Hash $dict, &do-stuff! ) {
-        $.BeginMarkedContentDict($tag, $dict);
+    multi method marked-content(PDF::Content::Tag $_, &do-stuff) {
+        samewith( .tag, :props(.props), &do-stuff);
+    }
+
+    multi method marked-content( Str $tag,
+                                 &do-stuff!,
+                                 Hash :$props! where .so) {
+        $.BeginMarkedContentDict($tag, $props);
         my \ret = &do-stuff(self);
         $.EndMarkedContent;
         ret;

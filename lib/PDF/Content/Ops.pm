@@ -109,8 +109,10 @@ class X::PDF::Content::UnknownResource
 class PDF::Content::Ops {
 
     use PDF::Writer;
+    use PDF::COS;
+    use PDF::COS::Util :from-ast, :to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
-    use PDF::COS::Util :from-ast;
+    use PDF::Content::Tag;
 
     has Routine @.callback is rw;
     has Pair @.ops;
@@ -366,7 +368,8 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     has @.gsave;
-    has Pair @.tags;
+    has PDF::Content::Tag @!open-tags;
+    has PDF::Content::Tag @.tags;
 
     # *** Type 3 Font Metrics ***
 
@@ -488,8 +491,12 @@ class PDF::Content::Ops {
         },
 
         # name dict              BDC | DP
-        'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str) {
-            my Pair $prop = $p ~~ Hash ?? :dict($p) !! :name($p);
+        'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str|Pair) {
+            my Pair $prop = do given $p {
+                when Hash { PDF::COS.coerce(:dict($p)).content }
+                when Str  { :name($p) }
+                default { $_ }
+            }
             [ :$name, $prop ]
         },
 
@@ -644,15 +651,15 @@ class PDF::Content::Ops {
     multi method op(*@args is copy) {
         $!content-cache = Nil;
         my \opn = op(|@args);
-	my Str $op;
-
-        if opn ~~ Pair {
-	    $op = opn.key.Str;
-	    @args = opn.value.map: *.value;
-	}
-	else {
-	    $op = opn.Str;
-	}
+	my Str $op = do given opn {
+            when Pair {
+                @args = .value.map: *.value;
+                .key.Str
+            }
+            default {
+                .Str;
+            }
+        }
 
         if $!strict && !@!gsave && self.is-graphics-op($op) {
             # not illegal just bad practice to perform graphics outside of a
@@ -663,11 +670,18 @@ class PDF::Content::Ops {
 
 	@!ops.push(opn);
         unless $op ~~ Comment {
+            # built-in callbacks
             self!track-context($op);
             self.track-graphics($op, |@args );
+
+            # user supplied callbacks
 	    if @!callback {
-                 # cook a little more
-                 my @params = @args.map: { .isa(List) ?? [ .map: *.value ] !! $_ };
+                # cook hash and array values (only go down one level)
+                my @params = @args.map: {
+                    when List { [ .map: *.value ] }
+                    when Hash { [ .map: {.key => .value .value} ] }
+                    default { $_ }
+                }
                 my $*gfx = self;
                 .($op, |@params )
                     for @!callback;
@@ -808,15 +822,29 @@ class PDF::Content::Ops {
         @!StrokeColor = @colors;
     }
     multi method track-graphics('BMC', Str $name!) {
-	@!tags.push: 'BMC' => [$name];
+        my PDF::Content::Tag $tag .= new: :op<BMC>, :$name, :start(+@!ops);
+        with @!open-tags.tail {
+            .children.push: $tag;
+            $tag.parent = $_;
+        }
+	@!open-tags.push: $tag;
     }
-    multi method track-graphics('BDC', Str $name, $p where Hash|Str) {
-	@!tags.push: 'BDC' => [$name, $p];
+    multi method track-graphics('BDC', Str $name, $p where Hash|Str|Pair) {
+        my $props = $p ~~ Str ?? .resource-entry($p) !! PDF::COS.coerce($p);
+        my PDF::Content::Tag $tag .= new: :op<BDC>, :$name, :start(+@!ops), :$props;
+        with @!open-tags.tail {
+            .children.push: $tag;
+            $tag.parent = $_;
+        }
+	@!open-tags.push: $tag;
     }
     multi method track-graphics('EMC') {
 	die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
-	    unless @!tags;
-	@!tags.pop;
+	    unless @!open-tags;
+	my PDF::Content::Tag $tag = @!open-tags.pop;
+        $tag.end = +@!ops;
+        @!tags.push: $tag
+            without $tag.parent;
     }
     multi method track-graphics('gs', Str $key) {
         with self.parent {
@@ -864,8 +892,8 @@ class PDF::Content::Ops {
     }
 
     method finish {
-	die X::PDF::Content::Unclosed.new: :message("Unclosed @!tags[] at end of content stream")
-	    if @!tags;
+	die X::PDF::Content::Unclosed.new: :message("Unclosed @!open-tags[] at end of content stream")
+	    if @!open-tags;
 	die X::PDF::Content::Unclosed.new: :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream")
 	    if @!gsave;
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")

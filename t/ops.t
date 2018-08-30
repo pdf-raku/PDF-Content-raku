@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 104;
+plan 105;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -48,9 +48,11 @@ is-deeply $g.StrokeColor, (:DeviceRGB[.4, .5, .6]), '$g.StrokeColor - updated ag
 
 lives-ok { $g.op('SCN', .2, .3, .4) }, 'SCN (/DeviceRGB)';
 
-lives-ok { $g.BeginMarkedContentDict('PlacedGraphic', 'MC0') }, '$g.BeginMarkedContent';
+lives-ok { $g.BeginMarkedContentDict('P', ${ :MCID(42) }) }, '$g.BeginMarkedContent';
 is-deeply $g.MoveShowText("move-show-text"), ("'" => [ :literal<move-show-text> ] ), 'MoveShowText';
 lives-ok { $g.EndMarkedContent }, '$g.EndMarkedContent';
+
+is $g.tags[0].gist, '<P/>', 'tags';
 
 $g.StrokeColor = :DeviceN[.7, .8];
 is-deeply $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';
