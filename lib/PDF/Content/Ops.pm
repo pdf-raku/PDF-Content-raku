@@ -311,7 +311,7 @@ class PDF::Content::Ops {
     has UInt    $.LineCap     is graphics(method ($!LineCap) {}) is rw = ButtCaps;
     has UInt    $.LineJoin    is graphics(method ($!LineJoin) {}) is rw = MiterJoin;
     has         @.DashPattern is graphics(method (Array $a, Numeric $p ) {
-                                               @!DashPattern = [ [$a.map: *.value], $p]; 
+                                               @!DashPattern = [ $a, $p];
                                            }) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
 
@@ -672,18 +672,23 @@ class PDF::Content::Ops {
         unless $op ~~ Comment {
             # built-in callbacks
             self!track-context($op);
+
+            if $op ~~ 'BDC'|'DP'|'TJ'|'d' {
+                # operation may array or dict operands
+                @args = @args.map: {
+                    when List { [ .map: *.value ] }
+                    when Hash { %( .map: {.key => .value .value} ) }
+                    default { $_ }
+                }
+            }
+
             self.track-graphics($op, |@args );
 
             # user supplied callbacks
 	    if @!callback {
                 # cook hash and array values (only go down one level)
-                my @params = @args.map: {
-                    when List { [ .map: *.value ] }
-                    when Hash { [ .map: {.key => .value .value} ] }
-                    default { $_ }
-                }
                 my $*gfx = self;
-                .($op, |@params )
+                .($op, |@args )
                     for @!callback;
             }
             opn.value.push: (:comment(%OpName{$op}))
@@ -822,16 +827,16 @@ class PDF::Content::Ops {
         @!StrokeColor = @colors;
     }
     multi method track-graphics('BMC', Str $name!) {
-        my PDF::Content::Tag $tag .= new: :op<BMC>, :$name, :start(+@!ops);
+        my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops);
         with @!open-tags.tail {
             .children.push: $tag;
             $tag.parent = $_;
         }
 	@!open-tags.push: $tag;
     }
-    multi method track-graphics('BDC', Str $name, $p where Hash|Str|Pair) {
-        my $props = $p ~~ Str ?? .resource-entry($p) !! PDF::COS.coerce($p);
-        my PDF::Content::Tag $tag .= new: :op<BDC>, :$name, :start(+@!ops), :$props;
+    multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
+        my $props = $p ~~ Str ?? $.resource-entry($p) !! $p;
+        my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops), :$props;
         with @!open-tags.tail {
             .children.push: $tag;
             $tag.parent = $_;
@@ -845,6 +850,27 @@ class PDF::Content::Ops {
         $tag.end = +@!ops;
         @!tags.push: $tag
             without $tag.parent;
+    }
+    multi method track-graphics('MP', Str $name!) {
+        my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops) :end(+@!ops);
+        with @!open-tags.tail {
+            .children.push: $tag;
+            $tag.parent = $_;
+        }
+        else {
+            @!tags.push: $tag
+        }
+    }
+    multi method track-graphics('DP', Str $name!, $p where Str|Hash|Pair) {
+        my $props = $p ~~ Str ?? $.resource-entry($p) !! $p;
+        my PDF::Content::Tag $tag .= new: :$name, :$props, :start(+@!ops) :end(+@!ops);
+        with @!open-tags.tail {
+            .children.push: $tag;
+            $tag.parent = $_;
+        }
+        else {
+            @!tags.push: $tag
+        }
     }
     multi method track-graphics('gs', Str $key) {
         with self.parent {
@@ -883,12 +909,12 @@ class PDF::Content::Ops {
     multi method track-graphics('"', $!WordSpacing, $!CharSpacing, $) {
         self!new-line();
     }
-    multi method track-graphics($op, *@args) is default {
-        .(self,|@args) with %PostOp{$op};
-    }
     multi method track-graphics('d0', $!char-width, $!char-height) {
     }
     multi method track-graphics('d1', $!char-width, $!char-height, *@!char-bbox) {
+    }
+    multi method track-graphics($op, *@args) is default {
+        .(self,|@args) with %PostOp{$op};
     }
 
     method finish {

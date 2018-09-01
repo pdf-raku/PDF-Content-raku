@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 9;
+plan 10;
 
 use PDF::Content;
 use PDF::Grammar::Test :is-json-equiv;
@@ -37,13 +37,16 @@ my $props = { :MCID(42) };
 $g .= new: :$parent;
 $g.marked-content: 'Foo', :$props, {
    .marked-content: 'Nested',  sub ($) { };
+   $g.MarkPoint('A');
 };
 $g.marked-content: 'Bar', sub ($) { };
+$g.MarkPointDict('B', ${ :MCID(99) });
 
 my Array $tags = $g.tags;
-is +$tags, 2, 'top level tags';
-is $tags[0].gist, '<Foo><Nested/></Foo>';
+is +$tags, 3, 'top level tags';
+is $tags[0].gist, '<Foo><Nested/><A/></Foo>';
 is $tags[1].gist, '<Bar/>';
+is $tags[2].gist, '<B/>';
 
 is $tags[0].mcid, 42, 'marked content id';
 $tags[1].mcid = 99;

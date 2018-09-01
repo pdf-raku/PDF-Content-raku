@@ -20,9 +20,9 @@ class PDF::Content::Tag {
     }
     method gist {
         @!children
-        ?? [~] "<{$.name}>",
-            @!children.map(*.gist),
-            "</{$.name}>"
+        ?? [~] flat("<{$.name}>",
+                    @!children.map(*.gist),
+                    "</{$.name}>")
         !! "<{$.name}/>";
     }
 }
