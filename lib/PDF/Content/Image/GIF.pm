@@ -110,7 +110,7 @@ class PDF::Content::Image::GIF
 
         $!descr .= read: $fh;
 
-        with $!descr.flags -> uint8 $flags {
+        given $!descr.flags -> uint8 $flags {
             self!read-colorspace($fh, $flags)
                 if $flags +& 0x80;
         }
@@ -123,7 +123,7 @@ class PDF::Content::Image::GIF
                     my Bool $interlaced = False;
                     $!img .= read: $fh;
 
-                    with $!img.flags -> uint8 $flags {
+                    given $!img.flags -> uint8 $flags {
                         self!read-colorspace($fh, $flags)
                             if $flags +& 0x80; # local colormap
 
@@ -182,12 +182,14 @@ class PDF::Content::Image::GIF
 
     method to-dict(Bool :$trans = True) {
         need PDF::COS;
+
         my %dict = ( :Type( :name<XObject> ),
                      :Subtype( :name<Image> ),
                      :Width( self.width),
                      :Height( self.height),
                      :BitsPerComponent(8),
             );
+
         with $!color-table {
             my $cols = .elems div 3;
             my $encoded = $!color-table.decode("latin-1");
@@ -200,7 +202,7 @@ class PDF::Content::Image::GIF
         }
 
         if $trans & $!gc.defined {
-            with $!gc.cFlags -> uint8 $cFlags {
+            given $!gc.cFlags -> uint8 $cFlags {
                 my uint8 $transIndex = $!gc.transIndex;
                 %dict<Mask> = [$transIndex, $transIndex]
                     if $cFlags +& 0x01;

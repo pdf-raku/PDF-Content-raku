@@ -38,8 +38,8 @@ class PDF::Content::Image::JPEG
             last if $len < 2;
             last if $fh.eof;
 
-            my $buf = $fh.read: $len - 2;
-            with $hdr.mark -> uint8 $mark {
+            my $buf := $fh.read: $len - 2;
+            given $hdr.mark -> uint8 $mark {
                 if 0xC0 <= $mark <= 0xCF
                 && $mark !~~ 0xC4|0xC8|0xCC {
                     $!is-dct = ?( $mark ~~ 0xC0|0xC2);
