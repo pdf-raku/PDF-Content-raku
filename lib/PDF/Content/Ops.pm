@@ -311,7 +311,7 @@ class PDF::Content::Ops {
     has UInt    $.LineCap     is graphics(method ($!LineCap) {}) is rw = ButtCaps;
     has UInt    $.LineJoin    is graphics(method ($!LineJoin) {}) is rw = MiterJoin;
     has         @.DashPattern is graphics(method (Array $a, Numeric $p ) {
-                                               @!DashPattern = [ $a, $p];
+                                               @!DashPattern = [ $a.clone, $p];
                                            }) is rw = [[], 0];
     my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
 
@@ -670,23 +670,22 @@ class PDF::Content::Ops {
 
 	@!ops.push(opn);
         unless $op ~~ Comment {
-            # built-in callbacks
-            self!track-context($op);
 
             if $op ~~ 'BDC'|'DP'|'TJ'|'d' {
-                # operation may array or dict operands
+                # operation may have array or dict operands
                 @args = @args.map: {
                     when List { [ .map: *.value ] }
-                    when Hash { %( .map: {.key => .value .value} ) }
+                    when Hash { %( .map: {.key => .value.value} ) }
                     default { $_ }
                 }
             }
 
+            # built-in callbacks
+            self!track-context($op);
             self.track-graphics($op, |@args );
 
             # user supplied callbacks
 	    if @!callback {
-                # cook hash and array values (only go down one level)
                 my $*gfx = self;
                 .($op, |@args )
                     for @!callback;
@@ -716,19 +715,17 @@ class PDF::Content::Ops {
     method parse(Str $content) {
 	use PDF::Grammar::Content::Fast;
 	use PDF::Grammar::Content::Actions;
-	state $actions //= PDF::Grammar::Content::Actions.new: :strict;
+	state $actions = PDF::Grammar::Content::Actions.new: :strict;
 	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
 	    // die X::PDF::Content::ParseError.new :$content;
 	p.ast
     }
 
     multi method track-graphics('q') {
-        my @Tm = @!TextMatrix;
-        my @CTM = @!CTM;
-        my @Dp = @!DashPattern;
-        my @Sc = @!StrokeColor;
-        my @Fc = @!FillColor;
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@Tm, :@CTM, :@Dp, :$!StrokeColorSpace, :$!FillColorSpace, :@Sc, :@Fc, :$!StrokeAlpha, :$!FillAlpha, :$!RenderingIntent, :$!Flatness;
+        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@!TextMatrix, :@!CTM, :@!DashPattern, :$!StrokeColorSpace, :$!FillColorSpace, :@!StrokeColor, :@!FillColor, :$!StrokeAlpha, :$!FillAlpha, :$!RenderingIntent, :$!Flatness;
+        for %gstate.values {
+            $_ = .clone if $_ ~~ Array;
+        }
         # todo - get this trait driven
         ## for %GraphicVars.pairs {
         ##    %gstate{.key} = .value.get_value(.value, self);
@@ -739,34 +736,34 @@ class PDF::Content::Ops {
         die X::PDF::Content::OP::BadNesting.new: :op<Q>, :mnemonic(%OpName<Q>), :opener("'q' (%OpName<q>)")
             unless @!gsave;
         my %gstate = @!gsave.pop;
-        $!CharSpacing  = %gstate<CharSpacing>;
-        $!WordSpacing  = %gstate<WordSpacing>;
-        $!HorizScaling = %gstate<HorizScaling>;
-        $!TextLeading  = %gstate<TextLeading>;
-        $!TextRender   = %gstate<TextRender>;
-        $!TextRise     = %gstate<TextRise>;
-        $!Font         = %gstate<Font>;
-        $!LineWidth    = %gstate<LineWidth>;
-        $!LineCap      = %gstate<LineCap>;
-        $!LineJoin     = %gstate<LineJoin>;
-        @!TextMatrix   = %gstate<Tm>.list;
-        @!CTM          = %gstate<CTM>.list;
-        @!DashPattern  = %gstate<Dp>.list;
-        @!StrokeColor  = %gstate<Sc>.list;
-        @!FillColor   = %gstate<Fc>.list;
+        $!CharSpacing      = %gstate<CharSpacing>;
+        $!WordSpacing      = %gstate<WordSpacing>;
+        $!HorizScaling     = %gstate<HorizScaling>;
+        $!TextLeading      = %gstate<TextLeading>;
+        $!TextRender       = %gstate<TextRender>;
+        $!TextRise         = %gstate<TextRise>;
+        $!Font             = %gstate<Font>;
+        $!LineWidth        = %gstate<LineWidth>;
+        $!LineCap          = %gstate<LineCap>;
+        $!LineJoin         = %gstate<LineJoin>;
+        @!TextMatrix       = %gstate<TextMatrix>.list;
+        @!CTM              = %gstate<CTM>.list;
+        @!DashPattern      = %gstate<DashPattern>.list;
+        @!StrokeColor      = %gstate<StrokeColor>.list;
+        @!FillColor        = %gstate<FillColor>.list;
         $!StrokeColorSpace = %gstate<StrokeColorSpace>;
-        $!FillColorSpace = %gstate<FillColorSpace>;
-        $!StrokeAlpha = %gstate<StrokeAlpha>;
-        $!FillAlpha = %gstate<FillAlpha>;
-        $!RenderingIntent = %gstate<RenderingIntent>;
-        $!Flatness = %gstate<Flatness>;
+        $!FillColorSpace   = %gstate<FillColorSpace>;
+        $!StrokeAlpha      = %gstate<StrokeAlpha>;
+        $!FillAlpha        = %gstate<FillAlpha>;
+        $!RenderingIntent  = %gstate<RenderingIntent>;
+        $!Flatness         = %gstate<Flatness>;
 	Restore;
     }
     multi method track-graphics('BT') {
-        @!TextMatrix =  [ 1, 0, 0, 1, 0, 0, ];
+        @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
     multi method track-graphics('ET') {
-        @!TextMatrix =  [ 1, 0, 0, 1, 0, 0, ];
+        @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
         @!CTM = multiply([a, b, c, d, e, f], @!CTM);
