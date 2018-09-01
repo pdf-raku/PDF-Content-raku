@@ -829,8 +829,7 @@ class PDF::Content::Ops {
     multi method track-graphics('BMC', Str $name!) {
         my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops);
         with @!open-tags.tail {
-            .children.push: $tag;
-            $tag.parent = $_;
+            .add-kid: $tag;
         }
 	@!open-tags.push: $tag;
     }
@@ -838,8 +837,7 @@ class PDF::Content::Ops {
         my $props = $p ~~ Str ?? $.resource-entry($p) !! $p;
         my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops), :$props;
         with @!open-tags.tail {
-            .children.push: $tag;
-            $tag.parent = $_;
+            .add-kid: $tag;
         }
 	@!open-tags.push: $tag;
     }
@@ -854,8 +852,7 @@ class PDF::Content::Ops {
     multi method track-graphics('MP', Str $name!) {
         my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops) :end(+@!ops);
         with @!open-tags.tail {
-            .children.push: $tag;
-            $tag.parent = $_;
+            .add-kid: $tag;
         }
         else {
             @!tags.push: $tag
@@ -865,8 +862,7 @@ class PDF::Content::Ops {
         my $props = $p ~~ Str ?? $.resource-entry($p) !! $p;
         my PDF::Content::Tag $tag .= new: :$name, :$props, :start(+@!ops) :end(+@!ops);
         with @!open-tags.tail {
-            .children.push: $tag;
-            $tag.parent = $_;
+            .add-kid: $tag;
         }
         else {
             @!tags.push: $tag
@@ -918,7 +914,7 @@ class PDF::Content::Ops {
     }
 
     method finish {
-	die X::PDF::Content::Unclosed.new: :message("Unclosed @!open-tags[] at end of content stream")
+	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@!open-tags.map(*.gist).join: ' '} at end of content stream")
 	    if @!open-tags;
 	die X::PDF::Content::Unclosed.new: :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream")
 	    if @!gsave;

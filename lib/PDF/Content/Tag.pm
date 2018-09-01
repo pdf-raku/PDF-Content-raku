@@ -6,9 +6,13 @@ class PDF::Content::Tag {
     has UInt $.start;
     has UInt $.end is rw;
     has PDF::Content::Tag $.parent is rw;
-    has PDF::Content::Tag @.children is rw handles<push AT-POS>;
+    has PDF::Content::Tag @.children handles<AT-POS>;
     submethod TWEAK(:$mcid) {
         $!props<MCID> = $_ with $mcid;
+    }
+    method add-kid(PDF::Content::Tag $kid) {
+        @!children.push: $kid;
+        $kid.parent = self;
     }
     method mcid is rw {
         Proxy.new(
