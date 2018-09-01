@@ -592,7 +592,7 @@ class PDF::Content::Ops {
             my Str $name = @args.pop
                 if @args.tail ~~ Str;
 
-            @args = @args.map({ 
+            @args = @args.map({
                 when Pair    {$_}
                 when Numeric { :real($_) }
                 default {
@@ -834,7 +834,7 @@ class PDF::Content::Ops {
 	@!open-tags.push: $tag;
     }
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
-        my $props = $p ~~ Str ?? $.resource-entry($p) !! $p;
+        my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
         my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops), :$props;
         with @!open-tags.tail {
             .add-kid: $tag;
@@ -858,8 +858,8 @@ class PDF::Content::Ops {
             @!tags.push: $tag
         }
     }
-    multi method track-graphics('DP', Str $name!, $p where Str|Hash|Pair) {
-        my $props = $p ~~ Str ?? $.resource-entry($p) !! $p;
+    multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
+        my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
         my PDF::Content::Tag $tag .= new: :$name, :$props, :start(+@!ops) :end(+@!ops);
         with @!open-tags.tail {
             .add-kid: $tag;
