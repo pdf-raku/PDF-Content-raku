@@ -145,8 +145,11 @@ class PDF::Content:ver<0.2.4>
         };
     }
 
-    method use-pattern(PDF::COS::Stream $pat! where .<Type> eq 'Pattern' --> Pair) {
-        $pat.finish;
+    my subset Pattern of Hash where .<PatternType> ~~ 1|2;
+    my subset TilingPattern of Pattern where .<PatternType> == 1;
+    method use-pattern(Pattern $pat!) {
+        $pat.finish
+            if $pat ~~ TilingPattern;
         :Pattern(self.resource-key($pat));
     }
 
