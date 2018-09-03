@@ -827,7 +827,7 @@ class PDF::Content::Ops {
         @!StrokeColor = @colors;
     }
     multi method track-graphics('BMC', Str $name!) {
-        my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops);
+        my PDF::Content::Tag $tag .= new: :op<BMC>, :$name, :start(+@!ops);
         with @!open-tags.tail {
             .add-kid: $tag;
         }
@@ -835,7 +835,7 @@ class PDF::Content::Ops {
     }
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
         my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops), :$props;
+        my PDF::Content::Tag $tag .= new: :op<BDC>, :$name, :start(+@!ops), :$props;
         with @!open-tags.tail {
             .add-kid: $tag;
         }
@@ -850,7 +850,7 @@ class PDF::Content::Ops {
             without $tag.parent;
     }
     multi method track-graphics('MP', Str $name!) {
-        my PDF::Content::Tag $tag .= new: :$name, :start(+@!ops) :end(+@!ops);
+        my PDF::Content::Tag $tag .= new: :op<MP>, :$name, :start(+@!ops) :end(+@!ops);
         with @!open-tags.tail {
             .add-kid: $tag;
         }
@@ -860,7 +860,7 @@ class PDF::Content::Ops {
     }
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
         my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        my PDF::Content::Tag $tag .= new: :$name, :$props, :start(+@!ops) :end(+@!ops);
+        my PDF::Content::Tag $tag .= new: :op<DP>, :$name, :$props, :start(+@!ops) :end(+@!ops);
         with @!open-tags.tail {
             .add-kid: $tag;
         }
@@ -868,6 +868,15 @@ class PDF::Content::Ops {
             @!tags.push: $tag
         }
     }
+    multi method track-graphics('Do', Str $name!) {
+        my PDF::Content::Tag $tag .= new: :op<Do>, :$name, :start(+@!ops) :end(+@!ops);
+        with @!open-tags.tail {
+            .add-kid: $tag;
+        }
+        else {
+            @!tags.push: $tag
+        }
+     }
     multi method track-graphics('gs', Str $key) {
         with self.parent {
             with .resource-entry('ExtGState', $key) {

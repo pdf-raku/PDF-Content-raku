@@ -1,7 +1,8 @@
 use v6;
 
 class PDF::Content::Tag {
-    has Str $.name;
+    has Str $.op is required;
+    has Str $.name is required;
     has Hash $.props;
     has UInt $.start;
     has UInt $.end is rw;
