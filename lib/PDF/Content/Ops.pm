@@ -456,6 +456,7 @@ class PDF::Content::Ops {
 
         'EI' => sub ($op) { $op => [] },
 
+        # unary operators
         'BT'|'ET'|'EMC'|'BX'|'EX'|'b*'|'b'|'B*'|'B'|'f*'|'F'|'f'
             |'h'|'n'|'q'|'Q'|'s'|'S'|'T*'|'W*'|'W' => sub ($op) {
             [];
@@ -490,7 +491,7 @@ class PDF::Content::Ops {
             [ :$name, :$real ]
         },
 
-        # name dict              BDC | DP
+        # tag [dict|name]         BDC | DP
         'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str|Pair) {
             my Pair $prop = do given $p {
                 when Hash { PDF::COS.coerce(:dict($p)).content }
@@ -501,7 +502,7 @@ class PDF::Content::Ops {
         },
 
         # dashArray dashPhase    d
-        'd' => sub (Str $op, Array $args!, Numeric $real!) {
+        'd' => sub (Str $op, List $args!, Numeric $real!) {
             my @array = $args.map({
                 when Numeric { :real($_) }
                 when Pair    { $_ }
@@ -570,13 +571,13 @@ class PDF::Content::Ops {
             die X::PDF::Content::OP::TooFewArgs.new: :$op, :mnemonic(%OpName{$op})
                 unless @args;
 
-            @args = @args.map({
+            @args = @args.map: {
                 when Pair    {$_}
                 when Numeric { :real($_) }
                 default {
                     die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_);
                 }
-            });
+            };
 
             @args
         },
@@ -592,13 +593,13 @@ class PDF::Content::Ops {
             my Str $name = @args.pop
                 if @args.tail ~~ Str;
 
-            @args = @args.map({
+            @args = @args.map: {
                 when Pair    {$_}
                 when Numeric { :real($_) }
                 default {
                     die X::PDF::Content::OP::BadArrayArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_);
                 }
-            });
+            };
 
             @args.push: (:$name) if $name.defined;
 
@@ -700,7 +701,7 @@ class PDF::Content::Ops {
 	$.ops( self.parse($ops) );
     }
 
-    multi method ops(Array $ops?) {
+    multi method ops(List $ops?) {
 	with $ops {
 	    self.op($_)
 		for .list
@@ -793,34 +794,36 @@ class PDF::Content::Ops {
         @!StrokeColor = [ c, m, y, k ];
     }
 
-    method !check-color-args($op, Str $cs, @scn) {
-        my \arity = do given $cs {
-            when 'DeviceGray'|'CalGray'|'Indexed' { 1 }
-            when 'DeviceRGB'|'CalRGB'|'Lab'  { 3 }
-            when 'DeviceCMYK' { 4 }
+    method !color-args-ok($op, @colors) {
+        my Str $cs = do given $op {
+            when 'SC'|'SCN' {$!StrokeColorSpace}
+            when 'sc'|'scn' {$!FillColorSpace}
         }
 
-        if arity {
-            my $got = +@scn;
-            $got-- if @scn && @scn.tail ~~ Str;
+        constant %Arity = %(
+            'DeviceGray'|'CalGray'|'Indexed' => 1,
+            'DeviceRGB'|'CalRGB'|'Lab' => 3,
+            'DeviceCMYK' => 4
+        );
+
+        with %Arity{$cs} -> \arity {
+            my $got = +@colors;
+            $got-- if $op.uc eq 'SCN' && @colors.tail ~~ Str;
             die X::PDF::Content::OP::ArgCount.new: :message("Incorrect number of arguments in $op command, expected {arity} $cs colors, got: $got")
                 unless $got == arity;
         }
+        True;
     }
-    multi method track-graphics('scn', *@colors) {
-        self!check-color-args('scn', $!FillColorSpace, @colors);
+    multi method track-graphics('scn', *@colors where self!color-args-ok('scn', @colors)) {
         @!FillColor = @colors;
     }
-    multi method track-graphics('SCN', *@colors) {
-        self!check-color-args('SCN', $!StrokeColorSpace, @colors);
+    multi method track-graphics('SCN', *@colors where self!color-args-ok('SCN', @colors)) {
         @!StrokeColor = @colors;
     }
-    multi method track-graphics('sc', *@colors) {
-        self!check-color-args('sc', $!FillColorSpace, @colors);
+    multi method track-graphics('sc',  *@colors where self!color-args-ok('sc',  @colors)) {
         @!FillColor = @colors;
     }
-    multi method track-graphics('SC', *@colors) {
-        self!check-color-args('SC', $!StrokeColorSpace, @colors);
+    multi method track-graphics('SC',  *@colors where self!color-args-ok('SC',  @colors)) {
         @!StrokeColor = @colors;
     }
     multi method track-graphics('BMC', Str $name!) {
