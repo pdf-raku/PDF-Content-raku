@@ -4,7 +4,7 @@ class PDF::Content::Tag {
     has Str $.op is required;
     has Str $.name is required;
     has Hash $.props;
-    has UInt $.start;
+    has UInt $.start is rw;
     has UInt $.end is rw;
     has PDF::Content::Tag $.parent is rw;
     has PDF::Content::Tag @.children handles<AT-POS>;

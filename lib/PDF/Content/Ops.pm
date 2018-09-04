@@ -760,35 +760,44 @@ class PDF::Content::Ops {
         $!Flatness         = %gstate<Flatness>;
 	Restore;
     }
+
     multi method track-graphics('BT') {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
+
     multi method track-graphics('ET') {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
+
     multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
         @!CTM = multiply([a, b, c, d, e, f], @!CTM);
     }
+
     multi method track-graphics('rg', \r, \g, \b) {
         $!FillColorSpace = 'DeviceRGB';
         @!FillColor = [r, g, b];
     }
+
     multi method track-graphics('RG', \r, \g, \b) {
         $!StrokeColorSpace = 'DeviceRGB';
         @!StrokeColor = [r, g, b]
     }
+
     multi method track-graphics('g', \gray) {
         $!FillColorSpace = 'DeviceGray';
         @!FillColor = [ gray, ];
     }
+
     multi method track-graphics('G', \gray) {
         $!StrokeColorSpace = 'DeviceGray';
         @!StrokeColor = [ gray, ];
     }
+
     multi method track-graphics('k', \c, \m, \y, \k) {
         $!FillColorSpace = 'DeviceCMYK';
         @!FillColor = [ c, m, y, k ];
     }
+
     multi method track-graphics('K', \c, \m, \y, \k) {
         $!StrokeColorSpace = 'DeviceCMYK';
         @!StrokeColor = [ c, m, y, k ];
@@ -814,43 +823,40 @@ class PDF::Content::Ops {
         }
         True;
     }
+
     multi method track-graphics('scn', *@colors where self!color-args-ok('scn', @colors)) {
         @!FillColor = @colors;
     }
+
     multi method track-graphics('SCN', *@colors where self!color-args-ok('SCN', @colors)) {
         @!StrokeColor = @colors;
     }
+
     multi method track-graphics('sc',  *@colors where self!color-args-ok('sc',  @colors)) {
         @!FillColor = @colors;
     }
+
     multi method track-graphics('SC',  *@colors where self!color-args-ok('SC',  @colors)) {
         @!StrokeColor = @colors;
     }
-    multi method track-graphics('BMC', Str $name!) {
-        my PDF::Content::Tag $tag .= new: :op<BMC>, :$name, :start(+@!ops);
+
+    method !open-tag(PDF::Content::Tag $tag) {
+        $tag.start = +@!ops;
         with @!open-tags.tail {
             .add-kid: $tag;
         }
-	@!open-tags.push: $tag;
+        @!open-tags.push: $tag;
     }
-    multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
-        my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        my PDF::Content::Tag $tag .= new: :op<BDC>, :$name, :start(+@!ops), :$props;
-        with @!open-tags.tail {
-            .add-kid: $tag;
-        }
-	@!open-tags.push: $tag;
-    }
-    multi method track-graphics('EMC') {
-	die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
-	    unless @!open-tags;
+
+    method !close-tag {
 	my PDF::Content::Tag $tag = @!open-tags.pop;
         $tag.end = +@!ops;
         @!tags.push: $tag
             without $tag.parent;
     }
-    multi method track-graphics('MP', Str $name!) {
-        my PDF::Content::Tag $tag .= new: :op<MP>, :$name, :start(+@!ops) :end(+@!ops);
+
+    method !add-tag(PDF::Content::Tag $tag) {
+        $tag.start = $tag.end = +@!ops;
         with @!open-tags.tail {
             .add-kid: $tag;
         }
@@ -858,25 +864,35 @@ class PDF::Content::Ops {
             @!tags.push: $tag
         }
     }
+
+    multi method track-graphics('BMC', Str $name!) {
+        self!open-tag: PDF::Content::Tag.new: :op<BMC>, :$name;
+    }
+
+    multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
+        my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
+        self!open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :$props;
+    }
+
+    multi method track-graphics('EMC') {
+	die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
+	    unless @!open-tags;
+        self!close-tag;
+    }
+
+    multi method track-graphics('MP', Str $name!) {
+        self!add-tag: PDF::Content::Tag.new: :op<MP>, :$name;
+    }
+
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
         my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        my PDF::Content::Tag $tag .= new: :op<DP>, :$name, :$props, :start(+@!ops) :end(+@!ops);
-        with @!open-tags.tail {
-            .add-kid: $tag;
-        }
-        else {
-            @!tags.push: $tag
-        }
+        self!add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :$props;
     }
+
     multi method track-graphics('Do', Str $name!) {
-        my PDF::Content::Tag $tag .= new: :op<Do>, :$name, :start(+@!ops) :end(+@!ops);
-        with @!open-tags.tail {
-            .add-kid: $tag;
-        }
-        else {
-            @!tags.push: $tag
-        }
-     }
+        self!add-tag: PDF::Content::Tag.new: :op<Do>, :$name;
+    }
+
     multi method track-graphics('gs', Str $key) {
         with self.parent {
             with .resource-entry('ExtGState', $key) {
@@ -895,29 +911,38 @@ class PDF::Content::Ops {
             }
         }
     }
+
     multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
         @!TextMatrix = multiply([1, 0, 0, 1, $tx, $ty], @!TextMatrix);
     }
+
     multi method track-graphics('TD', Numeric $tx!, Numeric $ty) {
         $!TextLeading = - $ty;
         $.track-graphics(TextMove, $tx, $ty);
     }
+
     method !new-line {
         @!TextMatrix[5] -= $!TextLeading;
     }
+
     multi method track-graphics('T*') {
         self!new-line();
     }
+
     multi method track-graphics("'", $) {
         self!new-line();
     }
+
     multi method track-graphics('"', $!WordSpacing, $!CharSpacing, $) {
         self!new-line();
     }
+
     multi method track-graphics('d0', $!char-width, $!char-height) {
     }
+
     multi method track-graphics('d1', $!char-width, $!char-height, *@!char-bbox) {
     }
+
     multi method track-graphics($op, *@args) is default {
         .(self,|@args) with %PostOp{$op};
     }

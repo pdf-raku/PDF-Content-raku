@@ -45,6 +45,7 @@ $g.MarkPointDict('B', ${ :MCID(99) });
 
 my Array $tags = $g.tags;
 is +$tags, 3, 'top level tags';
+
 is $tags[0].gist, '<Foo><Nested/><A/><Img1/></Foo>';
 is $tags[1].gist, '<Bar/>';
 is $tags[2].gist, '<B/>';
