@@ -209,7 +209,7 @@ class PDF::Content::Ops {
 	:MiterJoin(0) :RoundJoin(1) :BevelJoin(2)
     »;
 
-    method graphics-accessor($att, $setter) is rw {
+    method graphics-accessor(Attribute $att, $setter) is rw {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,*@v) {
@@ -218,7 +218,7 @@ class PDF::Content::Ops {
             });
     }
 
-    method ext-graphics-accessor($att, $key) is rw {
+    method ext-graphics-accessor(Attribute $att, $key) is rw {
         Proxy.new(
             FETCH => sub ($) { $att.get_value(self) },
             STORE => sub ($,\v) {
@@ -370,6 +370,13 @@ class PDF::Content::Ops {
     has @.gsave;
     has PDF::Content::Tag @!open-tags;
     has PDF::Content::Tag @.tags;
+    multi method tags(@tags = @!tags, :$flat! where .so) {
+        flat @tags.map: {
+            ($_,
+             self.tags(.children, :flat))
+        }
+    }
+    multi method tags is rw is default { @!tags }
 
     # *** Type 3 Font Metrics ***
 
