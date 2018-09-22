@@ -23,6 +23,7 @@
     "PDF::Content::Color" : "lib/PDF/Content/Color.pm",
     "PDF::Content::Font" : "lib/PDF/Content/Font.pm",
     "PDF::Content::Font::CoreFont" : "lib/PDF/Content/Font/CoreFont.pm",
+    "PDF::Content::Font::Enc::Glyphic" : "lib/PDF/Content/Font/Enc/Glyphic.pm",
     "PDF::Content::Font::Enc::Type1" : "lib/PDF/Content/Font/Enc/Type1.pm",
     "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
     "PDF::Content::Fontish" : "lib/PDF/Content/Fontish.pm",

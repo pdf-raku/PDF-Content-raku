@@ -17,7 +17,7 @@ role PDF::Content::Resourced {
 	self!resources.resource-key($obj, |c);
     }
 
-    #| my %fonts = $doc.page(1).resources('Font');
+    #| my %fonts = $pdf.page(1).resources('Font');
     multi method resources('ProcSet') {
 	my @entries;
 	my $resource-entries = .ProcSet with self.Resources;

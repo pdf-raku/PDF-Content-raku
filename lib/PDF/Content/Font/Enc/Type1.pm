@@ -1,70 +1,55 @@
-class PDF::Content::Font::Enc::Type1 {
-    use Font::AFM;
-    use PDF::Content::Font::Encodings;
-    has $.glyphs = %Font::AFM::Glyphs;
-    has UInt %!from-unicode;
-    has UInt %!subset;
+use PDF::Content::Font::Enc::Glyphic;
+
+class PDF::Content::Font::Enc::Type1
+    does PDF::Content::Font::Enc::Glyphic {
+    use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs;
+    has UInt %!from-unicode;  #| all encoding mappings
+    has UInt %!charset;       #| used characters
     has uint16 @.to-unicode[256];
     has uint8 @!fallback-cids;
-    has uint8 @!differences;
     my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
     has EncodingScheme $.enc = 'win';
 
     submethod TWEAK {
-        my array $encoding;
-	given $!enc {
-	    when 'mac' {
-		$encoding = $PDF::Content::Font::Encodings::mac-encoding;
-	    }
-	    when 'win' {
-		$encoding = $PDF::Content::Font::Encodings::win-encoding;
-	    }
-	    when 'sym' {
-		$encoding = $PDF::Content::Font::Encodings::sym-encoding;
-	    }
-	    when 'std' {
-		$encoding = $PDF::Content::Font::Encodings::std-encoding;
-	    }
-	    when 'zapf' {
-		$!glyphs = $PDF::Content::Font::Encodings::zapf-glyphs;
-		$encoding = $PDF::Content::Font::Encodings::zapf-encoding;
-	    }
-	}
+        my array $encoding = %(
+            :mac($mac-encoding),   :win($win-encoding),
+            :sym($sym-encoding),   :std($std-encoding),
+            :zapf($zapf-encoding),
+        ){$!enc};
+
+	self.glyphs = $zapf-glyphs
+            if $!enc eq 'zapf';
 
         @!to-unicode = $encoding.list;
-        my uint16 @more-cids;
+        my uint16 @encoded-cids;
         for 1 .. 255 -> $idx {
             my uint16 $code-point = @!to-unicode[$idx];
             if $code-point {
                 %!from-unicode{$code-point} = $idx;
-                @more-cids.unshift: $idx;
+                # CID used in this encoding schema. rellocate as a last resort
+                @encoded-cids.unshift: $idx;
             }
             else {
+                # spare CID use it first
                 @!fallback-cids.push($idx)
             }
         }
-        @!fallback-cids.append: @more-cids;
+        @!fallback-cids.append: @encoded-cids;
         # map non-breaking space to a regular space
         %!from-unicode{"\c[NO-BREAK SPACE]".ord} //= %!from-unicode{' '.ord};
     }
 
-    method lookup-glyph(UInt $chr-code) {
-        $!glyphs{$chr-code.chr}
-    }
-
-    method glyph-map {
-        %( $!glyphs.invert );
-    }
-
-    method !add-encoding($chr-code, $idx) {
-        %!from-unicode{$chr-code} = $idx;
-        @!to-unicode[$idx] = $chr-code;
-        %!subset{$chr-code} = $idx;
-        @!differences.push: $idx;
+    method set-encoding($chr-code, $idx) {
+        unless %!from-unicode{$chr-code} ~~ $idx {
+            %!from-unicode{$chr-code} = $idx;
+            @!to-unicode[$idx] = $chr-code;
+            %!charset{$chr-code} = $idx;
+            $.add-glyph-diff($idx);
+        }
     }
     method add-encoding($chr-code, :$idx is copy = %!from-unicode{$chr-code} // 0) {
         if $idx {
-            %!subset{$chr-code} = $idx;
+            %!charset{$chr-code} = $idx;
         }
         else {
             my $glyph-name = self.lookup-glyph($chr-code);
@@ -73,13 +58,13 @@ class PDF::Content::Font::Enc::Type1 {
                 while @!fallback-cids && !$idx {
                     $idx = @!fallback-cids.shift;
                     my $old-chr-code = @!to-unicode[$idx];
-                    if $old-chr-code && %!subset{$old-chr-code} {
+                    if $old-chr-code && %!charset{$old-chr-code} {
                         # already inuse
                         $idx = 0;
                     }
                     else {
                         # add it to the encoding scheme
-                        self!add-encoding($chr-code, $idx);
+                        self.set-encoding($chr-code, $idx);
                    }
                 }
             }
@@ -90,7 +75,7 @@ class PDF::Content::Font::Enc::Type1 {
         self.encode($text).decode: 'latin-1';
     }
     multi method encode(Str $text --> buf8) is default {
-        buf8.new: $text.ords.map({%!subset{$_} || self.add-encoding($_) }).grep: {$_};
+        buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) }).grep: {$_};
     }
 
     multi method decode(Str $encoded, :$str! --> Str) {
@@ -100,33 +85,4 @@ class PDF::Content::Font::Enc::Type1 {
         buf16.new: $encoded.ords.map({@!to-unicode[$_]}).grep: {$_};
     }
 
-    method differences is rw {
-        Proxy.new(
-            STORE => sub ($, @differences) {
-                my %glyph-map := self.glyph-map;
-                my uint32 $idx = 0;
-                for @differences {
-                    when UInt { $idx  = $_ }
-                    when Str {
-                        self!add-encoding(.ord, $idx)
-                            with %glyph-map{$_};
-                        $idx++;
-                    }
-                }
-            },
-            FETCH => sub ($) {
-                my %seen;
-                my @diffs;
-                my int $cur-idx = -2;
-                for @!differences.list.sort {
-                    unless $_ == ++$cur-idx {
-                        @diffs.push: $_;
-                        $cur-idx = $_;
-                    }
-                    @diffs.push: 'name' => self.lookup-glyph( @!to-unicode[$_] ) // '.notdef';
-                }
-                @diffs
-            },
-        )
-    }
 }
