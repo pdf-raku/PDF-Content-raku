@@ -69,15 +69,14 @@ role PDF::Content::Graphics {
         PDF::Content.new( :parent(self), |c );
     }
 
-    method render($g? is copy, Bool :$tidy = True, |c) is default {
-        warn '$render($gfx,...) is deprecated' with $g;
-        $g //= $.gfx(|c);
+    method render(Bool :$tidy = True, |c) is default {
+        my $gfx //= $.gfx(|c);
         my Pair @ops = self.contents-parse;
         @ops = self!tidy(@ops)
             if $tidy;
-        $g.ops: @ops;
+        $gfx.ops: @ops;
         $!rendered = True;
-        $g;
+        $gfx;
     }
 
     method finish {
@@ -129,8 +128,8 @@ role PDF::Content::Graphics {
     my subset ImageFile of Str where /:i '.'('png'|'svg'|'pdf') $/;
     method save-as-image(ImageFile $outfile) {
         # experimental draft rendering via Cairo
-        (try require PDF::Render::Cairo) !=== Nil
-             or die "save-as-image method is only supported if PDF::Render::Cairo is installed";
-        ::('PDF::Render::Cairo').save-as-image(self, $outfile);
+        (try require PDF::To::Cairo) !=== Nil
+             or die "save-as-image method is only supported if PDF::To::Cairo is installed";
+        ::('PDF::To::Cairo').save-as-image(self, $outfile);
     }
 }
