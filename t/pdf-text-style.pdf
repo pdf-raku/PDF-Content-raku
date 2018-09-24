@@ -28,7 +28,7 @@ endobj
 endobj
 
 4 0 obj <<
-  /Length 7422
+  /Length 5892
 >> stream
 BT
   50 100 Td
@@ -129,31 +129,31 @@ BT
   0 Ts
   1 0 0 1 350 700 Tm
   75 Tz
-  [ (***) -278 (HorizScaling) -278 (75) -278 (***) -278 (Lorem) ] TJ
+  (*** HorizScaling 75 *** Lorem) Tj
   T*
-  [ (ipsum) -278 (dolor) -278 (sit) -278 (amet,) ] TJ
+  (ipsum dolor sit amet,) Tj
   T*
-  [ (consectetur) -278 (adipiscing) -278 (elit,) ] TJ
+  (consectetur adipiscing elit,) Tj
   T*
-  [ (sed) -278 (do) -278 (eiusmod) -278 (tempor) ] TJ
+  (sed do eiusmod tempor) Tj
   T*
-  [ (incididunt) -278 (ut) -278 (labore) -278 (et) -278 (dolore) ] TJ
+  (incididunt ut labore et dolore) Tj
   T*
-  [ (magna) -278 (aliqua.) -278 (Ut) -278 (enim) -278 (ad) ] TJ
+  (magna aliqua. Ut enim ad) Tj
   T*
-  [ (minim) -278 (veniam,) -278 (quis) -278 (nostrud) ] TJ
+  (minim veniam, quis nostrud) Tj
   T*
-  [ (exercitation) -278 (ullamco) -278 (laboris) ] TJ
+  (exercitation ullamco laboris) Tj
   T*
-  [ (nisi) -278 (ut) -278 (aliquip) -278 (ex) -278 (ea) -278 (commodo) ] TJ
+  (nisi ut aliquip ex ea commodo) Tj
   T*
-  [ (consequat.) -278 (Duis) -278 (aute) -278 (irure) ] TJ
+  (consequat. Duis aute irure) Tj
   T*
-  [ (dolor) -278 (in) -278 (reprehenderit) -278 (in) ] TJ
+  (dolor in reprehenderit in) Tj
   T*
-  [ (voluptate) -278 (velit) -278 (esse) -278 (cillum) ] TJ
+  (voluptate velit esse cillum) Tj
   T*
-  [ (dolore) -278 (eu) -278 (fugiat) -278 (nulla) -278 (pariatur.) ] TJ
+  (dolore eu fugiat nulla pariatur.) Tj
   T*
   100 Tz
   1 0 0 1 460 700 Tm
@@ -162,169 +162,169 @@ BT
   T*
   (HorizScaling) Tj
   T*
-  [ (150) -278 (***) -278 (Lorem) ] TJ
+  (150 *** Lorem) Tj
   T*
-  [ (ipsum) -278 (dolor) -278 (sit) ] TJ
+  (ipsum dolor sit) Tj
   T*
   (amet,) Tj
   T*
   (consectetur) Tj
   T*
-  [ (adipiscing) -278 (elit,) ] TJ
+  (adipiscing elit,) Tj
   T*
-  [ (sed) -278 (do) ] TJ
+  (sed do) Tj
   T*
   (eiusmod) Tj
   T*
   (tempor) Tj
   T*
-  [ (incididunt) -278 (ut) ] TJ
+  (incididunt ut) Tj
   T*
-  [ (labore) -278 (et) ] TJ
+  (labore et) Tj
   T*
-  [ (dolore) -278 (magna) ] TJ
+  (dolore magna) Tj
   T*
   100 Tz
   1 0 0 1 20 530 Tm
   -0.75 Tc
-  [ (***) -278 (CharSpacing) -278 (-0.75) -278 (***) ] TJ
+  (*** CharSpacing -0.75 ***) Tj
   T*
-  [ (Lorem) -278 (ipsum) -278 (dolor) -278 (sit) ] TJ
+  (Lorem ipsum dolor sit) Tj
   T*
-  [ (amet,) -278 (consectetur) ] TJ
+  (amet, consectetur) Tj
   T*
-  [ (adipiscing) -278 (elit,) -278 (sed) -278 (do) ] TJ
+  (adipiscing elit, sed do) Tj
   T*
-  [ (eiusmod) -278 (tempor) ] TJ
+  (eiusmod tempor) Tj
   T*
-  [ (incididunt) -278 (ut) -278 (labore) -278 (et) ] TJ
+  (incididunt ut labore et) Tj
   T*
-  [ (dolore) -278 (magna) -278 (aliqua.) -278 (Ut) ] TJ
+  (dolore magna aliqua. Ut) Tj
   T*
-  [ (enim) -278 (ad) -278 (minim) -278 (veniam,) ] TJ
+  (enim ad minim veniam,) Tj
   T*
-  [ (quis) -278 (nostrud) -278 (exercitation) ] TJ
+  (quis nostrud exercitation) Tj
   T*
-  [ (ullamco) -278 (laboris) -278 (nisi) -278 (ut) ] TJ
+  (ullamco laboris nisi ut) Tj
   T*
-  [ (aliquip) -278 (ex) -278 (ea) -278 (commodo) ] TJ
+  (aliquip ex ea commodo) Tj
   T*
-  [ (consequat.) -278 (Duis) -278 (aute) ] TJ
+  (consequat. Duis aute) Tj
   T*
-  [ (irure) -278 (dolor) -278 (in) -278 (reprehenderit) ] TJ
+  (irure dolor in reprehenderit) Tj
   T*
   0 Tc
   1 0 0 1 130 530 Tm
   0.75 Tc
-  [ (***) -278 (CharSpacing) ] TJ
+  (*** CharSpacing) Tj
   T*
-  [ (0.75) -278 (***) -278 (Lorem) ] TJ
+  (0.75 *** Lorem) Tj
   T*
-  [ (ipsum) -278 (dolor) -278 (sit) ] TJ
+  (ipsum dolor sit) Tj
   T*
-  [ (amet,) -278 (consectetur) ] TJ
+  (amet, consectetur) Tj
   T*
-  [ (adipiscing) -278 (elit,) -278 (sed) ] TJ
+  (adipiscing elit, sed) Tj
   T*
-  [ (do) -278 (eiusmod) -278 (tempor) ] TJ
+  (do eiusmod tempor) Tj
   T*
-  [ (incididunt) -278 (ut) -278 (labore) ] TJ
+  (incididunt ut labore) Tj
   T*
-  [ (et) -278 (dolore) -278 (magna) ] TJ
+  (et dolore magna) Tj
   T*
-  [ (aliqua.) -278 (Ut) -278 (enim) -278 (ad) ] TJ
+  (aliqua. Ut enim ad) Tj
   T*
-  [ (minim) -278 (veniam,) -278 (quis) ] TJ
+  (minim veniam, quis) Tj
   T*
   (nostrud) Tj
   T*
   (exercitation) Tj
   T*
-  [ (ullamco) -278 (laboris) -278 (nisi) ] TJ
+  (ullamco laboris nisi) Tj
   T*
   0 Tc
   1 0 0 1 240 530 Tm
   1.5 Tc
-  [ (***) -278 (CharSpacing) ] TJ
+  (*** CharSpacing) Tj
   T*
-  [ (1.5) -278 (***) -278 (Lorem) ] TJ
+  (1.5 *** Lorem) Tj
   T*
-  [ (ipsum) -278 (dolor) -278 (sit) ] TJ
+  (ipsum dolor sit) Tj
   T*
   (amet,) Tj
   T*
   (consectetur) Tj
   T*
-  [ (adipiscing) -278 (elit,) ] TJ
+  (adipiscing elit,) Tj
   T*
-  [ (sed) -278 (do) -278 (eiusmod) ] TJ
+  (sed do eiusmod) Tj
   T*
-  [ (tempor) -278 (incididunt) ] TJ
+  (tempor incididunt) Tj
   T*
-  [ (ut) -278 (labore) -278 (et) ] TJ
+  (ut labore et) Tj
   T*
-  [ (dolore) -278 (magna) ] TJ
+  (dolore magna) Tj
   T*
-  [ (aliqua.) -278 (Ut) -278 (enim) ] TJ
+  (aliqua. Ut enim) Tj
   T*
-  [ (ad) -278 (minim) -278 (veniam,) ] TJ
+  (ad minim veniam,) Tj
   T*
-  [ (quis) -278 (nostrud) ] TJ
+  (quis nostrud) Tj
   T*
   0 Tc
   1 0 0 1 350 530 Tm
-  [ (***) -78 (WordSpacing) -78 (-2) -78 (***) ] TJ
+  (*** WordSpacing -2 ***) Tj
   T*
-  [ (Lorem) -78 (ipsum) -78 (dolor) -78 (sit) ] TJ
+  (Lorem ipsum dolor sit) Tj
   T*
-  [ (amet,) -78 (consectetur) ] TJ
+  (amet, consectetur) Tj
   T*
-  [ (adipiscing) -78 (elit,) -78 (sed) -78 (do) ] TJ
+  (adipiscing elit, sed do) Tj
   T*
-  [ (eiusmod) -78 (tempor) ] TJ
+  (eiusmod tempor) Tj
   T*
-  [ (incididunt) -78 (ut) -78 (labore) -78 (et) ] TJ
+  (incididunt ut labore et) Tj
   T*
-  [ (dolore) -78 (magna) -78 (aliqua.) ] TJ
+  (dolore magna aliqua.) Tj
   T*
-  [ (Ut) -78 (enim) -78 (ad) -78 (minim) ] TJ
+  (Ut enim ad minim) Tj
   T*
-  [ (veniam,) -78 (quis) -78 (nostrud) ] TJ
+  (veniam, quis nostrud) Tj
   T*
-  [ (exercitation) -78 (ullamco) ] TJ
+  (exercitation ullamco) Tj
   T*
-  [ (laboris) -78 (nisi) -78 (ut) -78 (aliquip) -78 (ex) ] TJ
+  (laboris nisi ut aliquip ex) Tj
   T*
-  [ (ea) -78 (commodo) ] TJ
+  (ea commodo) Tj
   T*
-  [ (consequat.) -78 (Duis) -78 (aute) ] TJ
+  (consequat. Duis aute) Tj
   T*
   1 0 0 1 460 530 Tm
-  [ (***) -778 (WordSpacing) -778 (5) ] TJ
+  (*** WordSpacing 5) Tj
   T*
-  [ (***) -778 (Lorem) -778 (ipsum) ] TJ
+  (*** Lorem ipsum) Tj
   T*
-  [ (dolor) -778 (sit) -778 (amet,) ] TJ
+  (dolor sit amet,) Tj
   T*
   (consectetur) Tj
   T*
-  [ (adipiscing) -778 (elit,) -778 (sed) ] TJ
+  (adipiscing elit, sed) Tj
   T*
-  [ (do) -778 (eiusmod) -778 (tempor) ] TJ
+  (do eiusmod tempor) Tj
   T*
-  [ (incididunt) -778 (ut) -778 (labore) ] TJ
+  (incididunt ut labore) Tj
   T*
-  [ (et) -778 (dolore) -778 (magna) ] TJ
+  (et dolore magna) Tj
   T*
-  [ (aliqua.) -778 (Ut) -778 (enim) -778 (ad) ] TJ
+  (aliqua. Ut enim ad) Tj
   T*
-  [ (minim) -778 (veniam,) -778 (quis) ] TJ
+  (minim veniam, quis) Tj
   T*
-  [ (nostrud) -778 (exercitation) ] TJ
+  (nostrud exercitation) Tj
   T*
-  [ (ullamco) -778 (laboris) -778 (nisi) ] TJ
+  (ullamco laboris nisi) Tj
   T*
-  [ (ut) -778 (aliquip) -778 (ex) -778 (ea) ] TJ
+  (ut aliquip ex ea) Tj
   T*
   1 0 0 1 20 360 Tm
   (*** leading 0.8 ***) Tj
@@ -443,8 +443,8 @@ xref
 0000000068 00000 n 
 0000000134 00000 n 
 0000000305 00000 n 
-0000007782 00000 n 
-0000007893 00000 n 
+0000006252 00000 n 
+0000006363 00000 n 
 trailer
 <<
   /ID [ <d743a886fcdcf87b69c36548219ea941> <d743a886fcdcf87b69c36548219ea941> ]
@@ -452,5 +452,5 @@ trailer
   /Size 7
 >>
 startxref
-7999
+6469
 %%EOF

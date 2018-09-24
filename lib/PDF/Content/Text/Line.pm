@@ -18,8 +18,9 @@ class PDF::Content::Text::Line {
     multi method align('justify', Numeric :$width! ) {
         my Numeric \content-width = $.content-width;
         my Numeric \wb = +@!word-boundary.grep: *.so;
+        my Numeric \stretch = $width / content-width;
 
-        if content-width && wb && 1.0 < $width / content-width < 2.0 {
+        if content-width && wb && 1.0 < stretch < 2.0 {
             $!word-gap += ($width - content-width) / wb;
             $!indent = 0;
         }
@@ -37,7 +38,7 @@ class PDF::Content::Text::Line {
         $!indent = - $.content-width  /  2;
     }
 
-    method content(Numeric :$font-size!, Numeric :$x-shift = 0, :$space!) {
+    method content(Numeric :$font-size!, Numeric :$x-shift = 0, :$space!, :$space-pad = 0) {
         my Numeric \scale = -1000 / $font-size;
         my subset Str-or-Pos where Str|Numeric;
         my Str-or-Pos @line;
@@ -49,14 +50,17 @@ class PDF::Content::Text::Line {
         my int $wc = 0;
 
         for @!words -> \w {
-	    @line.push: $space if @!word-boundary[$wc++];
+            if @!word-boundary[$wc++] {
+	        @line.push: $space;
+                @line.push: $space-pad unless $space-pad =~= 0;
+            }
             @line.append: w.list;
         }
 
         #| coalesce adjacent strings
         my @out;
         my $n = 0;
-        my $prev = 0;
+        my $prev := 0;
         for @line {
             if $_ ~~ Str && $prev ~~ Str {
                 @out[$n-1] ~= $_
@@ -64,7 +68,7 @@ class PDF::Content::Text::Line {
             else {
                 @out[$n++] = $_;
             }
-            $prev = $_;
+            $prev := $_;
         }
 
         @out == 1 && @out[0].isa(Str)

@@ -1,5 +1,8 @@
 Release 0.2.4
 - Added PDF::Content::Tag and $.marked-content method for tag extraction
+- Added PDF::Content::Font::Enc::Glyphic role
+- Keep space characters when rendering text blocks. Conform with
+  [PDF 32000 - 14.8.2.5: Identifying Word Breaks]
 
 Release 0.2.3
 - open() method moved from PDF::Content::Image to PDF::Content::XObject

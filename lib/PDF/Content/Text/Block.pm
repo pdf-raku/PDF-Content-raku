@@ -149,20 +149,6 @@ class PDF::Content::Text::Block {
         $word-gap * $.HorizScaling / 100;
     }
 
-    #| calculates ShowSpaceText(TD) atom for the given word-gap
-    method !word-spacer($word-gap is copy) {
-        if $word-gap =~= $.space-width && $.WordSpacing =~= 0 && $.CharSpacing =~= 0 {
-            # A real space fits. use it.
-            $!style.space;
-        }
-        else {
-            my Numeric \scale = -1000 / $.font-size;
-            $word-gap /= $.HorizScaling / 100
-                unless $.HorizScaling =~= 100;
-            scale * ($word-gap - $.CharSpacing);
-        }
-    }
-
     method width  { $!width  // self.content-width }
     method height { $!height // self.content-height }
     method !dy {
@@ -220,6 +206,8 @@ class PDF::Content::Text::Block {
         }
 
         my $leading = $gfx.TextLeading;
+        my $space = $!style.space;
+        my Numeric \scale = -1000 / $.font-size;
 
         for @!lines.pairs {
 	    my \line = .value;
@@ -230,8 +218,8 @@ class PDF::Content::Text::Block {
 		@content.push: OpCode::TextNextLine;
 	    }
 
-            my $space = self!word-spacer(line.word-gap);
-            @content.push: line.content(:$.font-size, :$x-shift, :$space);
+            my $space-pad = scale * (line.word-gap - self!word-gap);
+            @content.push: line.content(:$.font-size, :$x-shift, :$space, :$space-pad);
         }
 
 	if $nl {
