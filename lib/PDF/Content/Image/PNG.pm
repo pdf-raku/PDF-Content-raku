@@ -57,7 +57,8 @@ class PDF::Content::Image::PNG
         while !$fh.eof {
             my Quad $len .= read($fh);
             my buf8 $hdr = $fh.read(4);
-            my buf8 $buf = $fh.read(+$len);
+            my buf8 $buf = $_ ?? $fh.read($_) !! buf8.new
+                given +$len;
             my Quad $crc .= read($fh);
             if +$len {
                 my uint32 $crc-got = +$crc;

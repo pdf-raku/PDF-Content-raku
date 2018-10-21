@@ -59,11 +59,12 @@ class PDF::Content::Image::JPEG
         my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
         with $!atts {
             my Str \color-space = do given .color-channels {
-                when 1 {'DeviceGray'}
-                when 3 {'DeviceRGB'}
-                when 4 {'DeviceCMYK'}
-                default {warn "JPEG has unknown color-space: $_";
-                         'DeviceGray'}
+                constant @ColorSpaces = [Mu, 'DeviceGray', Mu, 'DeviceRGB', 'DeviceCMYK'];
+                @ColorSpaces[$_]
+                // do  {
+                    warn "JPEG has unknown color-channel: $_";
+                    'DeviceGray'
+                }
             }
 
             %dict<ColorSpace> = :name(color-space);

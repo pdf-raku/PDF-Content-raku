@@ -70,7 +70,7 @@ class PDF::Content::Image {
     }
 
     multi method load(IO::Path $io-path) {
-        self.load( $io-path.open( :r, :enc<latin-1>) );
+        self.load( $io-path.open( :r, :bin) );
     }
 
     method !image-handler(Str :$image-type!) {
