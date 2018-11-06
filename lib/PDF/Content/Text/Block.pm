@@ -68,7 +68,7 @@ class PDF::Content::Text::Block {
 
             given $atom {
                 when Str {
-                    if ($!style.kern) {
+                    if $!style.kern {
                         ($word, $word-width) = $!style.font.kern($atom);
                     }
                     else {
@@ -185,7 +185,6 @@ class PDF::Content::Text::Block {
             for @!lines;
 
         my @content;
-	my $space-size = -(1000 * $.space-width / $.font-size).round.Int;
 
         my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
         @content.push( OpCode::TextMove => [0, $y-shift ] )

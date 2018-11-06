@@ -368,12 +368,12 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     has @.gsave;
-    has PDF::Content::Tag @!open-tags;
+    has PDF::Content::Tag @.open-tags;
     has PDF::Content::Tag @.tags;
     multi method tags(@tags = @!tags, :$flat! where .so) {
         flat @tags.map: {
             ($_,
-             self.tags(.children, :flat))
+             self.tags(.children.grep(PDF::Content::Tag), :flat))
         }
     }
     multi method tags is rw is default { @!tags }
@@ -421,7 +421,7 @@ class PDF::Content::Ops {
             $!context = .value;
         }
 
-        if !$ok-here && $.strict {
+        if !$ok-here && $!strict {
             # Found an op we didn't expect. Raise a warning.
             my $type;
             my $where;
@@ -503,7 +503,6 @@ class PDF::Content::Ops {
             my Pair $prop = do given $p {
                 when Hash { PDF::COS.coerce(:dict($p)).content }
                 when Str  { :name($p) }
-                default { $_ }
             }
             [ :$name, $prop ]
         },
@@ -919,17 +918,21 @@ class PDF::Content::Ops {
         }
     }
 
-    multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
+    method !text-move(Numeric $tx, Numeric $ty) {
         @!TextMatrix = multiply([1, 0, 0, 1, $tx, $ty], @!TextMatrix);
+    }
+
+    method !new-line {
+        self!text-move(0, - $!TextLeading);
+    }
+
+    multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
+        self!text-move($tx, $ty);
     }
 
     multi method track-graphics('TD', Numeric $tx!, Numeric $ty) {
         $!TextLeading = - $ty;
-        $.track-graphics(TextMove, $tx, $ty);
-    }
-
-    method !new-line {
-        @!TextMatrix[5] -= $!TextLeading;
+        self!text-move($tx, $ty);
     }
 
     multi method track-graphics('T*') {
@@ -992,7 +995,7 @@ class PDF::Content::Ops {
 	}).join: "\n";
     }
 
-    #| serialized current content as an array of strings - for debugging/testing
+    # serialized current content as an array of strings - for debugging/testing
     method content-dump {
         my PDF::Writer $writer .= new;
 
