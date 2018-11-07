@@ -155,16 +155,18 @@ class PDF::Content:ver<0.2.4>
 
     multi method paint(Bool :$fill! where .so, Bool :$even-odd,
                        Bool :$close, Bool :$stroke) {
-        my constant @FillOps = [
-            [[<Fill>,         <FillStroke>],
-             [<EOFill>,       <EOFillStroke>],
-            ],
-            [[<Close Fill>,   <CloseFillStroke>],
-             [<Close EOFill>, <CloseEOFillStroke>],
-            ]];
+        my @paint-ops = $even-odd
+            ?? ($close
+                ?? ($stroke ?? <CloseEOFillStroke> !! <Close EOFill>)
+                !! ($stroke ?? <EOFillStroke>      !! <EOFill>)
+               )
+            !! ($close
+                ?? ($stroke ?? <CloseFillStroke>   !! <Close Fill>)
+                !! ($stroke ?? <FillStroke>        !! <Fill>)
+               );
 
         self."$_"()
-            for @FillOps[?$close][?$even-odd][?$stroke].list;
+            for @paint-ops;
     }
 
     multi method paint(Bool :$stroke! where .so, Bool :$close) {
