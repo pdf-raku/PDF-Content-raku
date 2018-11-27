@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.2.4>
+class PDF::Content:ver<0.2.5>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -16,14 +16,14 @@ class PDF::Content:ver<0.2.4>
 
     method graphics( &do-stuff! ) {
         $.op(Save);
-        my \ret = &do-stuff(self);
+        my \ret = do-stuff(self);
         $.op(Restore);
         ret;
     }
 
     method text( &do-stuff! ) {
         $.op(BeginText);
-        my \ret = &do-stuff(self);
+        my \ret = do-stuff(self);
         $.op(EndText);
         ret
     }
@@ -36,14 +36,14 @@ class PDF::Content:ver<0.2.4>
                                  &do-stuff!,
                                  Hash :$props! where .so) {
         $.BeginMarkedContentDict($tag, $props);
-        my \ret = &do-stuff(self);
+        my \ret = do-stuff(self);
         $.EndMarkedContent;
         ret;
     }
 
     multi method marked-content( Str $tag, &do-stuff! ) {
         $.BeginMarkedContent($tag);
-        my \ret = &do-stuff(self);
+        my \ret = do-stuff(self);
         $.EndMarkedContent;
         ret;
     }
@@ -54,8 +54,8 @@ class PDF::Content:ver<0.2.4>
         self.draw($canvas);
     }
 
-    method load-image(Str $spec ) {
-        PDF::Content::XObject.open( $spec );
+    method load-image($spec) {
+        PDF::Content::XObject.open($spec);
     }
 
     #| extract any inline images from the content stream. returns an array of XObject Images

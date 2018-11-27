@@ -165,7 +165,9 @@ class PDF::Content::Ops {
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
+# These match PDF::ExtGState from PDF::Class
     my enum ExtGState is export(:ExtGState) «
+
 	:LineWidth<LW>
 	:LineCap<LC>
 	:LineJoinStyle<LJ>
@@ -176,15 +178,15 @@ class PDF::Content::Ops {
 	:OverPrintStroke<op>
 	:OverPrintMode<OPM>
 	:Font<Font>
-	:BlackGenerationFunction-old<BG>
-	:BlackGenerationFunction<BG2>
-	:UnderCoverRemovalFunction-old<UCR>
-	:UnderCoverRemovalFunction<UCR2>
+	:BlackGeneration-old<BG>
+	:BlackGeneration<BG2>
+	:UnderColorRemoval-old<UCR>
+	:UnderColorRemoval<UCR2>
 	:TransferFunction-old<TR>
 	:TransferFunction<TR2>
 	:Halftone<HT>
 	:Flatness<FT>
-	:Smoothness<ST>
+	:Smoothness<SM>
         :StrokeAdjust<SA>
         :BlendMode<BM>
         :SoftMask<SMask>
@@ -729,42 +731,29 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('q') {
-        my %gstate = :$!CharSpacing, :$!WordSpacing, :$!HorizScaling, :$!TextLeading, :$!TextRender, :$!TextRise, :$!Font, :$!LineWidth, :$!LineCap, :$!LineJoin, :@!TextMatrix, :@!CTM, :@!DashPattern, :$!StrokeColorSpace, :$!FillColorSpace, :@!StrokeColor, :@!FillColor, :$!StrokeAlpha, :$!FillAlpha, :$!RenderingIntent, :$!Flatness;
-        for %gstate.values {
-            $_ = .clone if $_ ~~ Array;
-        }
         # todo - get this trait driven
-        ## for %GraphicVars.pairs {
-        ##    %gstate{.key} = .value.get_value(.value, self);
-        ## }
+        my %gstate = %GraphicVars.pairs.map: {
+            my Str $key       = .key;
+            my Attribute $att = .value;
+            my $val           = $att.get_value(self);
+            $val .= clone if $val ~~ Array;
+            $key => $val;
+        }
         @!gsave.push: %gstate;
     }
+
     multi method track-graphics('Q') {
         die X::PDF::Content::OP::BadNesting.new: :op<Q>, :mnemonic(%OpName<Q>), :opener("'q' (%OpName<q>)")
             unless @!gsave;
+
         my %gstate = @!gsave.pop;
-        $!CharSpacing      = %gstate<CharSpacing>;
-        $!WordSpacing      = %gstate<WordSpacing>;
-        $!HorizScaling     = %gstate<HorizScaling>;
-        $!TextLeading      = %gstate<TextLeading>;
-        $!TextRender       = %gstate<TextRender>;
-        $!TextRise         = %gstate<TextRise>;
-        $!Font             = %gstate<Font>;
-        $!LineWidth        = %gstate<LineWidth>;
-        $!LineCap          = %gstate<LineCap>;
-        $!LineJoin         = %gstate<LineJoin>;
-        @!TextMatrix       = %gstate<TextMatrix>.list;
-        @!CTM              = %gstate<CTM>.list;
-        @!DashPattern      = %gstate<DashPattern>.list;
-        @!StrokeColor      = %gstate<StrokeColor>.list;
-        @!FillColor        = %gstate<FillColor>.list;
-        $!StrokeColorSpace = %gstate<StrokeColorSpace>;
-        $!FillColorSpace   = %gstate<FillColorSpace>;
-        $!StrokeAlpha      = %gstate<StrokeAlpha>;
-        $!FillAlpha        = %gstate<FillAlpha>;
-        $!RenderingIntent  = %gstate<RenderingIntent>;
-        $!Flatness         = %gstate<Flatness>;
-	Restore;
+
+        for %gstate.pairs {
+            my Str $key       = .key;
+            my Attribute $att = %GraphicVars{$key};
+            my $val           = .value;
+            $att.set_value(self, $val);
+        }
     }
 
     multi method track-graphics('BT') {
