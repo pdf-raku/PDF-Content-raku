@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 105;
+plan 107;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -219,7 +219,7 @@ is-json-equiv [ $g.ops[*-4..*] ], [
     :ET[],
 ], 'Text block parse';
 
-$g .= new :comment-ops;
+$g .= new( :comment-ops, :$parent);
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 $g.add-comment("That's all!");
@@ -251,11 +251,16 @@ $g.CTM = [0, -2, 2, 0, 40, -20];
 is-deeply [ $g.CTM.list ], [0.0, -2.0, 2.0, 0.0, 40.0, -20.0], 'graphics matrix assignment';
 $g.Restore;
 
+my ($x, $y) = $g.user-default-coords(80, 100);
+is-deeply ($x, $y), (80, 100), 'original device coordinates';
+
 $g.Save;
 $g.ConcatMatrix(1,0,0,1,0,792);
 $g.ConcatMatrix(2,0,0,2,0,0);
 $g.ConcatMatrix(1,0,0,1,75,-25,);
 is-deeply [ $g.CTM.list ], [2, 0, 0, 2, 150, 742], "chained matrix transforms";
+($x, $y) = $g.user-default-coords(80, -100);
+is-deeply ($x, $y), (310, 542), 'transformed device coordinates';
 $g.Restore;
 
 $g.Save;

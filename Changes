@@ -1,3 +1,9 @@
+Release 0.2.6
+- $gfx.do() and $text-block.print() now return rectangles
+  representing the display coordinates
+- Added method user-default-coords() to convert coordinates or
+  rectangles from transformed user-space to default user-space.
+
 Release 0.2.5
 - Streamline Save(q) and Restore(Q) methods in PDF::Content::Ops
 - Fixed Extended Graphics State Smoothness method. Renamed BlackGenerationFunction

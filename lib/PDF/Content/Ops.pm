@@ -165,7 +165,7 @@ class PDF::Content::Ops {
 
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
-# These match PDF::ExtGState from PDF::Class
+    # These match PDF::ExtGState from PDF::Class
     my enum ExtGState is export(:ExtGState) «
 
 	:LineWidth<LW>
@@ -731,7 +731,7 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('q') {
-        # todo - get this trait driven
+
         my %gstate = %GraphicVars.pairs.map: {
             my Str $key       = .key;
             my Attribute $att = .value;
@@ -739,6 +739,7 @@ class PDF::Content::Ops {
             $val .= clone if $val ~~ Array;
             $key => $val;
         }
+
         @!gsave.push: %gstate;
     }
 

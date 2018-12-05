@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 1;
+plan 3;
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Block;
@@ -24,9 +24,11 @@ my PDF::Content::XObject $image .= open: "t/images/lightbulb.gif";
 
 my $image-padded = $page.xobject-form(:BBox[0, 0, $image.width + 1, $image.height + 4]);
 $image-padded.gfx;
+my @rect;
 $image-padded.graphics: {
-    .do($image,1,0);
+    @rect = .do($image,1,0);
 }
+is-deeply @rect, [1, 0, 1 + $image.width, $image.height], '$gfx.do returned rectangle';
 
 my $text-block;
 
@@ -38,7 +40,8 @@ $page.text: -> $gfx {
         $source = $image-padded;
     }
     $text-block = $gfx.text-block( :@chunks, :$font, :$font-size, :width(220) );
-    $gfx.say($text-block);
+    @rect = $gfx.say($text-block).list;
+    is-deeply [@rect.map(*.round)], [100, 465, 100+220, 465+50], '$gfx.say returned rectangle';
 
     is-json-equiv [$text-block.images.map({[ .<Tx>, .<Ty> ]})], [
         [141.344, 0],

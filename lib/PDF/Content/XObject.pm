@@ -34,6 +34,7 @@ role PDF::Content::XObject['Form']
     has Numeric $.height;
     method width  { with $!width  { $_ } else { self!size()[0] } }
     method height { with $!height { $_ } else { self!size()[1] } }
+    method bbox { self<BBox> }
     method !size {
         my $bbox = self<BBox>;
         $!width  = abs($bbox[2] - $bbox[0]);

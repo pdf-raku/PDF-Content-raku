@@ -48,8 +48,7 @@ class PDF::Content::Text::Block {
 	self!layup(@chunks);
     }
 
-    method !layup(@chunks, :$resume, :$next-line) is default {
-        my @atoms = @chunks; # copy
+    method !layup(@atoms is copy) is default {
         my @line-atoms;
         my Bool $follows-ws = flush-space(@atoms);
         my $word-gap = self!word-gap;
@@ -152,13 +151,10 @@ class PDF::Content::Text::Block {
     method width  { $!width  // self.content-width }
     method height { $!height // self.content-height }
     method !dy {
-        given $!valign {
-            when 'center' { 0.5 }
-            when 'bottom' { 1.0 }
-            default       { 0 }
-        };
+        %( :center(0.5), :bottom(1.0) ){$!valign}
+            // 0;
     }
-    method top-offset {
+    method !top-offset {
         self!dy * ($.height - $.content-height);
     }
 
@@ -178,7 +174,7 @@ class PDF::Content::Text::Block {
 		unless .value =~= $gfx-val;
 	}
 
-        my $width = $!width // self.content-width
+        my $width = $.width
             if $!align eq 'justify';
 
         .align($!align, :$width )
@@ -186,15 +182,13 @@ class PDF::Content::Text::Block {
 
         my @content;
 
-        my $y-shift = $top ?? - $.top-offset !! self!dy * $.height;
+        my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
         @content.push( OpCode::TextMove => [0, $y-shift ] )
             unless $y-shift =~= 0.0;
 
-        my $dx = do given $!align {
-            when 'center' { 0.5 }
-            when 'right'  { 1.0 }
-            default       { 0.0 }
-        }
+        my $dx = %( :center(0.5), :right(1.0) ){$!align}
+           // 0.0;
+
         my $x-shift = $left ?? $dx * $.width !! 0.0;
         # compute text positions of images content
         for @!images {
@@ -222,7 +216,7 @@ class PDF::Content::Text::Block {
         }
 
 	if $nl {
-	    my $height = @!lines ?? @!lines[*-1].height !! $.font-size;
+	    my $height = @!lines ?? @!lines.tail.height !! $.font-size;
 	    @content.push: ( OpCode::SetTextLeading => [ $leading = $height * $.leading ] )
                 unless $.font-size * $.leading =~= $leading;
 	    @content.push: OpCode::TextNextLine;
@@ -235,7 +229,7 @@ class PDF::Content::Text::Block {
                 unless $gfx."{.key}"() == .value;
 	}
 
-	@content;
+	($x-shift, $y-shift);
     }
 
     # flow any xobject images. This needs to be done

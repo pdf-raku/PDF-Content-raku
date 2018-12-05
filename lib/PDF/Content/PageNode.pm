@@ -22,7 +22,7 @@ role PDF::Content::PageNode {
         self."$bbox"();
     }
 
-    method bbox(BoxName $box-name) is rw {
+    method bbox(BoxName $box-name = 'media') is rw {
         my &fetch-sub := do given $box-name {
             when 'media' { sub ($) { self.MediaBox // [0, 0, 612, 792] } }
             when 'crop'  { sub ($) { self.CropBox // self.bbox('media') } }

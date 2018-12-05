@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.2.5>
+class PDF::Content:ver<0.2.6>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -124,17 +124,15 @@ class PDF::Content:ver<0.2.5>
         $dx *= $width;
         $dy *= $height;
 
-        with $obj<Subtype> {
-            when 'Form' {
-                $obj.finish;
-                $width /= $obj-width;
-                $height /= $obj-height;
-            }
+        if $obj<Subtype> ~~ 'Form' {
+            $obj.finish;
+            $width /= $obj-width;
+            $height /= $obj-height;
         }
 
         self.graphics: {
             $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
-            if $inline && $obj.Subtype eq 'Image' {
+            if $inline && $obj<Subtype> ~~ 'Image' {
                 # serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]
                 $.ops( $obj.inline-content );
             }
@@ -142,7 +140,12 @@ class PDF::Content:ver<0.2.5>
                 my Str:D $key = $.resource-key($obj),
                 $.op(XObject, $key);
             }
-        };
+        }
+        # return the display rectangle for the image
+       ($x + $dx,
+        $y + $dy,
+        $x + $dx + $width,
+        $y + $dy + $height);
     }
 
     my subset Pattern of Hash where .<PatternType> ~~ 1|2;
@@ -266,18 +269,21 @@ class PDF::Content:ver<0.2.5>
 
         self!set-position($text-block, $_, :$left, :$top)
             with $position;
-
+        my ($x, $y) = $.text-position;
         my Numeric \font-size = $text-block.font-size;
         my \font = $.use-font($text-block.font);
 
         self.set-font(font, font-size);
-        $text-block.render(self, :$nl, :$top, :$left, :$preserve);
+        my ($x-shift, $y-shift) = $text-block.render(self, :$nl, :$top, :$left, :$preserve);
+        $x += $x-shift;
+        $y += $y-shift;
 
         unless in-text {
             self.EndText;
             self.EndMarkedContent;
         }
-        $text-block;
+        # return the display rectangle for the text block
+        ($x, $y, $x + $text-block.width, $y + $text-block.height);
     }
 
     #| output text; move the text position down one line
@@ -318,4 +324,12 @@ class PDF::Content:ver<0.2.5>
         $canvas.render($renderer);
     }
 
+    # convert transformed user coordinates to untransformed (default) coordinates
+    use PDF::Content::Matrix :dot;
+    multi method user-default-coords(Numeric $x, Numeric $y) {
+        dot($.CTM, $x, $y);
+    }
+    multi method user-default-coords(Numeric $x0, Numeric $y0, Numeric $x1, Numeric $y1) {
+        (flat dot($.CTM, $x0, $y0), dot($.CTM, $x1, $y1));
+    }
 }
