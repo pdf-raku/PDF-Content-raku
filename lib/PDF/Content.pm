@@ -318,18 +318,22 @@ class PDF::Content:ver<0.2.6>
         nextwith( $text, :$font, |c);
     }
 
-    method draw($canvas) {
-        my $renderer = (require HTML::Canvas::To::PDF).new: :gfx(self);
-
+    method draw($canvas, :$renderer = (require HTML::Canvas::To::PDF).new: :gfx(self)) {
         $canvas.render($renderer);
     }
 
     # convert transformed user coordinates to untransformed (default) coordinates
     use PDF::Content::Matrix :dot;
-    multi method user-default-coords(Numeric $x, Numeric $y) {
-        dot($.CTM, $x, $y);
+    method base-coords(*@coords where .elems %% 2, :$user = True, :$text = False) {
+        (
+            flat @coords.map: -> $x is copy, $y is copy {
+                ($x, $y) = dot($.TextMatrix, $x, $y) if $text;
+                ($x, $y) = dot($.CTM, $x, $y) if $user;
+                $x, $y;
+            }
+        )
     }
-    multi method user-default-coords(Numeric $x0, Numeric $y0, Numeric $x1, Numeric $y1) {
-        (flat dot($.CTM, $x0, $y0), dot($.CTM, $x1, $y1));
+    method user-default-coords(|c) is DEPRECATED('base-coords') {
+        $.base-coords(|c);
     }
 }

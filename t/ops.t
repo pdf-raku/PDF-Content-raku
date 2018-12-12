@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 107;
+plan 109;
 
 use lib '.';
 use PDF::Grammar::Test :is-json-equiv;
@@ -251,16 +251,23 @@ $g.CTM = [0, -2, 2, 0, 40, -20];
 is-deeply [ $g.CTM.list ], [0.0, -2.0, 2.0, 0.0, 40.0, -20.0], 'graphics matrix assignment';
 $g.Restore;
 
-my ($x, $y) = $g.user-default-coords(80, 100);
-is-deeply ($x, $y), (80, 100), 'original device coordinates';
+my ($x, $y) = $g.base-coords(80, 100);
+is-deeply ($x, $y), (80, 100), 'base coordinates';
 
 $g.Save;
 $g.ConcatMatrix(1,0,0,1,0,792);
 $g.ConcatMatrix(2,0,0,2,0,0);
 $g.ConcatMatrix(1,0,0,1,75,-25,);
 is-deeply [ $g.CTM.list ], [2, 0, 0, 2, 150, 742], "chained matrix transforms";
-($x, $y) = $g.user-default-coords(80, -100);
-is-deeply ($x, $y), (310, 542), 'transformed device coordinates';
+$g.text: {
+    .text-position = 5, 10;
+    ($x, $y) = $g.base-coords(80, -100);
+    is-deeply ($x, $y), (310, 542), 'graphics to base user coordinates';
+    ($x, $y) = $g.base-coords(80, -100, :text);
+    is-deeply ($x, $y), (320, 562), 'graphics+text to base user coordinates, :text';
+    ($x, $y) = $g.base-coords(80, -100, :text, :!user);
+    is-deeply ($x, $y), (85, -90), 'text to graphics coordinates';
+}
 $g.Restore;
 
 $g.Save;
