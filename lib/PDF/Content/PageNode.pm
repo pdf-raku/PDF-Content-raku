@@ -37,6 +37,27 @@ role PDF::Content::PageNode {
            );
     }
 
+    method bleed is rw {
+        my enum <lx ly ux uy>;
+        Proxy.new(
+            FETCH => -> $_ {
+                my @c[4] = $.bbox('crop');
+                my @b[4] = $.bbox('bleed');
+                @c[lx]-@b[lx], @c[ly]-@b[ly], @b[ux]-@c[ux], @b[uy]-@c[uy]; 
+            },
+            STORE => -> $, Array() $b is copy {
+                my @c[4] = $.bbox('crop');
+
+                $b[lx] //= 8.5;
+                $b[ly] //= $b[lx];
+                $b[ux] //= $b[lx];
+                $b[uy] //= $b[ly];
+
+                self.BleedBox = @c[lx]-$b[lx], @c[ly]-$b[ly], @c[ux]+$b[ux], @c[uy]+$b[uy];
+            },
+        );
+    }
+
     method media-box(|c) is rw { self.bbox('media', |c) }
     method crop-box(|c)  is rw { self.bbox('crop',  |c) }
     method bleed-box(|c) is rw { self.bbox('bleed', |c) }

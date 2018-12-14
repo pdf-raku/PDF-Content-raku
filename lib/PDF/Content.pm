@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.2.6>
+class PDF::Content:ver<0.2.7>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -322,7 +322,7 @@ class PDF::Content:ver<0.2.6>
         $canvas.render($renderer);
     }
 
-    # convert transformed user coordinates to untransformed (default) coordinates
+    # map transformed user coordinates to untransformed (default) coordinates
     use PDF::Content::Matrix :dot;
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = False) {
         (

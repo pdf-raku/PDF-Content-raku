@@ -1,3 +1,7 @@
+Release 0.2.7
+- Added $page.bleed() method. Convenience method for getting
+  or setting bleed as a gutter around the crop box.
+
 Release 0.2.6
 - $gfx.do() and $text-block.print() now return rectangles
   representing the display coordinates
