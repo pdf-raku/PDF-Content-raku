@@ -41,19 +41,19 @@ role PDF::Content::PageNode {
         my enum <lx ly ux uy>;
         Proxy.new(
             FETCH => -> $_ {
-                my @c[4] = $.bbox('crop');
+                my @t[4] = $.bbox('trim');
                 my @b[4] = $.bbox('bleed');
-                @c[lx]-@b[lx], @c[ly]-@b[ly], @b[ux]-@c[ux], @b[uy]-@c[uy]; 
+                @t[lx]-@b[lx], @t[ly]-@b[ly], @b[ux]-@t[ux], @b[uy]-@t[uy]; 
             },
             STORE => -> $, Array() $b is copy {
-                my @c[4] = $.bbox('crop');
+                my @t[4] = $.bbox('trim');
 
                 $b[lx] //= 8.5;
                 $b[ly] //= $b[lx];
                 $b[ux] //= $b[lx];
                 $b[uy] //= $b[ly];
 
-                self.BleedBox = @c[lx]-$b[lx], @c[ly]-$b[ly], @c[ux]+$b[ux], @c[uy]+$b[uy];
+                self.BleedBox = @t[lx]-$b[lx], @t[ly]-$b[ly], @t[ux]+$b[ux], @t[uy]+$b[uy];
             },
         );
     }
