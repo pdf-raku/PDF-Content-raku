@@ -2,16 +2,16 @@ use v6;
 use Test;
 plan 109;
 
-use lib '.';
+use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
 use PDF::Content::Matrix :scale;
-use t::GfxParent;
+use FakeGfxParent;
 
 my $dummy-font = %() does role { method cb-finish {} }
 
-my $parent = { :Font{ :F1($dummy-font) }, } does t::GfxParent;
+my $parent = { :Font{ :F1($dummy-font) }, } does FakeGfxParent;
 my PDF::Content $g .= new: :$parent;
 
 $g.op(Save);

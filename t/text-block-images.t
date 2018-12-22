@@ -1,19 +1,19 @@
 use v6;
 use Test;
 plan 3;
-use lib '.';
+use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Block;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::XObject;
-use t::PDFTiny;
+use PDFTiny;
 
 # experimental feature to flow text and images
 
 # ensure consistant document ID generation
 srand(123456);
 
-my t::PDFTiny $pdf .= new;
+my PDFTiny $pdf .= new;
 my $page = $pdf.add-page;
 
 my @chunks = PDF::Content::Text::Block.comb: 'I must go down to the seas';

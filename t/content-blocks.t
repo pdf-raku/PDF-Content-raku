@@ -4,10 +4,10 @@ plan 14;
 
 use PDF::Content;
 use PDF::Grammar::Test :is-json-equiv;
-use lib '.';
-use t::GfxParent;
+use lib 't/lib';
+use FakeGfxParent;
 
-my $parent = { :Font{ :F1{} }, } does t::GfxParent;
+my $parent = { :Font{ :F1{} }, } does FakeGfxParent;
 
 my PDF::Content $g .= new: :$parent;
 $g.graphics: { .BeginText; .ShowText("Hi"); .EndText;};
