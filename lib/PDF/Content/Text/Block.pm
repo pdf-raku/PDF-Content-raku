@@ -103,9 +103,10 @@ class PDF::Content::Text::Block {
                 $pre-word-gap = 0;
             }
             if $reserving {
-                my $height = $atom.height;
-                $line.height = $height
-                    if $height > $line.height;
+                given $atom.height {
+                    $line.height = $_
+                        if $_ > $line.height;
+                }
             }
             if $!height && self.content-height > $!height {
                 # height exceeded
