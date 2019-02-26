@@ -1,7 +1,10 @@
 role PDF::Content::Font::Enc::Glyphic {
     use Font::AFM;
     has Hash $.glyphs is rw = %Font::AFM::Glyphs;
-    has @!differences;
+    use PDF::COS;
+    use PDF::COS::Name;
+    my subset NameOrUInt where PDF::COS::Name|UInt;
+    has NameOrUInt @!differences;
     has uint8 @!diff-cids;
     has Bool  $!diff-cids-updated = False;
 
@@ -20,16 +23,18 @@ role PDF::Content::Font::Enc::Glyphic {
 
     method differences is rw {
         Proxy.new(
-            STORE => sub ($, @!differences) {
+            STORE => sub ($, @diffs) {
                 my %glyph-map := self.glyph-map;
                 my uint32 $idx = 0;
-                for @!differences {
+                @!differences = @diffs.map: {
                     when UInt { $idx  = $_ }
                     when Str {
                         self.set-encoding(.ord, $idx)
                             with %glyph-map{$_};
                         $idx++;
+                        PDF::COS.coerce($_, PDF::COS::Name);
                     }
+                    default { die "bad difference entry: .perl" }
                 }
                 $!diff-cids-updated = False;
             },
@@ -42,7 +47,11 @@ role PDF::Content::Font::Enc::Glyphic {
                             @!differences.push: $_;
                             $cur-idx = $_;
                         }
-                        @!differences.push: 'name' => self.lookup-glyph( @.to-unicode[$_] ) // '.notdef';
+                        my $glyph-name = PDF::COS.coerce(
+                            self.lookup-glyph( @.to-unicode[$_] ) // '.notdef',
+                            PDF::COS::Name
+                        );
+                        @!differences.push: $glyph-name;
                     }
                     $!diff-cids-updated = False;
                 }
