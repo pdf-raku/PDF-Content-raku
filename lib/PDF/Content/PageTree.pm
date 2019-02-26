@@ -7,7 +7,7 @@ role PDF::Content::PageTree
 
     use PDF::Content::PageNode;
     use PDF::COS;
-    my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids;
+    my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids && .[0] ~~ PDF::Content::PageNode;
 
     #| add new last page
     method add-page( PDF::Content::PageNode $page? is copy ) {
@@ -91,7 +91,7 @@ role PDF::Content::PageTree
             @index = self.Kids.values
         }
         else {
-            my $kids = self.Kids;
+            my $kids := self.Kids;
             for 0 ..^ + $kids {
                 given $kids[$_] {
                     when PDF::Content::PageTree { @index.append: .page-index }
@@ -101,6 +101,19 @@ role PDF::Content::PageTree
             }
         }
         @index;
+    }
+
+    method pages {
+        my @pages;
+        my $kids := self.Kids;
+        for 0 ..^ + $kids {
+            given $kids[$_] {
+                when PDF::Content::PageTree { @pages.append: .pages }
+                when PDF::Content::PageNode { @pages.push: $_ }
+                default { die "unexpected object in page tree: {.perl}"; }
+            }
+        }
+        @pages;
     }
 
     #| delete page from page tree
