@@ -17,8 +17,8 @@ class PDF::Content::Tag {
     }
     method mcid is rw {
         Proxy.new(
-            FETCH => sub ($) { .<MCID> with $!props },
-            STORE => sub ($, UInt $_) {
+            FETCH => { .<MCID> with $!props },
+            STORE => -> $, UInt $_ {
                 $!props<MCID> = $_
             },
         );

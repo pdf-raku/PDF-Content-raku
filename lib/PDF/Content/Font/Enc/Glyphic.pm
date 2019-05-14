@@ -23,7 +23,7 @@ role PDF::Content::Font::Enc::Glyphic {
 
     method differences is rw {
         Proxy.new(
-            STORE => sub ($, @diffs) {
+            STORE => -> $, @diffs {
                 my %glyph-map := self.glyph-map;
                 my uint32 $idx = 0;
                 @!differences = @diffs.map: {
@@ -38,7 +38,7 @@ role PDF::Content::Font::Enc::Glyphic {
                 }
                 $!diff-cids-updated = False;
             },
-            FETCH => sub ($) {
+            FETCH => {
                 if $!diff-cids-updated {
                     @!differences = ();
                     my int $cur-idx = -2;

@@ -238,11 +238,11 @@ class PDF::Content:ver<0.2.8>
             unless $.context == GraphicsContext::Text;
 
 	Proxy.new(
-	    FETCH => sub (\p) {
+	    FETCH => {
                 my @tm = @.TextMatrix;
 	        @tm[4] / @tm[0], @tm[5] / @tm[3];
 	    },
-	    STORE => sub (\p, Vector \v) {
+	    STORE => -> $, Vector \v {
                 my @tm = @.TextMatrix;
                 @tm[4] = $_ * @tm[0] with v[0];
                 @tm[5] = $_ * @tm[3] with v[1];
@@ -303,10 +303,10 @@ class PDF::Content:ver<0.2.8>
 
     method font is rw returns Array {
         Proxy.new(
-            FETCH => sub ($) {
+            FETCH => {
                 $.Font;
             },
-            STORE => sub ($, $v) {
+            STORE => -> $, $v {
                 my @v = $v.isa(List) ?? @$v !! [ $v, ];
                 @v[0] = .use-font(@v[0]) with $.parent;
                 self.set-font(|@v);

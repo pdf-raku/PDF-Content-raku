@@ -213,8 +213,8 @@ class PDF::Content::Ops {
 
     method graphics-accessor(Attribute $att, $setter) is rw {
         Proxy.new(
-            FETCH => sub ($) { $att.get_value(self) },
-            STORE => sub ($,*@v) {
+            FETCH => { $att.get_value(self) },
+            STORE => -> $, *@v {
                 self."$setter"(|@v)
                     unless [$att.get_value(self).list] eqv @v;
             });
@@ -222,8 +222,8 @@ class PDF::Content::Ops {
 
     method ext-graphics-accessor(Attribute $att, $key) is rw {
         Proxy.new(
-            FETCH => sub ($) { $att.get_value(self) },
-            STORE => sub ($,\v) {
+            FETCH => { $att.get_value(self) },
+            STORE => -> $, \v {
                 unless $att.get_value(self) eqv v {
                     with self.parent {
                         my  &grepper = sub (Hash $_) {
@@ -300,8 +300,8 @@ class PDF::Content::Ops {
     has Numeric @.CTM is graphics = [ 1, 0, 0, 1, 0, 0, ];      # graphics matrix;
     method CTM is rw {
         Proxy.new(
-            FETCH => sub ($) {@!CTM},
-            STORE => sub ($, List $gm) {
+            FETCH => { @!CTM },
+            STORE => -> $, List $gm {
                 my @ctm-inv = inverse(@!CTM);
                 my @diff = multiply($gm, @ctm-inv);
                 self.ConcatMatrix( |@diff )
@@ -321,8 +321,8 @@ class PDF::Content::Ops {
     has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
         Proxy.new(
-            FETCH => sub ($) {$!StrokeColorSpace => @!StrokeColor},
-            STORE => sub ($, Pair $_) {
+            FETCH => -> $ { $!StrokeColorSpace => @!StrokeColor },
+            STORE => -> $, Pair $_ {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
                     if $key ~~ /^ Device(RGB|Gray|CMYK) $/ {
@@ -342,8 +342,8 @@ class PDF::Content::Ops {
     has @!FillColor is graphics = [0.0];
     method FillColor is rw {
         Proxy.new(
-            FETCH => sub ($) {$!FillColorSpace => @!FillColor},
-            STORE => sub ($, Pair $_) {
+            FETCH => -> $ {$!FillColorSpace => @!FillColor},
+            STORE => -> $, Pair $_ {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!FillColorSpace && .value eqv @!FillColor {
                     if $key ~~ /^ Device(RGB|Gray|CMYK) $/ {

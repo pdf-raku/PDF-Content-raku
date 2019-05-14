@@ -100,10 +100,10 @@ class PDF::Content::Image {
 
     method data-uri is rw {
         Proxy.new(
-            FETCH => sub ($) {
+            FETCH => {
                 $!data-uri //= $.make-data-uri( :$.image-type, :$!source );
             },
-            STORE => sub ($, $!data-uri) {},
+            STORE => -> $, $!data-uri {},
         )
     }
 

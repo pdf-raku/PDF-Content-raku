@@ -71,8 +71,8 @@ role PDF::Content::Page
 
     method decoded is rw {
         Proxy.new(
-            FETCH => sub ($) { self.contents },
-            STORE => sub ($,$decoded) {
+            FETCH => { self.contents },
+            STORE => -> $, $decoded {
                 if self<Contents> ~~ PDF::COS::Stream {
                     self<Contents>.decoded = $decoded;
                 }

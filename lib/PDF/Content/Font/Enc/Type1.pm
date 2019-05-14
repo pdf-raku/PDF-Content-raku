@@ -1,5 +1,11 @@
 use PDF::Content::Font::Enc::Glyphic;
 
+#| Implements a Type-1 single byte font encoding scheme.
+#| it optimises the encoding to accomodate any subset of
+#| <= 255 unique glyphs; by (1) using the standard
+#| encoding for the glyph (2) mapping codes that are not
+#| used in the encoding scheme, or (3) re-allocating codes
+#| that have not been used.
 class PDF::Content::Font::Enc::Type1
     does PDF::Content::Font::Enc::Glyphic {
     use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs;

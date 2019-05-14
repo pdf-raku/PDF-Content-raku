@@ -40,7 +40,7 @@ role PDF::Content::PageNode {
     method bleed is rw {
         my enum <lx ly ux uy>;
         Proxy.new(
-            FETCH => -> $_ {
+            FETCH => {
                 my @t[4] = $.bbox('trim');
                 my @b[4] = $.bbox('bleed');
                 @t[lx]-@b[lx], @t[ly]-@b[ly], @b[ux]-@t[ux], @b[uy]-@t[uy]; 
