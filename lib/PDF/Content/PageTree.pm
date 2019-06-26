@@ -48,8 +48,8 @@ role PDF::Content::PageTree
         $pages;
     }
 
-    #| $.page(0) - adds a new page
-    multi method page(Int $page-num where $page-num == 0
+    #| $.page(0?) - adds a new page
+    multi method page(Int $page-num where 0 = 0
 	--> PDF::Content::PageNode) {
         self.add-page;
     }

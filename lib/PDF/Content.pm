@@ -62,13 +62,13 @@ class PDF::Content:ver<0.2.8>
     method inline-images returns Array {
 	my PDF::COS::Stream @images;
 	for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
-	    my $v = $.ops[$i];
-	    my $v1 = $.ops[$i+1];
+	    my $bi = $.ops[$i];
+	    my $id = $.ops[$i+1];
 	    die "'BI' op not followed by 'ID' in content stream"
-		unless $v1 ~~ Pair && $v1.key eq 'ID';
+		unless $id ~~ Pair && $id.key eq 'ID';
 
-	    my %dict = PDF::Content::XObject['Image'].inline-to-xobject($v.value[0]<dict>);
-	    my $encoded = $v1.value[0]<encoded>;
+	    my %dict = PDF::Content::XObject['Image'].inline-to-xobject($bi.value[0]<dict>);
+	    my $encoded = $id.value[0]<encoded>;
 
 	    @images.push: PDF::COS.coerce( :stream{ :%dict, :$encoded } );
 	}

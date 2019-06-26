@@ -39,6 +39,7 @@ class PDFTiny is PDF {
 	has Numeric @.MediaBox is entry(:inherit,:len(4));
 	has Numeric @.CropBox  is entry(:len(4));
 	has Numeric @.TrimBox  is entry(:len(4));
+	has Numeric @.BleedBox is entry(:len(4));
     }
     my class Pages is PageNode does PDF::Content::PageTree {
 	has PageNode @.Kids    is entry(:required, :indirect);

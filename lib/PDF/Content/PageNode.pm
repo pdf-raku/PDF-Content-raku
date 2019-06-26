@@ -3,9 +3,10 @@ use v6;
 use PDF::COS::Tie::Hash;
 
 role PDF::Content::PageNode {
-
+    use PDF::Content::Page :PageSizes;
     #| source: http://www.gnu.org/software/gv/
     my subset Box of List where {.elems == 4}
+    my subset BoxOrStr where Box|Str;
 
     #| e.g. $.to-landscape(PagesSizes::A4)
     method to-landscape(Box $p --> Box) {
@@ -23,15 +24,18 @@ role PDF::Content::PageNode {
     }
 
     method bbox(BoxName $box-name = 'media') is rw {
-        my &fetch-sub := do given $box-name {
-            when 'media' { sub ($) { self.MediaBox // [0, 0, 612, 792] } }
-            when 'crop'  { sub ($) { self.CropBox // self.bbox('media') } }
-            default      { sub ($) { self!get-prop($box-name) // self.bbox('crop') } }
+        my &FETCH := do given $box-name {
+            when 'media' { -> $ { self.MediaBox // [0, 0, 612, 792] } }
+            when 'crop'  { -> $ { self.CropBox // self.bbox('media') } }
+            default      { -> $ { self!get-prop($box-name) // self.bbox('crop') } }
         };
 
         Proxy.new(
-            FETCH => &fetch-sub,
-            STORE => sub ($, Box $rect) {
+            :&FETCH,
+            STORE => -> $, BoxOrStr $size {
+                my $rect := $size ~~ Box
+                    ?? $size
+                    !! PageSizes::{$size} // fail "Unknown named page size '$size' (expected: {PageSizes::.keys.sort.join: ', '})";
                 self!get-prop($box-name) = $rect;
             },
            );
