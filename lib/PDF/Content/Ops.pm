@@ -114,7 +114,7 @@ class PDF::Content::Ops {
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
     use PDF::Content::Tag;
 
-    has Routine @.callback is rw;
+    has Block @.callback is rw;
     has Pair @.ops;
     has Bool $.comment-ops is rw = False;
     has Bool $.strict is rw = True;
