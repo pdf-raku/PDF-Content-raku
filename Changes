@@ -1,11 +1,14 @@
+Release 0.2.9
+- Add $gfx(:debug) option
+
 Release 0.2.8
 - Allow named page sizes: $page.media-box = 'Letter';
 - add typechecking/coercement to Type1 encoder differences array
+
 Release 0.2.7
 - Added $page.bleed() method. Convenience method for getting
   or setting bleed as a gutter around the crop box.
 - Fix tests for Rakudo 2018.12+ blead
-- Added type-checking/coercement to Type1 encoder differences array
 
 Release 0.2.6
 - $gfx.do() and $text-block.print() now return rectangles

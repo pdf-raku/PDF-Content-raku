@@ -115,9 +115,10 @@ class PDF::Content::Ops {
     use PDF::Content::Tag;
 
     has Block @.callback is rw;
-    has Pair @.ops;
-    has Bool $.comment-ops is rw = False;
-    has Bool $.strict is rw = True;
+    has Pair  @.ops;
+    has Bool  $.comment-ops is rw = False;
+    has Bool  $.debug = False;
+    has Bool  $.strict is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
 
     # some convenient mnemomic names
@@ -702,7 +703,30 @@ class PDF::Content::Ops {
             opn.value.push: (:comment(%OpName{$op}))
                 if $!comment-ops && $op ne 'ID';
         }
+
+        self!debug($op, opn) if $!debug;
+
 	opn;
+    }
+
+    method !debug(Str $op, Pair \opn) {
+        my $nesting = @!gsave.elems + @!open-tags.elems;
+        $nesting++ if $!context == Text;
+        my $indent = '  ' x $nesting;
+        my PDF::Writer $writer .= new;
+
+        my $str = $indent ~ $writer.write: :content(opn);
+        $str ~= "\t% %OpName{$op}"
+            unless $op ~~ Comment || $!comment-ops;
+        note $str;
+
+        if $.is-graphics-op($op) || $op ~~ 'Q'|'cm' {
+            my %GS = $.graphics-state;
+            note $indent ~ "\t%% " ~ :%GS.perl;
+        }
+
+        note $indent ~ "\t%% " ~ :@!TextMatrix.perl
+            if $op ∈ TextStateOps || $op ∈ TextOps;
     }
 
     multi method ops(Str $ops!) {
@@ -730,16 +754,18 @@ class PDF::Content::Ops {
 	p.ast
     }
 
-    multi method track-graphics('q') {
-
-        my %gstate = %GraphicVars.pairs.map: {
+    method graphics-state {
+        %GraphicVars.pairs.map: {
             my Str $key       = .key;
             my Attribute $att = .value;
             my $val           = $att.get_value(self);
             $val .= clone if $val ~~ Array;
             $key => $val;
         }
+    }
 
+    multi method track-graphics('q') {
+        my %gstate = $.graphics-state;
         @!gsave.push: %gstate;
     }
 

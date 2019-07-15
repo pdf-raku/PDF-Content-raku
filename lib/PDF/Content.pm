@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.2.8>
+class PDF::Content:ver<0.2.9>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -158,16 +158,17 @@ class PDF::Content:ver<0.2.8>
 
     multi method paint(Bool :$fill! where .so, Bool :$even-odd,
                        Bool :$close, Bool :$stroke) {
-        my @paint-ops = $even-odd
-            ?? ($close
-                ?? ($stroke ?? <CloseEOFillStroke> !! <Close EOFill>)
-                !! ($stroke ?? <EOFillStroke>      !! <EOFill>)
-               )
-            !! ($close
-                ?? ($stroke ?? <CloseFillStroke>   !! <Close Fill>)
-                !! ($stroke ?? <FillStroke>        !! <Fill>)
-               );
-
+        my @paint-ops = do {
+            when $even-odd {
+                when $close { $stroke ?? <CloseEOFillStroke> !! <Close EOFill> }
+                default     { $stroke ?? <EOFillStroke>      !! <EOFill>       }
+            }
+            default {
+                when $close { $stroke ?? <CloseFillStroke>   !! <Close Fill>   }
+                default     { $stroke ?? <FillStroke>        !! <Fill>         }
+            }
+        }
+                    
         self."$_"()
             for @paint-ops;
     }

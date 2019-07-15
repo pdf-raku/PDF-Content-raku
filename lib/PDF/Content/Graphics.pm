@@ -14,20 +14,20 @@ role PDF::Content::Graphics {
     has PDF::Content $!gfx;     #| appended graphics
     has Bool $!rendered = False;
 
-    #| add any missing 'q' (Save) and 'Q' (Restore) operators
-    #| if missing at the end of input, or if needed to make the
-    #| content safely editable
+    #| Fix nesting issues that aren't illegal, but could cause problems:
+    #| - append any missing 'Q' (Restore) operators at end of stream
+    #| - wrap with 'q' (Save) and 'Q' (Restore) operators, if there
+    #|   are any top-level graphics, which may affect the state.
     method !tidy(@ops) {
         my int $nesting = 0;
-        my $needed = False;
+        my $wrap = False;
 
         for @ops {
             given .key {
                 when OpCode::Save {$nesting++}
                 when OpCode::Restore {$nesting--}
                 default {
-                    $needed = True
-                        if $nesting <= 0
+                    $wrap ||= $nesting <= 0
                         && PDF::Content::Ops.is-graphics-op: $_;
                 }
             }
@@ -36,10 +36,11 @@ role PDF::Content::Graphics {
         @ops.push: OpCode::Restore => []
             while $nesting-- > 0;
 
-	if $needed {
+	if $wrap {
 	    @ops.unshift: OpCode::Save => [];
 	    @ops.push: OpCode::Restore => [];
 	}
+
         @ops;
     }
 
