@@ -164,6 +164,8 @@ class PDF::Content::Ops {
     my constant CompatOps = set <BX EX>;
     my constant FontOps = set <d0 d1>;
 
+    my constant Openers = set <q BT BMC BDC BX>;
+    my constant Closers = set <Q ET EMC EX>;
     # Extended Graphics States (Resource /ExtGState entries)
     # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
     # These match PDF::ExtGState from PDF::Class
@@ -712,6 +714,7 @@ class PDF::Content::Ops {
     method !debug(Str $op, Pair \opn) {
         my $nesting = @!gsave.elems + @!open-tags.elems;
         $nesting++ if $!context == Text;
+        $nesting-- if $op ∈ Openers;
         my $indent = '  ' x $nesting;
         my PDF::Writer $writer .= new;
 
@@ -989,9 +992,8 @@ class PDF::Content::Ops {
     #| serialize content into a string. indent blocks for readability
     has Str $!content-cache;
     method Str { $!content-cache //= self!content }
+
     method !content returns Str {
-	my constant Openers = 'q'|'BT'|'BMC'|'BDC'|'BX';
-	my constant Closers = 'Q'|'ET'|'EMC'|'EX';
         my PDF::Writer $writer .= new;
 
 	$.finish;
@@ -1000,9 +1002,9 @@ class PDF::Content::Ops {
         @!ops.map({
 	    my \op = ~ .key;
 
-	    $nesting-- if $nesting && op ~~ Closers;
+	    $nesting-- if $nesting && op ∈ Closers;
 	    $writer.indent = '  ' x $nesting;
-	    $nesting++ if op ~~ Openers;
+	    $nesting++ if op ∈ Openers;
 
 	    my \pad = op eq 'EI'
                 ?? ''
