@@ -721,15 +721,20 @@ class PDF::Content::Ops {
         my $str = $indent ~ $writer.write: :content(opn);
         $str ~= "\t% %OpName{$op}"
             unless $op ~~ Comment || $!comment-ops;
-        note $str;
 
-        if $.is-graphics-op($op) || $op ~~ 'Q'|'cm' {
-            my %GS = $.graphics-state;
-            note $indent ~ "\t%% " ~ :%GS.perl;
+        $str ~= do given $op {
+            when $.is-graphics-op($_) || $_ ~~ 'Q'|'cm' {
+                my %GS = $.graphics-state;
+                "\t" ~ :%GS.perl;
+            }
+            when 'Td'|'T*'|"'"
+                       { "\t" ~ :@!TextMatrix.perl }
+            when '"'   { "\t" ~ (:$!WordSpacing, :$!CharSpacing, :@!TextMatrix).perl }
+            when 'TD'  { "\t" ~ (:$!TextLeading, :@!TextMatrix).perl }
+            when 'Tf'  { "\t" ~ :$!Font.perl }
+            default    { '' }
         }
-
-        note $indent ~ "\t%% " ~ :@!TextMatrix.perl
-            if $op ∈ TextStateOps || $op ∈ TextOps;
+        note $str;
     }
 
     multi method ops(Str $ops!) {
