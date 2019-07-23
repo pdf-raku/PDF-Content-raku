@@ -110,6 +110,7 @@ class PDF::Content::Ops {
 
     use PDF::Writer;
     use PDF::COS;
+    use PDF::COS::Dict;
     use PDF::COS::Util :from-ast, :to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
     use PDF::Content::Tag;
@@ -506,7 +507,7 @@ class PDF::Content::Ops {
         # tag [dict|name]         BDC | DP
         'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str|Pair) {
             my Pair $prop = do given $p {
-                when Hash { PDF::COS.coerce(:dict($p)).content }
+                when Hash { PDF::COS::Dict.new(:dict($p)).content }
                 when Str  { :name($p) }
             }
             [ :$name, $prop ]
