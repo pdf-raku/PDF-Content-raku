@@ -724,15 +724,19 @@ class PDF::Content::Ops {
             unless $op ~~ Comment || $!comment-ops;
 
         $str ~= do given $op {
-            when $.is-graphics-op($_) || $_ ~~ 'Q'|'cm' {
-                my %GS = $.graphics-state;
-                "\t" ~ :%GS.perl;
-            }
+            when 'k'|'g'|'rg' { "\t" ~ (:$!FillColorSpace, :@!FillColor).perl }
+            when 'K'|'G'|'RG' { "\t" ~ (:$!StrokeColorSpace, :@!StrokeColor).perl }
+            when 'sc'|'scn'   { "\t" ~ :@!FillColor.perl }
+            when 'SC'|'SCN' { "\t" ~ :@!StrokeColor.perl }
             when 'Td'|'T*'|"'"
                        { "\t" ~ :@!TextMatrix.perl }
             when '"'   { "\t" ~ (:$!WordSpacing, :$!CharSpacing, :@!TextMatrix).perl }
             when 'TD'  { "\t" ~ (:$!TextLeading, :@!TextMatrix).perl }
             when 'Tf'  { "\t" ~ :$!Font.perl }
+            when $.is-graphics-op($_) || $_ ~~ 'Q'|'cm'|'gs' {
+                my %GS = $.graphics-state;
+                "\t" ~ :%GS.perl;
+            }
             default    { '' }
         }
         note $str;
@@ -855,19 +859,19 @@ class PDF::Content::Ops {
         True;
     }
 
-    multi method track-graphics('scn', *@colors where self!color-args-ok('scn', @colors)) {
-        @!FillColor = @colors;
-    }
-
-    multi method track-graphics('SCN', *@colors where self!color-args-ok('SCN', @colors)) {
-        @!StrokeColor = @colors;
-    }
-
     multi method track-graphics('sc',  *@colors where self!color-args-ok('sc',  @colors)) {
         @!FillColor = @colors;
     }
 
+    multi method track-graphics('scn', *@colors where self!color-args-ok('scn', @colors)) {
+        @!FillColor = @colors;
+    }
+
     multi method track-graphics('SC',  *@colors where self!color-args-ok('SC',  @colors)) {
+        @!StrokeColor = @colors;
+    }
+
+    multi method track-graphics('SCN', *@colors where self!color-args-ok('SCN', @colors)) {
         @!StrokeColor = @colors;
     }
 

@@ -34,7 +34,7 @@ class PDF::Content::Image::PNG
     has Blob $.trns is rw;
     has Blob $.stream;
     constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
-    constant \NullPointer = nativecast(CArray,Pointer.new(0));
+    constant NullPointer = nativecast(CArray,Pointer.new(0));
 
     method !crc($hdr, $buf) {
         my uint32 $crc = Compress::Zlib::Raw::crc32(0, NullPointer, 0);

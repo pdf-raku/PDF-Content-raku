@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Image;
 
-# adapted from Perl 5's PDF::API::Resource::XObject::Image::JPEG
+# adapted from Perl 5's PDF::API2::Resource::XObject::Image::JPEG
 
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
