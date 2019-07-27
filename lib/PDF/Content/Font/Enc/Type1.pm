@@ -13,7 +13,7 @@ class PDF::Content::Font::Enc::Type1
     has UInt %!charset;       #| used characters
     has uint16 @.to-unicode[256];
     has uint8 @!fallback-cids;
-    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf';
+    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std';
     has EncodingScheme $.enc = 'win';
 
     submethod TWEAK {

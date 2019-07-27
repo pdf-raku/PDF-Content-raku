@@ -1,9 +1,10 @@
 Release 0.2.9
 - Add $gfx(:debug) option
+- Fix handling of 'std' encoding in PDF::Content::Font::Enc::Glyphic
 
 Release 0.2.8
 - Allow named page sizes: $page.media-box = 'Letter';
-- add typechecking/coercement to Type1 encoder differences array
+- Add typechecking/coercement to Type1 encoder differences array
 
 Release 0.2.7
 - Added $page.bleed() method. Convenience method for getting
