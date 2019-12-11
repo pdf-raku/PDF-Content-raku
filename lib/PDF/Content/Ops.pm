@@ -374,7 +374,7 @@ class PDF::Content::Ops {
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
-    has @.gsave;
+    has @.gsaves;
     sub delta(@gs) {
         loop (my $n = @gs - 1; $n >= 1; $n--) {
             @gs[$n] .= clone;
@@ -386,12 +386,16 @@ class PDF::Content::Ops {
         @gs.shift;
         @gs;
     }
-    multi method gsave(:$delta! where .so) {
-        my @gs = @!gsave;
+    multi method gsaves(:$delta! where .so) {
+        my @gs = @!gsaves;
         @gs.push: $.graphics-state;
         delta(@gs);
     }
-    multi method gsave is default { @!gsave }
+    multi method gsaves is default { @!gsaves }
+
+    # looks too much like a verb
+    method gsave is DEPRECATED('gsaves') { @!gsaves }
+
     has PDF::Content::Tag @.open-tags;
     has PDF::Content::Tag @.tags;
     multi method tags(@tags = @!tags, :$flat! where .so) {
@@ -424,14 +428,13 @@ class PDF::Content::Ops {
 
             'W'|'W*' => ( (Path) => Clipping ),
             'm'|'re' => ( (Page) => Path ),
-            'Do'     => ( (Page) => Page ),
             any(PaintingOps.keys) => ( (Clipping|Path) => Page ),
         );
 
         my constant %InSitu = %(
            (Path) => PathOps ∪ CompatOps,
            (Text) => TextOps ∪ TextStateOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps ∪ CompatOps,
-           (Page) => TextStateOps ∪ SpecialGraphicOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps ∪ CompatOps ∪ FontOps ∪ <sh>.Set,
+           (Page) => TextStateOps ∪ SpecialGraphicOps ∪ GeneralGraphicOps ∪ ColorOps ∪ MarkedContentOps ∪ CompatOps ∪ FontOps ∪ <sh Do>.Set,
            (Image) => <ID>.Set,
         );
 
@@ -692,7 +695,7 @@ class PDF::Content::Ops {
             }
         }
 
-        if $!strict && !@!gsave && self.is-graphics-op($op) {
+        if $!strict && !@!gsaves && self.is-graphics-op($op) {
             # not illegal just bad practice to perform graphics outside of a
             # block. makes it harder to later edit/reuse this content stream
             # and may upset downstream utilities
@@ -733,7 +736,7 @@ class PDF::Content::Ops {
     sub json($_) { to-json($_, :!pretty) }
 
     method !debug(Str $op, Pair \opn) {
-        my $nesting = @!gsave.elems + @!open-tags.elems;
+        my $nesting = @!gsaves.elems + @!open-tags.elems;
         $nesting++ if $!context == Text;
         $nesting-- if $op ∈ Openers;
         my $indent = '  ' x $nesting;
@@ -787,8 +790,8 @@ class PDF::Content::Ops {
 	p.ast
     }
 
-    multi method graphics-state(:$delta! where {.so && @!gsave}) {
-        delta([@!gsave.tail, $.graphics-state]).tail;
+    multi method graphics-state(:$delta! where {.so && @!gsaves}) {
+        delta([@!gsaves.tail, $.graphics-state]).tail;
     }
     multi method graphics-state is default {
         %(
@@ -804,14 +807,14 @@ class PDF::Content::Ops {
 
     multi method track-graphics('q') {
         my %gstate := $.graphics-state;
-        @!gsave.push: %gstate;
+        @!gsaves.push: %gstate;
     }
 
     multi method track-graphics('Q') {
         die X::PDF::Content::OP::BadNesting.new: :op<Q>, :mnemonic(%OpName<Q>), :opener("'q' (%OpName<q>)")
-            unless @!gsave;
+            unless @!gsaves;
 
-        my %gstate = @!gsave.pop;
+        my %gstate = @!gsaves.pop;
 
         for %gstate.pairs {
             my Str $key       = .key;
@@ -1015,7 +1018,7 @@ class PDF::Content::Ops {
 	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@!open-tags.map(*.gist).join: ' '} at end of content stream")
 	    if @!open-tags;
 	die X::PDF::Content::Unclosed.new: :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream")
-	    if @!gsave;
+	    if @!gsaves;
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")
             if $!strict && $!context != Page;
 
