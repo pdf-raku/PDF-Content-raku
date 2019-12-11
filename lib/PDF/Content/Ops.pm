@@ -114,6 +114,7 @@ class PDF::Content::Ops {
     use PDF::COS::Util :from-ast, :to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
     use PDF::Content::Tag;
+    use JSON::Fast;
 
     has Block @.callback is rw;
     has Pair  @.ops;
@@ -374,6 +375,23 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     has @.gsave;
+    sub delta(@gs) {
+        loop (my $n = @gs - 1; $n >= 1; $n--) {
+            @gs[$n] .= clone;
+            for @gs[$n].keys {
+                @gs[$n]{$_}:delete
+                    if @gs[$n]{$_} eqv @gs[$n-1]{$_};
+            }
+        }
+        @gs.shift;
+        @gs;
+    }
+    multi method gsave(:$delta! where .so) {
+        my @gs = @!gsave;
+        @gs.push: $.graphics-state;
+        delta(@gs);
+    }
+    multi method gsave is default { @!gsave }
     has PDF::Content::Tag @.open-tags;
     has PDF::Content::Tag @.tags;
     multi method tags(@tags = @!tags, :$flat! where .so) {
@@ -712,6 +730,8 @@ class PDF::Content::Ops {
 	opn;
     }
 
+    sub json($_) { to-json($_, :!pretty) }
+
     method !debug(Str $op, Pair \opn) {
         my $nesting = @!gsave.elems + @!open-tags.elems;
         $nesting++ if $!context == Text;
@@ -723,22 +743,22 @@ class PDF::Content::Ops {
         $str ~= "\t% %OpName{$op}"
             unless $op ~~ Comment || $!comment-ops;
 
-        $str ~= do given $op {
-            when 'k'|'g'|'rg' { "\t" ~ (:$!FillColorSpace, :@!FillColor).perl }
-            when 'K'|'G'|'RG' { "\t" ~ (:$!StrokeColorSpace, :@!StrokeColor).perl }
-            when 'sc'|'scn'   { "\t" ~ :@!FillColor.perl }
-            when 'SC'|'SCN' { "\t" ~ :@!StrokeColor.perl }
+        my $data = do given $op {
+            when 'k'|'g'|'rg' { %(:$!FillColorSpace, :@!FillColor) }
+            when 'K'|'G'|'RG' { %(:$!StrokeColorSpace, :@!StrokeColor) }
+            when 'sc'|'scn'   { %(:@!FillColor) }
+            when 'SC'|'SCN'   { %(:@!StrokeColor) }
             when 'Td'|'T*'|"'"
-                       { "\t" ~ :@!TextMatrix.perl }
-            when '"'   { "\t" ~ (:$!WordSpacing, :$!CharSpacing, :@!TextMatrix).perl }
-            when 'TD'  { "\t" ~ (:$!TextLeading, :@!TextMatrix).perl }
-            when 'Tf'  { "\t" ~ :$!Font.perl }
+                       { %(:@!TextMatrix) }
+            when '"'   { %(:$!WordSpacing, :$!CharSpacing, :@!TextMatrix) }
+            when 'TD'  { %(:$!TextLeading, :@!TextMatrix) }
+            when 'Tf'  { %(:$!Font) }
             when $.is-graphics-op($_) || $_ ~~ 'Q'|'cm'|'gs' {
-                my %GS = $.graphics-state;
-                "\t" ~ :%GS.perl;
+                $.graphics-state(:delta);
             }
-            default    { '' }
+            default { Nil }
         }
+        $str ~= "\t" ~ to-json($_, :!pretty, :sorted-keys) with $data;
         note $str;
     }
 
@@ -767,18 +787,23 @@ class PDF::Content::Ops {
 	p.ast
     }
 
-    method graphics-state {
-        %GraphicVars.pairs.map: {
-            my Str $key       = .key;
-            my Attribute $att = .value;
-            my $val           = $att.get_value(self);
-            $val .= clone if $val ~~ Array;
-            $key => $val;
-        }
+    multi method graphics-state(:$delta! where {.so && @!gsave}) {
+        delta([@!gsave.tail, $.graphics-state]).tail;
+    }
+    multi method graphics-state is default {
+        %(
+            %GraphicVars.pairs.map: {
+                my Str $key       = .key;
+                my Attribute $att = .value;
+                my $val           = $att.get_value(self);
+                $val .= clone if $val ~~ Array;
+                $key => $val;
+            }
+        )
     }
 
     multi method track-graphics('q') {
-        my %gstate = $.graphics-state;
+        my %gstate := $.graphics-state;
         @!gsave.push: %gstate;
     }
 

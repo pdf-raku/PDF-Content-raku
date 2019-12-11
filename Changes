@@ -1,3 +1,10 @@
+Release 0.3.0
+- Added graphics-state :delta option:
+  -- .graphics-state(:delta) returns variables updated since last Save('q')
+  -- .gsave(:delta) returns an array that summarizes updated variables on the
+     graphics stack. The final entry is the same as .graphics-state(:delta)
+  -- improved !debug() method. Uses .graphics-state(:delta) and dumps JSON.
+
 Release 0.2.9
 - Add $gfx(:debug) option
 - Fix handling of 'std' encoding in PDF::Content::Font::Enc::Glyphic

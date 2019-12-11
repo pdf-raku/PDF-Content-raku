@@ -1,6 +1,6 @@
 # PDF::Content
 
-This Perl 6 module is a library of roles and classes for basic PDF content creation and rendering, including text, images, fonts and general graphics.
+This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, fonts and general graphics.
 
 It is centered around implementing a graphics state machine and provding support for the operators and graphics variables
 as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PDF-API6#appendix-i-graphics).
@@ -57,9 +57,8 @@ use PDF::Content;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::Text::Block;
 my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
-my $font-size = 16;
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
-my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :$font-size );
+my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :font-size(16) );
 my PDF::Content $gfx .= new;
 $gfx.BeginText;
 $text-block.render($gfx);
