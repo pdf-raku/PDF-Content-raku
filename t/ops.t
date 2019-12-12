@@ -229,7 +229,7 @@ is-json-equiv $g.ops, [
     :v[:int(300), :int(800), :int(400), :int(720), :comment<CurveToInitial>, ],
     :h[ :comment<ClosePath>, ],
     :S[ :comment<Stroke>, ],
-    :comment["That's all!"],
+    :comment["That's all♥!"],
 ], 'parse and comment';
 
 is-deeply $g.content-dump, $(
@@ -238,13 +238,13 @@ is-deeply $g.content-dump, $(
     '300 800 400 720 v % CurveToInitial',
     'h % ClosePath',
     'S % Stroke',
-    '% That's all#1234!',
+    "% That's all#2665!",
 ), 'content with comments';
 
 my PDF::Content $g1 .= new;
 lives-ok {$g1.ops: $g.ops;}, "comments import - lives";
 is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), ]), 'comments import - head';
-is-json-equiv $g1.ops.tail, (:S[ ]), 'comments import - tail';
+is-json-equiv $g1.ops.tail(2).List, (:S[ ], :comment["That's all♥!"]), 'comments import - tail';
 
 $g.Save;
 $g.CTM = [0, -2, 2, 0, 40, -20];
