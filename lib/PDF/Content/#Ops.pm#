@@ -662,11 +662,17 @@ class PDF::Content::Ops {
         },
      );
 
+    sub sanitize-comment($_) {
+        # just make sure we don't leak non-latin unicode
+        .subst(/<- [ \x0..\xFF ]>/, q<\u[> ~ *.Str.uniname ~ q<]>, :g)'
+    }
     proto sub op(|c) returns Pair {*}
     # semi-raw and a little dwimmy e.g:  op('TJ' => [[:literal<a>, :hex-string<b>, 'c']])
     #                                     --> :TJ( :array[ :literal<a>, :hex-string<b>, :literal<c> ] )
     my subset Comment of Pair where {.key eq 'comment'}
-    multi sub op(Comment $comment) { $comment }
+    multi sub op(Comment $_) {
+        comment => sanitize-comment(.value);
+    }
     multi sub op(Pair $raw!) {
         my Str $op = $raw.key;
         my @raw-vals = $raw.value.grep(* !~~ Comment);

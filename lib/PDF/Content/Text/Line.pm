@@ -38,10 +38,11 @@ class PDF::Content::Text::Line {
         $!indent = - $.content-width  /  2;
     }
 
-    method content(Numeric :$font-size!, Numeric :$x-shift = 0, :$space!, :$space-pad = 0) {
+    method content(:$font!, Numeric :$font-size!, Numeric :$x-shift = 0, :$space-pad = 0) {
         my Numeric \scale = -1000 / $font-size;
         my subset Str-or-Pos where Str|Numeric;
         my Str-or-Pos @line;
+        constant Space = ' ';
 
         my Numeric $indent = $!indent + $x-shift;
         $indent = ($indent * scale).round.Int;
@@ -51,7 +52,7 @@ class PDF::Content::Text::Line {
 
         for @!words -> \w {
             if @!word-boundary[$wc++] {
-	        @line.push: $space;
+	        @line.push: Space;
                 @line.push: $space-pad unless $space-pad =~= 0;
             }
             @line.append: w.list;
@@ -60,15 +61,16 @@ class PDF::Content::Text::Line {
         #| coalesce adjacent strings
         my @out;
         my $n = 0;
-        my $prev := 0;
+        my $prev := Int;
         for @line {
-            if $_ ~~ Str && $prev ~~ Str {
-                @out[$n-1] ~= $_
+            my $tk := $_ ~~ Str ?? $font.encode($_, :str) !! $_;
+            if $tk ~~ Str && $prev ~~ Str {
+                @out[$n-1] ~= $tk;
             }
             else {
-                @out[$n++] = $_;
+                @out[$n++] = $tk;
             }
-            $prev := $_;
+            $prev := $tk;
         }
 
         @out == 1 && @out[0].isa(Str)

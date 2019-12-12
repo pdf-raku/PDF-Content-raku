@@ -219,10 +219,10 @@ is-json-equiv [ $g.ops[*-4..*] ], [
     :ET[],
 ], 'Text block parse';
 
-$g .= new( :comment-ops, :$parent);
+$g .= new( :comment, :$parent);
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
-$g.add-comment("That's all!");
+$g.add-comment("That's all♥!");
 is-json-equiv $g.ops, [
     :m[:int(175), :int(720), :comment<MoveTo>, ],
     :l[:int(175), :int(700), :comment<LineTo>, ],
@@ -238,7 +238,7 @@ is-deeply $g.content-dump, $(
     '300 800 400 720 v % CurveToInitial',
     'h % ClosePath',
     'S % Stroke',
-    "% That's all!",
+    '% That's all#1234!',
 ), 'content with comments';
 
 my PDF::Content $g1 .= new;

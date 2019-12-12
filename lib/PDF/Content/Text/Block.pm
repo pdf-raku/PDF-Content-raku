@@ -69,6 +69,7 @@ class PDF::Content::Text::Block {
                 when Str {
                     if $!style.kern {
                         ($word, $word-width) = $!style.font.kern($atom);
+                        $_ = -$_ for $word.list.grep(Numeric);
                     }
                     else {
                         $word = [ $atom, ];
@@ -77,15 +78,6 @@ class PDF::Content::Text::Block {
                     $word-width *= $!style.font-size * $.HorizScaling / 100000;
                     $word-width += ($atom.chars - 1) * $.CharSpacing
                         if $.CharSpacing > -$!style.font-size;
-
-                    for $word.list {
-                        when Str {
-                            $_ = $!style.font.encode($_, :str);
-                        }
-                        when Numeric {
-                            $_ = -$_;
-                        }
-                    }
                 }
                 when PDF::Content::XObject {
                     $reserving = True;
@@ -160,13 +152,14 @@ class PDF::Content::Text::Block {
     }
 
     method render(
-	PDF::Content::Ops $gfx,
+	PDF::Content::Ops:D $gfx,
 	Bool :$nl,   # add trailing line
 	Bool :$top,  # position from top
 	Bool :$left, # position from left
 	Bool :$preserve = True, # restore text state
 	) {
 	my %saved;
+
 	for :$.CharSpacing, :$.HorizScaling, :$.TextRise {
 	    my $gfx-val = $gfx."{.key}"();
 	    %saved{.key} = $gfx-val
@@ -182,6 +175,8 @@ class PDF::Content::Text::Block {
             for @!lines;
 
         my @content;
+        @content.push: 'comment' => 'text: ' ~ @!lines.map(*.words.map(*.grep(Str).join)).join: ' '
+            if $gfx.comment;
 
         my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
         @content.push( OpCode::TextMove => [0, $y-shift ] )
@@ -200,7 +195,6 @@ class PDF::Content::Text::Block {
         }
 
         my $leading = $gfx.TextLeading;
-        my $space = $!style.space;
         my Numeric \scale = -1000 / $.font-size;
 
         for @!lines.pairs {
@@ -213,7 +207,7 @@ class PDF::Content::Text::Block {
 	    }
 
             my $space-pad = scale * (line.word-gap - self!word-gap);
-            @content.push: line.content(:$.font-size, :$x-shift, :$space, :$space-pad);
+            @content.push: line.content(:$.font, :$.font-size, :$x-shift, :$space-pad);
         }
 
 	if $nl {
