@@ -119,6 +119,7 @@ class PDF::Content::Ops {
     has Block @.callback is rw;
     has Pair  @.ops;
     has Bool  $.comment is rw = False;
+    method comment-ops is rw is DEPRECATED('comment') { $!comment }
     has Bool  $.debug   is rw = False;
     has Bool  $.strict  is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
