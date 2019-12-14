@@ -759,7 +759,7 @@ class PDF::Content::Ops {
                     opn.value.push: (:$comment);
                 }
                 else {
-                    self!debug() if $!debug;
+                    self!debug($op, opn) if $!debug;
                 }
             }
         }
