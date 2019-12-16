@@ -120,7 +120,7 @@ class PDF::Content::Ops {
     has Pair  @.ops;
     has Bool  $.comment is rw = False;
     method comment-ops is rw is DEPRECATED('comment') { $!comment }
-    has Bool  $.debug   is rw = False;
+    has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
 
@@ -728,7 +728,7 @@ class PDF::Content::Ops {
 	@!ops.push(opn);
 
         if $op ~~ 'comment' {
-            note '% ' ~ opn if $!debug && ! $!comment;
+            note '% ' ~ opn if $!trace && ! $!comment;
         }
         else {
             if $op ~~ 'BDC'|'DP'|'TJ'|'d' {
@@ -755,11 +755,11 @@ class PDF::Content::Ops {
                 if $!comment {
                     my $comment = %OpName{$op};
                     $comment ~= self!show-updates($op)
-                        if $!debug;
+                        if $!trace;
                     opn.value.push: (:$comment);
                 }
                 else {
-                    self!debug($op, opn) if $!debug;
+                    self!trace($op, opn) if $!trace;
                 }
             }
         }
@@ -801,7 +801,7 @@ class PDF::Content::Ops {
         }
     }
 
-    method !debug(Str $op, Pair \opn) {
+    method !trace(Str $op, Pair \opn) {
         my $nesting = @!gsaves.elems + @!open-tags.elems;
         $nesting++ if $!context == Text;
         $nesting-- if $op ∈ Openers;

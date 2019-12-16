@@ -1,16 +1,16 @@
 Release 0.3.0
-- Added graphics-state :delta option:
+- [PDF::Content::Ops] Added graphics-state :delta option:
+  -- rename :comment-ops option to :comment
+  -- rename :debug option to :trace
   -- .graphics-state(:delta) returns variables updated since last Save('q')
   -- .gsave(:delta) returns an array that summarizes updated variables on the
      graphics stack. The final entry is the same as .graphics-state(:delta)
   -- improved !debug() method. Uses .graphics-state(:delta) and dumps JSON.
-- [PDF::Content::Ops]
-  -- rename :comment-ops option to :comment
-  -- improved !debug() method. Setting both :comment and :debug now causes
-     debugging comments to be written to the PDF
+  -- Setting both :comment and :trace now causes tracing to be written as
+     comments to PDF content streams
 - [PDF::Content::Text::{Block|Line|Style}]
   -- Defer font encoding until rendering
-  -- Add a comment displaying original text when $gfx :comment option is True
+  -- Add comments displaying original text when $gfx :comment option is True
 
 Release 0.2.9
 - Add $gfx(:debug) option

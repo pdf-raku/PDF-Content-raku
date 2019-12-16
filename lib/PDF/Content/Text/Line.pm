@@ -50,21 +50,23 @@ class PDF::Content::Text::Line {
             if $indent;
         my int $wc = 0;
 
-        for @!words -> \w {
-            if @!word-boundary[$wc++] {
+        # flatten words. insert spaces and space adjustments.
+        # Ensure we add a space - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
+        for 0 ..^ +@!words -> $i {
+            if @!word-boundary[$i] {
 	        @line.push: Space;
                 @line.push: $space-pad unless $space-pad =~= 0;
             }
-            @line.append: w.list;
+            @line.append: @!words[$i].list;
         }
 
-        #| coalesce adjacent strings
         my @out;
         my $n = 0;
         my $prev := Int;
         for @line {
             my $tk := $_ ~~ Str ?? $font.encode($_, :str) !! $_;
             if $tk ~~ Str && $prev ~~ Str {
+                # coalesce adjacent strings
                 @out[$n-1] ~= $tk;
             }
             else {

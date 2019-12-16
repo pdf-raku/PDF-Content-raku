@@ -162,10 +162,11 @@ class PDF::Content::Text::Block {
 
 	for :$.CharSpacing, :$.HorizScaling, :$.TextRise {
 	    my $gfx-val = $gfx."{.key}"();
-	    %saved{.key} = $gfx-val
-		if $preserve;
-	    $gfx."Set{.key}"(.value)
-		unless .value =~= $gfx-val;
+	    unless .value =~= $gfx-val {
+	        %saved{.key} = $gfx-val
+		    if $preserve;
+	        $gfx."Set{.key}"(.value);
+            }
 	}
 
         my $width = $.width
@@ -218,7 +219,7 @@ class PDF::Content::Text::Block {
 	}
 
         $gfx.ops: @content;
-        # restore original values
+        # restore original graphics values
 	for %saved.pairs {
 	    $gfx."Set{.key}"(.value)
                 unless $gfx."{.key}"() == .value;
