@@ -325,7 +325,7 @@ class PDF::Content:ver<0.3.1>
 
     # map transformed user coordinates to untransformed (default) coordinates
     use PDF::Content::Matrix :dot;
-    method base-coords(*@coords where .elems %% 2, :$user = True, :$text = False) {
+    method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
             flat @coords.map: -> $x is copy, $y is copy {
                 ($x, $y) = dot($.TextMatrix, $x, $y) if $text;

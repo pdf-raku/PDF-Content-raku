@@ -268,7 +268,7 @@ $g.text: {
     is-deeply ($x, $y), (310, 542), 'graphics to base user coordinates';
     ($x, $y) = $g.base-coords(80, -100, :text);
     is-deeply ($x, $y), (320, 562), 'graphics+text to base user coordinates, :text';
-    ($x, $y) = $g.base-coords(80, -100, :text, :!user);
+    ($x, $y) = $g.base-coords(80, -100, :!user);
     is-deeply ($x, $y), (85, -90), 'text to graphics coordinates';
 }
 $g.Restore;
