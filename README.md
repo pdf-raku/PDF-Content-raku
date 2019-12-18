@@ -1,6 +1,6 @@
 # PDF::Content
 
-This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, fonts and general graphics.
+This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, basic colors, core fonts and general graphics.
 
 It is centered around implementing a graphics state machine and provding support for the operators and graphics variables
 as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PDF-API6#appendix-i-graphics).
@@ -84,11 +84,11 @@ Simple Color construction functions:
     my Color $red .= new(0xff, 0x0a, 0x0a)
     $gfx.StrokeColor = color $red; # Color objects
 
+
 ## See Also
 
-- [PDF::Lite](https://github.com/p6-pdf/PDF-Lite-p6) minimal creation and manipulation of PDF documents.
+- [PDF::Font::Loader] provides the ability to load and embed Type-1 and True-Type fonts.
 
-- [PDF::API6](https://github.com/p6-pdf/PDF-API6) PDF manipulation library.
+- [PDF::Lite](https://github.com/p6-pdf/PDF-Lite-p6) minimal creation and manipulation of PDF documents. Built directly from PDF and this module.
 
-
-
+- [PDF::API6](https://github.com/p6-pdf/PDF-API6) PDF manipulation library. Uses this module. Adds the ability to handle separation and device-n colors

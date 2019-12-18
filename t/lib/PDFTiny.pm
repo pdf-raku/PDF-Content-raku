@@ -1,6 +1,7 @@
 use v6;
 use PDF;
-class PDFTiny is PDF {
+use PDF::Content::Interface;
+class PDFTiny is PDF does PDF::Content::Interface {
     use PDF::COS;
     use PDF::COS::Tie;
     use PDF::COS::Loader;
@@ -73,7 +74,10 @@ class PDFTiny is PDF {
 	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], :Count(0), } };
     }
 
-    method Pages handles <page add-page page-count> {
+    method Pages handles <page add-page delete-page insert-page page-count media-box crop-box bleed-box trim-box art-box core-font use-font rotate> {
         self.Root.Pages;
     }
+
+    # restrict to to PDF format; avoid FDF etc
+    method open(|c) { nextwith( :type<PDF>, |c); }
 }

@@ -30,6 +30,7 @@
     "PDF::Content::Fontish" : "lib/PDF/Content/Fontish.pm",
     "PDF::Content::Graphics" : "lib/PDF/Content/Graphics.pm",
     "PDF::Content::Image" : "lib/PDF/Content/Image.pm",
+    "PDF::Content::Interface" : "lib/PDF/Content/Interface.pm",
     "PDF::Content::Image::GIF" : "lib/PDF/Content/Image/GIF.pm",
     "PDF::Content::Image::JPEG" : "lib/PDF/Content/Image/JPEG.pm",
     "PDF::Content::Image::PDF" : "lib/PDF/Content/Image/PDF.pm",
