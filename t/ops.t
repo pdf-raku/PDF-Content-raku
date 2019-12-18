@@ -3,6 +3,7 @@ use Test;
 plan 109;
 
 use lib 't/lib';
+use PDF;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
@@ -232,6 +233,8 @@ is-json-equiv $g.ops, [
     :comment["That's all♥!"],
 ], 'parse and comment';
 
+todo "needs PDF >= v0.3.8 for comment unicode fixes"
+   unless PDF.^ver >= v0.3.8;
 is-deeply $g.content-dump, $(
     '175 720 m % MoveTo',
     '175 700 l % LineTo',
