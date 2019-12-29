@@ -272,11 +272,7 @@ class PDF::Content:ver<0.3.1>
         my Bool $top = False;
         my Bool \in-text = $.context == GraphicsContext::Text;
 
-        unless in-text {
-            my Str $tag = $text-block.type.Str;
-            self.BeginMarkedContent($tag);
-            self.BeginText;
-        }
+        self.BeginText unless in-text;
 
         self!set-position($text-block, $_, :$left, :$top)
             with $position;
@@ -289,10 +285,8 @@ class PDF::Content:ver<0.3.1>
         $x += $x-shift;
         $y += $y-shift;
 
-        unless in-text {
-            self.EndText;
-            self.EndMarkedContent;
-        }
+        self.EndText unless in-text;
+
         # return the display rectangle for the text block
         ($x, $y, $x + $text-block.width, $y + $text-block.height);
     }

@@ -5,6 +5,7 @@ role PDF::Content::Graphics {
 
     use PDF::Content;
     use PDF::Content::Ops :OpCode;
+    use PDF::Content::Tag;
     use PDF::COS;
 
     has PDF::Content $!pre-gfx; #| prepended graphics
@@ -78,6 +79,14 @@ role PDF::Content::Graphics {
         $gfx.ops: @ops;
         $!rendered = True;
         $gfx;
+    }
+
+    # needs to be called before .finish()
+    method new-tags {
+        my PDF::Content::Tag @new;
+        @new.append: .tags.grep(*.is-new) with $!pre-gfx;
+        @new.append: .tags.grep(*.is-new) with $!gfx;
+        @new;
     }
 
     method finish {

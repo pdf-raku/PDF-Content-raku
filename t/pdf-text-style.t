@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 1;
+plan 2;
 use lib 't/lib';
 use PDF::Content::Ops :OpCode;
 use PDFTiny;
@@ -16,22 +16,27 @@ my $font-size = 18;
 my $bold-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 my $font = $page.core-font( :family<Helvetica> );
 
-$gfx.BeginText;
-$gfx.TextMove(50,100);
-$gfx.set-font($bold-font, $font-size);
-$gfx.say('Hello, World!', :$width, :kern);
-$gfx.EndText;
+$gfx.tag: 'P', {
+    .text: {
+        .text-position = 50, 100;
+        .font = $bold-font, $font-size;
+        .say('Hello, World!', :$width, :kern);
+    }
+};
 
 is-deeply $gfx.content-dump, $(
+    "/P BMC",
     "BT",
-    "50 100 Td", 
+    "1 0 0 1 50 100 Tm", 
     "/F1 18 Tf",
     "(Hello,) Tj",
     "19.8 TL",
     "T*",
     "[ (W) 60 (orld!) ] TJ",
     "T*",
-    "ET"), "kern";
+    "ET",
+    "EMC",
+    ), "hello world (with kerning)";
 
 $width = 100;
 my $height = 150;
@@ -89,6 +94,8 @@ for (
 }
 
 $gfx.EndText;
+
+is $page.new-tags.map(*.gist).join, '<P/>', '.new-tags()';
 
 $pdf.save-as('t/pdf-text-style.pdf');
 

@@ -11,7 +11,7 @@ my $page = $pdf.add-page;
 
 lives-ok {
     $page.graphics: -> $gfx {
-        my $pattern = $page.tiling-pattern(:BBox[0, 0, 25, 25], );
+        my PDFTiny::Tiling-Pattern $pattern = $page.tiling-pattern(:BBox[0, 0, 25, 25], );
         $pattern.graphics: {
             .FillColor = :DeviceRGB[.7, .7, .9];
             .Rectangle(|$pattern<BBox>);
