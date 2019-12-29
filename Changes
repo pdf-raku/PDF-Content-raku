@@ -1,3 +1,8 @@
+Release 0.3.1
+- [PDF::Content] Add $.tag method. Deprecate $.marked-content()
+- [PDF::Content::Interface] new role for PDF implementations
+- [t/ops.t] fix text for PDF v0.3.8- (issue #3)
+
 Release 0.3.0
 - [PDF::Content::Ops] Added graphics-state :delta option:
   -- rename :comment-ops option to :comment

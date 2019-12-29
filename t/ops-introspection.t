@@ -65,11 +65,11 @@ is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[{}, 16
 is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[{}, 16]}, 'graphics-state :delta';
 is-deeply $g.context, GraphicsContext::Text;
 
-$g.marked-content: 'Foo', {
+$g.tag: 'Foo', {
     .ShowText("Hi");
 };
 
-$g.marked-content: 'Bar', {
+$g.tag: 'Bar', {
     is .tags.map(*.gist).join, '<Foo/>';
     is .open-tags.map(*.gist).join, '<Bar/>';
     .ShowText("There");

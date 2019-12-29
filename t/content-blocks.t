@@ -18,14 +18,14 @@ $g.text: { .ShowText("Hi"); };
 is-json-equiv [$g.ops], [:BT[], :Tj[:literal<Hi>], "ET" => [], ], '.text block';
 
 $g .= new: :$parent;
-$g.marked-content: 'Foo', {
+$g.tag: 'Foo', {
     .BeginText;
     .ShowText("Hi");
     .EndText };
 is-json-equiv [$g.ops], [:BMC[:name<Foo>], :BT[], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block';
 
 $g .= new: :$parent;
-$g.marked-content: 'Foo', :props{ :Bar{ :Baz(42) } }, {
+$g.tag: 'Foo', :Bar{ :Baz(42) }, {
    .BeginText;
    .ShowText("Hi");
    .EndText;
@@ -35,18 +35,18 @@ is-json-equiv [$g.ops], [:BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(:int(42))})}], "
 my $props = { :MCID(42) };
 
 $g .= new: :$parent;
-$g.marked-content: 'Foo', :$props, {
-   .marked-content: 'Nested',  sub ($) { };
+$g.tag: 'Foo', |$props, {
+   .tag: 'Nested',  sub ($) { };
    $g.MarkPoint('A');
    $g.XObject('Img1');
 };
-$g.marked-content: 'Bar', sub ($) { };
-$g.MarkPointDict('B', ${ :MCID(99) });
+$g.tag: 'Bar', sub ($) { };
+$g.tag('B', :MCID(99));
 
 my PDF::Content::Tag @tags = $g.tags;
 is +@tags, 3, 'top level tags';
 
-is @tags[0].gist, '<Foo mcid="42"><Nested/><A/><Img1/></Foo>', '@tags[0]';
+is @tags[0].gist, '<Foo mcid="42"><Nested/><A/></Foo>', '@tags[0]';
 is @tags[1].gist, '<Bar/>', '@tags[1]';
 is @tags[2].gist, '<B mcid="99"/>', '@tags[2]';
 
@@ -58,7 +58,7 @@ is @tags[0].op, 'BDC', 'marked content op';
 is @tags[1].mcid, 99, 'marked content id[1]';
 
 my PDF::Content::Tag @tags-flat = $g.tags: :flat;
-is +@tags-flat, 6, 'flat tags elems';
-is [@tags-flat.map: *.name].join(','), 'Foo,Nested,A,Img1,Bar,B', 'flat tags names';
+is +@tags-flat, 5, 'flat tags elems';
+is [@tags-flat.map: *.name].join(','), 'Foo,Nested,A,Bar,B', 'flat tags names';
 
 done-testing;

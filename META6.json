@@ -11,7 +11,7 @@
     "Compress::Zlib::Raw",
     "Font::AFM",
     "Native::Packing",
-      "JSON::Fast",  
+    "JSON::Fast",
     "PDF:ver<0.3.7+>",
     "PDF::Grammar"
   ],

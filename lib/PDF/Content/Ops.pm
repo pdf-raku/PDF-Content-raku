@@ -170,7 +170,7 @@ class PDF::Content::Ops {
     my constant Openers = set <q BT BMC BDC BX>;
     my constant Closers = set <Q ET EMC EX>;
     # Extended Graphics States (Resource /ExtGState entries)
-    # See [PDF 1.7 TABLE 4.8 Entries in a graphics state parameter dictionary]
+    # See [PDF 3200 Table 58 – Entries in a Graphics State Parameter Dictionary]
     # These match PDF::ExtGState from PDF::Class
     my enum ExtGState is export(:ExtGState) «
 	:LineWidth<LW>
@@ -201,7 +201,6 @@ class PDF::Content::Ops {
 	:TextKnockout<TK>
     »;
 
-    # [PDF 1.7 TABLE 5.3 Text rendering modes]
     my Int enum TextMode is export(:TextMode) «
 	:FillText(0) :OutlineText(1) :FillOutlineText(2)
         :InvisableText(3) :FillClipText(4) :OutlineClipText(5)
@@ -377,6 +376,7 @@ class PDF::Content::Ops {
     # *** Marked Content Tags ***
     has PDF::Content::Tag @.open-tags;
     has PDF::Content::Tag @.tags;
+    has PDF::Content::Tag $.closed-tag;
     multi method tags(@tags = @!tags, :$flat! where .so) {
         flat @tags.map: {
             ($_,
@@ -936,10 +936,10 @@ class PDF::Content::Ops {
     }
 
     method !close-tag {
-	my PDF::Content::Tag $tag = @!open-tags.pop;
-        $tag.end = +@!ops;
-        @!tags.push: $tag
-            without $tag.parent;
+	$!closed-tag = @!open-tags.pop;
+        $!closed-tag.end = +@!ops;
+        @!tags.push: $!closed-tag
+            without $!closed-tag.parent;
     }
 
     method !add-tag(PDF::Content::Tag $tag) {
@@ -974,10 +974,6 @@ class PDF::Content::Ops {
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
         my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
         self!add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :$props;
-    }
-
-    multi method track-graphics('Do', Str $name!) {
-        self!add-tag: PDF::Content::Tag.new: :op<Do>, :$name;
     }
 
     multi method track-graphics('gs', Str $key) {

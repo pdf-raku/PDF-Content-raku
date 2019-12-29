@@ -28,28 +28,38 @@ class PDF::Content:ver<0.3.1>
         ret
     }
 
-    multi method marked-content(PDF::Content::Tag $_, &do-stuff) {
-        samewith( .tag, :props(.props), &do-stuff);
+    method marked-content($tag, &code, :$props) is DEPRECATED<tag> {
+        with $props { $.tag($tag, &code, |$_) } else { $.tag($tag, &code) }
     }
 
-    multi method marked-content( Str $tag,
-                                 &do-stuff!,
-                                 Hash :$props! where .so) {
-        $.BeginMarkedContentDict($tag, $props);
-        my \ret = do-stuff(self);
-        $.EndMarkedContent;
-        ret;
+    multi method tag(PDF::Content::Tag $_, &do-stuff) {
+        samewith( .tag, |.props, &do-stuff);
     }
 
-    multi method marked-content( Str $tag, &do-stuff! ) {
-        $.BeginMarkedContent($tag);
-        my \ret = do-stuff(self);
+    multi method tag(PDF::Content::Tag $_) {
+        samewith( .tag, |.props);
+    }
+
+    multi method tag(Str $tag, *%props) {
+        my \rv := %props
+            ?? $.MarkPointDict($tag, $%props)
+            !! $.MarkPoint($tag);
+        $.closed-tag.is-new = True;
+        rv;
+    }
+
+    multi method tag(Str $tag, &do-stuff!, *%props) {
+        %props
+            ?? $.BeginMarkedContentDict($tag, $%props)
+            !! $.BeginMarkedContent($tag);
+        my \rv := do-stuff(self);
         $.EndMarkedContent;
-        ret;
+        $.closed-tag.is-new = True;
+        rv;
     }
 
     method canvas( &mark-up! ) {
-        my $canvas = (require HTML::Canvas).new;
+        my $canvas := (require HTML::Canvas).new;
         $canvas.context(&mark-up);
         self.draw($canvas);
     }

@@ -6,6 +6,7 @@ class PDF::Content::Tag {
     has Hash $.props;
     has UInt $.start is rw;
     has UInt $.end is rw;
+    has Bool $.is-new is rw;  # tags not yet in the struct tree
     has PDF::Content::Tag $.parent is rw;
     has @.children handles<AT-POS>;
     submethod TWEAK(:$mcid) {
