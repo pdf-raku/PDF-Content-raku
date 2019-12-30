@@ -163,7 +163,7 @@ $g.Restore;
 is $g.RenderingIntent, 'RelativeColorimetric', 'RenderingIntent, restored';
 is $g.Flatness, 0, 'Flatness, restored';
 
-$g .= new;
+$g .= new: :$parent;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 is-json-equiv $g.ops, [:m[:int(175), :int(720)],
@@ -244,7 +244,7 @@ is-deeply $g.content-dump, $(
     "% That's all#2665!",
 ), 'content with comments';
 
-my PDF::Content $g1 .= new;
+my PDF::Content $g1 .= new: :$parent;
 lives-ok {$g1.ops: $g.ops;}, "comments import - lives";
 is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), ]), 'comments import - head';
 is-json-equiv $g1.ops.tail(2).List, (:S[ ], :comment["That's all♥!"]), 'comments import - tail';

@@ -122,7 +122,7 @@ class PDF::Content::Ops {
     method comment-ops is rw is DEPRECATED('comment') { $!comment }
     has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;
-    has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
+    has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
     method owner { $.parent }
 
     # some convenient mnemomic names
@@ -230,7 +230,7 @@ class PDF::Content::Ops {
             FETCH => { $att.get_value(self) },
             STORE => -> $, \v {
                 unless $att.get_value(self) eqv v {
-                    with self.parent {
+                    given self.parent {
                         my  &grepper = sub (Hash $_) {
                             .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
                         }
@@ -238,9 +238,6 @@ class PDF::Content::Ops {
                             // PDF::COS.coerce({ :Type{ :name<ExtGState> }, $key => v });
                         my Str $gs-entry = .resource-key($gs, :eqv);
 	                self.SetGraphicsState($gs-entry);
-                    }
-                    else {
-                        warn "unable to set extended graphics state - no parent";
                     }
                 }
             });
@@ -286,16 +283,11 @@ class PDF::Content::Ops {
     has Numeric $.TextRise      is graphics(method ($!TextRise)     {}) is rw = 0;
     has Numeric @.TextMatrix    is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
     has Array   $.Font          is graphics(method (Str $key, Numeric $size!) {
-        with self.parent {
-            with .resource-entry('Font', $key) -> \font-face {
-                $!Font = [font-face, $size];
-            }
-            else {
-                die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;
-            }
+        with $!parent.resource-entry('Font', $key) -> \font-face {
+            $!Font = [font-face, $size];
         }
         else {
-            $!Font = [$key, $size];
+            die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;
         }
     }) is rw;
     method font-face {$!Font[0]}
@@ -949,7 +941,7 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('gs', Str $key) {
-        with self.parent {
+         given $!parent {
             with .resource-entry('ExtGState', $key) {
                 with .<CA>   { $!StrokeAlpha = $_ }
                 with .<ca>   { $!FillAlpha = $_ }
@@ -1014,7 +1006,7 @@ class PDF::Content::Ops {
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")
             if $!strict && $!context != Page;
 
-        with $!parent {
+        given $!parent {
             try .cb-finish for .resources('Font').values;
         }
     }

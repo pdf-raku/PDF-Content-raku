@@ -1,10 +1,15 @@
 use v6;
 use Test;
+use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Ops :OpCode;
+use FakeGfxParent;
+
+my $parent = { } does FakeGfxParent;
+
 plan 6;
 
-my PDF::Content::Ops $gfx .= new;
+my PDF::Content::Ops $gfx .= new: :$parent;
 
 $gfx.Save;
 lives-ok {$gfx.op(BeginText)}, 'basic op';

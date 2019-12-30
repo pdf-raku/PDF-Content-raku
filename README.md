@@ -10,8 +10,11 @@ as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PD
 ### `PDF::Content`
 implements a PDF graphics state machine for composition, or rendering:
 ```
+use lib 't/lib'; use PDFTiny;
 use PDF::Content;
-my PDF::Content $gfx .= new;
+my $parent = PDFTiny.new.add-page;
+my PDF::Content $gfx .= new: :$parent;
+$gfx.use-font: $gfx.core-font('Courier'); # define /F1 font
 $gfx.BeginText;
 $gfx.Font = 'F1', 16;
 $gfx.TextMove(10, 20);
@@ -53,13 +56,15 @@ say $font.stringwidth("RVX", :kern); # 2111
 a utility class for creating and outputting simple text lines and paragraphs:
 
 ```
+use lib 't/lib'; use PDFTiny;
+my $parent = PDFTiny.new.add-page;
 use PDF::Content;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::Text::Block;
 my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :font-size(16) );
-my PDF::Content $gfx .= new;
+my PDF::Content $gfx .= new: :$parent;
 $gfx.BeginText;
 $text-block.render($gfx);
 $gfx.EndText;
@@ -70,9 +75,11 @@ say $gfx.Str;
 
 Simple Color construction functions:
 
+    use lib 't/lib'; use PDFTiny;
+    my $parent = PDFTiny.new.add-page;
     use PDF::Content;
     use PDF::Content::Color :color, :ColorName;
-    PDF::Content $gfx .= new;
+    PDF::Content $gfx .= new: :$parent;
     $gfx.FillColor = color Blue; # named color
     $gfx.StrokeColor = color '#fa9'; # RGB mask, 3 digit
     $gfx.StrokeColor = color '#ffaa99'; # RGB mask, 6 digit
