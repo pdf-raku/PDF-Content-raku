@@ -22,15 +22,15 @@ $g.tag: 'Foo', {
     .BeginText;
     .ShowText("Hi");
     .EndText };
-is-json-equiv [$g.ops], [:BMC[:name<Foo>], :BT[], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block';
+is-json-equiv [$g.ops], [:BDC[:name<Foo>, :dict{:MCID(:int(1))}], :BT[], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block';
 
 $g .= new: :$parent;
-$g.tag: 'Foo', :Bar{ :Baz(42) }, {
+$g.tag: 'Foo', :Bar{ :Baz }, {
    .BeginText;
    .ShowText("Hi");
    .EndText;
 };
-is-json-equiv [$g.ops], [:BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(:int(42))})}], "BT" => [], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block with dict';
+is-json-equiv [$g.ops], [:BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(:bool)}),  :MCID(:int(2))}], "BT" => [], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block with dict';
 
 my $props = { :MCID(42) };
 
@@ -46,9 +46,9 @@ $g.tag('B', :MCID(99));
 my PDF::Content::Tag @tags = $g.tags.list;
 is +@tags, 3, 'top level tags';
 
-is @tags[0].gist, '<Foo mcid="42"><Nested/><A/></Foo>', '@tags[0]';
-is @tags[1].gist, '<Bar/>', '@tags[1]';
-is @tags[2].gist, '<B mcid="99"/>', '@tags[2]';
+is @tags[0].gist, '<Foo MCID="42"><Nested MCID="43"/><A/></Foo>', '@tags[0]';
+is @tags[1].gist, '<Bar MCID="44"/>', '@tags[1]';
+is @tags[2].gist, '<B MCID="99"/>', '@tags[2]';
 
 is @tags[0].mcid, 42, 'marked content id';
 is @tags[0].name, 'Foo', 'marked content name';

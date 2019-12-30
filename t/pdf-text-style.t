@@ -25,7 +25,7 @@ $gfx.tag: 'P', {
 };
 
 is-deeply $gfx.content-dump, $(
-    "/P BMC",
+    "/P <<\n  /MCID 1\n>> BDC",
     "BT",
     "1 0 0 1 50 100 Tm", 
     "/F1 18 Tf",
@@ -95,7 +95,7 @@ for (
 
 $gfx.EndText;
 
-is $page.new-tags.map(*.gist).join, '<P/>', '.new-tags()';
+is $page.new-tags.map(*.gist).join, '<P MCID="1"/>', '.new-tags()';
 
 $pdf.save-as('t/pdf-text-style.pdf');
 

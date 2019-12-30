@@ -53,7 +53,7 @@ lives-ok { $g.BeginMarkedContentDict('P', ${ :MCID(42) }) }, '$g.BeginMarkedCont
 is-deeply $g.MoveShowText("move-show-text"), ("'" => [ :literal<move-show-text> ] ), 'MoveShowText';
 lives-ok { $g.EndMarkedContent }, '$g.EndMarkedContent';
 
-is $g.tags[0].gist, '<P mcid="42"/>', 'tags';
+is $g.tags[0].gist, '<P MCID="42"/>', 'tags';
 
 $g.StrokeColor = :DeviceN[.7, .8];
 is-deeply $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';

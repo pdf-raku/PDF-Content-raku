@@ -917,7 +917,8 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
-        my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
+        my Hash $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
+        $!parent.use-mcid($_) with $props<MCID>;
         self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :$props, :$.owner, :start(+@!ops);
     }
 
@@ -935,7 +936,8 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
-        my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
+        my Hash $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
+        $!parent.use-mcid($_) with $props<MCID>;
         my $start = my $end = +@!ops;
         self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :$props, :$.owner, :$start, :$end;
     }

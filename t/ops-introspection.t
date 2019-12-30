@@ -70,12 +70,12 @@ $g.tag: 'Foo', {
 };
 
 $g.tag: 'Bar', {
-    is .tags.map(*.gist).join, '<Foo/>';
-    is .open-tags.map(*.gist).join, '<Bar/>';
+    is .tags.map(*.gist).join, '<Foo MCID="1"/>';
+    is .open-tags.map(*.gist).join, '<Bar MCID="2"/>';
     .ShowText("There");
 };
 
-is $g.tags.map(*.gist).join, '<Foo/><Bar/>';
+is $g.tags.map(*.gist).join, '<Foo MCID="1"/><Bar MCID="2"/>';
 
 $g.EndText;
 $g.Restore;

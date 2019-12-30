@@ -1,6 +1,7 @@
 role FakeGfxParent {
     has $!key = 'R0';
     has Str %!keys{Any};
+    has UInt $.mcid;
     method find-resource(&match, :$type) {
         my $entry;
 
@@ -33,4 +34,8 @@ role FakeGfxParent {
     method resources($a) {
         self{$a}
     }
+    method use-mcid(UInt:D $_) {
+        $!mcid = $_ unless ($!mcid//-1) >= $_;
+    }
+    method next-mcid { ++$!mcid }
 }

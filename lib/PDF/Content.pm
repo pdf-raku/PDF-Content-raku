@@ -10,10 +10,6 @@ class PDF::Content:ver<0.3.1>
     use PDF::Content::XObject;
     use PDF::Content::Tag;
 
-    method TWEAK(:$strict) {
-        self.strict = $_ with $strict;
-    }
-
     method graphics( &do-stuff! ) {
         $.op(Save);
         my \ret = do-stuff(self);
@@ -49,9 +45,14 @@ class PDF::Content:ver<0.3.1>
     }
 
     multi method tag(Str $tag, &do-stuff!, *%props) {
-        %props
-            ?? $.BeginMarkedContentDict($tag, $%props)
-            !! $.BeginMarkedContent($tag);
+        with %props<MCID> {
+            $.parent.use-mcid($_);
+        }
+        else {
+            $_ = $.parent.next-mcid;
+        }
+
+        $.BeginMarkedContentDict($tag, $%props);
         my \rv := do-stuff(self);
         $.EndMarkedContent;
         $.closed-tag.is-new = True;

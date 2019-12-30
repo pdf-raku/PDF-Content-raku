@@ -27,7 +27,7 @@ class PDF::Content::Tag {
     }
     method gist {
         my $atts = do with $.mcid {
-            ' mcid="' ~ $_ ~ '"';
+            ' MCID="' ~ $_ ~ '"';
         }
         else {
             '';
