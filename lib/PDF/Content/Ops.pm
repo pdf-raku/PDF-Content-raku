@@ -123,6 +123,7 @@ class PDF::Content::Ops {
     has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height>;
+    method owner { $.parent }
 
     # some convenient mnemomic names
     my Str enum OpCode is export(:OpCode) «
@@ -374,16 +375,8 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     # *** Marked Content Tags ***
-    has PDF::Content::Tag @.open-tags;
-    has PDF::Content::Tag @.tags;
-    has PDF::Content::Tag $.closed-tag;
-    multi method tags(@tags = @!tags, :$flat! where .so) {
-        flat @tags.map: {
-            ($_,
-             self.tags(.children.grep(PDF::Content::Tag), :flat))
-        }
-    }
-    multi method tags is rw is default { @!tags }
+    use PDF::Content::Tags;
+    has PDF::Content::Tags $.tags handles<open-tag close-tag add-tag open-tags closed-tag> .= new;;
 
     # *** Graphics Stack ***
     sub delta(@gs) {
@@ -802,7 +795,7 @@ class PDF::Content::Ops {
     }
 
     method !trace(Str $op, Pair \opn) {
-        my $nesting = @!gsaves.elems + @!open-tags.elems;
+        my $nesting = @!gsaves.elems + @.open-tags.elems;
         $nesting++ if $!context == Text;
         $nesting-- if $op ∈ Openers;
         my $indent = '  ' x $nesting;
@@ -927,53 +920,32 @@ class PDF::Content::Ops {
     multi method track-graphics('SC',  *@!StrokeColor where self!color-args-ok('SC',  $_)) { }
     multi method track-graphics('SCN', *@!StrokeColor where self!color-args-ok('SCN', $_)) { }
 
-    method !open-tag(PDF::Content::Tag $tag) {
-        $tag.start = +@!ops;
-        with @!open-tags.tail {
-            .add-kid: $tag;
-        }
-        @!open-tags.push: $tag;
-    }
-
-    method !close-tag {
-	$!closed-tag = @!open-tags.pop;
-        $!closed-tag.end = +@!ops;
-        @!tags.push: $!closed-tag
-            without $!closed-tag.parent;
-    }
-
-    method !add-tag(PDF::Content::Tag $tag) {
-        $tag.start = $tag.end = +@!ops;
-        with @!open-tags.tail {
-            .add-kid: $tag;
-        }
-        else {
-            @!tags.push: $tag
-        }
-    }
-
     multi method track-graphics('BMC', Str $name!) {
-        self!open-tag: PDF::Content::Tag.new: :op<BMC>, :$name;
+        self.open-tag: PDF::Content::Tag.new: :op<BMC>, :$name, :$.owner, :start(+@!ops);
     }
 
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
         my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        self!open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :$props;
+        self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :$props, :$.owner, :start(+@!ops);
     }
 
     multi method track-graphics('EMC') {
 	die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
-	    unless @!open-tags;
-        self!close-tag;
+	    unless @.open-tags;
+        given self.close-tag {
+            .end = +@!ops;
+        }
     }
 
     multi method track-graphics('MP', Str $name!) {
-        self!add-tag: PDF::Content::Tag.new: :op<MP>, :$name;
+        my $start = my $end = +@!ops;
+        self.add-tag: PDF::Content::Tag.new: :op<MP>, :$name, :$.owner, :$start, :$end;
     }
 
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
         my $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        self!add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :$props;
+        my $start = my $end = +@!ops;
+        self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :$props, :$.owner, :$start, :$end;
     }
 
     multi method track-graphics('gs', Str $key) {
@@ -1035,8 +1007,8 @@ class PDF::Content::Ops {
     }
 
     method finish {
-	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@!open-tags.map(*.gist).join: ' '} at end of content stream")
-	    if @!open-tags;
+	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@.open-tags.map(*.gist).join: ' '} at end of content stream")
+	    if @.open-tags;
 	die X::PDF::Content::Unclosed.new: :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream")
 	    if @!gsaves;
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")
