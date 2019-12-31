@@ -1,18 +1,20 @@
 class PDF::Content::Tags {
 
     use PDF::Content::Tag;
+    use PDF::COS;
+    use PDF::COS::Dict;
 
     has PDF::Content::Tag @.open-tags;
-    has PDF::Content::Tag @!tags;
     has PDF::Content::Tag $.closed-tag;
-    proto method list(|c) handles<grep AT-POS> {*}
-    multi method list(@tags = @!tags, :$flat! where .so) {
+    has PDF::Content::Tag @.tags;
+    proto method tags(|c) handles<grep map AT-POS> {*}
+    multi method tags(@tags = @!tags, :$flat! where .so) {
         flat @tags.map: {
             ($_,
-             self.list(.children.grep(PDF::Content::Tag), :flat))
+             self.tags(.children.grep(PDF::Content::Tag), :flat))
         }
     }
-    multi method list is default { @!tags }
+    multi method tags is default { @!tags }
 
     method open-tag(PDF::Content::Tag $tag) {
         with @!open-tags.tail {
@@ -34,6 +36,21 @@ class PDF::Content::Tags {
         }
         else {
             @!tags.push: $tag
+        }
+    }
+
+    multi method content(PDF::COS::Dict :$parent!) {
+        [ @!tags.map(*.content(:$parent)) ];
+    }
+
+    multi method content {
+        my PDF::COS::Dict $root;
+        die "unclosed tags: {@!open-tags.map(*.gist).join}"
+            if @!open-tags;
+        if @!tags {
+            $root = PDF::COS.coerce: { :Type( :name<StructTreeRoot> ) };
+            my @k = @!tags.map(*.content(:parent($root)));
+            $root<K> = +@k > 1 ?? @k !! @k[0];
         }
     }
 

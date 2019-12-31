@@ -11,18 +11,31 @@ my $parent = { :Font{ :F1{} }, } does FakeGfxParent;
 
 my PDF::Content $g .= new: :$parent;
 $g.graphics: { .BeginText; .ShowText("Hi"); .EndText;};
-is-json-equiv [$g.ops], [:q[], :BT[], :Tj[:literal("Hi")], "ET" => [], :Q[]], '.graphics block';
+is-json-equiv [$g.ops], [
+    :q[],
+    :BT[],
+    :Tj[:literal("Hi")],
+    "ET" => [],
+    :Q[]], '.graphics block';
 
 $g .= new: :$parent;
 $g.text: { .ShowText("Hi"); };
-is-json-equiv [$g.ops], [:BT[], :Tj[:literal<Hi>], "ET" => [], ], '.text block';
+is-json-equiv [$g.ops], [
+    :BT[],
+    :Tj[:literal<Hi>],
+    "ET" => [], ], '.text block';
 
 $g .= new: :$parent;
 $g.tag: 'Foo', {
     .BeginText;
     .ShowText("Hi");
     .EndText };
-is-json-equiv [$g.ops], [:BDC[:name<Foo>, :dict{:MCID(:int(1))}], :BT[], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block';
+is-json-equiv [$g.ops], [
+    :BDC[:name<Foo>, :dict{:MCID(:int(1))}],
+    :BT[],
+    :Tj[:literal<Hi>],
+    "ET" => [],
+    :EMC[], ], '.tag content block';
 
 $g .= new: :$parent;
 $g.tag: 'Foo', :Bar{ :Baz }, {
@@ -30,7 +43,12 @@ $g.tag: 'Foo', :Bar{ :Baz }, {
    .ShowText("Hi");
    .EndText;
 };
-is-json-equiv [$g.ops], [:BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(:bool)}),  :MCID(:int(2))}], "BT" => [], :Tj[:literal<Hi>], "ET" => [], :EMC[]], '.marked content block with dict';
+is-json-equiv [$g.ops], [
+    :BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(:bool)}),  :MCID(:int(2))}],
+    "BT" => [],
+    :Tj[:literal<Hi>],
+    "ET" => [],
+    :EMC[], ], '.tag content block with dict';
 
 my $props = { :MCID(42) };
 
@@ -43,7 +61,7 @@ $g.tag: 'Foo', |$props, {
 $g.tag: 'Bar', sub ($) { };
 $g.tag('B', :MCID(99));
 
-my PDF::Content::Tag @tags = $g.tags.list;
+my PDF::Content::Tag @tags = $g.tags;
 is +@tags, 3, 'top level tags';
 
 is @tags[0].gist, '<Foo MCID="42"><Nested MCID="43"/><A/></Foo>', '@tags[0]';
@@ -57,7 +75,7 @@ is @tags[0].op, 'BDC', 'marked content op';
 @tags[1].mcid = 99;
 is @tags[1].mcid, 99, 'marked content id[1]';
 
-my PDF::Content::Tag @tags-flat = $g.tags.list: :flat;
+my PDF::Content::Tag @tags-flat = $g.tags: :flat;
 is +@tags-flat, 5, 'flat tags elems';
 is [@tags-flat.map: *.name].join(','), 'Foo,Nested,A,Bar,B', 'flat tags names';
 

@@ -15,7 +15,7 @@
     "PDF:ver<0.3.7+>",
     "PDF::Grammar"
   ],
-  "description" : "PDF content related classes; including text, images, fonts and graphics",
+  "description" : "PDF content related classes; including text, images, fonts, graphics and tags",
   "license" : "Artistic-2.0",
   "name" : "PDF::Content",
   "perl" : "6.*",

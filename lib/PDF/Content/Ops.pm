@@ -368,7 +368,7 @@ class PDF::Content::Ops {
 
     # *** Marked Content Tags ***
     use PDF::Content::Tags;
-    has PDF::Content::Tags $.tags handles<open-tag close-tag add-tag open-tags closed-tag> .= new;;
+    has PDF::Content::Tags $!tags handles<open-tag close-tag add-tag open-tags closed-tag tags> .= new;
 
     # *** Graphics Stack ***
     sub delta(@gs) {
