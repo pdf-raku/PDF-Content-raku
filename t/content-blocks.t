@@ -61,7 +61,7 @@ $g.tag: 'Foo', |$props, {
 $g.tag: 'Bar', sub ($) { };
 $g.tag('B', :MCID(99));
 
-my PDF::Content::Tag @tags = $g.tags;
+my PDF::Content::Tag @tags = $g.tags.list;
 is +@tags, 3, 'top level tags';
 
 is @tags[0].gist, '<Foo MCID="42"><Nested MCID="43"/><A/></Foo>', '@tags[0]';
@@ -75,7 +75,7 @@ is @tags[0].op, 'BDC', 'marked content op';
 @tags[1].mcid = 99;
 is @tags[1].mcid, 99, 'marked content id[1]';
 
-my PDF::Content::Tag @tags-flat = $g.tags: :flat;
+my PDF::Content::Tag @tags-flat = $g.tags.list: :flat;
 is +@tags-flat, 5, 'flat tags elems';
 is [@tags-flat.map: *.name].join(','), 'Foo,Nested,A,Bar,B', 'flat tags names';
 

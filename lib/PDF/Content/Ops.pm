@@ -367,8 +367,7 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     # *** Marked Content Tags ***
-    use PDF::Content::Tags;
-    has PDF::Content::Tags $!tags handles<open-tag close-tag add-tag open-tags closed-tag tags> .= new;
+    has PDF::Content::Tag::Kids $.tags handles<open-tag close-tag add-tag open-tags closed-tag> .= new;
 
     # *** Graphics Stack ***
     sub delta(@gs) {

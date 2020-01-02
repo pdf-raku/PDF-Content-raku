@@ -5,7 +5,6 @@ plan 1;
 use lib 't/lib';
 use PDFTiny;
 use PDF::Content::Tag;
-use PDF::Content::Tags;
 
 my PDFTiny $pdf .= new;
 
@@ -34,13 +33,13 @@ $gfx.tag: 'P', {
 #
 # under construction. manually finish page and StructTreeRoot;
 # todo * /Nums entry in StructTreeRoot /StructParents entry in Page
-my @tags = $gfx.tags;
+my $kids = $gfx.tags;
 
-my $doc = PDF::Content::Tag.new: :name<Document>, :children(@tags);
-my $root = PDF::Content::Tags.new: :tags[$doc];
+my $doc = PDF::Content::Tag.new: :name<Document>, :$kids;
+my $root = PDF::Content::Tag::Kids.new: :tags[$doc];
 
 my $content = $root.content;
-$pdf.Root<StructTreeRoot> = $content<P>;
+$pdf.Root<StructTreeRoot> = $content;
 
 lives-ok {$pdf.save-as: "t/tags.pdf";}
 

@@ -14,7 +14,7 @@ role PDF::Content::Graphics {
     method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
     has PDF::Content $!gfx;     #| appended graphics
     has Bool $!rendered = False;
-    has UInt $.mcid;
+    has UInt $.mcid = 0;
 
     #| Fix nesting issues that aren't illegal, but could cause problems:
     #| - append any missing 'Q' (Restore) operators at end of stream
@@ -125,7 +125,7 @@ role PDF::Content::Graphics {
     method use-mcid(UInt:D $_) {
         $!mcid = $_ unless ($!mcid//-1) >= $_;
     }
-    method next-mcid { ++$!mcid }
+    method next-mcid { $!mcid++ }
 
     method tiling-pattern(List    :$BBox!,
                           Numeric :$XStep = $BBox[2] - $BBox[0],
