@@ -1,4 +1,5 @@
 Release 0.3.1
+- [PDF::Content::Tag] add Kids class for child nodes
 - [PDF::Content] Add $.tag method. Deprecate $.marked-content()
 - [PDF::Content::Interface] new role for PDF implementations
 - [t/ops.t] fix text for PDF v0.3.8- (issue #3)

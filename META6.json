@@ -10,6 +10,7 @@
     "Color",
     "Compress::Zlib::Raw",
     "Font::AFM",
+    "Method::Also",
     "Native::Packing",
     "JSON::Fast",
     "PDF:ver<0.3.7+>",

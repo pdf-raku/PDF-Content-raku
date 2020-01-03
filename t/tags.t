@@ -6,6 +6,9 @@ use lib 't/lib';
 use PDFTiny;
 use PDF::Content::Tag;
 
+# ensure consistant document ID generation
+srand(123456);
+
 my PDFTiny $pdf .= new;
 
 my PDFTiny::Page $page = $pdf.add-page;
@@ -30,16 +33,18 @@ $gfx.tag: 'P', {
     }
 };
 
-#
-# under construction. manually finish page and StructTreeRoot;
-# todo * /Nums entry in StructTreeRoot /StructParents entry in Page
 my $kids = $gfx.tags;
 
-my $doc = PDF::Content::Tag.new: :name<Document>, :$kids;
-my $root = PDF::Content::Tag::Kids.new: :tags[$doc];
+# finishing work; normally undertaken by the API
 
+my $doc = PDF::Content::Tag.new: :name<Document>, :$kids;
+my $root = PDF::Content::Tag::Kids.new: :children[$doc];
 my $content = $root.content;
 $pdf.Root<StructTreeRoot> = $content;
+($pdf.Root<MarkedInfo> //= {})<Marked> = True;
+for $root.struct-parents {
+    .key<StructParents> = .value;
+}
 
 lives-ok {$pdf.save-as: "t/tags.pdf";}
 

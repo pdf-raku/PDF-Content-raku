@@ -16,20 +16,22 @@ has Hash $.props;
 has UInt $.start is rw;
 has UInt $.end is rw;
 has Bool $.is-new is rw;  # tags not yet in the struct tree
-has PDF::Content::Tag $.parent is rw; # heirarcheal parent
-
+has PDF::Content::Tag $.parent is rw; # hierarchical parent
 our class Kids {...}
 has Kids $.kids handles<AT-POS list children grep map> .= new;
 
 submethod TWEAK(:$mcid) {
     $!props<MCID> = $_ with $mcid;
-    for $!kids.tags {
-        with .parent {
-            die "child already has a parent"
+    for $!kids.children {
+        when PDF::Content::Tag {
+
+            with .parent {
+                die "child already has a parent"
                 unless $_ === self;
-        }
-        else {
-            $_ = self;
+            }
+            else {
+                $_ = self;
+            }
         }
     }
 }
@@ -60,16 +62,23 @@ method gist {
         !! "<{$.name}$atts/>";
 }
 
-method content(PDF::COS::Dict :parent($P)!) {
+method content(PDF::COS::Dict :parent($P)!, :@struct-parents, :%nums) {
     my $elem = PDF::COS.coerce: %(
         :Type( :name<StructElem> ),
         :S( :$!name ),
         :$P,
     );
-    $elem<K> = $_ with $.mcid;
+
+
     with $!owner {
         when PageLike {
-            $elem<Pg> = $_;
+            my $pg := $_;
+            $elem<Pg> = $pg;
+            do with $.mcid -> $mcid {
+                given %nums{$pg} {
+                    $_ = $mcid if !.defined || $_ < $mcid;
+                }
+            }
         }
         when XObjectFormLike {
             warn "todo: tagged content handling of XObject forms";
@@ -79,9 +88,9 @@ method content(PDF::COS::Dict :parent($P)!) {
         }
     }
 
-    if $!kids {
-        my @k =  $!kids.map(*.content(:parent($elem)));
-        $elem<K> = @k > 1 ?? @k !! @k[0];
+    $elem<K> = $.mcid // do with $!kids {
+        my @k = .content(:parent($elem), :@struct-parents, :%nums);
+        @k > 1 ?? @k !! @k[0];
     }
 
     $elem;
@@ -89,18 +98,11 @@ method content(PDF::COS::Dict :parent($P)!) {
 
 our class Kids {
 
+    my subset Node where PDF::Content::Tag | Str;
     has PDF::Content::Tag @.open-tags;
     has PDF::Content::Tag $.closed-tag;
-    has PDF::Content::Tag @.tags handles<grep map AT-POS Bool>;
-
-    proto method list(|c) is also<children> {*};
-    multi method list(@tags = @!tags, :$flat! where .so) {
-        flat @tags.map: {
-            ($_,
-             self.list(.grep(PDF::Content::Tag), :flat))
-        }
-    }
-    multi method list is default { @!tags }
+    has Node @.children handles<grep map AT-POS Bool>;
+    has @.struct-parents;
 
     method open-tag(PDF::Content::Tag $tag) {
         with @!open-tags.tail {
@@ -111,33 +113,54 @@ our class Kids {
 
     method close-tag {
 	$!closed-tag = @!open-tags.pop;
-        @!tags.push: $!closed-tag
+        @!children.push: $!closed-tag
             without $!closed-tag.parent;
         $!closed-tag;
     }
 
-    method add-tag(PDF::Content::Tag $tag) is also<push> {
+    method add-tag(Node $node) is also<push> {
         with @!open-tags.tail {
-            .add-kid: $tag;
+            .add-kid: $node;
         }
         else {
-            @!tags.push: $tag
+            @!children.push: $node;
         }
     }
 
-    multi method content(PDF::COS::Dict :$parent!) {
-        [ @!tags.map(*.content(:$parent)) ];
+    method !child-content($parent, |c) {
+        [ @!children.map(*.content(:$parent, |c)) ];
     }
 
-    multi method content {
-        my PDF::COS::Dict $root;
+    method !root-content {
         die "unclosed tags: {@!open-tags.map(*.gist).join}"
             if @!open-tags;
-        if @!tags {
-            $root = PDF::COS.coerce: { :Type( :name<StructTreeRoot> ) };
-            my @k = @!tags.map(*.content(:parent($root), ));
+        @!struct-parents = ();
+        my PDF::COS::Dict $root = PDF::COS.coerce: { :Type( :name<StructTreeRoot> ) };
+        if @!children {
+            my UInt %nums{Any};
+            my @k = self!child-content($root, :@!struct-parents, :%nums);
             $root<K> = +@k > 1 ?? @k !! @k[0];
+            if %nums {
+                my $n = 0;
+                my @Nums;
+                for %nums.sort {
+                    @Nums.push: $n;
+                    @Nums.push: .key;
+                    $n += .value;
+                }
+                $root<ParentTree> = %( :@Nums );
+            }
         }
         $root;
     }
+
+    method content(PDF::COS::Dict :$parent, |c) {
+        with $parent {
+            self!child-content($_, |c)
+        } else {
+            self!root-content;
+        }
+    }
+
+    method gist { @!children.map(*.gist).join }
 }
