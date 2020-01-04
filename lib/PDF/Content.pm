@@ -38,11 +38,11 @@ class PDF::Content:ver<0.3.1>
     }
 
     multi method tag(PDF::Content::Tag $_, &do-stuff) {
-        samewith( .tag, |.props, &do-stuff);
+        samewith( .tag, |.atts, &do-stuff);
     }
 
     multi method tag(PDF::Content::Tag $_) {
-        samewith( .tag, |.props);
+        samewith( .tag, |.atts);
     }
 
     multi method tag(Str $tag, *%props) {

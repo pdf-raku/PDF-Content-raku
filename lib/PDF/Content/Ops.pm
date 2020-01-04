@@ -367,7 +367,7 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     # *** Marked Content Tags ***
-    has PDF::Content::Tag::Kids $.tags handles<open-tag close-tag add-tag open-tags closed-tag> .= new;
+    has PDF::Content::Tag::Kids $.tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> .= new;
 
     # *** Graphics Stack ***
     sub delta(@gs) {
@@ -916,9 +916,10 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
-        my Hash $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        $!parent.use-mcid($_) with $props<MCID>;
-        self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :$props, :$.owner, :start(+@!ops);
+        my %atts = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
+        my UInt $mcid = $_ with %atts<MCID>:delete;
+        $!parent.use-mcid($_) with $mcid;
+        self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%atts, :$.owner, :start(+@!ops), :$mcid;
     }
 
     multi method track-graphics('EMC') {
@@ -935,10 +936,11 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
-        my Hash $props = $p ~~ Str ?? $.resource-entry('Properties', $p) !! $p;
-        $!parent.use-mcid($_) with $props<MCID>;
+        my %atts = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
+        my UInt $mcid = $_ with %atts<MCID>:delete;
+        $!parent.use-mcid($_) with $mcid;
         my $start = my $end = +@!ops;
-        self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :$props, :$.owner, :$start, :$end;
+        self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%atts, :$.owner, :$start, :$end, :$mcid;
     }
 
     multi method track-graphics('gs', Str $key) {

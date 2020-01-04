@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 1;
+plan 2;
 
 use lib 't/lib';
 use PDFTiny;
@@ -37,13 +37,14 @@ my $kids = $gfx.tags;
 
 # finishing work; normally undertaken by the API
 
-my $doc = PDF::Content::Tag.new: :name<Document>, :$kids;
-my $root = PDF::Content::Tag::Kids.new: :children[$doc];
-my $content = $root.content;
-$pdf.Root<StructTreeRoot> = $content;
+my $doc = PDF::Content::Tag.new: :name<Document>, :$kids, :atts{ :test<yep> };
+
+is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P';
+my ($struct-tree, $Nums) = $doc.build-struct-tree;
+$pdf.Root<StructTreeRoot> = $struct-tree;
 ($pdf.Root<MarkedInfo> //= {})<Marked> = True;
-for $root.struct-parents {
-    .key<StructParents> = .value;
+for @$Nums -> $n, $parent {
+    $parent<StructParents> = $n;
 }
 
 lives-ok {$pdf.save-as: "t/tags.pdf";}
