@@ -6,29 +6,26 @@ use PDF::COS;
 use PDF::COS::Dict;
 use Method::Also;
 
-my subset PageLike of PDF::COS::Dict where .<Type> ~~ 'Page';
-my subset XObjectFormLike of PDF::COS::Dict where .<Subtype> ~~ 'Form';
-
 has Str $.name is required;
-has $.owner; # PDF element that contains this tag
 has Str $.op;
 has Hash $.atts;
 has UInt $.start is rw;
 has UInt $.end is rw;
 has Bool $.is-new is rw;  # tags not yet in the struct tree
-has UInt $.mcid is rw; # marked content identifer
 has PDF::Content::Tag $.parent is rw; # hierarchical parent
-our class Kids {...}
-has Kids $.kids handles<AT-POS list children grep map> .= new;
+our class Set {...}
+has Set $.kids handles<AT-POS list grep map> .= new;
+method tags is also<children> { $!kids.tags }
 
 method add-kid(PDF::Content::Tag $kid) {
     $!kids.push: $kid;
     $kid.parent = self;
 }
+
 method !atts-gist {
     with $!atts {
         my %a = $_;
-        %a<MCID> = $_ with $.mcid;
+        %a<MCID> = $_ with self.?mcid;
         %a.pairs.sort.map({ " {.key}=\"{.value}\"" }).join: '';
     }
     else {
@@ -45,7 +42,7 @@ method gist {
         !! "<{$.name}$atts/>";
 }
 
-method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
+method build-struct-elem(PDF::COS::Dict :parent($P)!) {
     my $elem = PDF::COS.coerce: %(
         :Type( :name<StructElem> ),
         :S( :$!name ),
@@ -55,29 +52,6 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
     if $!atts {
         my Str %dict = $!atts.List;
         $elem<A> = PDF::COS.coerce: :%dict;
-    }
-
-    with $!owner {
-        when PageLike {
-            my $pg := $_;
-            $elem<Pg> = $pg;
-            do with $.mcid -> $mcid {
-                given %nums{$pg} {
-                    $_ = $mcid if !.defined || $_ < $mcid;
-                }
-            }
-        }
-        when XObjectFormLike {
-            warn "todo: tagged content handling of XObject forms";
-        }
-        default {
-            warn "todo: tagged content items of type: {.WHAT.perl}";
-        }
-    }
-
-    $elem<K> = $.mcid // do given $!kids {
-        my @k = .build-struct-elems($elem, :%nums);
-        @k > 1 ?? @k !! @k[0];
     }
 
     $elem;
@@ -90,18 +64,18 @@ method take-descendants {
 method descendant-tags { gather self.take-descendants }
 
 method build-struct-tree {
-    my $root = PDF::Content::Tag::Kids.new: :children[self];
+    my $root = PDF::Content::Tag::Set.new: :tags[self];
     $root.build-struct-tree;
 }
 
-our class Kids {
+our class Set {
 
     my subset Node where PDF::Content::Tag | Str;
     has PDF::Content::Tag @.open-tags;
     has PDF::Content::Tag $.closed-tag;
-    has Node @.children handles<grep map AT-POS Bool>;
+    has Node @.tags handles<grep map AT-POS Bool shift>;
 
-    method take-descendants { @!children.grep(PDF::Content::Tag).map(*.take-descendants) }
+    method take-descendants { @!tags.grep(PDF::Content::Tag).map(*.take-descendants) }
     method descendant-tags { gather self.take-descendants }
 
     method open-tag(PDF::Content::Tag $tag) {
@@ -113,7 +87,7 @@ our class Kids {
 
     method close-tag {
 	$!closed-tag = @!open-tags.pop;
-        @!children.push: $!closed-tag
+        @!tags.push: $!closed-tag
             without $!closed-tag.parent;
         $!closed-tag;
     }
@@ -123,12 +97,12 @@ our class Kids {
             .add-kid: $node;
         }
         else {
-            @!children.push: $node;
+            @!tags.push: $node;
         }
     }
 
     method build-struct-elems($parent, |c) {
-        [ @!children.map(*.build-struct-elem(:$parent, |c)) ];
+        [ @!tags.map(*.build-struct-elem(:$parent, |c)) ];
     }
 
     method build-struct-tree {
@@ -137,7 +111,7 @@ our class Kids {
         my PDF::COS::Dict $struct-tree = PDF::COS.coerce: { :Type( :name<StructTreeRoot> ) };
         my @Nums;
 
-        if @!children {
+        if @!tags {
             my UInt %nums{Any};
             my @k = self.build-struct-elems($struct-tree, :%nums);
             $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
@@ -156,5 +130,5 @@ our class Kids {
         ($struct-tree, @Nums);
     }
 
-    method gist { @!children.map(*.gist).join }
+    method gist { @!tags.map(*.gist).join }
 }

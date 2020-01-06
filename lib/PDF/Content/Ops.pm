@@ -114,6 +114,7 @@ class PDF::Content::Ops {
     use PDF::COS::Util :from-ast, :to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
     use PDF::Content::Tag;
+    use PDF::Content::Tag::Marked;
     use JSON::Fast;
 
     has Block @.callback is rw;
@@ -367,7 +368,7 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     # *** Marked Content Tags ***
-    has PDF::Content::Tag::Kids $.tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> .= new;
+    has PDF::Content::Tag::Set $.tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> .= new;
 
     # *** Graphics Stack ***
     sub delta(@gs) {
@@ -912,14 +913,14 @@ class PDF::Content::Ops {
     multi method track-graphics('SCN', *@!StrokeColor where self!color-args-ok('SCN', $_)) { }
 
     multi method track-graphics('BMC', Str $name!) {
-        self.open-tag: PDF::Content::Tag.new: :op<BMC>, :$name, :$.owner, :start(+@!ops);
+        self.open-tag: PDF::Content::Tag::Marked.new: :op<BMC>, :$name, :$.owner, :start(+@!ops);
     }
 
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
         my %atts = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
         my UInt $mcid = $_ with %atts<MCID>:delete;
         $!parent.use-mcid($_) with $mcid;
-        self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%atts, :$.owner, :start(+@!ops), :$mcid;
+        self.open-tag: PDF::Content::Tag::Marked.new: :op<BDC>, :$name, :%atts, :$.owner, :start(+@!ops), :$mcid;
     }
 
     multi method track-graphics('EMC') {
@@ -932,7 +933,7 @@ class PDF::Content::Ops {
 
     multi method track-graphics('MP', Str $name!) {
         my $start = my $end = +@!ops;
-        self.add-tag: PDF::Content::Tag.new: :op<MP>, :$name, :$.owner, :$start, :$end;
+        self.add-tag: PDF::Content::Tag::Marked.new: :op<MP>, :$name, :$.owner, :$start, :$end;
     }
 
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
@@ -940,7 +941,7 @@ class PDF::Content::Ops {
         my UInt $mcid = $_ with %atts<MCID>:delete;
         $!parent.use-mcid($_) with $mcid;
         my $start = my $end = +@!ops;
-        self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%atts, :$.owner, :$start, :$end, :$mcid;
+        self.add-tag: PDF::Content::Tag::Marked.new: :op<DP>, :$name, :%atts, :$.owner, :$start, :$end, :$mcid;
     }
 
     multi method track-graphics('gs', Str $key) {
