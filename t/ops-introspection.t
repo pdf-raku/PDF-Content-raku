@@ -36,7 +36,7 @@ my %gs-initial = %(
     :WordSpacing(0)
 );
 
-my $parent = { :Font{ :F1($dummy-font) }, } does FakeGfxParent;
+my $parent = { :Type<Page>, :Font{ :F1($dummy-font) }, } does FakeGfxParent;
 my PDF::Content $g .= new: :$parent;
 
 is-json-equiv $g.gsaves, [], 'gsave initial';

@@ -30,6 +30,7 @@ sub warns-like(&code, $ex-type, $desc = 'warning') {
 my $dummy-font = %() does role { method cb-finish {} }
 
 my $parent = {
+    :Type<Page>,
     :Font{ :F1($dummy-font) },
     :ExtGState{ :G1{ :ca(0.5) } },
 } does FakeGfxParent;

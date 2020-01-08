@@ -8,18 +8,6 @@ use PDF::Content::Page;
 
 my subset PageGraphics of PDF::Content where .parent ~~ PDF::Content::Page;
 
-method build-struct-elem(:%nums) {
-    given callsame() -> $elem {
-        $elem<K> = do given $.kids {
-            my @k = .build-struct-elems($elem, :%nums);
-            @k > 1 ?? @k !! @k[0];
-        }
-        $elem;
-    }
-
-
-}
-
 multi method graphics(PDF::Content::Page $page, &action) {
     self.graphics($page.gfx, &action);
 }

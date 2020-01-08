@@ -7,7 +7,7 @@ use PDF::Grammar::Test :is-json-equiv;
 use lib 't/lib';
 use FakeGfxParent;
 
-my $parent = { :Font{ :F1{} }, } does FakeGfxParent;
+my $parent = { :Type<Page>, :Font{ :F1{} }, } does FakeGfxParent;
 
 my PDF::Content $g .= new: :$parent;
 $g.graphics: { .BeginText; .ShowText("Hi"); .EndText;};

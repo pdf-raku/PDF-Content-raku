@@ -12,7 +12,7 @@ use FakeGfxParent;
 
 my $dummy-font = %() does role { method cb-finish {} }
 
-my $parent = { :Font{ :F1($dummy-font) }, } does FakeGfxParent;
+my $parent = { :Type<Page>, :Font{ :F1($dummy-font) }, } does FakeGfxParent;
 my PDF::Content $g .= new: :$parent;
 
 $g.op(Save);
