@@ -41,6 +41,10 @@ method gist {
         !! "<{$.name}$atts/>";
 }
 
+method build-struct-kids($elem, :%nums) {
+     $.kids.build-struct-elems($elem, :%nums);
+}
+
 method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
 
     my $elem = PDF::COS.coerce: %(
@@ -49,11 +53,9 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
         :$P,
     );
 
-    if $.kids {
-        $elem<K> = do given $.kids {
-            my @k = .build-struct-elems($elem, :%nums);
-            @k > 1 ?? @k !! @k[0];
-        }
+    my @k = $.build-struct-kids($elem, :%nums);
+    if @k {
+        $elem<K> = @k > 1 ?? @k !! @k[0];
     }
 
     if $!atts {
@@ -94,7 +96,9 @@ our class Set {
         if @!tags {
             my UInt %nums{Any};
             my @k = self.build-struct-elems($struct-tree, :%nums);
-            $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
+            if @k {
+                $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
+            }
             if %nums {
                 my $n = 0;
                 for %nums.sort {

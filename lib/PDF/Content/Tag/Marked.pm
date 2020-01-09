@@ -12,10 +12,8 @@ my subset TagOwner where PageLike|XObjectFormLike;
 has TagOwner $.owner is required;
 has UInt $.mcid is rw; # marked content identifer
 
-method build-struct-elem(:%nums) {
-    my $elem := callsame();
-
-    $elem<K> //= do with $!mcid -> $mcid {
+method build-struct-kids($elem, :%nums) {
+    do with $!mcid -> $mcid {
         given $!owner {
             when PageLike {
                 my $pg := $_;
@@ -31,8 +29,14 @@ method build-struct-elem(:%nums) {
                 warn "todo: tagged content items of type: {.WHAT.perl}";
             }
         }
-        $mcid;
+        [$mcid;]
     }
+    else {
+        []
+    }
+}
 
+method build-struct-elem(:%nums) {
+    my $elem := callsame();
     $elem<K>:exists ?? $elem !! Mu;
 }

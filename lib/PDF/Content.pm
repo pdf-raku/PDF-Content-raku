@@ -28,12 +28,18 @@ class PDF::Content:ver<0.3.1>
         with $props { $.tag($tag, &code, |$_) } else { $.tag($tag, &code) }
     }
 
-    method !gen-mcid(%props) {
-        with %props<MCID> {
-            $.parent.use-mcid($_);
+    method !set-mcid(%props) {
+        if $.open-tags.first(*.mcid.defined) {
+            warn "MCIDs may not be nested"
+                with %props<MICD>:delete;
         }
         else {
-            $_ = $.parent.next-mcid;
+            with %props<MCID> {
+                $.parent.use-mcid($_);
+            }
+            else {
+                $_ = $.parent.next-mcid;
+            }
         }
     }
 
@@ -46,7 +52,8 @@ class PDF::Content:ver<0.3.1>
     }
 
     multi method tag(Str $tag, *%props) {
-        self!gen-mcid: %props;
+        self!set-mcid: %props;
+
         my \rv := %props
             ?? $.MarkPointDict($tag, $%props)
             !! $.MarkPoint($tag);
@@ -55,7 +62,7 @@ class PDF::Content:ver<0.3.1>
     }
 
     multi method tag(Str $tag, &do-stuff!, *%props) {
-        self!gen-mcid: %props;
+        self!set-mcid: %props;
 
         $.BeginMarkedContentDict($tag, $%props);
         my \rv := do-stuff(self);
