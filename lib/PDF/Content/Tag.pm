@@ -16,6 +16,35 @@ has PDF::Content::Tag $.parent is rw; # hierarchical parent
 our class Set {...}
 has Set $.kids handles<AT-POS list grep map tags children> .= new;
 
+#| See [PDF 32000 Tables 333 - Standard structure types for grouping elements]
+my enum StructureTags is export(:StructureTags,:Tags) (
+    :Document<Document>, :Part<Part>, :Article<Art>, :Section<Sect>,
+    :Division<Div>, :BlockQuotation<BlockQuote>, :Caption<Caption>,
+    :TableOfContents<TOC>, :TableOfContentsItem<TOCI>, :Index<Index>,
+    :NonstructuralElement<NonStruct>, :PrivateElement<Private>,
+);
+
+#| See [PDF 32000 Tables 334-337 - Block-level structure elements]
+my enum ParagraphTags is export(:ParagraphTags,:Tags) (
+    :Paragraph<P>, :Header<H>,   :Header1<H1>,
+    :Header2<H2>,  :Header3<H3>, :Header4<H4>,
+    :Header5<H5>,  :Header6<H6>,
+);
+my enum ListElemTags is export(:ListElemTags,:Tags) (
+    :List<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
+);
+my enum TableTags is export(:TableTags,:Tags) (
+    :Table<Table>,  :TableRow<TR>,     :TableHeader<TH>,
+    :TableData<TD>, :TableBody<TBody>, :TableFooter<TFoot>, 
+);
+
+#| See [PDF 32000 Table 338 - Standard structure types for inline-level structure elements]
+my enum InlineElemTags is export(:InlineElemTags,:Tags) (
+    :Span<Span>, :Quotation<Quote>, :Note<Note>, :Reference<Reference>,
+    :BibliographyEntry<BibEntry>, :Code<Code>, :Link<Link>,
+    :Annotation<Annot>, :Ruby<Ruby>, :Warichu<Warichu>,
+);
+
 method add-kid(PDF::Content::Tag $kid) {
     $!kids.push: $kid;
     $kid.parent = self;
@@ -53,7 +82,7 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
         :$P,
     );
 
-    my @k = $.build-struct-kids($elem, :%nums);
+    my @k = @.build-struct-kids($elem, :%nums);
     if @k {
         $elem<K> = @k > 1 ?? @k !! @k[0];
     }
@@ -95,7 +124,7 @@ our class Set {
 
         if @!tags {
             my UInt %nums{Any};
-            my @k = self.build-struct-elems($struct-tree, :%nums);
+            my @k = @.build-struct-elems($struct-tree, :%nums);
             if @k {
                 $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
             }

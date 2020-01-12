@@ -13,7 +13,7 @@ has TagOwner $.owner is required;
 has UInt $.mcid is rw; # marked content identifer
 
 method build-struct-kids($elem, :%nums) {
-    do with $!mcid -> $mcid {
+    my @ = do with $!mcid -> $mcid {
         given $!owner {
             when PageLike {
                 my $pg := $_;
@@ -26,13 +26,10 @@ method build-struct-kids($elem, :%nums) {
                 warn "todo: tagged content handling of XObject forms";
             }
             default {
-                warn "todo: tagged content items of type: {.WHAT.perl}";
+                warn "todo? tagged content items of type: {.WHAT.perl}";
             }
         }
-        [$mcid;]
-    }
-    else {
-        []
+        $mcid;
     }
 }
 

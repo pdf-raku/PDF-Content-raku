@@ -6,7 +6,7 @@ class PDF::Content::Text::Block {
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
-    use PDF::Content::Marked :ParagraphTags;
+    use PDF::Content::Tag :ParagraphTags;
     use PDF::Content::XObject;
 
     has Numeric $.width;

@@ -15,7 +15,7 @@ my $page = $pdf.add-page;
 my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 my $body-font = $page.core-font( :family<Helvetica> );
 
-my $doc = PDF::Content::Tag::Elem.new: :name<Document>, :atts{ :test<yep> };
+my PDF::Content::Tag::Elem $doc .= new: :name<Document>, :atts{ :test<yep> };
 
 $doc.graphics: $page, -> $gfx {
 
