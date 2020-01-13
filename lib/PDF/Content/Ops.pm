@@ -1,29 +1,5 @@
 use v6;
 
-my role GraphicsAtt {
-    has Str $.accessor-name is rw;
-    method compose(Mu \package) {
-        my \meth-name = self.accessor-name;
-        nextsame
-            if package.^declares_method(meth-name)
-            || ! (self.has_accessor && self.rw);
-        my \setter = 'Set' ~ meth-name;
-        package.^add_method( meth-name, sub (\obj) is rw { obj.graphics-accessor( self, setter ); } );
-    }
-}
-
-my role ExtGraphicsAtt {
-    has Str $.accessor-name is rw;
-    has Str $.key is rw;
-    method compose(Mu \package) {
-        my \meth-name = self.accessor-name;
-        nextsame
-            if package.^declares_method(meth-name)
-            || ! (self.has_accessor && self.rw);
-        package.^add_method( meth-name, sub (\obj) is rw { obj.ext-graphics-accessor( self, self.key ); } );
-    }
-}
-
 class X::PDF::Content is Exception {
 }
 
@@ -153,6 +129,7 @@ class PDF::Content::Ops {
         :MoveShowText<'>
     »;
 
+    my constant %OpCode is export(:OpName) = OpCode.enums.Hash;
     my constant %OpName is export(:OpName) = OpCode.enums.invert.Hash;
 
     # See [PDF 1.7 TABLE 4.1 Operator categories]
@@ -202,6 +179,7 @@ class PDF::Content::Ops {
 	:AlphaSource<AIS>
 	:TextKnockout<TK>
     »;
+    constant %ExtGState = ExtGState.enums.Hash;
 
     my Int enum TextMode is export(:TextMode) «
 	:FillText(0) :OutlineText(1) :FillOutlineText(2)
@@ -249,13 +227,25 @@ class PDF::Content::Ops {
     my Str %ExtGStateEntries;
 
     multi trait_mod:<is>(Attribute $att, :$graphics!) {
-        $att does GraphicsAtt;
-        $att.accessor-name = $att.name.substr(2);
+
+        my role GraphicsAttHOW {
+            method accessor-name { self.name.substr(2) }
+            method compose(Mu \package) {
+                my \meth-name = self.accessor-name;
+                nextsame
+                    if package.^declares_method(meth-name)
+                    || ! (self.has_accessor && self.rw);
+                my \setter = 'Set' ~ meth-name;
+                package.^add_method( meth-name, sub (\obj) is rw { obj.graphics-accessor( self, setter ); } );
+            }
+        }
+
+        $att does GraphicsAttHOW;
         %GraphicVars{$att.accessor-name} = $att;
 
         if $graphics ~~ Method {
             my \setter = 'Set' ~ $att.accessor-name;
-            my Str \op = OpCode.enums{setter}
+            my Str \op = %OpCode{setter}
                 or die "No OpCode::{setter} entry for {$att.name}";
             %PostOp{op} = $graphics;
         }
@@ -266,13 +256,29 @@ class PDF::Content::Ops {
     }
 
     multi trait_mod:<is>(Attribute $att, :$ext-graphics!) {
-        $att does ExtGraphicsAtt;
-        my $method-name = $att.name.substr(2);
-        $att.accessor-name = $method-name;
-        %GraphicVars{$method-name} = $att;
-        $att.key = ExtGState.enums{$method-name}
-            or die "no ExtGState::$method-name enumeration";
-        %ExtGStateEntries{$method-name} = $att.key;
+
+        my role ExtGraphicsAttHOW {
+            method accessor-name { self.name.substr(2) }
+            method key {
+                given $.accessor-name {
+                    %ExtGState{$_}
+                        or die "no ExtGState::$_ enumeration";
+                }
+            }
+            method compose(Mu \package) {
+                my \meth-name = self.accessor-name;
+                nextsame
+                    if package.^declares_method(meth-name)
+                    || ! (self.has_accessor && self.rw);
+                package.^add_method( meth-name, sub (\obj) is rw { obj.ext-graphics-accessor( self, self.key ); } );
+            }
+        }
+
+        $att does ExtGraphicsAttHOW;
+        given $att.accessor-name {
+            %GraphicVars{$_} = $att;
+            %ExtGStateEntries{$_} = $att.key;
+        }
     }
 
     # *** TEXT STATE ***
@@ -310,11 +316,13 @@ class PDF::Content::Ops {
     has Numeric $.LineWidth   is graphics(method ($!LineWidth) {}) is rw = 1.0;
     has UInt    $.LineCap     is graphics(method ($!LineCap) {}) is rw = ButtCaps;
     has UInt    $.LineJoin    is graphics(method ($!LineJoin) {}) is rw = MiterJoin;
-    has         @.DashPattern is graphics(method (Array $a, Numeric $p ) {
-                                               @!DashPattern = [ $a.clone, $p];
-                                           }) is rw = [[], 0];
-    my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
+    has         @.DashPattern is graphics(
+        method (Array $a, Numeric $p ) {
+            @!DashPattern = [ $a.clone, $p];
+        }
+    ) is rw = [[], 0];
 
+    my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
     has Str $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
     has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
@@ -1073,13 +1081,13 @@ class PDF::Content::Ops {
     }
 
     method dispatch:<.?>(\name, |c) is raw {
-        self.can(name) || OpCode.enums{name} ?? self."{name}"(|c) !! Nil
+        self.can(name) || %OpCode{name} ?? self."{name}"(|c) !! Nil
     }
     method ShowSpaceText(Array $args) {
         self.op(OpCode::ShowSpaceText, $args);
     }
     method FALLBACK(\name, |c) {
-        with OpCode.enums{name} -> \op {
+        with %OpCode{name} -> \op {
             # e.g. $.Restore :== $.op('Q', [])
             self.op(op, |c);
         }
