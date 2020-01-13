@@ -259,12 +259,7 @@ class PDF::Content::Ops {
 
         my role ExtGraphicsAttHOW {
             method accessor-name { self.name.substr(2) }
-            method key {
-                given $.accessor-name {
-                    %ExtGState{$_}
-                        or die "no ExtGState::$_ enumeration";
-                }
-            }
+            has Str $.key is rw;
             method compose(Mu \package) {
                 my \meth-name = self.accessor-name;
                 nextsame
@@ -276,8 +271,12 @@ class PDF::Content::Ops {
 
         $att does ExtGraphicsAttHOW;
         given $att.accessor-name {
+            my $key := ExtGState.enums{$_}
+                or die "no ExtGState::$_ enumeration";
+
+            $att.key = $key;
+            %ExtGStateEntries{$_} = $key;
             %GraphicVars{$_} = $att;
-            %ExtGStateEntries{$_} = $att.key;
         }
     }
 
