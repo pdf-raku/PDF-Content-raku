@@ -71,6 +71,29 @@ class PDF::Content:ver<0.3.1>
         rv;
     }
 
+    # to allow e.g. $gfx.tag.Header({ ... });
+    my class Tagger {
+        use PDF::Content::Tag :TagSet, :%TagAliases;
+        has $.gfx is required;
+        method FALLBACK($tag, |c) {
+            if $tag ∈ TagSet {
+                $!gfx.tag($tag, |c)
+            }
+            else {
+                with %TagAliases{$tag} {
+                    $!gfx.tag($_, |c)
+                }
+                else {
+                    die "unknown tag: $_";
+                }
+            }
+        }
+    }
+    has Tagger $!tagger;
+    multi method tag is default {
+        $!tagger //= Tagger.new: :gfx(self);
+    }
+
     method canvas( &mark-up! ) {
         my $canvas := (require HTML::Canvas).new;
         $canvas.context(&mark-up);

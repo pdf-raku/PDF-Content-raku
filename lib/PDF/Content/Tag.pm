@@ -45,6 +45,9 @@ my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Annotation<Annot>, :Ruby<Ruby>, :Warichu<Warichu>,
 );
 
+constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums );
+constant TagSet is export(:TagSet) = %TagAliases.values.Set;
+
 method add-kid(PDF::Content::Tag $kid) {
     $!kids.push: $kid;
     $kid.parent = self;

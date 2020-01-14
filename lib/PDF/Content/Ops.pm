@@ -89,7 +89,7 @@ class PDF::Content::Ops {
     use PDF::COS::Dict;
     use PDF::COS::Util :from-ast, :to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
-    use PDF::Content::Tag;
+    use PDF::Content::Tag :TagSet;
     use PDF::Content::Tag::Marked;
     use JSON::Fast;
 
@@ -378,8 +378,11 @@ class PDF::Content::Ops {
     my class TagSetBuilder is PDF::Content::Tag::Set {
         has PDF::Content::Tag @.open-tags;            # currently open descendant tags
         has PDF::Content::Tag $.closed-tag;
+        has Bool $.strict;
 
         method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
+            warn "unknown marked-content tag '{$tag.name}'"
+                if $!strict && $tag.name ∉ TagSet;
             with @!open-tags.tail {
                 .add-kid: $tag;
             }
@@ -393,16 +396,18 @@ class PDF::Content::Ops {
             $!closed-tag;
         }
 
-        method add-tag(PDF::Content::Tag $node) {    # add child to innermost descendant
+        method add-tag(PDF::Content::Tag $tag) {    # add child to innermost descendant
+            warn "unknown marked-content tag '{$tag.name}'"
+                if $!strict && $tag.name ∉ TagSet;
             with @!open-tags.tail {
-                .add-kid: $node;
+                .add-kid: $tag;
             }
             else {
-                @.tags.push: $node;
+                @.tags.push: $tag;
             }
         }
     }
-    has TagSetBuilder $.tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> .= new;
+    has TagSetBuilder $.tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> .= new: :$!strict;
 
     # *** Graphics Stack ***
     sub delta(@gs) {

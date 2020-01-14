@@ -27,7 +27,7 @@ $doc.graphics: $page, -> $gfx {
         }
     };
 
-    $gfx.tag: 'P', {
+    $gfx.tag.Paragraph: {
         .text: {
             .text-position = 70, 100;
             .font = $body-font, 12;
