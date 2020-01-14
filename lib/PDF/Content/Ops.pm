@@ -321,7 +321,11 @@ class PDF::Content::Ops {
         }
     ) is rw = [[], 0];
 
-    my subset ColorSpace of Str where 'DeviceRGB'|'DeviceGray'|'DeviceCMYK'|'DeviceN'|'Pattern'|'Separation'|'ICCBased'|'Indexed'|'Lab'|'CalGray'|'CalRGB';
+    sub device-colorspace(Str $_) {
+        my Str $cs := .substr(6) if .starts-with('Device');
+        $cs ~~ 'RGB'|'Gray'|'CMYK' ?? $cs !! Str;
+    }
+
     has Str $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
     has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
@@ -330,8 +334,8 @@ class PDF::Content::Ops {
             STORE => -> $, Pair $_ {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
-                    if $key ~~ /^ Device(RGB|Gray|CMYK) $/ {
-                        my Str $cs = ~ $0;
+                    my $cs := device-colorspace($key);
+                    if $cs {
                         self."SetStroke$cs"(|.value);
                     }
                     else {
@@ -351,8 +355,8 @@ class PDF::Content::Ops {
             STORE => -> $, Pair $_ {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!FillColorSpace && .value eqv @!FillColor {
-                    if $key ~~ /^ Device(RGB|Gray|CMYK) $/ {
-                        my Str $cs = ~ $0;
+                    my $cs := device-colorspace($key);
+                    if $cs {
                         self."SetFill$cs"(|.value);
                     }
                     else {
@@ -396,7 +400,7 @@ class PDF::Content::Ops {
             $!closed-tag;
         }
 
-        method add-tag(PDF::Content::Tag $tag) {    # add child to innermost descendant
+        method add-tag(PDF::Content::Tag $tag) {      # add child to innermost descendant
             warn "unknown marked-content tag '{$tag.name}'"
                 if $!strict && $tag.name ∉ TagSet;
             with @!open-tags.tail {
