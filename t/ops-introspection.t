@@ -65,17 +65,17 @@ is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[{}, 16
 is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[{}, 16]}, 'graphics-state :delta';
 is-deeply $g.context, GraphicsContext::Text;
 
-$g.tag: 'Foo', {
+$g.tag: 'P', {
     .ShowText("Hi");
 };
 
-$g.tag: 'Bar', {
-    is .tags.map(*.gist).join, '<Foo MCID="1"/>';
-    is .open-tags.map(*.gist).join, '<Bar MCID="2"/>';
+$g.tag: 'Div', {
+    is .tags.map(*.gist).join, '<P MCID="1"/>';
+    is .open-tags.map(*.gist).join, '<Div MCID="2"/>';
     .ShowText("There");
 };
 
-is $g.tags.map(*.gist).join, '<Foo MCID="1"/><Bar MCID="2"/>';
+is $g.tags.map(*.gist).join, '<P MCID="1"/><Div MCID="2"/>';
 
 $g.EndText;
 $g.Restore;

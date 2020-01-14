@@ -57,7 +57,7 @@ lives-ok {$g.SetGraphicsState('G1')}, 'valid SetGraphicsState';
 throws-like {$g.SetGraphicsState('G2'); }, X::PDF::Content::UnknownResource, :message("Unknown ExtGState resource: /G2");
 $g.Restore;
 
-$g.BeginMarkedContent('foo');
+$g.BeginMarkedContent('P');
 lives-ok {$g.EndMarkedContent}, 'valid EndMarkedContent';
 throws-like {$g.EndMarkedContent}, X::PDF::Content::OP::BadNesting, :message("Bad nesting; 'EMC' (EndMarkedContent) operator not matched by preceeding 'BMC' or 'BDC' (BeginMarkedContent)");
 

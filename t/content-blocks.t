@@ -9,7 +9,7 @@ use FakeGfxParent;
 
 my $parent = { :Type<Page>, :Font{ :F1{} }, } does FakeGfxParent;
 
-my PDF::Content $g .= new: :$parent;
+my PDF::Content $g .= new: :$parent, :!strict;
 $g.graphics: { .BeginText; .ShowText("Hi"); .EndText;};
 is-json-equiv [$g.ops], [
     :q[],
@@ -18,14 +18,14 @@ is-json-equiv [$g.ops], [
     "ET" => [],
     :Q[]], '.graphics block';
 
-$g .= new: :$parent;
+$g .= new: :$parent, :!strict;
 $g.text: { .ShowText("Hi"); };
 is-json-equiv [$g.ops], [
     :BT[],
     :Tj[:literal<Hi>],
     "ET" => [], ], '.text block';
 
-$g .= new: :$parent;
+$g .= new: :$parent, :!strict;
 $g.tag: 'Foo', {
     .BeginText;
     .ShowText("Hi");
@@ -37,7 +37,7 @@ is-json-equiv [$g.ops], [
     "ET" => [],
     :EMC[], ], '.tag content block';
 
-$g .= new: :$parent;
+$g .= new: :$parent, :!strict;
 $g.tag: 'Foo', :Bar{ :Baz }, {
    .BeginText;
    .ShowText("Hi");
@@ -52,7 +52,7 @@ is-json-equiv [$g.ops], [
 
 my $props = { :MCID(42) };
 
-$g .= new: :$parent;
+$g .= new: :$parent, :!strict;
 $g.tag: 'Foo', |$props, {
    .tag: 'Nested',  sub ($) { };
    $g.MarkPoint('A');
