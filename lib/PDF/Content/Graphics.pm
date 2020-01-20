@@ -15,6 +15,10 @@ role PDF::Content::Graphics {
     has PDF::Content $!gfx;     #| appended graphics
     has Bool $!rendered = False;
     has UInt $.mcid = 0;
+    method use-mcid(UInt:D $_) {
+        $!mcid = $_ unless $!mcid.defined && $!mcid >= $_;
+    }
+    method next-mcid { $!mcid++ }
 
     #| Fix nesting issues that aren't illegal, but could cause problems:
     #| - append any missing 'Q' (Restore) operators at end of stream
@@ -46,11 +50,7 @@ role PDF::Content::Graphics {
         @ops;
     }
 
-    method gfx(Bool :$render = False, |c) {
-	$!gfx //= self.new-gfx(|c);
-        self.render(|c) if $render && !$!rendered;
-        $!gfx;
-    }
+    method gfx(|c) is default {	$!gfx //= self.new-gfx(|c) }
     method graphics(&code) { self.gfx.graphics( &code ) }
     method text(&code) { self.gfx.text( &code ) }
     method canvas(&code) { self.gfx.canvas( &code ) }
@@ -73,12 +73,14 @@ role PDF::Content::Graphics {
     }
 
     method render(Bool :$tidy = True, |c) is default {
-        my $gfx //= $.gfx(|c);
-        my Pair @ops = self.contents-parse;
-        @ops = self!tidy(@ops)
-            if $tidy;
-        $gfx.ops: @ops;
-        $!rendered = True;
+        my $gfx := $.gfx(|c);
+        $!rendered ||= do {
+            my Pair @ops = self.contents-parse;
+            @ops = self!tidy(@ops)
+                if $tidy;
+            $gfx.ops: @ops;
+            True;
+        }
         $gfx;
     }
 
@@ -121,11 +123,6 @@ role PDF::Content::Graphics {
             if $group;
         PDF::COS.coerce( :stream{ :%dict });
     }
-
-    method use-mcid(UInt:D $_) {
-        $!mcid = $_ unless ($!mcid//-1) >= $_;
-    }
-    method next-mcid { $!mcid++ }
 
     method tiling-pattern(List    :$BBox!,
                           Numeric :$XStep = $BBox[2] - $BBox[0],
