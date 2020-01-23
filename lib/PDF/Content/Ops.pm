@@ -960,10 +960,10 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
-        my %atts = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
-        my UInt $mcid = $_ with %atts<MCID>:delete;
+        my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
+        my UInt $mcid = $_ with %attributes<MCID>:delete;
         $!parent.use-mcid($_) with $mcid;
-        self.open-tag: PDF::Content::Tag::Marked.new: :op<BDC>, :$name, :%atts, :$.owner, :start(+@!ops), :$mcid;
+        self.open-tag: PDF::Content::Tag::Marked.new: :op<BDC>, :$name, :%attributes, :$.owner, :start(+@!ops), :$mcid;
     }
 
     multi method track-graphics('EMC') {
@@ -980,11 +980,11 @@ class PDF::Content::Ops {
     }
 
     multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
-        my %atts = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
-        my UInt $mcid = $_ with %atts<MCID>:delete;
+        my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
+        my UInt $mcid = $_ with %attributes<MCID>:delete;
         $!parent.use-mcid($_) with $mcid;
         my $start = my $end = +@!ops;
-        self.add-tag: PDF::Content::Tag::Marked.new: :op<DP>, :$name, :%atts, :$.owner, :$start, :$end, :$mcid;
+        self.add-tag: PDF::Content::Tag::Marked.new: :op<DP>, :$name, :%attributes, :$.owner, :$start, :$end, :$mcid;
     }
 
     multi method track-graphics('gs', Str $key) {

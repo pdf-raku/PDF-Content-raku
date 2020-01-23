@@ -8,7 +8,7 @@ use Method::Also;
 
 has Str $.name is required;
 has Str $.op;
-has Hash $.atts;
+has Hash $.attributes;
 has UInt $.start is rw;
 has UInt $.end is rw;
 has Bool $.is-new is rw;  # tags not yet in the struct tree
@@ -42,10 +42,17 @@ my enum TableTags is export(:TableTags,:Tags) (
 my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Span<Span>, :Quotation<Quote>, :Note<Note>, :Reference<Reference>,
     :BibliographyEntry<BibEntry>, :Code<Code>, :Link<Link>,
-    :Annotation<Annot>, :Ruby<Ruby>, :Warichu<Warichu>,
+    :Annotation<Annot>,
+    :Ruby<Ruby>, :RubyPunctutation<RP>, :RubyBaseText<RB>, :RubyText<RT>,
+    :Warichu<Warichu>, :WarichuPunctutation<RP>, :WarichuText<RT>,
+    :Artifact<Artifact>,
 );
 
-constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, :Artifact<Artifact> );
+my enum IllustrationTags is export(:IllusttrationTags,:Tags) (
+    :Figure<Figure>, :Forumla<Formula>, :Form<Form>
+);
+
+constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums );
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
 method add-kid(PDF::Content::Tag $kid) {
@@ -53,8 +60,8 @@ method add-kid(PDF::Content::Tag $kid) {
     $kid.parent = self;
 }
 
-method !atts-gist {
-    with $!atts {
+method !attributes-gist {
+    with $!attributes {
         my %a = $_;
         %a<MCID> = $_ with self.?mcid;
         %a.pairs.sort.map({ " {.key}=\"{.value}\"" }).join: '';
@@ -65,12 +72,12 @@ method !atts-gist {
 }
 
 method gist {
-    my $atts = self!atts-gist();
+    my $attributes = self!attributes-gist();
     $.kids
-        ?? [~] flat("<{$.name}$atts>",
+        ?? [~] flat("<{$.name}$attributes>",
                     $!kids.map(*.gist),
                     "</{$.name}>")
-        !! "<{$.name}$atts/>";
+        !! "<{$.name}$attributes/>";
 }
 
 method build-struct-kids($elem, :%nums) {
@@ -90,8 +97,8 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
         $elem<K> = @k > 1 ?? @k !! @k[0];
     }
 
-    if $!atts {
-        my Str %dict = $!atts.List;
+    if $!attributes {
+        my Str %dict = $!attributes.List;
         $elem<A> = PDF::COS.coerce: :%dict;
     }
 
