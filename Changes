@@ -1,3 +1,6 @@
+Release 0.4.0
+- Rename modules *.pm -> *.rakumod
+
 Release 0.3.2
 - [PDF::Content::Graphics]
   - remove $.gfx(:render, ...) option

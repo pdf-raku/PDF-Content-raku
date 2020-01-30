@@ -1,11 +1,12 @@
 {
-  "api" : "PDF-1.7",
-  "auth" : "github:p6-pdf",
-  "authors" : [
+  "api": "PDF-1.7",
+  "auth": "github:p6-pdf",
+  "authors": [
     "David Warring"
   ],
-  "build-depends" : [ ],
-  "depends" : [
+  "build-depends": [
+  ],
+  "depends": [
     "Base64::Native",
     "Color",
     "Compress::Zlib::Raw",
@@ -16,44 +17,48 @@
     "PDF:ver<0.3.7+>",
     "PDF::Grammar"
   ],
-  "description" : "PDF content related classes; including text, images, fonts and graphics",
-  "license" : "Artistic-2.0",
-  "name" : "PDF::Content",
-  "perl" : "6.*",
-  "provides" : {
-    "PDF::Content" : "lib/PDF/Content.pm",
-    "PDF::Content::Color" : "lib/PDF/Content/Color.pm",
-    "PDF::Content::Font" : "lib/PDF/Content/Font.pm",
-    "PDF::Content::Font::CoreFont" : "lib/PDF/Content/Font/CoreFont.pm",
-    "PDF::Content::Font::Enc::Glyphic" : "lib/PDF/Content/Font/Enc/Glyphic.pm",
-    "PDF::Content::Font::Enc::Type1" : "lib/PDF/Content/Font/Enc/Type1.pm",
-    "PDF::Content::Font::Encodings" : "lib/PDF/Content/Font/Encodings.pm",
-    "PDF::Content::Fontish" : "lib/PDF/Content/Fontish.pm",
-    "PDF::Content::Graphics" : "lib/PDF/Content/Graphics.pm",
-    "PDF::Content::Image" : "lib/PDF/Content/Image.pm",
-    "PDF::Content::Interface" : "lib/PDF/Content/Interface.pm",
-    "PDF::Content::Image::GIF" : "lib/PDF/Content/Image/GIF.pm",
-    "PDF::Content::Image::JPEG" : "lib/PDF/Content/Image/JPEG.pm",
-    "PDF::Content::Image::PDF" : "lib/PDF/Content/Image/PDF.pm",
-    "PDF::Content::Image::PNG" : "lib/PDF/Content/Image/PNG.pm",
-    "PDF::Content::Matrix" : "lib/PDF/Content/Matrix.pm",
-    "PDF::Content::Ops" : "lib/PDF/Content/Ops.pm",
-    "PDF::Content::Page" : "lib/PDF/Content/Page.pm",
-    "PDF::Content::PageNode" : "lib/PDF/Content/PageNode.pm",
-    "PDF::Content::PageTree" : "lib/PDF/Content/PageTree.pm",
-    "PDF::Content::ResourceDict" : "lib/PDF/Content/ResourceDict.pm",
-    "PDF::Content::Resourced" : "lib/PDF/Content/Resourced.pm",
-    "PDF::Content::Tag" : "lib/PDF/Content/Tag.pm",
-    "PDF::Content::Tag::Elem" : "lib/PDF/Content/Tag/Elem.pm",
-    "PDF::Content::Tag::Marked" : "lib/PDF/Content/Tag/Marked.pm",
-    "PDF::Content::Text::Block" : "lib/PDF/Content/Text/Block.pm",
-    "PDF::Content::Text::Line" : "lib/PDF/Content/Text/Line.pm",
-    "PDF::Content::Text::Style" : "lib/PDF/Content/Text/Style.pm",
-    "PDF::Content::XObject" : "lib/PDF/Content/XObject.pm"
+  "description": "PDF content related classes; including text, images, fonts and graphics",
+  "license": "Artistic-2.0",
+  "name": "PDF::Content",
+  "perl": "6.*",
+  "provides": {
+    "PDF::Content": "lib/PDF/Content.rakumod",
+    "PDF::Content::Color": "lib/PDF/Content/Color.rakumod",
+    "PDF::Content::Font": "lib/PDF/Content/Font.rakumod",
+    "PDF::Content::Font::CoreFont": "lib/PDF/Content/Font/CoreFont.rakumod",
+    "PDF::Content::Font::Enc::Glyphic": "lib/PDF/Content/Font/Enc/Glyphic.rakumod",
+    "PDF::Content::Font::Enc::Type1": "lib/PDF/Content/Font/Enc/Type1.rakumod",
+    "PDF::Content::Font::Encodings": "lib/PDF/Content/Font/Encodings.rakumod",
+    "PDF::Content::Fontish": "lib/PDF/Content/Fontish.rakumod",
+    "PDF::Content::Graphics": "lib/PDF/Content/Graphics.rakumod",
+    "PDF::Content::Image": "lib/PDF/Content/Image.rakumod",
+    "PDF::Content::Image::GIF": "lib/PDF/Content/Image/GIF.rakumod",
+    "PDF::Content::Image::JPEG": "lib/PDF/Content/Image/JPEG.rakumod",
+    "PDF::Content::Image::PDF": "lib/PDF/Content/Image/PDF.rakumod",
+    "PDF::Content::Image::PNG": "lib/PDF/Content/Image/PNG.rakumod",
+    "PDF::Content::Interface": "lib/PDF/Content/Interface.rakumod",
+    "PDF::Content::Matrix": "lib/PDF/Content/Matrix.rakumod",
+    "PDF::Content::Ops": "lib/PDF/Content/Ops.rakumod",
+    "PDF::Content::Page": "lib/PDF/Content/Page.rakumod",
+    "PDF::Content::PageNode": "lib/PDF/Content/PageNode.rakumod",
+    "PDF::Content::PageTree": "lib/PDF/Content/PageTree.rakumod",
+    "PDF::Content::ResourceDict": "lib/PDF/Content/ResourceDict.rakumod",
+    "PDF::Content::Resourced": "lib/PDF/Content/Resourced.rakumod",
+    "PDF::Content::Tag": "lib/PDF/Content/Tag.rakumod",
+    "PDF::Content::Tag::Elem": "lib/PDF/Content/Tag/Elem.rakumod",
+    "PDF::Content::Tag::Marked": "lib/PDF/Content/Tag/Marked.rakumod",
+    "PDF::Content::Text::Block": "lib/PDF/Content/Text/Block.rakumod",
+    "PDF::Content::Text::Line": "lib/PDF/Content/Text/Line.rakumod",
+    "PDF::Content::Text::Style": "lib/PDF/Content/Text/Style.rakumod",
+    "PDF::Content::XObject": "lib/PDF/Content/XObject.rakumod"
   },
-  "resources" : [ ],
-  "source-url" : "git://github.com/p6-pdf/PDF-Content-p6.git",
-  "tags" : [ "pdf" ],
-  "test-depends" : [ ],
-  "version" : "0.3.2"
+  "resources": [
+  ],
+  "source-url": "git://github.com/p6-pdf/PDF-Content-p6.git",
+  "tags": [
+    "pdf"
+  ],
+  "test-depends": [
+  ],
+  "version": "0.4.0"
 }
