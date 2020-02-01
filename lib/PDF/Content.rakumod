@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.4.0>
+class PDF::Content:ver<0.4.1>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -58,7 +58,7 @@ class PDF::Content:ver<0.4.0>
             ?? $.MarkPointDict($tag, $%props)
             !! $.MarkPoint($tag);
         $.closed-tag.is-new = True;
-        rv;
+        $.closed-tag;
     }
 
     multi method tag(Str $tag, &do-stuff!, *%props) {
@@ -68,7 +68,7 @@ class PDF::Content:ver<0.4.0>
         my \rv := do-stuff(self);
         $.EndMarkedContent;
         $.closed-tag.is-new = True;
-        rv;
+        $.closed-tag;
     }
 
     # to allow e.g. $gfx.tag.Header({ ... });
@@ -242,8 +242,7 @@ class PDF::Content:ver<0.4.0>
         ) {
 
         my $text-block = self.text-block( :$text, |c);
-        $.print( $text-block, |c);
-        $text-block;
+        @.print( $text-block, |c);
     }
 
     my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
@@ -329,7 +328,7 @@ class PDF::Content:ver<0.4.0>
 
     #| output text; move the text position down one line
     method say($text = '', |c) {
-        $.print($text, :nl, |c);
+        @.print($text, :nl, |c);
     }
 
     #| thin wrapper to $.op(SetFont, ...)

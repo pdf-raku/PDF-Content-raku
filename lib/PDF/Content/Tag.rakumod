@@ -8,7 +8,7 @@ use Method::Also;
 
 has Str $.name is required;
 has Str $.op;
-has Hash $.attributes;
+has %.attributes;
 has UInt $.start is rw;
 has UInt $.end is rw;
 has Bool $.is-new is rw;  # tags not yet in the struct tree
@@ -61,13 +61,10 @@ method add-kid(PDF::Content::Tag $kid) {
 }
 
 method !attributes-gist {
-    with $!attributes {
+    given %!attributes {
         my %a = $_;
         %a<MCID> = $_ with self.?mcid;
         %a.pairs.sort.map({ " {.key}=\"{.value}\"" }).join: '';
-    }
-    else {
-        '';
     }
 }
 
@@ -97,9 +94,8 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
         $elem<K> = @k > 1 ?? @k !! @k[0];
     }
 
-    if $!attributes {
-        my Str %dict = $!attributes.List;
-        $elem<A> = PDF::COS.coerce: :%dict;
+    if %!attributes {
+        $elem<A> = PDF::COS.coerce: :dict(%!attributes);
     }
 
     $elem;
