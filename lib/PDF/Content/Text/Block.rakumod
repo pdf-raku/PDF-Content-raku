@@ -6,7 +6,6 @@ class PDF::Content::Text::Block {
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
-    use PDF::Content::Tag :ParagraphTags;
     use PDF::Content::XObject;
 
     has Numeric $.width;
@@ -18,7 +17,6 @@ class PDF::Content::Text::Block {
     has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRise baseline-shift space-width>;
     has @.lines;
     has @.overflow is rw;
-    has ParagraphTags $.type = Paragraph;
     has @.images;
     has Str $.text;
 
@@ -168,6 +166,11 @@ class PDF::Content::Text::Block {
 	        $gfx."Set{.key}"(.value);
             }
 	}
+
+        with $!style.font -> $_ {
+            # todo: preserve current font?
+            $gfx.font = [$_, $!style.font-size // 12];
+        }
 
         my $width = $.width
             if $!align eq 'justify';

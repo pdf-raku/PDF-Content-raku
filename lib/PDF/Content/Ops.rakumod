@@ -386,7 +386,7 @@ class PDF::Content::Ops {
 
         method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
             warn "unknown marked-content tag '{$tag.name}'"
-                if $!strict && $tag.name ∉ TagSet;
+                if $!strict && $tag.name.Str ∉ TagSet;
             with @!open-tags.tail {
                 .add-kid: $tag;
             }

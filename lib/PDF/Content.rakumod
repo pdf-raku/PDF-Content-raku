@@ -8,7 +8,7 @@ class PDF::Content:ver<0.4.1>
     use PDF::COS::Stream;
     use PDF::Content::Text::Block;
     use PDF::Content::XObject;
-    use PDF::Content::Tag;
+    use PDF::Content::Tag :ParagraphTags;
 
     method graphics( &do-stuff! ) {
         $.op(Save);
@@ -144,6 +144,7 @@ class PDF::Content:ver<0.4.1>
               Align   :$align  = 'left',
               Valign  :$valign = 'bottom',
               Bool    :$inline = False,
+              Str     :$tag,
         )  {
 
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
@@ -176,6 +177,11 @@ class PDF::Content:ver<0.4.1>
             $height /= $obj-height;
         }
 
+        with $tag {
+            self!set-mcid(my %atts);
+            self.BeginMarkedContentDict($_, $%atts);
+        }
+
         self.graphics: {
             $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
             if $inline && $obj<Subtype> ~~ 'Image' {
@@ -187,11 +193,18 @@ class PDF::Content:ver<0.4.1>
                 $.op(XObject, $key);
             }
         }
+        my @rect = ($x + $dx,
+                    $y + $dy,
+                    $x + $dx + $width,
+                    $y + $dy + $height);
+
+        with $tag {
+            self.EndMarkedContent();
+            self!set-tag-bbox(@rect);
+        }
+
         # return the display rectangle for the image
-       ($x + $dx,
-        $y + $dy,
-        $x + $dx + $width,
-        $y + $dy + $height);
+        @rect;
     }
 
     my subset Pattern of Hash where .<PatternType> ~~ 1|2;
@@ -297,15 +310,35 @@ class PDF::Content:ver<0.4.1>
 	    );
     }
 
+    method !set-tag-bbox(@rect) {
+        # locate the opening marked content dict in the op-tree
+        my $tag-obj = self.closed-tag;
+        my @bbox = self.base-coords(@rect, :text);
+        if $tag-obj.mcid.defined {
+            # tag is directly linked to struct tree; add it there
+            $tag-obj.attributes<BBox> = @bbox;
+        }
+        else {
+            # Add a cooked BBox entry the op tree, giving the absolute coordinates of the text block
+            my Hash:D $dict = self.ops[$tag-obj.start-1]<BDC>[1]<dict>;
+            $dict<BBox> = :array[ @bbox.map( -> $real { :$real }) ];
+        }
+    }
     multi method print(PDF::Content::Text::Block $text-block,
                        Text-Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
+                       Str :$tag,
         ) {
 
         my Bool $left = False;
         my Bool $top = False;
         my Bool \in-text = $.context == GraphicsContext::Text;
+
+        with $tag {
+            self!set-mcid(my %atts);
+            self.BeginMarkedContentDict($_, $%atts);
+        }
 
         self.BeginText unless in-text;
 
@@ -322,8 +355,14 @@ class PDF::Content:ver<0.4.1>
 
         self.EndText unless in-text;
 
+        my @rect = ($x, $y, $x + $text-block.width, $y + $text-block.height);
+        with $tag {
+            self.EndMarkedContent();
+            self!set-tag-bbox(@rect);
+        }
+
         # return the display rectangle for the text block
-        ($x, $y, $x + $text-block.width, $y + $text-block.height);
+        @rect;
     }
 
     #| output text; move the text position down one line

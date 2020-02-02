@@ -1,9 +1,10 @@
 use v6;
 use Test;
-plan 2;
+plan 7;
 
 use lib 't/lib';
 use PDFTiny;
+use PDF::Content::Tag :ParagraphTags;
 use PDF::Content::Tag::Elem;
 use PDF::Content::Tag::Marked;
 use PDF::Content::XObject;
@@ -23,29 +24,32 @@ $doc.graphics: $page, -> $gfx {
 
     my @rect;
     my PDF::Content::Tag::Marked $tag;
-    $tag = $gfx.tag: 'H1', {
-        .text: {
-            .text-position = 50, 120;
-            .font = $header-font, 14;
-            @rect = .say('Header text');
-        }
-    };
-    $tag.attributes<BBox> = [ $gfx.base-coords(@rect) ];
+    my PDF::Content::Tag::Marked $tag2;
+    $gfx.text: {
+        .say('Header text',
+             :tag(Header1),
+             :font($header-font),
+             :font-size(15),
+             :position[50, 120]);
+    }
+    $tag = $gfx.closed-tag;
+    is $tag.name, 'H1', 'tag name';
+    todo "these coordinates look wrong - need desk-checking";
+    is-deeply [ $tag.attributes<BBox>.map(*.round) ], [100, 224, 182, 240], 'tag BBox';
 
-    $tag = $gfx.tag.Paragraph: {
+    $tag2 = $gfx.tag.Paragraph: {
         .text: {
-            .text-position = 50, 100;
-            .font = $body-font, 12;
-            @rect = .say('Some body text');
+            @rect = .say('Some body text', :tag<Span>, :position[50, 100], :font($body-font), :font-size(12));
+            $tag = $gfx.closed-tag;
         }
     }
-    $tag.attributes<BBox> = [ $gfx.base-coords(@rect) ];
+    is $tag.name, 'Span', 'inner tag name';
+    is $tag2.name, 'P', 'outer tag name';
 
-    $tag = $gfx.tag.Figure: {
-        my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-       @rect = .do: $img, 50, 70;
-    }
-    $tag.attributes<BBox> = [ $gfx.base-coords(@rect) ];
+    my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
+    @rect = $gfx.do: $img, 50, 70, :tag<Figure>;
+    $tag = $gfx.closed-tag;
+    is-deeply $tag.attributes<BBox>, [50, 70, 69, 89], 'image tag BBox';
 };
 
 # finishing work; normally undertaken by the API

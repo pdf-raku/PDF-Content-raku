@@ -9,8 +9,6 @@ use Method::Also;
 has Str $.name is required;
 has Str $.op;
 has %.attributes;
-has UInt $.start is rw;
-has UInt $.end is rw;
 has Bool $.is-new is rw;  # tags not yet in the struct tree
 has PDF::Content::Tag $.parent is rw; # hierarchical parent
 our class Set {...}

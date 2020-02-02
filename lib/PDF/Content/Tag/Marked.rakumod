@@ -10,6 +10,8 @@ my subset XObjectFormLike of Hash where .<Subtype> ~~ 'Form';
 my subset TagOwner where PageLike|XObjectFormLike;
 
 has TagOwner $.owner is required;
+has UInt $.start is rw;
+has UInt $.end is rw;
 has UInt $.mcid is rw; # marked content identifer
 
 method build-struct-kids($elem, :%nums) {
