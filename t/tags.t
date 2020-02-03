@@ -33,8 +33,7 @@ $doc.graphics: $page, -> $gfx {
     }
     $tag = $gfx.closed-tag;
     is $tag.name, 'H1', 'tag name';
-    todo "these coordinates look wrong - need desk-checking";
-    is-deeply [ $tag.attributes<BBox>.map(*.round) ], [100, 224, 182, 240], 'tag BBox';
+    is-deeply [ $tag.attributes<BBox>.map(*.round) ], [50, 120, 132, 137], 'tag BBox';
 
     $tag2 = $gfx.tag.Paragraph: {
         .text: {

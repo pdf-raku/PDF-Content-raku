@@ -313,7 +313,7 @@ class PDF::Content:ver<0.4.1>
     method !set-tag-bbox(@rect) {
         # locate the opening marked content dict in the op-tree
         my $tag-obj = self.closed-tag;
-        my @bbox = self.base-coords(@rect, :text);
+        my @bbox = self.base-coords(@rect);
         $tag-obj.attributes<BBox> = @bbox;
         # Add a cooked BBox entry the op tree, giving the absolute coordinates of the text block
         my Hash:D $dict = self.ops[$tag-obj.start-1]<BDC>[1]<dict>;
@@ -402,8 +402,11 @@ class PDF::Content:ver<0.4.1>
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
             flat @coords.map: -> $x is copy, $y is copy {
+                warn "$x $y {$.TextMatrix.perl}" if $text;
                 ($x, $y) = dot($.TextMatrix, $x, $y) if $text;
+                warn "$x $y" if $text;
                 ($x, $y) = dot($.CTM, $x, $y) if $user;
+                warn "$x $y" if $text;
                 $x, $y;
             }
         )
