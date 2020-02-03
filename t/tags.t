@@ -21,7 +21,6 @@ my $body-font = $page.core-font( :family<Helvetica> );
 my PDF::Content::Tag::Elem $doc .= new: :name<Document>, :attributes{ :test<yep> };
 
 $doc.graphics: $page, -> $gfx {
-
     my @rect;
     my PDF::Content::Tag::Marked $tag;
     my PDF::Content::Tag::Marked $tag2;

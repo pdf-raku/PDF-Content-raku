@@ -3,7 +3,7 @@ use PDF::Content::Tag;
 unit class PDF::Content::Tag::Marked
     is PDF::Content::Tag;
 
-use PDF::COS::Dict;
+use PDF::COS;
 
 my subset PageLike of Hash where .<Type> ~~ 'Page';
 my subset XObjectFormLike of Hash where .<Subtype> ~~ 'Form';
@@ -14,28 +14,15 @@ has UInt $.start is rw;
 has UInt $.end is rw;
 has UInt $.mcid is rw; # marked content identifer
 
-method build-struct-kids($elem, :%nums) {
-    my @ = do with $!mcid -> $mcid {
-        given $!owner {
-            when PageLike {
-                my $pg := $_;
-                $elem<Pg> = $pg;
-                given %nums{$pg} {
-                    $_ = $mcid if !.defined || $_ < $mcid;
-                }
-            }
-            when XObjectFormLike {
-                warn "todo: tagged content handling of XObject forms";
-            }
-            default {
-                warn "todo? tagged content items of type: {.WHAT.perl}";
-            }
-        }
-        $mcid;
-    }
-}
-
 method build-struct-elem(:%nums) {
-    my $elem := callsame();
-    $elem<K>:exists ?? $elem !! Mu;
+    with $!mcid -> $MCID {
+        PDF::COS.coerce: %(
+            :Type( :name<MCR> ),
+            :Pg($!owner),
+            :$MCID
+        );
+    }
+    else {
+       Mu; # nested tag
+    }
 }

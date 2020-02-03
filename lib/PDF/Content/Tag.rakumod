@@ -75,10 +75,6 @@ method gist {
         !! "<{$.name}$attributes/>";
 }
 
-method build-struct-kids($elem, :%nums) {
-     $.kids.build-struct-elems($elem, :%nums);
-}
-
 method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
 
     my $elem = PDF::COS.coerce: %(
@@ -87,7 +83,7 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
         :$P,
     );
 
-    my @k = @.build-struct-kids($elem, :%nums);
+    my @k = $.kids.build-struct-elems($elem, :%nums);
     if @k {
         $elem<K> = @k > 1 ?? @k !! @k[0];
     }

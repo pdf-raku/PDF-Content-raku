@@ -314,16 +314,12 @@ class PDF::Content:ver<0.4.1>
         # locate the opening marked content dict in the op-tree
         my $tag-obj = self.closed-tag;
         my @bbox = self.base-coords(@rect, :text);
-        if $tag-obj.mcid.defined {
-            # tag is directly linked to struct tree; add it there
-            $tag-obj.attributes<BBox> = @bbox;
-        }
-        else {
-            # Add a cooked BBox entry the op tree, giving the absolute coordinates of the text block
-            my Hash:D $dict = self.ops[$tag-obj.start-1]<BDC>[1]<dict>;
-            $dict<BBox> = :array[ @bbox.map( -> $real { :$real }) ];
-        }
+        $tag-obj.attributes<BBox> = @bbox;
+        # Add a cooked BBox entry the op tree, giving the absolute coordinates of the text block
+        my Hash:D $dict = self.ops[$tag-obj.start-1]<BDC>[1]<dict>;
+        $dict<BBox> = :array[ @bbox.map( -> $real { :$real }) ];
     }
+
     multi method print(PDF::Content::Text::Block $text-block,
                        Text-Position :$position,
                        Bool :$nl = False,
