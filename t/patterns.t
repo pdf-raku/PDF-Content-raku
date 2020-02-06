@@ -17,7 +17,7 @@ lives-ok {
             .Rectangle(|$pattern<BBox>);
             .Fill;
             my $img = .load-image("t/images/lightbulb.gif");
-            .do($img, 5, 5 );
+            .do($img, :position[5, 5] );
         }
         $gfx.FillColor = $gfx.use-pattern($pattern);
         $gfx.Rectangle(0, 20, 100, 250);

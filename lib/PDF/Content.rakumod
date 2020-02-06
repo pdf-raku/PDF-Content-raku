@@ -10,18 +10,28 @@ class PDF::Content:ver<0.4.1>
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
 
+    my subset Align of Str where 'left' | 'center' | 'right';
+    my subset Valign of Str where 'top'  | 'center' | 'bottom';
+    my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
+    my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
+    my subset Position of List where {
+        .elems <= 2
+        && (!defined(.[0]) || .[0] ~~ Numeric|XPos-Pair)
+        && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
+    }
+
     method graphics( &do-stuff! ) {
         $.op(Save);
-        my \ret = do-stuff(self);
+        my \rv = do-stuff(self);
         $.op(Restore);
-        ret;
+        rv;
     }
 
     method text( &do-stuff! ) {
         $.op(BeginText);
-        my \ret = do-stuff(self);
+        my \rv = do-stuff(self);
         $.op(EndText);
-        ret
+        rv;
     }
 
     method marked-content($tag, &code, :$props) is DEPRECATED<tag> {
@@ -132,21 +142,26 @@ class PDF::Content:ver<0.4.1>
 	$.SetTextMatrix( @matrix );
     }
 
-    my subset Align of Str where 'left' | 'center' | 'right';
-    my subset Valign of Str where 'top'  | 'center' | 'bottom';
-
     #| place an image, or form object
-    method do(PDF::COS::Stream $obj! where .<Subtype> ~~ 'Image'|'Form',
-              Numeric $x = 0,
-              Numeric $y = 0,
-              Numeric :$width is copy,
-              Numeric :$height is copy,
-              Align   :$align  = 'left',
-              Valign  :$valign = 'bottom',
-              Bool    :$inline = False,
-              Str     :$tag,
+    multi method do(PDF::COS::Stream $obj! where .<Subtype> ~~ 'Image'|'Form',
+              Position :$position = [0, 0],
+              Numeric  :$width is copy,
+              Numeric  :$height is copy,
+              Align    :$align is copy  = 'left',
+              Valign   :$valign is copy = 'bottom',
+              Bool     :$inline = False,
+              Str      :$tag,
         )  {
 
+        my Numeric ($x, $y);
+        given $position[0] {
+            when XPos-Pair { $align = .key; $x = .value; }
+            default        { $x = $_;}
+        }
+        given $position[1] {
+            when YPos-Pair { $valign = .key; $y = .value; }
+            default        { $y = $_;}
+        }
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
         my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
@@ -206,6 +221,9 @@ class PDF::Content:ver<0.4.1>
         # return the display rectangle for the image
         @rect;
     }
+    multi method do($img, Numeric $x, Numeric $y = 0, *%opt) is default {
+        self.do($img, :position[$x, $y], |%opt);
+    }
 
     my subset Pattern of Hash where .<PatternType> ~~ 1|2;
     my subset TilingPattern of Pattern where .<PatternType> == 1;
@@ -256,14 +274,6 @@ class PDF::Content:ver<0.4.1>
 
         my $text-block = self.text-block( :$text, |c);
         @.print( $text-block, |c);
-    }
-
-    my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
-    my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
-    my subset Text-Position of List where {
-        .elems <= 2
-        && (!defined(.[0]) || .[0] ~~ Numeric|XPos-Pair)
-        && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
     }
 
     method !set-position($text-block, $position,
@@ -321,7 +331,7 @@ class PDF::Content:ver<0.4.1>
     }
 
     multi method print(PDF::Content::Text::Block $text-block,
-                       Text-Position :$position,
+                       Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
                        Str :$tag,
@@ -402,11 +412,8 @@ class PDF::Content:ver<0.4.1>
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
             flat @coords.map: -> $x is copy, $y is copy {
-                warn "$x $y {$.TextMatrix.perl}" if $text;
                 ($x, $y) = dot($.TextMatrix, $x, $y) if $text;
-                warn "$x $y" if $text;
                 ($x, $y) = dot($.CTM, $x, $y) if $user;
-                warn "$x $y" if $text;
                 $x, $y;
             }
         )

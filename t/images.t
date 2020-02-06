@@ -197,7 +197,7 @@ sub save-images(@images) {
     
 	for @images {
 	    my ($desc, $img) = .kv;
-	    $gfx.do($img, $x, $y,);
+	    $gfx.do($img, :position[$x, $y],);
 	    $gfx.print($desc, :position[$x + 45, $y + 15]);
 	    if ++$n %% 3 {
 		$x = 45;

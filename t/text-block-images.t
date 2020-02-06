@@ -26,7 +26,7 @@ my $image-padded = $page.xobject-form(:BBox[0, 0, $image.width + 1, $image.heigh
 $image-padded.gfx;
 my @rect;
 $image-padded.graphics: {
-    @rect = .do($image,1,0);
+    @rect = .do($image, :position[1,0]);
 }
 is-deeply @rect, [1, 0, 1 + $image.width, $image.height], '$gfx.do returned rectangle';
 

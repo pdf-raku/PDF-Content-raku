@@ -45,7 +45,7 @@ $doc.graphics: $page, -> $gfx {
     is $tag2.name, 'P', 'outer tag name';
 
     my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-    @rect = $gfx.do: $img, 50, 70, :tag<Figure>;
+    @rect = $gfx.do: $img, :position[50, 70], :tag<Figure>;
     $tag = $gfx.closed-tag;
     is-deeply $tag.attributes<BBox>, [50, 70, 69, 89], 'image tag BBox';
 };

@@ -25,7 +25,7 @@ $gfx.tag: 'P', {
 };
 
 is-deeply $gfx.content-dump, $(
-    "/P <<\n  /MCID 0\n>> BDC",
+    "/P << /MCID 0 >> BDC",
     "BT",
     "1 0 0 1 50 100 Tm", 
     "/F1 18 Tf",

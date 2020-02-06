@@ -29,9 +29,9 @@ $page.graphics: {
     }
     is $form.new-tags.map(*.gist).join, '<P MCID="0"/>';
     # display a simple form a couple of times
-    .do($form, 10, 10);
+    .do($form, :position(10, 10));
     .transform: :translate(10,40), :rotate(.1), :scale(.75);
-    .do($form, 10, 10);
+    .do($form, :position(10, 10));
 }
 
 lives-ok {$pdf.save-as: "t/forms.pdf"};
