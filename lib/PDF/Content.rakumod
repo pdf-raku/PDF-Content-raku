@@ -392,7 +392,7 @@ class PDF::Content:ver<0.4.1>
                 $.Font;
             },
             STORE => -> $, $v {
-                my @v = $v.isa(List) ?? @$v !! [ $v, ];
+                my @v = $v.isa(List) ?? @$v !! $v;
                 @v[0] = .use-font(@v[0]) with $.parent;
                 self.set-font(|@v);
             },

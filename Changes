@@ -1,6 +1,6 @@
 Release 0.4.1
 - .print() and .say() now always return block coordinates
-- the .do() method now accepts a :position argument; same as .print()
+- the .do() method now accepts a :position argument; compatible with .print()
 
 Release 0.4.0
 - Rename modules *.pm -> *.rakumod

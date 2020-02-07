@@ -2,6 +2,7 @@ use v6;
 use Test;
 plan 2;
 use lib 't/lib';
+use PDF;
 use PDF::Content::Ops :OpCode;
 use PDFTiny;
 # ensure consistant document ID generation
@@ -24,6 +25,8 @@ $gfx.tag: 'P', {
     }
 };
 
+todo "needs PDF >= v0.4.1"
+   unless PDF.^ver >= v0.4.1;
 is-deeply $gfx.content-dump, $(
     "/P << /MCID 0 >> BDC",
     "BT",

@@ -1,7 +1,7 @@
 use v6;
 use Test;
 plan 12;
-
+use PDF;
 use PDF::Content;
 use PDF::Grammar::Test :is-json-equiv;
 use lib 't/lib';

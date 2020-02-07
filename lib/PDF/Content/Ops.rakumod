@@ -704,11 +704,11 @@ class PDF::Content::Ops {
         my \opn = op($op, |@vals);
 	my \coerced-vals = opn.value;
 
-	my @ast-values = @raw-vals.pairs.map({
+	my @ast-values = @raw-vals.pairs.map: {
 	    .value ~~ Pair
 		?? .value
 		!! coerced-vals[.key]
-	});
+	};
 	$op => [ @ast-values ];
     }
 
