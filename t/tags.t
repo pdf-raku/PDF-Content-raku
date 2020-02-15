@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 7;
+plan 6;
 
 use lib 't/lib';
 use PDFTiny;
@@ -21,7 +21,6 @@ my $body-font = $page.core-font( :family<Helvetica> );
 my PDF::Content::Tag::Elem $doc .= new: :name<Document>, :attributes{ :test<yep> };
 
 $doc.graphics: $page, -> $gfx {
-    my @rect;
     my PDF::Content::Tag::Marked $tag;
     my PDF::Content::Tag::Marked $tag2;
     $gfx.text: {
@@ -33,21 +32,32 @@ $doc.graphics: $page, -> $gfx {
     }
     $tag = $gfx.closed-tag;
     is $tag.name, 'H1', 'tag name';
-    is-deeply [ $tag.attributes<BBox>.map(*.round) ], [50, 120, 132, 137], 'tag BBox';
 
-    $tag2 = $gfx.tag.Paragraph: {
+    $gfx.tag.Paragraph: {
         .text: {
-            @rect = .say('Some body text', :tag<Span>, :position[50, 100], :font($body-font), :font-size(12));
+            .say('Some body text', :tag<Span>, :position[50, 100], :font($body-font), :font-size(12));
             $tag = $gfx.closed-tag;
         }
     }
     is $tag.name, 'Span', 'inner tag name';
-    is $tag2.name, 'P', 'outer tag name';
+    is $gfx.closed-tag.name, 'P', 'outer tag name';
+
+    sub outer-rect(*@rects) {
+        [
+            @rects.map(*[0].round).min, @rects.map(*[1].round).min,
+            @rects.map(*[2].round).max, @rects.map(*[3].round).max,
+        ]
+    }
 
     my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-    @rect = $gfx.do: $img, :position[50, 70], :tag<Figure>;
+    $gfx.set-tag-bbox: $gfx.tag.Figure: {
+        outer-rect([
+            $gfx.do($img, :position[50, 70]),
+            $gfx.say("Eureka!", :tag<Caption>, :position[40, 60]),
+        ]);
+    }
     $tag = $gfx.closed-tag;
-    is-deeply $tag.attributes<BBox>, [50, 70, 69, 89], 'image tag BBox';
+    is-deeply $tag.attributes<BBox>, [40, 60, 81, 89], 'image tag BBox';
 };
 
 # finishing work; normally undertaken by the API

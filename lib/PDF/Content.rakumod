@@ -78,7 +78,7 @@ class PDF::Content:ver<0.4.1>
         my \rv := do-stuff(self);
         $.EndMarkedContent;
         $.closed-tag.is-new = True;
-        $.closed-tag;
+        rv;
     }
 
     # to allow e.g. $gfx.tag.Header({ ... });
@@ -208,17 +208,20 @@ class PDF::Content:ver<0.4.1>
                 $.op(XObject, $key);
             }
         }
-        my @rect = ($x + $dx,
-                    $y + $dy,
-                    $x + $dx + $width,
-                    $y + $dy + $height);
+
+        # return the display rectangle for the image
+        my \x0 = $x + $dx;
+        my \y0 = $y + $dy;
+        my \x1 = x0 + $width;
+        my \y1 = y0 + $height;
+        my @rect := [x0, y0, x1, y1];
 
         with $tag {
             self.EndMarkedContent();
-            self!set-tag-bbox(@rect);
+            self.set-tag-bbox(@rect)
+                if $_ ~~ 'Figure'|'Formula'|'Form';
         }
 
-        # return the display rectangle for the image
         @rect;
     }
     multi method do($img, Numeric $x, Numeric $y = 0, *%opt) is default {
@@ -320,7 +323,7 @@ class PDF::Content:ver<0.4.1>
 	    );
     }
 
-    method !set-tag-bbox(@rect) {
+    method set-tag-bbox(@rect) {
         # locate the opening marked content dict in the op-tree
         my $tag-obj = self.closed-tag;
         my @bbox = self.base-coords(@rect);
@@ -343,7 +346,9 @@ class PDF::Content:ver<0.4.1>
 
         with $tag {
             self!set-mcid(my %atts);
-            self.BeginMarkedContentDict($_, $%atts);
+            %atts
+                ?? self.BeginMarkedContentDict($_, $%atts)
+                !! self.BeginMarkedContent($_)
         }
 
         self.BeginText unless in-text;
@@ -351,24 +356,17 @@ class PDF::Content:ver<0.4.1>
         self!set-position($text-block, $_, :$left, :$top)
             with $position;
         my ($x, $y) = $.text-position;
-        my Numeric \font-size = $text-block.font-size;
-        my \font = $.use-font($text-block.font);
+        my ($dx, $dy) = $text-block.render(self, :$nl, :$top, :$left, :$preserve);
 
-        self.set-font(font, font-size);
-        my ($x-shift, $y-shift) = $text-block.render(self, :$nl, :$top, :$left, :$preserve);
-        $x += $x-shift;
-        $y += $y-shift;
+        self.EndText() unless in-text;
+        self.EndMarkedContent() with $tag;
 
-        self.EndText unless in-text;
+        my \x0 = $x + $dx;
+        my \y0 = $y + $dy;
+        my \x1 = x0 + $text-block.width;
+        my \y1 = y0 + $text-block.height;
 
-        my @rect = ($x, $y, $x + $text-block.width, $y + $text-block.height);
-        with $tag {
-            self.EndMarkedContent();
-            self!set-tag-bbox(@rect);
-        }
-
-        # return the display rectangle for the text block
-        @rect;
+        (x0, y0, x1, y1);
     }
 
     #| output text; move the text position down one line
