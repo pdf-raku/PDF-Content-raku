@@ -6,10 +6,10 @@ use PDF::COS;
 use PDF::COS::Dict;
 use Method::Also;
 
-has Str $.name is required;
+has Str $.name is rw;
 has Str $.op;
 has %.attributes;
-has Bool $.is-new is rw;  # tags not yet in the struct tree
+
 has PDF::Content::Tag $.parent is rw; # hierarchical parent
 our class Set {...}
 has Set $.kids handles<AT-POS list grep map tags children> .= new;
@@ -24,9 +24,9 @@ my enum StructureTags is export(:StructureTags,:Tags) (
 
 #| See [PDF 32000 Tables 334-337 - Block-level structure elements]
 my enum ParagraphTags is export(:ParagraphTags,:Tags) (
-    :Paragraph<P>, :Header<H>,   :Header1<H1>,
-    :Header2<H2>,  :Header3<H3>, :Header4<H4>,
-    :Header5<H5>,  :Header6<H6>,
+    :Paragraph<P>, :Header<H>,
+    :Header1<H1>,  :Header2<H2>,  :Header3<H3>,
+    :Header4<H4>,  :Header5<H5>,  :Header6<H6>,
 );
 my enum ListElemTags is export(:ListElemTags,:Tags) (
     :List<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
@@ -46,16 +46,26 @@ my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Artifact<Artifact>,
 );
 
-my enum IllustrationTags is export(:IllusttrationTags,:Tags) (
+my enum IllustrationTags is export(:IllustrationTags,:Tags) (
     :Figure<Figure>, :Forumla<Formula>, :Form<Form>
 );
 
 constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums );
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
-method add-kid(PDF::Content::Tag $kid) {
+multi method add-kid(PDF::Content::Tag $kid) {
+    die 'tag already parented by {.gist}' with $kid.parent;
     $!kids.push: $kid;
     $kid.parent = self;
+    $kid;
+}
+
+multi method add-kid(Hash $object, :$owner = self.owner) {
+    $.add-kid: (require ::('PDF::Content::Tag::Object')).new: :$object, :$owner;
+}
+
+multi method add-kid(Str $name, *%attributes) {
+    $.add-kid: (require ::('PDF::Content::Tag::Elem')).new: :$name, :%attributes;
 }
 
 method !attributes-gist {

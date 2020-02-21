@@ -4,26 +4,28 @@ unit class PDF::Content::Tag::Elem
     is PDF::Content::Tag;
 
 use PDF::Content;
-use PDF::Content::Page;
+use PDF::Content::Graphics;
 
-my subset PageGraphics of PDF::Content where .parent ~~ PDF::Content::Page;
+has $.owner;
 
-multi method graphics(PDF::Content::Page $page, &action) {
-    self.graphics($page.gfx, &action);
+multi method graphics(PDF::Content::Graphics $content, &action) {
+    self.graphics($content.gfx, &action);
 }
 
-multi method graphics(PageGraphics $gfx, &action) {
+multi method graphics(PDF::Content $gfx, &action) {
     fail "starting page with partially constructed marked content: {$gfx.open-tags.map(*.gist).join}"
         if $gfx.open-tags;
 
     my $rv := $gfx.graphics(&action);
 
-    fail "page finished with partially constructed marked content: {$gfx.open-tags.map(*.gist).join}"
+    fail "graphics finished with partially constructed marked content: {$gfx.open-tags.map(*.gist).join}"
         if $gfx.open-tags;
 
-    given $gfx.tags {
-        self.add-kid(.shift)
-            while $_;
+    for $gfx.tags.tags -> $tag {
+        unless $tag.parent {
+            $gfx.set-mcid($tag);
+            self.add-kid($tag, :owner($gfx));
+        }
     }
 
     $rv;

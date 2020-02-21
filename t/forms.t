@@ -27,7 +27,7 @@ $page.graphics: {
             .say("Simple Form", :position[2, 5]);
         }
     }
-    is $form.new-tags.map(*.gist).join, '<P MCID="0"/>';
+    is $form.gfx.tags.map(*.gist).join, '<P><Span/></P>';
     # display a simple form a couple of times
     .do($form, :position(10, 10));
     .transform: :translate(10,40), :rotate(.1), :scale(.75);

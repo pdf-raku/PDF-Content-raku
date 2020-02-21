@@ -400,9 +400,9 @@ class PDF::Content::Ops {
             $!closed-tag;
         }
 
-        method add-tag(PDF::Content::Tag $tag) {      # add child to innermost descendant
+        method add-tag(PDF::Content::Tag $tag, :$strict = $!strict) {      # add child to innermost descendant
             warn "unknown marked-content tag '{$tag.name}'"
-                if $!strict && $tag.name ∉ TagSet;
+                if $strict && $tag.name ∉ TagSet;
             with @!open-tags.tail {
                 .add-kid: $tag;
             }

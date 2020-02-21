@@ -84,14 +84,6 @@ role PDF::Content::Graphics {
         $gfx;
     }
 
-    # needs to be called before .finish()
-    method new-tags {
-        my PDF::Content::Tag @new;
-        @new.append: .tags.grep(*.is-new) with $!pre-gfx;
-        @new.append: .tags.grep(*.is-new) with $!gfx;
-        @new;
-    }
-
     method finish {
         if $!gfx.defined || $!pre-gfx.defined {
             # rebuild graphics, if they've been accessed

@@ -9,6 +9,7 @@ class PDF::Content:ver<0.4.1>
     use PDF::Content::Text::Block;
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
+    use PDF::Content::Tag::Object;
 
     my subset Align of Str where 'left' | 'center' | 'right';
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
@@ -20,16 +21,16 @@ class PDF::Content:ver<0.4.1>
         && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
     }
 
-    method graphics( &do-stuff! ) {
+    method graphics( &meth! ) {
         $.op(Save);
-        my \rv = do-stuff(self);
+        my \rv = meth(self);
         $.op(Restore);
         rv;
     }
 
-    method text( &do-stuff! ) {
+    method text( &meth! ) {
         $.op(BeginText);
-        my \rv = do-stuff(self);
+        my \rv = meth(self);
         $.op(EndText);
         rv;
     }
@@ -38,23 +39,30 @@ class PDF::Content:ver<0.4.1>
         with $props { $.tag($tag, &code, |$_) } else { $.tag($tag, &code) }
     }
 
-    method !set-mcid(%props) {
-        if $.open-tags.first(*.mcid.defined) {
-            warn "MCIDs may not be nested"
-                with %props<MICD>:delete;
-        }
-        else {
-            with %props<MCID> {
-                $.parent.use-mcid($_);
-            }
-            else {
-                $_ = $.parent.next-mcid;
-            }
+    method !get-mcid(%props) {
+        $.parent.use-mcid($_)
+            with %props<MCID>;
+    }
+
+    method op-dict(PDF::Content::Tag $tag) {
+        my Pair $op := self.ops[$tag.start-1];
+        # upgrade BMC operator to BDC to accomodate dict
+        $op = BDC => $op.value
+            if $op.key eq 'BMC';
+        $op.value[1]<dict> //= %();
+    }
+
+    method set-mcid(PDF::Content::Tag $tag) {
+        $tag.mcid //= do {
+            # edit opening BDC or BMC op in op-tree
+            my UInt $int = $.parent.next-mcid;
+            self.op-dict($tag)<MCID> = :$int;
+            $int;
         }
     }
 
-    multi method tag(PDF::Content::Tag $_, &do-stuff) {
-        samewith( .tag, |.attributes, &do-stuff);
+    multi method tag(PDF::Content::Tag $_, &meth) {
+        samewith( .tag, |.attributes, &meth);
     }
 
     multi method tag(PDF::Content::Tag $_) {
@@ -62,23 +70,28 @@ class PDF::Content:ver<0.4.1>
     }
 
     multi method tag(Str $tag, *%props) {
-        self!set-mcid: %props;
+        self!get-mcid: %props;
 
         my \rv := %props
             ?? $.MarkPointDict($tag, $%props)
             !! $.MarkPoint($tag);
-        $.closed-tag.is-new = True;
         $.closed-tag;
     }
 
-    multi method tag(Str $tag, &do-stuff!, *%props) {
-        self!set-mcid: %props;
+    multi method tag(Str $tag, &meth!, *%props) {
+        self!get-mcid: %props;
 
-        $.BeginMarkedContentDict($tag, $%props);
-        my \rv := do-stuff(self);
+        %props
+            ?? $.BeginMarkedContentDict($tag, $%props)
+            !! $.BeginMarkedContent($tag);
+
+        my \rv := meth(self);
         $.EndMarkedContent;
-        $.closed-tag.is-new = True;
         rv;
+    }
+
+    multi method tag(Str $name, Hash $object, *%attributes) {
+        self.add-tag: :!strict, PDF::Content::Tag::Object.new: :$name, :$.owner, :$object, :%attributes;
     }
 
     # to allow e.g. $gfx.tag.Header({ ... });
@@ -150,7 +163,7 @@ class PDF::Content:ver<0.4.1>
               Align    :$align is copy  = 'left',
               Valign   :$valign is copy = 'bottom',
               Bool     :$inline = False,
-              Str      :$tag,
+              Str      :$tag = 'Figure',
         )  {
 
         my Numeric ($x, $y);
@@ -193,7 +206,7 @@ class PDF::Content:ver<0.4.1>
         }
 
         with $tag {
-            self!set-mcid(my %atts);
+            self!get-mcid(my %atts);
             self.BeginMarkedContentDict($_, $%atts);
         }
 
@@ -328,16 +341,14 @@ class PDF::Content:ver<0.4.1>
         my $tag-obj = self.closed-tag;
         my @bbox = self.base-coords(@rect);
         $tag-obj.attributes<BBox> = @bbox;
-        # Add a cooked BBox entry the op tree, giving the absolute coordinates of the text block
-        my Hash:D $dict = self.ops[$tag-obj.start-1]<BDC>[1]<dict>;
-        $dict<BBox> = :array[ @bbox.map( -> $real { :$real }) ];
+        $.op-dict($tag-obj)<BBox> = :array[ @bbox.map( -> $real { :$real }) ];
     }
 
     multi method print(PDF::Content::Text::Block $text-block,
                        Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
-                       Str :$tag,
+                       Str :$tag = 'Span',
         ) {
 
         my Bool $left = False;
@@ -345,7 +356,7 @@ class PDF::Content:ver<0.4.1>
         my Bool \in-text = $.context == GraphicsContext::Text;
 
         with $tag {
-            self!set-mcid(my %atts);
+            self!get-mcid(my %atts);
             %atts
                 ?? self.BeginMarkedContentDict($_, $%atts)
                 !! self.BeginMarkedContent($_)

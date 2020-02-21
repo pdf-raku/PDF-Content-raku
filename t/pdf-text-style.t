@@ -17,18 +17,10 @@ my $font-size = 18;
 my $bold-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 my $font = $page.core-font( :family<Helvetica> );
 
-$gfx.tag: 'P', {
-    .text: {
-        .text-position = 50, 100;
-        .font = $bold-font, $font-size;
-        .say('Hello, World!', :$width, :kern);
-    }
-};
+$gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font), :$font-size, :tag<P>);
 
-todo "needs PDF >= v0.4.1"
-   unless PDF.^ver >= v0.4.1;
 is-deeply $gfx.content-dump, $(
-    "/P << /MCID 0 >> BDC",
+    "/P BMC",
     "BT",
     "1 0 0 1 50 100 Tm", 
     "/F1 18 Tf",
@@ -84,8 +76,7 @@ for (
         }
     }
 
-    $gfx.text-position = ($x, $y);
-    $gfx.say("*** {%opts} *** " ~ $sample, :$width, :$height, |%opts);
+    $gfx.say("*** {%opts} *** " ~ $sample, :$width, :$height, :position[$x, $y], |%opts);
 
     if $x < 400 {
         $x += 110;
@@ -98,8 +89,6 @@ for (
 
 $gfx.EndText;
 
-is $page.new-tags.map(*.gist).join, '<P MCID="0"/>', '.new-tags()';
-
-$pdf.save-as('t/pdf-text-style.pdf');
+lives-ok { $pdf.save-as('t/pdf-text-style.pdf');}
 
 done-testing;

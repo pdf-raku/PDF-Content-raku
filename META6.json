@@ -47,6 +47,7 @@
     "PDF::Content::Tag": "lib/PDF/Content/Tag.rakumod",
     "PDF::Content::Tag::Elem": "lib/PDF/Content/Tag/Elem.rakumod",
     "PDF::Content::Tag::Marked": "lib/PDF/Content/Tag/Marked.rakumod",
+    "PDF::Content::Tag::Object": "lib/PDF/Content/Tag/Object.rakumod",
     "PDF::Content::Text::Block": "lib/PDF/Content/Text/Block.rakumod",
     "PDF::Content::Text::Line": "lib/PDF/Content/Text/Line.rakumod",
     "PDF::Content::Text::Style": "lib/PDF/Content/Text/Style.rakumod",

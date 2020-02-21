@@ -70,12 +70,12 @@ $g.tag: 'P', {
 };
 
 $g.tag: 'Div', {
-    is .tags.map(*.gist).join, '<P MCID="1"/>';
-    is .open-tags.map(*.gist).join, '<Div MCID="2"/>';
+    is .tags.map(*.gist).join, '<P/>';
+    is .open-tags.map(*.gist).join, '<Div/>';
     .ShowText("There");
 };
 
-is $g.tags.map(*.gist).join, '<P MCID="1"/><Div MCID="2"/>';
+is $g.tags.map(*.gist).join, '<P/><Div/>';
 
 $g.EndText;
 $g.Restore;
