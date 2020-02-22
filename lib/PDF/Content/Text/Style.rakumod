@@ -8,8 +8,6 @@ class PDF::Content::Text::Style is rw {
     has Bool    $.kern;
 
     # directly mapped to graphics state
-    has Pair    $.FillColor;
-    has Pair    $.StrokeColor;
     has Numeric $.WordSpacing;
     has Numeric $.CharSpacing;
     has Numeric $.HorizScaling;
@@ -27,8 +25,6 @@ class PDF::Content::Text::Style is rw {
 	} else {
 	    with $gfx {.TextRise} else {0.0};
 	}
-        $!FillColor   //= do with $gfx {.FillColor}   else { :DeviceGray[0.0] }
-        $!StrokeColor //= do with $gfx {.StrokeColor} else { :DeviceGray[0.0] }
         $!TextRender  //= do with $gfx {.TextRender}  else { 0 }
     }
 

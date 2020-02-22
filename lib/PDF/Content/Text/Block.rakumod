@@ -14,7 +14,7 @@ class PDF::Content::Text::Block {
     has Alignment $.align = 'left';
     my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
     has VerticalAlignment $.valign = 'top';
-    has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRise baseline-shift space-width FillColor StrokeColor TextRender>;
+    has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width>;
     has @.lines;
     has @.overflow is rw;
     has @.images;
@@ -157,14 +157,12 @@ class PDF::Content::Text::Block {
 	Bool :$preserve = True, # restore text state
 	) {
 	my %saved;
+        my Bool $gsave;
 
-	for :$.CharSpacing, :$.HorizScaling, :$.TextRise, :$.TextRender, :$.FillColor, :$.StrokeColor {
+	for :$.CharSpacing, :$.HorizScaling, :$.TextRise, :$.TextRender {
             my $gval = $gfx."{.key}"();
-            my Bool $same := .key.ends-with('Color')
-                ?? ($gval = $gval.key => $gval.value.clone) eqv .value
-                !! $gval =~= .value;
 
-            unless $same {
+            unless $gval =~= .value {
                 %saved{.key} = $gval
 		    if $preserve;
                 $gfx."{.key}"() = .value; 
@@ -173,7 +171,7 @@ class PDF::Content::Text::Block {
 
         with $!style.font -> $_ {
             if $preserve {
-                %saved<Font> = $_ with $gfx.Font;
+                %saved<Font> = .clone with $gfx.Font;
             }
             $gfx.font = [$_, $!style.font-size // 12];
         }
