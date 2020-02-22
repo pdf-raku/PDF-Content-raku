@@ -163,7 +163,7 @@ class PDF::Content:ver<0.4.1>
               Align    :$align is copy  = 'left',
               Valign   :$valign is copy = 'bottom',
               Bool     :$inline = False,
-              Str      :$tag = 'Figure',
+              Str      :$tag is copy,
         )  {
 
         my Numeric ($x, $y);
@@ -204,6 +204,8 @@ class PDF::Content:ver<0.4.1>
             $width /= $obj-width;
             $height /= $obj-height;
         }
+
+        $tag //= 'Figure' unless self.open-tags;
 
         with $tag {
             self!get-mcid(my %atts);
@@ -348,12 +350,14 @@ class PDF::Content:ver<0.4.1>
                        Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
-                       Str :$tag = 'Span',
+                       Str :$tag is copy,
         ) {
 
         my Bool $left = False;
         my Bool $top = False;
         my Bool \in-text = $.context == GraphicsContext::Text;
+
+        $tag //= 'Span' unless self.open-tags;
 
         with $tag {
             self!get-mcid(my %atts);

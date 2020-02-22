@@ -47,7 +47,7 @@ endobj
   /BBox [ 0 0 95 25 ]
   /Group << /S /Transparency >>
   /Resources << /Font << /F1 5 0 R >> >>
-  /Length 206
+  /Length 172
 >> stream
 q
   /P BMC
@@ -56,14 +56,12 @@ q
     f
     /F1 16 Tf
     1 0.3 0.3 rg
-    /Span BMC
-      BT
-        1 0 0 1 2 5 Tm
-        (Simple Form) Tj
-        17.6 TL
-        T*
-      ET
-    EMC
+    BT
+      1 0 0 1 2 5 Tm
+      (Simple Form) Tj
+      17.6 TL
+      T*
+    ET
   EMC
 Q
 endstream
@@ -80,10 +78,10 @@ xref
 0000000721 00000 n 
 trailer
 <<
-  /ID [ <b85bac3c813a1c24d12a2dcc98f0172c> <b85bac3c813a1c24d12a2dcc98f0172c> ]
+  /ID [ <6aa0e4a41975d12738f1d072cf48969d> <6aa0e4a41975d12738f1d072cf48969d> ]
   /Root 1 0 R
   /Size 7
 >>
 startxref
-1110
+1076
 %%EOF
