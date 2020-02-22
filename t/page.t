@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan 7;
 
-use lib 't/lib';
+use lib 't';
 use PDF::Content::Page :PageSizes;
 use PDFTiny;
 # ensure consistant document ID generation

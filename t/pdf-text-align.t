@@ -1,7 +1,7 @@
 use v6;
 use Test;
 plan 1;
-use lib 't/lib';
+use lib 't';
 use PDF::Content::Ops :OpCode;
 use PDFTiny;
 # ensure consistant document ID generation

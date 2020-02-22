@@ -1,7 +1,7 @@
 use v6;
 use Test;
 plan 2;
-use lib 't/lib';
+use lib 't';
 use PDF::Content::Color :rgb;
 use PDFTiny;
 

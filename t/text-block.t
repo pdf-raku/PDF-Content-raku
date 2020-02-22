@@ -1,7 +1,7 @@
 use v6;
 use Test;
 plan 6;
-use lib 't/lib';
+use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Block;
 use PDF::Content::Font::CoreFont;
@@ -37,22 +37,22 @@ $gfx.Restore;
 
 is-json-equiv [ $gfx.ops ], [
     :q[],
-    :BT[],
-    :Tm[ :real(1),   :real(0),
-         :real(0),   :real(1),
-         :real(100), :real(350), ],
-    :rg[ :real(0), :real(0), :real(1) ],
-    :BMC[ :name("Span")],
-    :Tf[:name<F1>,   :real(16)],
-    :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
-    :TL[:real(17.6)],
-    'T*' => [],
-    :EMC[],
-    :BMC[ :name("Span")],
-    :Ts[ :real(3.648) ],
-    :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
-    :EMC[],
-    :ET[],
+      :BT[],
+        :Tm[ :real(1),   :real(0),
+             :real(0),   :real(1),
+             :real(100), :real(350), ],
+        :rg[ :real(0), :real(0), :real(1) ],
+        :BMC[ :name("Span")],
+          :Tf[:name<F1>,   :real(16)],
+          :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
+          :TL[:real(17.6)],
+          'T*' => [],
+        :EMC[],
+        :BMC[ :name("Span")],
+          :Ts[ :real(3.648) ],
+          :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
+        :EMC[],
+      :ET[],
     :Q[],
     ], 'simple text block';
 

@@ -61,11 +61,11 @@ multi method add-kid(PDF::Content::Tag $kid) {
 }
 
 multi method add-kid(Hash $object, :$owner = self.owner) {
-    $.add-kid: (require ::('PDF::Content::Tag::Object')).new: :$object, :$owner;
+    $.add-kid((require ::('PDF::Content::Tag::Object')).new: :$object, :$owner);
 }
 
 multi method add-kid(Str $name, *%attributes) {
-    $.add-kid: (require ::('PDF::Content::Tag::Elem')).new: :$name, :%attributes;
+    $.add-kid((require ::('PDF::Content::Tag::Elem')).new: :$name, :%attributes);
 }
 
 method !attributes-gist {

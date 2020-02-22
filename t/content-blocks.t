@@ -4,7 +4,7 @@ plan 12;
 use PDF;
 use PDF::Content;
 use PDF::Grammar::Test :is-json-equiv;
-use lib 't/lib';
+use lib 't';
 use FakeGfxParent;
 
 my $parent = { :Type<Page>, :Font{ :F1{} }, } does FakeGfxParent;

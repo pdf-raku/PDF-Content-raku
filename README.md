@@ -10,8 +10,9 @@ as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PD
 ### `PDF::Content`
 implements a PDF graphics state machine for composition, or rendering:
 ```
-use lib 't/lib'; use PDFTiny;
 use PDF::Content;
+use lib 't';
+use PDFTiny;
 my $parent = PDFTiny.new.add-page;
 my PDF::Content $gfx .= new: :$parent;
 $gfx.use-font: $gfx.core-font('Courier'); # define /F1 font
@@ -56,7 +57,8 @@ say $font.stringwidth("RVX", :kern); # 2111
 a utility class for creating and outputting simple text lines and paragraphs:
 
 ```
-use lib 't/lib'; use PDFTiny;
+use lib 't';
+use PDFTiny;
 my $parent = PDFTiny.new.add-page;
 use PDF::Content;
 use PDF::Content::Font::CoreFont;
@@ -75,7 +77,8 @@ say $gfx.Str;
 
 Simple Color construction functions:
 
-    use lib 't/lib'; use PDFTiny;
+    use lib 't';
+    use PDFTiny;
     my $parent = PDFTiny.new.add-page;
     use PDF::Content;
     use PDF::Content::Color :color, :ColorName;

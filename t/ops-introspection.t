@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan 18;
 
-use lib 't/lib';
+use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode, :LineCaps, :LineJoin, :GraphicsContext;

@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan 180;
 use PDF::Grammar::Test :is-json-equiv;
-use lib 't/lib';
+use lib 't';
 use PDF::Content::XObject;
 use PDFTiny;
 # ensure consistant document ID generation

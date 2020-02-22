@@ -2,7 +2,7 @@ use v6;
 use Test;
 plan 6;
 
-use lib 't/lib';
+use lib 't';
 use PDFTiny;
 use PDF::Content::Tag :ParagraphTags, :InlineElemTags;
 use PDF::Content::Tag::Elem;

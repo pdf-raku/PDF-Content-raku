@@ -1,6 +1,6 @@
 use v6;
 use Test;
-use lib 't/lib';
+use lib 't';
 use PDFTiny;
 
 # ensure consistant document ID generation

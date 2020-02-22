@@ -1,6 +1,6 @@
 use v6;
 use Test;
-use lib 't/lib';
+use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Ops :OpCode;
 use FakeGfxParent;
