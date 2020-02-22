@@ -2,6 +2,8 @@ Release 0.4.1
 - .print() and .say() methods now always return block coordinates
 - .tag() returns the return value of the executed block
 - the .do() method now accepts a :position argument; compatible with .print()
+- text blocks now bind the TextRender and Font graphics settings.
+- allow color(r, g, b) instead of color([r, g, b]), etc
 
 Release 0.4.0
 - Rename modules *.pm -> *.rakumod

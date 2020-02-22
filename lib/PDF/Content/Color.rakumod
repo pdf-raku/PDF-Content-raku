@@ -26,8 +26,9 @@ module PDF::Content::Color {
         :DeviceGray[g];
     }
 
-    our proto sub color($) is export(:color) {*};
+    our proto sub color(|) is export(:color) {*};
     multi sub color(Color $_) { color([.rgb]) }
+    multi sub color(Numeric $a, *@c) { @c.prepend($a); color(@c); }
     multi sub color(List $_) {
         when .max >= 2   {color .map(*/255).list}
         when .elems == 4 {cmyk(|$_)}
