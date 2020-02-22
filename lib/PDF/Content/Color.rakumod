@@ -41,4 +41,5 @@ module PDF::Content::Color {
         when /^'%'<xdigit>**8$/ { cmyk( |@<xdigit>.map({:16($^a.Str ~ $^b.Str) / 255 })) }
         default { warn "unrecognized color: $_"; gray(1) }
     }
+    multi sub color(Pair $c) { $c }
 }

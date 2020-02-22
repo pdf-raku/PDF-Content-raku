@@ -14,7 +14,7 @@ class PDF::Content::Text::Block {
     has Alignment $.align = 'left';
     my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
     has VerticalAlignment $.valign = 'top';
-    has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRise baseline-shift space-width>;
+    has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRise baseline-shift space-width FillColor StrokeColor TextRender>;
     has @.lines;
     has @.overflow is rw;
     has @.images;
@@ -158,17 +158,23 @@ class PDF::Content::Text::Block {
 	) {
 	my %saved;
 
-	for :$.CharSpacing, :$.HorizScaling, :$.TextRise {
-	    my $gfx-val = $gfx."{.key}"();
-	    unless .value =~= $gfx-val {
-	        %saved{.key} = $gfx-val
+	for :$.CharSpacing, :$.HorizScaling, :$.TextRise, :$.TextRender, :$.FillColor, :$.StrokeColor {
+            my $gval = $gfx."{.key}"();
+            my Bool $same := .key.ends-with('Color')
+                ?? ($gval = $gval.key => $gval.value.clone) eqv .value
+                !! $gval =~= .value;
+
+            unless $same {
+                %saved{.key} = $gval
 		    if $preserve;
-	        $gfx."Set{.key}"(.value);
+                $gfx."{.key}"() = .value; 
             }
-	}
+        }
 
         with $!style.font -> $_ {
-            # todo: preserve current font?
+            if $preserve {
+                %saved<Font> = $_ with $gfx.Font;
+            }
             $gfx.font = [$_, $!style.font-size // 12];
         }
 
@@ -223,10 +229,7 @@ class PDF::Content::Text::Block {
 
         $gfx.ops: @content;
         # restore original graphics values
-	for %saved.pairs {
-	    $gfx."Set{.key}"(.value)
-                unless $gfx."{.key}"() == .value;
-	}
+        $gfx."{.key}"() = .value for %saved.pairs;
 
 	($x-shift, $y-shift);
     }

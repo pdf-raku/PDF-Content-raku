@@ -59,14 +59,14 @@ a utility class for creating and outputting simple text lines and paragraphs:
 ```
 use lib 't';
 use PDFTiny;
-my $parent = PDFTiny.new.add-page;
+my $page = PDFTiny.new.add-page;
 use PDF::Content;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::Text::Block;
 my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :font-size(16) );
-my PDF::Content $gfx .= new: :$parent;
+my PDF::Content $gfx = $page.gfx;
 $gfx.BeginText;
 $text-block.render($gfx);
 $gfx.EndText;
@@ -79,10 +79,10 @@ Simple Color construction functions:
 
     use lib 't';
     use PDFTiny;
-    my $parent = PDFTiny.new.add-page;
+    my $page = PDFTiny.new.add-page;
     use PDF::Content;
     use PDF::Content::Color :color, :ColorName;
-    PDF::Content $gfx .= new: :$parent;
+    PDF::Content $gfx = $page.gfx;
     $gfx.FillColor = color Blue; # named color
     $gfx.StrokeColor = color '#fa9'; # RGB mask, 3 digit
     $gfx.StrokeColor = color '#ffaa99'; # RGB mask, 6 digit

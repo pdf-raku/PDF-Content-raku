@@ -336,11 +336,11 @@ class PDF::Content::Ops {
                 unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
                     my $cs := device-colorspace($key);
                     if $cs {
-                        self."SetStroke$cs"(|.value);
+                        self."SetStroke$cs"(|.value.clone);
                     }
                     else {
                         self.SetStrokeColorSpace($key);
-                        self.SetStrokeColorN(|.value);
+                        self.SetStrokeColorN(|.value.clone);
                     }
                 }
             }
@@ -357,11 +357,11 @@ class PDF::Content::Ops {
                 unless $key eq $!FillColorSpace && .value eqv @!FillColor {
                     my $cs := device-colorspace($key);
                     if $cs {
-                        self."SetFill$cs"(|.value);
+                        self."SetFill$cs"(|.value.clone);
                     }
                     else {
                         self.SetFillColorSpace($key);
-                        self.SetFillColorN(|.value);
+                        self.SetFillColorN(|.value.clone);
                     }
                 }
             }

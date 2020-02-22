@@ -1,16 +1,20 @@
 use v6;
 
 class PDF::Content::Text::Style is rw {
+    use PDF::Content::Color :&color;
     has         $.font is required;
     has Numeric $.font-size = 16;
     has Numeric $.leading = 1.1;
     has Bool    $.kern;
 
     # directly mapped to graphics state
+    has Pair    $.FillColor;
+    has Pair    $.StrokeColor;
     has Numeric $.WordSpacing;
     has Numeric $.CharSpacing;
     has Numeric $.HorizScaling;
     has Numeric $.TextRise;
+    has UInt    $.TextRender;
 
     my subset Baseline of Str is export(:BaseLine) where { !.defined || $_ ~~ 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging' };
 
@@ -23,6 +27,9 @@ class PDF::Content::Text::Style is rw {
 	} else {
 	    with $gfx {.TextRise} else {0.0};
 	}
+        $!FillColor   //= do with $gfx {.FillColor}   else { :DeviceGray[0.0] }
+        $!StrokeColor //= do with $gfx {.StrokeColor} else { :DeviceGray[0.0] }
+        $!TextRender  //= do with $gfx {.TextRender}  else { 0 }
     }
 
     method !baseline-height {  $!font.height( $!font-size, :from-baseline) }
