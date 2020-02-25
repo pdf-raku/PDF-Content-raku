@@ -1,6 +1,6 @@
 use PDF::Content::Tag;
 
-unit class PDF::Content::Tag::Marked
+unit class PDF::Content::Tag::Mark
     is PDF::Content::Tag;
 
 use PDF::COS;

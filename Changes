@@ -1,3 +1,5 @@
+Release 0.4.2
+- rename class PDF::Content::Tag::Marked -> PDF::Content::Tag::Mark
 Release 0.4.1
 - .print() and .say() methods now always return block coordinates
 - .tag() returns the return value of the executed block

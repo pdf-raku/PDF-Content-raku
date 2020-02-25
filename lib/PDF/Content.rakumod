@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.4.1>
+class PDF::Content:ver<0.4.2>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -17,8 +17,8 @@ class PDF::Content:ver<0.4.1>
     my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
     my subset Position of List where {
         .elems <= 2
-        && (!defined(.[0]) || .[0] ~~ Numeric|XPos-Pair)
-        && (!defined(.[1]) || .[1] ~~ Numeric|YPos-Pair)
+        && .[0] ~~ Numeric|XPos-Pair|Any:U
+        && .[1] ~~ Numeric|YPos-Pair|Any:U
     }
 
     method graphics( &meth! ) {
