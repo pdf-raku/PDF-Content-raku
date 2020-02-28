@@ -171,7 +171,8 @@ class PDF::Content::Text::Block {
 
         with $!style.font -> $_ {
             if $preserve {
-                %saved<Font> = .clone with $gfx.Font;
+                %saved<Font> = [$gfx.resource-key(.[0]), .[1]]
+                    with $gfx.Font;
             }
             $gfx.font = [$_, $!style.font-size // 12];
         }
