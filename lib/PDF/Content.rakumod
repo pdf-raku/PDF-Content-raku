@@ -99,17 +99,7 @@ class PDF::Content:ver<0.4.2>
         use PDF::Content::Tag :TagSet, :%TagAliases;
         has $.gfx is required;
         method FALLBACK($tag, |c) {
-            if $tag ∈ TagSet {
-                $!gfx.tag($tag, |c)
-            }
-            else {
-                with %TagAliases{$tag} {
-                    $!gfx.tag($_, |c)
-                }
-                else {
-                    die "unknown tag: $_";
-                }
-            }
+            $!gfx.tag($tag, |c)
         }
     }
     has Tagger $!tagger;
@@ -205,11 +195,13 @@ class PDF::Content:ver<0.4.2>
             $height /= $obj-height;
         }
 
-        $tag //= 'Figure' unless self.open-tags;
+        $tag //= 'Img' unless self.open-tags;
 
         with $tag {
-            self!get-mcid(my %atts);
-            self.BeginMarkedContentDict($_, $%atts);
+            self!get-mcid(my %props);
+            %props
+                ?? $.BeginMarkedContentDict($tag, $%props)
+                !! $.BeginMarkedContent($tag)
         }
 
         self.graphics: {
@@ -224,20 +216,12 @@ class PDF::Content:ver<0.4.2>
             }
         }
 
+        self.EndMarkedContent() with $tag;
+
         # return the display rectangle for the image
         my \x0 = $x + $dx;
         my \y0 = $y + $dy;
-        my \x1 = x0 + $width;
-        my \y1 = y0 + $height;
-        my @rect := [x0, y0, x1, y1];
-
-        with $tag {
-            self.EndMarkedContent();
-            self.set-tag-bbox(@rect)
-                if $_ ~~ 'Figure'|'Formula'|'Form';
-        }
-
-        @rect;
+        (x0, y0, x0 + $width, y0 + $height);
     }
     multi method do($img, Numeric $x, Numeric $y = 0, *%opt) is default {
         self.do($img, :position[$x, $y], |%opt);
@@ -335,7 +319,7 @@ class PDF::Content:ver<0.4.2>
                 @tm[5] = $_ * @tm[3] with v[1];
 		self.op(SetTextMatrix, @tm);
 	    },
-	    );
+	);
     }
 
     method set-tag-bbox(@rect) {
@@ -357,7 +341,7 @@ class PDF::Content:ver<0.4.2>
         my Bool $top = False;
         my Bool \in-text = $.context == GraphicsContext::Text;
 
-        $tag //= 'Span' unless self.open-tags;
+        $tag //= 'P' unless self.open-tags;
 
         with $tag {
             self!get-mcid(my %atts);

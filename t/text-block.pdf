@@ -15,18 +15,18 @@ endobj
 >>
 endobj
 
-4 0 obj << /Length 265 >> stream
+4 0 obj << /Length 259 >> stream
 q
   BT
     1 0 0 1 100 350 Tm
     0 0 1 rg
-    /Span BMC
+    /P BMC
       /F1 16 Tf
       (Hello. Ting, ting-ting. Attention! … ATTENTION!) Tj
       17.6 TL
       T*
     EMC
-    /Span BMC
+    /P BMC
       3.648 Ts
       (Hello. Ting, ting-ting. Attention! … ATTENTION!) Tj
     EMC
@@ -50,7 +50,7 @@ xref
 0000000064 00000 n 
 0000000124 00000 n 
 0000000263 00000 n 
-0000000580 00000 n 
+0000000574 00000 n 
 trailer
 <<
   /ID [ <6aa0e4a41975d12738f1d072cf48969d> <6aa0e4a41975d12738f1d072cf48969d> ]
@@ -58,5 +58,5 @@ trailer
   /Size 6
 >>
 startxref
-691
+685
 %%EOF

@@ -36,7 +36,7 @@ $page.graphics: -> $gfx {
         .say('Some body text', :position[50, 100], :font($body-font), :font-size(12));
         $tag = $gfx.closed-tag;
     }
-    is $tag.name, 'Span', 'inner tag name';
+    is $tag.name, 'P', 'inner tag name';
     is $tag.parent.name, 'P', 'outer tag name';
 
     sub outer-rect(*@rects) {
@@ -67,6 +67,17 @@ $page.graphics: -> $gfx {
     };
 
     $doc.add-kid(Link).add-kid($link);
+
+    my  PDF::Content::XObject $form = $page.xobject-form: :BBox[0, 0, 200, 50];
+    $form.text: {
+        my $font-size = 12;
+        .text-position = [10, 38];
+        .tag.Header1: { .say: "Tagged XObject header", :font($header-font), :$font-size};
+        .tag.Paragraph: { .say: "Some sample tagged text", :font($body-font), :$font-size};
+    }
+
+    $gfx.do($form, :position[150, 70]);
+
 }
 
 # finishing work; normally undertaken by the API

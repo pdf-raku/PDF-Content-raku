@@ -15,7 +15,7 @@ endobj
 >>
 endobj
 
-4 0 obj << /Length 6913 >> stream
+4 0 obj << /Length 6874 >> stream
 /P BMC
   BT
     1 0 0 1 50 100 Tm
@@ -29,7 +29,7 @@ endobj
 EMC
 BT
   /F2 10 Tf
-  /Span BMC
+  /P BMC
     1 0 0 1 20 700 Tm
     (*** *** Lorem ipsum) Tj
     11 TL
@@ -59,7 +59,7 @@ BT
     (consequat. Duis aute) Tj
     T*
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 130 700 Tm
     3 Ts
     (*** TextRise 3 ***) Tj
@@ -90,7 +90,7 @@ BT
     T*
     0 Ts
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 240 700 Tm
     -3 Ts
     (*** TextRise -3 ***) Tj
@@ -121,7 +121,7 @@ BT
     T*
     0 Ts
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 350 700 Tm
     75 Tz
     (*** HorizScaling 75 *** Lorem) Tj
@@ -152,7 +152,7 @@ BT
     T*
     100 Tz
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 460 700 Tm
     150 Tz
     (***) Tj
@@ -183,7 +183,7 @@ BT
     T*
     100 Tz
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 20 530 Tm
     -0.75 Tc
     (*** CharSpacing -0.75 ***) Tj
@@ -214,7 +214,7 @@ BT
     T*
     0 Tc
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 130 530 Tm
     0.75 Tc
     (*** CharSpacing) Tj
@@ -245,7 +245,7 @@ BT
     T*
     0 Tc
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 240 530 Tm
     1.5 Tc
     (*** CharSpacing) Tj
@@ -276,7 +276,7 @@ BT
     T*
     0 Tc
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 350 530 Tm
     (*** WordSpacing -2 ***) Tj
     T*
@@ -305,7 +305,7 @@ BT
     (consequat. Duis aute) Tj
     T*
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 460 530 Tm
     (*** WordSpacing 5) Tj
     T*
@@ -334,7 +334,7 @@ BT
     (ut aliquip ex ea) Tj
     T*
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 20 360 Tm
     (*** leading 0.8 ***) Tj
     8 TL
@@ -374,7 +374,7 @@ BT
     (nulla pariatur. ut) Tj
     T*
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 130 360 Tm
     (*** leading 1.5 ***) Tj
     15 TL
@@ -398,7 +398,7 @@ BT
     (exercitation ullamco) Tj
     T*
   EMC
-  /Span BMC
+  /P BMC
     1 0 0 1 240 360 Tm
     -9.31 Ts
     (*** baseline top ***) Tj
@@ -465,9 +465,9 @@ xref
 0000000064 00000 n 
 0000000124 00000 n 
 0000000283 00000 n 
-0000007249 00000 n 
-0000007360 00000 n 
-0000007466 00000 n 
+0000007210 00000 n 
+0000007321 00000 n 
+0000007427 00000 n 
 trailer
 <<
   /ID [ <6aa0e4a41975d12738f1d072cf48969d> <6aa0e4a41975d12738f1d072cf48969d> ]
@@ -475,5 +475,5 @@ trailer
   /Size 8
 >>
 startxref
-7570
+7531
 %%EOF

@@ -17,7 +17,7 @@ my $font-size = 18;
 my $bold-font = $page.core-font( :family<Helvetica>, :weight<bold> );
 my $font = $page.core-font( :family<Helvetica> );
 
-$gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font), :$font-size, :tag<P>);
+$gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font), :$font-size);
 
 is-deeply $gfx.content-dump, $(
     "/P BMC",

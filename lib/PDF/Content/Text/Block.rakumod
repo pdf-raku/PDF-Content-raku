@@ -169,13 +169,8 @@ class PDF::Content::Text::Block {
             }
         }
 
-        with $!style.font -> $_ {
-            if $preserve {
-                %saved<Font> = [$gfx.resource-key(.[0]), .[1]]
-                    with $gfx.Font;
-            }
-            $gfx.font = [$_, $!style.font-size // 12];
-        }
+        $gfx.font = [$_, $!style.font-size // 12]
+           with $!style.font;
 
         my $width = $.width
             if $!align eq 'justify';
