@@ -89,7 +89,7 @@ class PDF::Content::Ops {
     use PDF::COS::Dict;
     use PDF::COS::Util :from-ast, :to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity;
-    use PDF::Content::Tag :TagSet;
+    use PDF::Content::Tag;
     use PDF::Content::Tag::Mark;
     use JSON::Fast;
 
@@ -385,8 +385,6 @@ class PDF::Content::Ops {
         has Bool $.strict;
 
         method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
-            warn "unknown marked-content tag '{$tag.name}'"
-                if $!strict && $tag.name.Str ∉ TagSet;
             with @!open-tags.tail {
                 .add-kid: $tag;
             }
@@ -401,8 +399,6 @@ class PDF::Content::Ops {
         }
 
         method add-tag(PDF::Content::Tag $tag, :$strict = $!strict) {      # add child to innermost descendant
-            warn "unknown marked-content tag '{$tag.name}'"
-                if $strict && $tag.name ∉ TagSet;
             with @!open-tags.tail {
                 .add-kid: $tag;
             }

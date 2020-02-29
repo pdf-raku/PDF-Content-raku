@@ -210,8 +210,9 @@ class PDF::Content::Text::Block {
 	    my \line = .value;
 
 	    if .key {
-		@content.push: ( OpCode::SetTextLeading => [ $leading = line.height * $.leading ] )
-		    if $leading !=~= line.height * $.leading;
+                my \lead = line.height * $.leading;
+		@content.push: ( OpCode::SetTextLeading => [ $leading = lead ] )
+		    if $leading !=~= lead;
 		@content.push: OpCode::TextNextLine;
 	    }
 
