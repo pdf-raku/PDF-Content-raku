@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.4.2>
+class PDF::Content:ver<0.4.3>
     is PDF::Content::Ops {
 
     use PDF::COS;
@@ -35,71 +35,69 @@ class PDF::Content:ver<0.4.2>
         rv;
     }
 
-    method marked-content($tag, &code, :$props) is DEPRECATED<tag> {
+    method marked-content($tag, &code, :$props) is DEPRECATED<mark> {
         with $props { $.tag($tag, &code, |$_) } else { $.tag($tag, &code) }
     }
 
-    method !get-mcid(%props) {
-        $.parent.use-mcid($_)
-            with %props<MCID>;
-    }
-
-    method op-dict(PDF::Content::Tag $tag) {
-        my Pair $op := self.ops[$tag.start-1];
-        # upgrade BMC operator to BDC to accomodate dict
-        $op = BDC => $op.value
-            if $op.key eq 'BMC';
-        $op.value[1]<dict> //= %();
-    }
-
-    method set-mcid(PDF::Content::Tag $tag) {
-        $tag.mcid //= do {
-            # edit opening BDC or BMC op in op-tree
-            my UInt $int = $.parent.next-mcid;
-            self.op-dict($tag)<MCID> = :$int;
-            $int;
+    method !setup-mcid(Bool :$mark, :%props) {
+        with %props<MCID> {
+            $.parent.use-mcid($_);
+        }
+        elsif $mark {
+            die "illegal nesting of marked content tags"
+                if self.open-tags.grep(*.mcid.defined);
+            %props<MCID> = $.parent.next-mcid()
         }
     }
 
+    method mark(Str $t, &meth, |c) { self.tag($t, &meth, :mark, |c) }
+
     multi method tag(PDF::Content::Tag $_, &meth) {
-        samewith( .tag, |.attributes, &meth);
+        samewith( .tag, &meth, |.attributes, );
     }
 
     multi method tag(PDF::Content::Tag $_) {
         samewith( .tag, |.attributes);
     }
 
-    multi method tag(Str $tag, *%props) {
-        self!get-mcid: %props;
-
-        my \rv := %props
+    multi method tag(Str $tag, Bool :$mark, *%props) {
+        self!setup-mcid: :$mark, :%props;
+        %props
             ?? $.MarkPointDict($tag, $%props)
             !! $.MarkPoint($tag);
         $.closed-tag;
     }
 
-    multi method tag(Str $tag, &meth!, *%props) {
-        self!get-mcid: %props;
-
+    multi method tag(Str $tag, &meth!, Bool :$mark, *%props) {
+        self!setup-mcid: :$mark, :%props;
         %props
             ?? $.BeginMarkedContentDict($tag, $%props)
             !! $.BeginMarkedContent($tag);
-
-        my \rv := meth(self);
+        meth(self);
         $.EndMarkedContent;
-        rv;
+        $.closed-tag;
     }
 
     multi method tag(Str $name, Hash $object, *%attributes) {
-        self.add-tag: :!strict, PDF::Content::Tag::Object.new: :$name, :$.owner, :$object, :%attributes;
+        self.add-tag: PDF::Content::Tag::Object.new: :$name, :$.owner, :$object, :%attributes;
     }
 
     # to allow e.g. $gfx.tag.Header({ ... });
     my class Tagger {
-        use PDF::Content::Tag :TagSet, :%TagAliases;
+       use PDF::Content::Tag :TagSet, :%TagAliases;
         has $.gfx is required;
         method FALLBACK($tag, |c) {
-            $!gfx.tag($tag, |c)
+            if $tag ∈ TagSet {
+                $!gfx.tag($tag, |c)
+            }
+            else {
+                with %TagAliases{$tag} {
+                    $!gfx.tag($_, |c)
+                }
+                else {
+                    die "unknown tag: $_";
+                }
+            }
         }
     }
     has Tagger $!tagger;
@@ -153,7 +151,6 @@ class PDF::Content:ver<0.4.2>
               Align    :$align is copy  = 'left',
               Valign   :$valign is copy = 'bottom',
               Bool     :$inline = False,
-              Str      :$tag is copy,
         )  {
 
         my Numeric ($x, $y);
@@ -186,26 +183,20 @@ class PDF::Content:ver<0.4.2>
             }
         }
 
-        $dx *= $width;
-        $dy *= $height;
-
         if $obj<Subtype> ~~ 'Form' {
             $obj.finish;
             $width /= $obj-width;
             $height /= $obj-height;
         }
 
-        $tag //= 'Img' unless self.open-tags;
+        $dx *= $width;
+        $dy *= $height;
 
-        with $tag {
-            self!get-mcid(my %props);
-            %props
-                ?? $.BeginMarkedContentDict($tag, $%props)
-                !! $.BeginMarkedContent($tag)
-        }
+        my \x0 = $x + $dx;
+        my \y0 = $y + $dy;
 
         self.graphics: {
-            $.op(ConcatMatrix, $width, 0, 0, $height, $x + $dx, $y + $dy);
+            $.op(ConcatMatrix, $width, 0, 0, $height, x0, y0);
             if $inline && $obj<Subtype> ~~ 'Image' {
                 # serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]
                 $.ops( $obj.inline-content );
@@ -216,11 +207,7 @@ class PDF::Content:ver<0.4.2>
             }
         }
 
-        self.EndMarkedContent() with $tag;
-
         # return the display rectangle for the image
-        my \x0 = $x + $dx;
-        my \y0 = $y + $dy;
         (x0, y0, x0 + $width, y0 + $height);
     }
     multi method do($img, Numeric $x, Numeric $y = 0, *%opt) is default {
@@ -322,33 +309,15 @@ class PDF::Content:ver<0.4.2>
 	);
     }
 
-    method set-tag-bbox(@rect) {
-        # locate the opening marked content dict in the op-tree
-        my $tag-obj = self.closed-tag;
-        my @bbox = self.base-coords(@rect);
-        $tag-obj.attributes<BBox> = @bbox;
-        $.op-dict($tag-obj)<BBox> = :array[ @bbox.map( -> $real { :$real }) ];
-    }
-
     multi method print(PDF::Content::Text::Block $text-block,
                        Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
-                       Str :$tag is copy,
         ) {
 
         my Bool $left = False;
         my Bool $top = False;
         my Bool \in-text = $.context == GraphicsContext::Text;
-
-        $tag //= 'P' unless self.open-tags;
-
-        with $tag {
-            self!get-mcid(my %atts);
-            %atts
-                ?? self.BeginMarkedContentDict($_, $%atts)
-                !! self.BeginMarkedContent($_)
-        }
 
         self.BeginText unless in-text;
 
@@ -358,7 +327,6 @@ class PDF::Content:ver<0.4.2>
         my ($dx, $dy) = $text-block.render(self, :$nl, :$top, :$left, :$preserve);
 
         self.EndText() unless in-text;
-        self.EndMarkedContent() with $tag;
 
         my \x0 = $x + $dx;
         my \y0 = $y + $dy;

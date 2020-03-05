@@ -20,7 +20,6 @@ my $font = $page.core-font( :family<Helvetica> );
 $gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font), :$font-size);
 
 is-deeply $gfx.content-dump, $(
-    "/P BMC",
     "BT",
     "1 0 0 1 50 100 Tm", 
     "/F1 18 Tf",
@@ -30,7 +29,6 @@ is-deeply $gfx.content-dump, $(
     "[ (W) 60 (orld!) ] TJ",
     "T*",
     "ET",
-    "EMC",
     ), "hello world (with kerning)";
 
 $width = 100;

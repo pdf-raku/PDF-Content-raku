@@ -1,15 +1,14 @@
 use v6;
+use lib 't';
 use Test;
 plan 12;
 use PDF;
 use PDF::Content;
 use PDF::Grammar::Test :is-json-equiv;
-use lib 't';
-use FakeGfxParent;
+use PDFTiny;
 
-my $parent = { :Type<Page>, :Font{ :F1{} }, } does FakeGfxParent;
-
-my PDF::Content $g .= new: :$parent, :!strict;
+my PDFTiny $pdf .= new;
+my PDF::Content $g = $pdf.add-page.gfx: :!strict;
 $g.graphics: { .BeginText; .ShowText("Hi"); .EndText;};
 is-json-equiv [$g.ops], [
     :q[],
@@ -18,26 +17,30 @@ is-json-equiv [$g.ops], [
     "ET" => [],
     :Q[]], '.graphics block';
 
-$g .= new: :$parent, :!strict;
+$g = $pdf.add-page.gfx: :!strict;
 $g.text: { .ShowText("Hi"); };
 is-json-equiv [$g.ops], [
     :BT[],
     :Tj[:literal<Hi>],
     "ET" => [], ], '.text block';
 
-$g .= new: :$parent, :!strict;
-$g.tag: 'Foo', {
+$g = $pdf.add-page.gfx: :!strict;
+given $g {
+    .BeginMarkedContent('Foo');
     .BeginText;
     .ShowText("Hi");
-    .EndText };
+    .EndText;
+    .EndMarkedContent;
+};
 is-json-equiv [$g.ops], [
     :BMC[:name<Foo>,],
     :BT[],
     :Tj[:literal<Hi>],
     "ET" => [],
-    :EMC[], ], '.tag content block';
+    :EMC[],
+], '.tag content block';
 
-$g .= new: :$parent, :!strict;
+$g = $pdf.add-page.gfx: :!strict;
 $g.tag: 'Foo', :Bar{ :Baz }, {
    .BeginText;
    .ShowText("Hi");
@@ -52,7 +55,7 @@ is-json-equiv [$g.ops], [
 
 my $props = { :MCID(42) };
 
-$g .= new: :$parent, :!strict;
+$g = $pdf.add-page.gfx: :!strict;
 $g.tag: 'Foo', |$props, {
    .tag: 'Nested',  sub ($) { };
    $g.MarkPoint('A');

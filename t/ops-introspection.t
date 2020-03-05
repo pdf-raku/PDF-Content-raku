@@ -8,7 +8,7 @@ use PDF::Content;
 use PDF::Content::Ops :OpCode, :LineCaps, :LineJoin, :GraphicsContext;
 use PDF::Content::Matrix :scale;
 use PDF::Writer;
-use FakeGfxParent;
+use PDFTiny;
 
 my $dummy-font = %() does role { method cb-finish {} }
 
@@ -36,8 +36,7 @@ my %gs-initial = %(
     :WordSpacing(0)
 );
 
-my $parent = { :Type<Page>, :Font{ :F1($dummy-font) }, } does FakeGfxParent;
-my PDF::Content $g .= new: :$parent;
+my PDF::Content $g = PDFTiny.new.add-page.gfx;
 
 is-json-equiv $g.gsaves, [], 'gsave initial';
 is-json-equiv $g.graphics-state, %gs-initial;
@@ -59,10 +58,11 @@ is-deeply $g.content-dump, ('q', '10 1 15 2 3 4 cm'), 'content-dump';
 $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
 
 $g.BeginText;
+my $font = $g.core-font( :family<Helvetica> ); # define resource /F1
 $g.SetFont('F1', 16);
 
-is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[{}, 16]}, ], 'gsave saved :delta';
-is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[{}, 16]}, 'graphics-state :delta';
+is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[$font, 16]}, ], 'gsave saved :delta';
+is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[$font, 16]}, 'graphics-state :delta';
 is-deeply $g.context, GraphicsContext::Text;
 
 $g.tag: 'P', {

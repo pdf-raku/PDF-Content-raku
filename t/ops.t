@@ -8,12 +8,10 @@ use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
 use PDF::Content::Matrix :scale;
-use FakeGfxParent;
+use PDFTiny;
 
-my $dummy-font = %() does role { method cb-finish {} }
-
-my $parent = { :Type<Page>, :Font{ :F1($dummy-font) }, } does FakeGfxParent;
-my PDF::Content $g .= new: :$parent;
+my PDF::Content $g = PDFTiny.new.add-page.gfx;
+$g.core-font( :family<Helvetica> ); # define resource /F1
 
 $g.op(Save);
 
@@ -121,12 +119,13 @@ is $g.WordSpacing, 10.0, '$g.WordSpacing - MoveSetShow';
 is $g.CharSpacing, 20.0, '$g.CharSpacing - MoveSetShow';
 
 $g.FillAlpha = 1.0;
+my $parent = $g.parent;
 nok $parent<ExtGState>, 'FillAlpha Optimized';
 $g.FillAlpha = 0.4;
-is $g.ops[*-1], (:gs([:name<R1>])), 'FillAlpha op';
-is-json-equiv $parent<ExtGState><R1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';
+is $g.ops[*-1], (:gs([:name<GS1>])), 'FillAlpha op';
+is-json-equiv $parent<Resources><ExtGState><GS1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';
 $g.FillAlpha = 1.0;
-is-json-equiv $parent<ExtGState><R2>, { :Type<ExtGState>, :ca(1.0)}, 'FillAlpha graphics resource';
+is-json-equiv $parent<Resources><ExtGState><GS2>, { :Type<ExtGState>, :ca(1.0)}, 'FillAlpha graphics resource';
 
 is-json-equiv $g.op('scn', 0.30, 'int' => 1, 0.21, 'P2'), (:scn[ :real(.30), :int(1), :real(.21), :name<P2> ]), 'scn';
 is-json-equiv $g.op('TJ', $[ 'hello', 42, 'world']), (:TJ[ :array[ :literal<hello>, :int(42), :literal<world> ] ]), 'TJ';

@@ -1,10 +1,10 @@
 use v6;
 use Test;
-plan 6;
+plan 7;
 
 use lib 't';
 use PDFTiny;
-use PDF::Content::Tag :ParagraphTags, :InlineElemTags;
+use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags;
 use PDF::Content::Tag::Elem;
 use PDF::Content::Tag::Mark;
 use PDF::Content::XObject;
@@ -23,18 +23,20 @@ my PDF::Content::Tag::Elem $doc .= new: :name<Document>, :attributes{ :test<yep>
 $page.graphics: -> $gfx {
     my PDF::Content::Tag $tag;
     my PDF::Content::Tag $tag2;
-    $doc.add-kid(Header1).graphics: $gfx, {
+
+    $tag = $doc.add-kid(Header1).mark: $gfx, {
         .say('Header text',
              :font($header-font),
              :font-size(15),
              :position[50, 120]);
     }
-    $tag = $gfx.closed-tag.parent;
-    is $tag.name, 'H1', 'tag name';
 
-    $doc.add-kid(Paragraph).graphics: $gfx, {
+    is $tag.name, 'H1', 'mark tag name';
+    is $tag.mcid, 0, 'mark tag mcid';
+    is $tag.parent.name, 'H1', 'parent elem name';
+
+    $tag = $doc.add-kid(Paragraph).mark: $gfx, {
         .say('Some body text', :position[50, 100], :font($body-font), :font-size(12));
-        $tag = $gfx.closed-tag;
     }
     is $tag.name, 'P', 'inner tag name';
     is $tag.parent.name, 'P', 'outer tag name';
@@ -47,16 +49,16 @@ $page.graphics: -> $gfx {
     }
 
     my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-    
-    $gfx.set-tag-bbox: $gfx.tag.Figure: {
-        outer-rect([
+
+    my @rect;
+    $tag = $doc.add-kid(Form).mark: $gfx, {
+        @rect = outer-rect([
             $gfx.do($img, :position[50, 70]),
             $gfx.say("Eureka!", :tag<Caption>, :position[40, 60]),
-        ]);
+            ]);
     }
-    my $figure = $gfx.closed-tag;
-    is-deeply $figure.attributes<BBox>, [40, 60, 107, 89], 'image tag BBox';
-    $doc.add-kid($figure);
+    $tag.parent.set-bbox($gfx, @rect);
+    is-deeply $tag.parent.attributes<BBox>, [40, 60, 81, 89], 'image tag BBox';
 
     my Hash $link = PDF::COS.coerce: :dict{
         :Type(:name<Annot>),
@@ -72,16 +74,15 @@ $page.graphics: -> $gfx {
     $form.text: {
         my $font-size = 12;
         .text-position = [10, 38];
-        .tag.Header1: { .say: "Tagged XObject header", :font($header-font), :$font-size};
-        .tag.Paragraph: { .say: "Some sample tagged text", :font($body-font), :$font-size};
+        .mark: Header1, { .say: "Tagged XObject header", :font($header-font), :$font-size};
+        .mark: Paragraph, { .say: "Some sample tagged text", :font($body-font), :$font-size};
     }
 
-    $gfx.do($form, :position[150, 70]);
-
+    $doc.add-kid(Figure).do($gfx, $form, :position[150, 70]);
 }
 
 # finishing work; normally undertaken by the API
-is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P,Figure,Link';
+is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P,Form,Link,Figure';
 my ($struct-tree, $Nums) = $doc.build-struct-tree;
 $pdf.Root<StructTreeRoot> = $struct-tree;
 ($pdf.Root<MarkedInfo> //= {})<Marked> = True;
@@ -89,6 +90,7 @@ for @$Nums -> $n, $parent {
     $parent<StructParents> = $n;
 }
 
-lives-ok {$pdf.save-as: "t/tags.pdf";}
+##lives-ok {
+$pdf.save-as: "t/tags.pdf";##}
 
 done-testing;

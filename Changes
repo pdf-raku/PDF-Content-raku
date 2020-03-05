@@ -1,8 +1,13 @@
+Release 0.4.3
+- withdrew implicit content tagging in .print() and .do() methods
+- replaced with new PDF::Content::Tag::Elem .mark() and .do() methods
+- remove FakeGfxParent role from test suite. Just use PDFTiny.
+
 Release 0.4.2
 - rename class PDF::Content::Tag::Marked -> PDF::Content::Tag::Mark
 - remove tag-name check on marked content tags. Anything is allowed (it's
   only struct elem nodes that next to be named correctly).
-- also remove BBox attribute from Makred cotnent and rename tags to /Text
+- also remove BBox attribute from Marked cotnent and rename tags to /Text
   and /Image respectively.
 
 Release 0.4.1

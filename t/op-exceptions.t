@@ -6,7 +6,7 @@ use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode;
 use PDF::Content::Matrix :scale;
-use FakeGfxParent;
+use PDFTiny;
 
 sub warns-like(&code, $ex-type, $desc = 'warning') {
     my $ex;
@@ -29,16 +29,13 @@ sub warns-like(&code, $ex-type, $desc = 'warning') {
 
 my $dummy-font = %() does role { method cb-finish {} }
 
-my $parent = {
-    :Type<Page>,
-    :Font{ :F1($dummy-font) },
-    :ExtGState{ :G1{ :ca(0.5) } },
-} does FakeGfxParent;
-my PDF::Content $g .= new: :$parent;
+my PDF::Content $g = PDFTiny.new.add-page.gfx;
+$g.Save;
+$g.core-font( :family<Helvetica> ); # define resource /F1
+$g.StrokeAlpha = .5; # define resource /GS1
 
 throws-like {$g.Blah}, X::Method::NotFound, :message("No such method 'Blah' for invocant of type 'PDF::Content'");
 
-$g.Save;
 lives-ok {$g.Restore}, 'valid Restore';
 throws-like {$g.Restore}, X::PDF::Content::OP::BadNesting, :message("Bad nesting; 'Q' (Restore) operator not matched by preceeding 'q' (Save)");
 
@@ -53,8 +50,8 @@ throws-like {$g.SetStrokeColor(.2, .3)}, X::PDF::Content::OP::ArgCount, :message
 
 lives-ok {$g.SetStrokeColorSpace('C1')};
 
-lives-ok {$g.SetGraphicsState('G1')}, 'valid SetGraphicsState';
-throws-like {$g.SetGraphicsState('G2'); }, X::PDF::Content::UnknownResource, :message("Unknown ExtGState resource: /G2");
+lives-ok {$g.SetGraphicsState('GS1')}, 'valid SetGraphicsState';
+throws-like {$g.SetGraphicsState('GS2'); }, X::PDF::Content::UnknownResource, :message("Unknown ExtGState resource: /GS2");
 $g.Restore;
 
 $g.BeginMarkedContent('P');

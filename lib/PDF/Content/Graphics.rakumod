@@ -106,6 +106,7 @@ role PDF::Content::Graphics {
 
     method cb-finish { $.finish }
 
+    #| create a new XObject Form
     method xobject-form(:$group = True, *%dict) {
         %dict<Type> = :name<XObject>;
         %dict<Subtype> = :name<Form>;
@@ -116,6 +117,7 @@ role PDF::Content::Graphics {
         PDF::COS.coerce( :stream{ :%dict });
     }
 
+    #| create a new Type 1 (Tiling) Pattern
     method tiling-pattern(List    :$BBox!,
                           Numeric :$XStep = $BBox[2] - $BBox[0],
                           Numeric :$YStep = $BBox[3] - $BBox[1],
@@ -137,4 +139,33 @@ role PDF::Content::Graphics {
              or die "save-as-image method is only supported if PDF::To::Cairo is installed";
         ::('PDF::To::Cairo').save-as-image(self, $outfile);
     }
+    # *** Marked Content Tags ***
+    my class TagSetBuilder is PDF::Content::Tag::Set {
+        has PDF::Content::Tag @.open-tags;            # currently open descendant tags
+        has PDF::Content::Tag $.closed-tag;
+
+        method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
+            with @!open-tags.tail {
+                .add-kid: $tag;
+            }
+            @!open-tags.push: $tag;
+        }
+
+        method close-tag {                            # close innermost descendant
+            $!closed-tag = @!open-tags.pop;
+            @.tags.push: $!closed-tag
+                without $!closed-tag.parent;
+            $!closed-tag;
+        }
+
+        method add-tag(PDF::Content::Tag $tag) {      # add child to innermost descendant
+            with @!open-tags.tail {
+                .add-kid: $tag;
+            }
+            else {
+                @.tags.push: $tag;
+            }
+        }
+    }
+    has TagSetBuilder $.tags .= new();
 }

@@ -378,36 +378,9 @@ class PDF::Content::Ops {
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
-    # *** Marked Content Tags ***
-    my class TagSetBuilder is PDF::Content::Tag::Set {
-        has PDF::Content::Tag @.open-tags;            # currently open descendant tags
-        has PDF::Content::Tag $.closed-tag;
-        has Bool $.strict;
-
-        method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
-            with @!open-tags.tail {
-                .add-kid: $tag;
-            }
-            @!open-tags.push: $tag;
-        }
-
-        method close-tag {                            # close innermost descendant
-            $!closed-tag = @!open-tags.pop;
-            @.tags.push: $!closed-tag
-                without $!closed-tag.parent;
-            $!closed-tag;
-        }
-
-        method add-tag(PDF::Content::Tag $tag, :$strict = $!strict) {      # add child to innermost descendant
-            with @!open-tags.tail {
-                .add-kid: $tag;
-            }
-            else {
-                @.tags.push: $tag;
-            }
-        }
+    method tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> {
+        $!parent.tags;
     }
-    has TagSetBuilder $.tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> .= new: :$!strict;
 
     # *** Graphics Stack ***
     sub delta(@gs) {

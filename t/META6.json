@@ -4,7 +4,6 @@
   "name": "PDF::Content::t",
   "perl": "6.c",
   "provides": {
-      "FakeGfxParent": "lib/FakeGfxParent.rakumod",
       "PDFTiny": "lib/PDFTiny.rakumod"
   },
   "source-url": "git://github.com/p6-pdf/PDF-Content-p6.git",

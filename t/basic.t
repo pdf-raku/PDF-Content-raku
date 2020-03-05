@@ -3,13 +3,11 @@ use Test;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Ops :OpCode;
-use FakeGfxParent;
-
-my $parent = { } does FakeGfxParent;
+use PDFTiny;
 
 plan 6;
 
-my PDF::Content::Ops $gfx .= new: :$parent;
+my PDF::Content::Ops $gfx = PDFTiny.new.add-page.gfx;
 
 $gfx.Save;
 lives-ok {$gfx.op(BeginText)}, 'basic op';

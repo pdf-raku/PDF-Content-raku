@@ -10,8 +10,8 @@ as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PD
 ### `PDF::Content`
 implements a PDF graphics state machine for composition, or rendering:
 ```
-use PDF::Content;
 use lib 't';
+use PDF::Content;
 use PDFTiny;
 my $parent = PDFTiny.new.add-page;
 my PDF::Content $gfx .= new: :$parent;

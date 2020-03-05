@@ -55,6 +55,8 @@ constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
 multi method add-kid(PDF::Content::Tag $kid) {
     die 'tag already parented by {.gist}' with $kid.parent;
+    die "can't add tag to itself"
+        if $kid === self;
     $!kids.push: $kid;
     $kid.parent = self;
     $kid;
