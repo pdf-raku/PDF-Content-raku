@@ -26,7 +26,15 @@ method build-struct-elem(:%nums) {
             :$MCID,
             :Pg($!owner),
         ) -> $mcr {
-           $mcr<Stm> = $_ with $!content;
+           my $obj = do with $!content {
+               $mcr<Stm> = $_;
+           }
+           else {
+               $!owner;
+           }
+           given %nums{$obj} {
+               $_ = $MCID if !.defined || $_ < $MCID;
+           }
            $mcr;
         }
     }

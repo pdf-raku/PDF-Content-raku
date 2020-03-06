@@ -142,7 +142,7 @@ our class Set {
             }
             if %nums {
                 my $n = 0;
-                for %nums.sort {
+                for %nums.sort(*.value) {
                     my $parent := .key;
                     @Nums.push: $n;
                     @Nums.push: $parent;

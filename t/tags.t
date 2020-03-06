@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 7;
+plan 8;
 
 use lib 't';
 use PDFTiny;
@@ -81,8 +81,9 @@ $page.graphics: -> $gfx {
     $doc.add-kid(Figure).do($gfx, $form, :position[150, 70]);
 }
 
-# finishing work; normally undertaken by the API
 is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P,Form,Link,Figure';
+# finishing work; normally. Need PDF::NumberTree (PDF::Class) to be able to
+# merge this into an existing ParentTree
 my ($struct-tree, $Nums) = $doc.build-struct-tree;
 $pdf.Root<StructTreeRoot> = $struct-tree;
 ($pdf.Root<MarkedInfo> //= {})<Marked> = True;
@@ -90,7 +91,6 @@ for @$Nums -> $n, $parent {
     $parent<StructParents> = $n;
 }
 
-##lives-ok {
-$pdf.save-as: "t/tags.pdf";##}
+lives-ok { $pdf.save-as: "t/tags.pdf" }
 
 done-testing;

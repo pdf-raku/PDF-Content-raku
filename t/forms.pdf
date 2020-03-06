@@ -14,21 +14,17 @@ endobj
 >>
 endobj
 
-4 0 obj << /Length 190 >> stream
+4 0 obj << /Length 140 >> stream
 q
-  /Img BMC
-    q
-      1 0 0 1 10 10 cm
-      /Fm1 Do
-    Q
-  EMC
+  q
+    1 0 0 1 10 10 cm
+    /Fm1 Do
+  Q
   0.74625 0.07488 -0.07488 0.74625 4.46753 30.59888 cm
-  /Img BMC
-    q
-      1 0 0 1 10 10 cm
-      /Fm1 Do
-    Q
-  EMC
+  q
+    1 0 0 1 10 10 cm
+    /Fm1 Do
+  Q
 Q
 endstream
 endobj
@@ -74,8 +70,8 @@ xref
 0000000064 00000 n 
 0000000150 00000 n 
 0000000287 00000 n 
-0000000529 00000 n 
-0000000635 00000 n 
+0000000479 00000 n 
+0000000585 00000 n 
 trailer
 <<
   /ID [ <6aa0e4a41975d12738f1d072cf48969d> <6aa0e4a41975d12738f1d072cf48969d> ]
@@ -83,5 +79,5 @@ trailer
   /Size 7
 >>
 startxref
-990
+940
 %%EOF

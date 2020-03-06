@@ -1,5 +1,5 @@
 {
-  "description": "PDF::Content test modules",
+  "description": "PDF::Content test suite modules",
   "license": "Artistic-2.0",
   "name": "PDF::Content::t",
   "perl": "6.c",
