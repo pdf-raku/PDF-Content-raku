@@ -150,7 +150,7 @@ our class Set {
 ##                    $n += .value;
 ##                }
 ##                $struct-tree<ParentTree> = %( :@Nums );
-            }
+##            }
         }
 
         ($struct-tree, @Nums);
