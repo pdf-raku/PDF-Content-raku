@@ -82,13 +82,13 @@ $page.graphics: -> $gfx {
 }
 
 is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P,Form,Link,Figure';
-# finishing work; normally. Need PDF::NumberTree (PDF::Class) to be able to
+# finishing work; Need PDF::NumberTree (PDF::Class) to be able to
 # merge this into an existing ParentTree
 my ($struct-tree, $Nums) = $doc.build-struct-tree;
 $pdf.Root<StructTreeRoot> = $struct-tree;
 ($pdf.Root<MarkedInfo> //= {})<Marked> = True;
 for @$Nums -> $n, $parent {
-    $parent<StructParents> = $n;
+##    $parent<StructParents> = $n;
 }
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }

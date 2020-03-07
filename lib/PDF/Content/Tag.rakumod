@@ -140,15 +140,16 @@ our class Set {
             if @k {
                 $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
             }
-            if %nums {
-                my $n = 0;
-                for %nums.sort(*.value) {
-                    my $parent := .key;
-                    @Nums.push: $n;
-                    @Nums.push: $parent;
-                    $n += .value;
-                }
-                $struct-tree<ParentTree> = %( :@Nums );
+# Not correct (issue #4)
+##            if %nums {
+##                my $n = 0;
+##                for %nums.sort(*.value) {
+##                    my $parent := .key;
+##                    @Nums.push: $n;
+##                    @Nums.push: $parent;
+##                    $n += .value;
+##                }
+##                $struct-tree<ParentTree> = %( :@Nums );
             }
         }
 
