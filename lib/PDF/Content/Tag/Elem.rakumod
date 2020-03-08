@@ -21,7 +21,7 @@ method do(PDF::Content $gfx, PDF::Content::XObject $xobj, |c) {
 
     if $xobj ~~ PDF::Content::XObject['Form'] {
         my $owner = $gfx.owner;
-        my PDF::Content::Tag @marks = $xobj.gfx.tags.children.grep(*.mcid.defined);
+        my PDF::Content::Tag @marks = $xobj.gfx.tags.descendants.grep(*.mcid.defined);
         for @marks {
             self.add-kid: .clone(:$owner, :content($xobj));
         }

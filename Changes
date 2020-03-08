@@ -2,6 +2,7 @@ Release 0.4.3
 - withdrew implicit content tagging in .print() and .do() methods
 - replaced with new PDF::Content::Tag::Elem .mark() and .do() methods
 - remove FakeGfxParent role from test suite. Just use PDFTiny.
+- fixed building of Structured Parent Tree
 
 Release 0.4.2
 - rename class PDF::Content::Tag::Marked -> PDF::Content::Tag::Mark

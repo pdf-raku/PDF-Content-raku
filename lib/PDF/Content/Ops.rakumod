@@ -378,7 +378,7 @@ class PDF::Content::Ops {
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
-    method tags handles<open-tag close-tag add-tag open-tags closed-tag descendant-tags> {
+    method tags handles<open-tag close-tag add-tag open-tags closed-tag descendants> {
         $!parent.tags;
     }
 

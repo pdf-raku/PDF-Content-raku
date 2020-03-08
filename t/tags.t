@@ -66,9 +66,10 @@ $page.graphics: -> $gfx {
         :Rect[71, 717, 190, 734],
         :Border[16, 16, 1, [3, 2]],
         :Dest[ { :Type(:name<Page>) }, :name<FitR>, -4, 399, 199, 533 ],
+        :P($page),
     };
 
-    $doc.add-kid(Link).add-kid($link);
+    $doc.add-kid(Link).add-kid($link, :owner($page));
 
     my  PDF::Content::XObject $form = $page.xobject-form: :BBox[0, 0, 200, 50];
     $form.text: {
@@ -82,14 +83,8 @@ $page.graphics: -> $gfx {
 }
 
 is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P,Form,Link,Figure';
-# finishing work; Need PDF::NumberTree (PDF::Class) to be able to
-# merge this into an existing ParentTree
-my ($struct-tree, $Nums) = $doc.build-struct-tree;
-$pdf.Root<StructTreeRoot> = $struct-tree;
+$pdf.Root<StructTreeRoot> = $doc.build-struct-tree;
 ($pdf.Root<MarkedInfo> //= {})<Marked> = True;
-for @$Nums -> $n, $parent {
-##    $parent<StructParents> = $n;
-}
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }
 

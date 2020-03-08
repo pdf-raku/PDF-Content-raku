@@ -3,8 +3,8 @@ use v6;
 unit class PDF::Content::Tag;
 
 use PDF::COS;
+use PDF::COS::Array;
 use PDF::COS::Dict;
-use Method::Also;
 
 has Str $.name is rw;
 has Str $.op;
@@ -87,7 +87,7 @@ method gist {
         !! "<{$.name}$attributes/>";
 }
 
-method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
+method build-struct-elem(PDF::COS::Dict :parent($P)!, :%parents) {
 
     my $elem = PDF::COS.coerce: %(
         :Type( :name<StructElem> ),
@@ -95,7 +95,7 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%nums) {
         :$P,
     );
 
-    my @k = $.kids.build-struct-elems($elem, :%nums);
+    my @k = $.kids.build-struct-elems($elem, :%parents);
     if @k {
         $elem<K> = @k > 1 ?? @k !! @k[0];
     }
@@ -124,36 +124,41 @@ our class Set {
     has Node @.tags handles<grep map AT-POS Bool shift push elems>;
     method  children { @!tags }
     method take-descendants { @!tags.grep(PDF::Content::Tag).map(*.take-descendants) }
-    method descendant-tags { gather self.take-descendants }
+    method descendants { gather self.take-descendants }
 
     method build-struct-elems($parent, |c) {
         [ @!tags.map(*.build-struct-elem(:$parent, |c)).grep(*.defined) ];
     }
 
     method build-struct-tree {
+        my %parents{Any};
         my PDF::COS::Dict $struct-tree = PDF::COS.coerce: { :Type( :name<StructTreeRoot> ) };
-        my @Nums;
 
         if @!tags {
-            my UInt %nums{Any};
-            my @k = @.build-struct-elems($struct-tree, :%nums);
+            my @k = @.build-struct-elems($struct-tree, :%parents);
             if @k {
                 $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
             }
-# Not correct (issue #4)
-##            if %nums {
-##                my $n = 0;
-##                for %nums.sort(*.value) {
-##                    my $parent := .key;
-##                    @Nums.push: $n;
-##                    @Nums.push: $parent;
-##                    $n += .value;
-##                }
-##                $struct-tree<ParentTree> = %( :@Nums );
-##            }
+            if %parents {
+                # build a simple flat number tree
+                my @Nums;
+                my $n = 0;
+                for %parents.keys -> $obj {
+                    my $parent := %parents{$obj};
+                    if $parent ~~ Array {
+                        $obj<StructParents> = $n;
+                    }
+                    else {
+                        $obj<StructParent> = $n;
+                    }
+                    @Nums.push: $n++;
+                    @Nums.push: $parent;
+                }
+                $struct-tree<ParentTree> = %( :@Nums );
+            }
         }
 
-        ($struct-tree, @Nums);
+        $struct-tree;
     }
 
     method gist { @!tags.map(*.gist).join }

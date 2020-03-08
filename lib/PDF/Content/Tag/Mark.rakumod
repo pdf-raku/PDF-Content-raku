@@ -17,7 +17,7 @@ has PDF::COS::Stream $.content;
 
 method content { $!content // $!owner }
 
-method build-struct-elem(:%nums) {
+method build-struct-elem(:%parents) {
     with $!mcid -> $MCID {
         fail "only applicable to page content"
             unless $!owner ~~ PageLike;
@@ -32,9 +32,7 @@ method build-struct-elem(:%nums) {
            else {
                $!owner;
            }
-           given %nums{$obj} {
-               $_ = $MCID if !.defined || $_ < $MCID;
-           }
+           %parents{$obj}.push: $mcr;
            $mcr;
         }
     }
@@ -42,3 +40,4 @@ method build-struct-elem(:%nums) {
         fail "unmarked";
     }
 }
+
