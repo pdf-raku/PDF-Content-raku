@@ -51,7 +51,7 @@ $page.graphics: -> $gfx {
     my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
 
     my @rect;
-    $tag = $doc.add-kid(Form).mark: $gfx, {
+    $tag = $doc.add-kid(Figure).mark: $gfx, {
         @rect = outer-rect([
             $gfx.do($img, :position[50, 70]),
             $gfx.say("Eureka!", :tag<Caption>, :position[40, 60]),
@@ -65,11 +65,11 @@ $page.graphics: -> $gfx {
         :Subtype(:name<Link>),
         :Rect[71, 717, 190, 734],
         :Border[16, 16, 1, [3, 2]],
-        :Dest[ { :Type(:name<Page>) }, :name<FitR>, -4, 399, 199, 533 ],
+        :Dest[ $page, :name<FitR>, -4, 399, 199, 533 ],
         :P($page),
     };
 
-    $doc.add-kid(Link).add-kid($link, :owner($page));
+    $doc.add-kid(Link).reference($gfx, $link);
 
     my  PDF::Content::XObject $form = $page.xobject-form: :BBox[0, 0, 200, 50];
     $form.text: {
@@ -79,12 +79,13 @@ $page.graphics: -> $gfx {
         .mark: Paragraph, { .say: "Some sample tagged text", :font($body-font), :$font-size};
     }
 
-    $doc.add-kid(Figure).do($gfx, $form, :position[150, 70]);
+    $doc.add-kid(Form).do($gfx, $form, :import, :position[150, 70]);
 }
 
-is $doc.descendant-tags.map(*.name).join(','), 'Document,H1,P,Form,Link,Figure';
+is $doc.descendants.map(*.name).join(','), 'Document,H1,P,Figure,Link,Form';
 $pdf.Root<StructTreeRoot> = $doc.build-struct-tree;
-($pdf.Root<MarkedInfo> //= {})<Marked> = True;
+.<Marked> = True
+    given $pdf.Root<MarkInfo> //= {};
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }
 

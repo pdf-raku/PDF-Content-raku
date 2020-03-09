@@ -111,7 +111,7 @@ method take-descendants {
     take self;
     $!kids.take-descendants;
 }
-method descendant-tags { gather self.take-descendants }
+method descendants { gather self.take-descendants }
 
 method build-struct-tree {
     .build-struct-tree
