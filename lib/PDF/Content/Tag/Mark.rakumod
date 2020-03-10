@@ -17,7 +17,7 @@ has PDF::COS::Stream $.content;
 
 method content { $!content // $!owner }
 
-method build-struct-elem(:%parents) {
+method build-struct-node(:%parents) {
     with $!mcid -> $MCID {
         fail "only applicable to page content"
             unless $!owner ~~ PageLike;

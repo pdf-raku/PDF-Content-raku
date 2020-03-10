@@ -106,19 +106,21 @@ Methods for managing PDF Marks/Tags (exprimental)
 use v6;
 use lib 't';
 use PDFTiny;
-use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags;
+use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags, :StructureTags;
+use PDF::Content::Tag::Root;
 use PDF::Content::Tag::Elem;
 
 my PDFTiny $pdf .= new;
 ## -- Create logical (tagged) document root -- #
-my PDF::Content::Tag::Elem $doc .= new: :name<Document>, :attributes{ :test<yep> };
+my PDF::Content::Tag::Root $tags .= new;
+my PDF::Content::Tag::Elem $doc = $tags.add-kid(Document);
 
 my $page = $pdf.add-page;
 $page.graphics: -> $gfx {
     my $header-font = $gfx.core-font( :family<Helvetica>, :weight<bold> );
     my $body-font   = $gfx.core-font( :family<Helvetica> );
 
-    # -- Add document header -- #
+    # -- Add document header tag -- #
     $doc.add-kid(Header1).mark: $gfx, {
         .say('Header text',
              :font($header-font),
@@ -126,7 +128,7 @@ $page.graphics: -> $gfx {
              :position[50, 120]);
     }
 
-    # -- Add paragraph -- #
+    # -- Add tagged paragraph -- #
     $doc.add-kid(Paragraph).mark: $gfx, {
         .say('Some body text', :position[50, 100], :font($body-font), :font-size(12));
     }
@@ -136,7 +138,7 @@ $page.graphics: -> $gfx {
     $doc.add-kid(Figure).do: $gfx, $img;
     my $dest-page = $pdf.add-page;
 
-    # -- Add annotation -- ##
+    # -- Add annotation -- #
     my Hash $link-annot = PDF::COS.coerce: :dict{
         :Type(:name<Annot>),
         :Subtype(:name<Link>),
@@ -158,20 +160,27 @@ $page.graphics: -> $gfx {
         .mark: Paragraph, { .say: "Some sample tagged text", :font($body-font), :$font-size};
     }
 
-    $doc.add-kid(Form).do($gfx, $form, :import, :position[150, 70]);
+    $doc.add-kid(Form).do($gfx, $form, :marks, :position[150, 70]);
 }
 
 # build the struct tree
-$pdf.Root<StructTreeRoot> = $doc.build-struct-tree;
+$pdf.Root<StructTreeRoot> = $tags.build-struct-tree;
 # define the PDF as being marked
 .<Marked> = True
     given $pdf.Root<MarkInfo> //= {};
+
+# re-read content marks
+$pdf .= open: "t/tags.pdf";
+
+say $pdf.page(1).render.tags.gist; # <H1 MCID="0"/><P MCID="1"/><Figure MCID="2"/>
 ```
 
 ## See Also
 
-- [PDF::Font::Loader] provides the ability to load and embed Type-1 and True-Type fonts.
+- [PDF::Font::Loader](https://github.com/p6-pdf/PDF-Font-Loader-p6) provides the ability to load and embed Type-1 and True-Type fonts.
 
 - [PDF::Lite](https://github.com/p6-pdf/PDF-Lite-p6) minimal creation and manipulation of PDF documents. Built directly from PDF and this module.
 
 - [PDF::API6](https://github.com/p6-pdf/PDF-API6) PDF manipulation library. Uses this module. Adds handling of outlines, options annotations, separations and device-n colors
+
+- [PDF::Tags](https://github.com/p6-pdf/PDF-Tags-raku) DOM-like reading and searching of tagged PDF content

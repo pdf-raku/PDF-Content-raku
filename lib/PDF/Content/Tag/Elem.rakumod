@@ -14,14 +14,14 @@ method set-bbox(PDF::Content $gfx, @rect) {
     self.attributes<BBox> = $gfx.base-coords(@rect).Array;
 }
 
-method do(PDF::Content $gfx, PDF::Content::XObject $xobj, Bool :$import, |c) {
+method do(PDF::Content $gfx, PDF::Content::XObject $xobj, Bool :$marks, |c) {
     my @rect = $gfx.do($xobj, |c);
 
-    if $import && $xobj ~~ PDF::Content::XObject['Form'] {
-        # import tags from the xobject
+    if $marks && $xobj ~~ PDF::Content::XObject['Form'] {
+        # import marked content tags from the xobject
         my $owner = $gfx.owner;
-        my PDF::Content::Tag @marks = $xobj.gfx.tags.descendants.grep(*.mcid.defined);
-        for @marks {
+        my PDF::Content::Tag @tags = $xobj.gfx.tags.descendants.grep(*.mcid.defined);
+        for @tags {
             my $mcr = .clone(:$owner, :content($xobj));
             my $name = $mcr.name;
             my $kid = self.new: :$name;

@@ -1,12 +1,13 @@
 use v6;
 use Test;
-plan 8;
+plan 9;
 
 use lib 't';
 use PDFTiny;
-use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags;
+use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags, :StructureTags;
 use PDF::Content::Tag::Elem;
 use PDF::Content::Tag::Mark;
+use PDF::Content::Tag::Root;
 use PDF::Content::XObject;
 
 # ensure consistant document ID generation
@@ -15,10 +16,11 @@ srand(123456);
 my PDFTiny $pdf .= new;
 
 my $page = $pdf.add-page;
-my $header-font = $page.core-font( :family<Helvetica>, :weight<bold> );
-my $body-font = $page.core-font( :family<Helvetica> );
+my $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
+my $body-font = $page.core-font: :family<Helvetica>;
 
-my PDF::Content::Tag::Elem $doc .= new: :name<Document>, :attributes{ :test<yep> };
+my PDF::Content::Tag::Root:D $tags .= new;
+my PDF::Content::Tag::Elem $doc = $tags.add-kid(Document);
 
 $page.graphics: -> $gfx {
     my PDF::Content::Tag $tag;
@@ -79,14 +81,20 @@ $page.graphics: -> $gfx {
         .mark: Paragraph, { .say: "Some sample tagged text", :font($body-font), :$font-size};
     }
 
-    $doc.add-kid(Form).do($gfx, $form, :import, :position[150, 70]);
+    $doc.add-kid(Form).do: $gfx, $form, :marks, :position[150, 70];
 }
 
 is $doc.descendants.map(*.name).join(','), 'Document,H1,P,Figure,Link,Form';
-$pdf.Root<StructTreeRoot> = $doc.build-struct-tree;
+$pdf.Root<StructTreeRoot> = $tags.build-struct-tree;
 .<Marked> = True
     given $pdf.Root<MarkInfo> //= {};
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }
+
+# check we can re-read tagged content
+
+$pdf .= open: "t/tags.pdf";
+
+is $pdf.page(1).render.tags.gist, '<H1 MCID="0"/><P MCID="1"/><Figure MCID="2"/>';
 
 done-testing;

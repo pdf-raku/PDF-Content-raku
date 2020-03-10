@@ -66,7 +66,7 @@ multi method add-kid(Hash $object, :$owner = self.owner) {
     $.add-kid((require ::('PDF::Content::Tag::Object')).new: :$object, :$owner);
 }
 
-multi method add-kid(Str $name, *%attributes) {
+multi method add-kid(Str:D $name, *%attributes) {
     $.add-kid((require ::('PDF::Content::Tag::Elem')).new: :$name, :%attributes);
 }
 
@@ -87,7 +87,7 @@ method gist {
         !! "<{$.name}$attributes/>";
 }
 
-method build-struct-elem(PDF::COS::Dict :parent($P)!, :%parents) {
+method build-struct-node(PDF::COS::Dict :parent($P)!, :%parents) {
 
     my $elem = PDF::COS.coerce: %(
         :Type( :name<StructElem> ),
@@ -95,7 +95,7 @@ method build-struct-elem(PDF::COS::Dict :parent($P)!, :%parents) {
         :$P,
     );
 
-    my @k = $.kids.build-struct-elems($elem, :%parents);
+    my @k = $.kids.build-struct-kids($elem, :%parents);
     if @k {
         $elem<K> = @k > 1 ?? @k !! @k[0];
     }
@@ -126,39 +126,8 @@ our class Set {
     method take-descendants { @!tags.grep(PDF::Content::Tag).map(*.take-descendants) }
     method descendants { gather self.take-descendants }
 
-    method build-struct-elems($parent, |c) {
-        [ @!tags.map(*.build-struct-elem(:$parent, |c)).grep(*.defined) ];
-    }
-
-    method build-struct-tree {
-        my %parents{Any};
-        my PDF::COS::Dict $struct-tree = PDF::COS.coerce: { :Type( :name<StructTreeRoot> ) };
-
-        if @!tags {
-            my @k = @.build-struct-elems($struct-tree, :%parents);
-            if @k {
-                $struct-tree<K> = +@k > 1 ?? @k !! @k[0];
-            }
-            if %parents {
-                # build a simple flat number tree
-                my @Nums;
-                my $n = 0;
-                for %parents.keys -> $obj {
-                    my $parent := %parents{$obj};
-                    if $parent ~~ Array {
-                        $obj<StructParents> = $n;
-                    }
-                    else {
-                        $obj<StructParent> = $n;
-                    }
-                    @Nums.push: $n++;
-                    @Nums.push: $parent;
-                }
-                $struct-tree<ParentTree> = %( :@Nums );
-            }
-        }
-
-        $struct-tree;
+    method build-struct-kids($parent, |c) {
+        [ @!tags.map(*.build-struct-node(:$parent, |c)).grep(*.defined) ];
     }
 
     method gist { @!tags.map(*.gist).join }

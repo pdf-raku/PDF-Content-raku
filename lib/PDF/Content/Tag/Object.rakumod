@@ -9,7 +9,7 @@ my subset PageLike of Hash where .<Type> ~~ 'Page';
 has PageLike $.owner is required;
 has PDF::COS::Dict $.object is required; # referenced object
 
-method build-struct-elem(:%parents) {
+method build-struct-node(:%parents) {
     given $!object -> $Obj {
         my $elem = PDF::COS.coerce: %(
             :Type( :name<OBJR> ),
