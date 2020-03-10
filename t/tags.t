@@ -19,7 +19,7 @@ my $page = $pdf.add-page;
 my $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
 my $body-font = $page.core-font: :family<Helvetica>;
 
-my PDF::Content::Tag::Root:D $tags .= new;
+my PDF::Content::Tag::Root $tags .= new;
 my PDF::Content::Tag::Elem $doc = $tags.add-kid(Document);
 
 $page.graphics: -> $gfx {
