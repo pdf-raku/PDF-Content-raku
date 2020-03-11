@@ -87,25 +87,7 @@ method gist {
         !! "<{$.name}$attributes/>";
 }
 
-method build-struct-node(PDF::COS::Dict :parent($P)!, :%parents) {
-
-    my $elem = PDF::COS.coerce: %(
-        :Type( :name<StructElem> ),
-        :S( :$!name ),
-        :$P,
-    );
-
-    my @k = $.kids.build-struct-kids($elem, :%parents);
-    if @k {
-        $elem<K> = @k > 1 ?? @k !! @k[0];
-    }
-
-    if %!attributes {
-        $elem<A> = PDF::COS.coerce: :dict(%!attributes);
-    }
-
-    $elem;
-}
+method build-struct-node(|) { ... }
 
 method take-descendants {
     take self;

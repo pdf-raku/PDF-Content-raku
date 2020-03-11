@@ -40,3 +40,23 @@ method reference(PDF::Content $gfx, PDF::COS::Dict $object, |c) {
     my $owner = $gfx.owner;
     self.add-kid($object, :$owner);
 }
+
+method build-struct-node(PDF::COS::Dict :parent($P)!, :%parents) {
+
+    my $elem = PDF::COS.coerce: %(
+        :Type( :name<StructElem> ),
+        :S( :$.name ),
+        :$P,
+    );
+
+    my @k = $.kids.build-struct-kids($elem, :%parents);
+    if @k {
+        $elem<K> = @k > 1 ?? @k !! @k[0];
+    }
+
+    my %dict := %.attributes;
+    $elem<A> = PDF::COS.coerce: :%dict
+        if %dict;
+
+    $elem;
+}
