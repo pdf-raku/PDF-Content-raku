@@ -98,82 +98,6 @@ $gfx.StrokeColor = color $red; # Color objects
 $gfx.Restore;
 ```
 
-### `PDF::Content::Tag`
-
-Methods for managing PDF Marks/Tags (exprimental) 
-
-```
-use v6;
-use lib 't';
-use PDFTiny;
-use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags, :StructureTags;
-use PDF::Content::Tag::Root;
-use PDF::Content::Tag::Elem;
-
-my PDFTiny $pdf .= new;
-## -- Create logical (tagged) document root -- #
-my PDF::Content::Tag::Root $tags .= new;
-my PDF::Content::Tag::Elem $doc = $tags.add-kid(Document);
-
-my $page = $pdf.add-page;
-$page.graphics: -> $gfx {
-    my $header-font = $gfx.core-font( :family<Helvetica>, :weight<bold> );
-    my $body-font   = $gfx.core-font( :family<Helvetica> );
-
-    # -- Add document header tag -- #
-    $doc.add-kid(Header1).mark: $gfx, {
-        .say('Header text',
-             :font($header-font),
-             :font-size(15),
-             :position[50, 120]);
-    }
-
-    # -- Add tagged paragraph -- #
-    $doc.add-kid(Paragraph).mark: $gfx, {
-        .say('Some body text', :position[50, 100], :font($body-font), :font-size(12));
-    }
-
-    # -- Add image -- #
-    my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-    $doc.add-kid(Figure).do: $gfx, $img;
-    my $dest-page = $pdf.add-page;
-
-    # -- Add annotation -- #
-    my Hash $link-annot = PDF::COS.coerce: :dict{
-        :Type(:name<Annot>),
-        :Subtype(:name<Link>),
-        :Rect[71, 717, 190, 734],
-        :Border[16, 16, 1, [3, 2]],
-        :Dest[ $dest-page, :name<FitR>, -4, 399, 199, 533 ],
-        :P($page),
-    };
-
-    $doc.add-kid(Link).reference($gfx, $link-annot);
-
-    ## -- Add form x-object, import tags
-    my  PDF::Content::XObject $form = $page.xobject-form: :BBox[0, 0, 200, 50];
-    $form.text: {
-        my $font-size = 12;
-        .text-position = [10, 38];
-        # marked sections to be exported
-        .mark: Header1, { .say: "Tagged XObject header", :font($header-font), :$font-size};
-        .mark: Paragraph, { .say: "Some sample tagged text", :font($body-font), :$font-size};
-    }
-
-    $doc.add-kid(Form).do($gfx, $form, :marks, :position[150, 70]);
-}
-
-# build the struct tree
-$pdf.Root<StructTreeRoot> = $tags.build-struct-tree;
-# define the PDF as being marked
-.<Marked> = True
-    given $pdf.Root<MarkInfo> //= {};
-
-# re-read content marks
-$pdf .= open: "t/tags.pdf";
-
-say $pdf.page(1).render.tags.gist; # <H1 MCID="0"/><P MCID="1"/><Figure MCID="2"/>
-```
 
 ## See Also
 
@@ -183,4 +107,4 @@ say $pdf.page(1).render.tags.gist; # <H1 MCID="0"/><P MCID="1"/><Figure MCID="2"
 
 - [PDF::API6](https://github.com/p6-pdf/PDF-API6) PDF manipulation library. Uses this module. Adds handling of outlines, options annotations, separations and device-n colors
 
-- [PDF::Tags](https://github.com/p6-pdf/PDF-Tags-raku) DOM-like reading and searching of tagged PDF content
+- [PDF::Tags](https://github.com/p6-pdf/PDF-Tags-raku) DOM-like reading and searching of tagged PDF content (under construction)
