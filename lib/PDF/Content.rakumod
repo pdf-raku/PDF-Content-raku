@@ -9,7 +9,6 @@ class PDF::Content:ver<0.4.4>
     use PDF::Content::Text::Block;
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
-    use PDF::Content::Tag::Object;
 
     my subset Align of Str where 'left' | 'center' | 'right';
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
@@ -76,10 +75,6 @@ class PDF::Content:ver<0.4.4>
         meth(self);
         $.EndMarkedContent;
         $.closed-tag;
-    }
-
-    multi method tag(Str $name, Hash $object, *%attributes) {
-        self.add-tag: PDF::Content::Tag::Object.new: :$name, :$.owner, :$object, :%attributes;
     }
 
     # to allow e.g. $gfx.tag.Header({ ... });

@@ -5,7 +5,6 @@ plan 6;
 use lib 't';
 use PDFTiny;
 use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags, :StructureTags;
-use PDF::Content::Tag::Mark;
 use PDF::Content::XObject;
 
 # ensure consistant document ID generation
