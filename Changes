@@ -1,3 +1,8 @@
+Release 0.4.4
+- Remove PDF::Content::Tag::* subclasses. Strip back to content
+  related tags only. Fuctionality exported to PDF::Tags (under
+  construction).
+  
 Release 0.4.3
 - withdrew implicit content tagging in .print() and .do() methods
 - replaced with new PDF::Content::Tag::Elem .mark() and .do() methods
@@ -8,7 +13,7 @@ Release 0.4.3
 Release 0.4.2
 - rename class PDF::Content::Tag::Marked -> PDF::Content::Tag::Mark
 - remove tag-name check on marked content tags. Anything is allowed (it's
-  only struct elem nodes that next to be named correctly).
+  only struct elem nodes thayt next to be named correctly).
 - also remove BBox attribute from Marked cotnent and rename tags to /Text
   and /Image respectively.
 

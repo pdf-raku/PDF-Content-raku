@@ -5,14 +5,22 @@ unit class PDF::Content::Tag;
 use PDF::COS;
 use PDF::COS::Array;
 use PDF::COS::Dict;
+use PDF::COS::Stream;
+
+my subset PageLike of Hash where .<Type> ~~ 'Page';
+my subset Owner where PageLike|PDF::COS::Stream;
+our class Set {...}
 
 has Str $.name is rw;
 has Str $.op;
 has %.attributes;
-
+has Owner $.owner is required;
+has UInt $.start is rw;
+has UInt $.end is rw;
+has UInt $.mcid is rw; # marked content identifer
+has PDF::COS::Stream $.content;
 has PDF::Content::Tag $.parent is rw; # hierarchical parent
-our class Set {...}
-has Set $.kids handles<AT-POS list grep map tags children> .= new;
+has Set $.kids handles<AT-POS list grep map tags children elems> .= new;
 
 #| See [PDF 32000 Tables 333 - Standard structure types for grouping elements]
 my enum StructureTags is export(:StructureTags,:Tags) (
@@ -101,7 +109,6 @@ method build-struct-tree {
 }
 
 our class Set {
-
     my subset Node where PDF::Content::Tag | Str;
     has Node @.tags handles<grep map AT-POS Bool shift push elems>;
     method  children { @!tags }
