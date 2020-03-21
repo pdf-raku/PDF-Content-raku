@@ -1,6 +1,6 @@
 # PDF::Content
 
-This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, basic colors, core fonts and general graphics.
+This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, basic colors, core fonts, marked content and general graphics.
 
 It is centered around implementing a graphics state machine and provding support for the operators and graphics variables
 as listed in the [PDF::API6 Graphics Documentation](https://github.com/p6-pdf/PDF-API6#appendix-i-graphics).
@@ -98,6 +98,55 @@ $gfx.StrokeColor = color $red; # Color objects
 $gfx.Restore;
 ```
 
+## `PDF::Content::Tag`
+
+This class assists in the detection or construction of marked content
+in page or xobject form content streams:
+
+```
+use lib 't';
+use PDFTiny;
+use PDF::Content::XObject;
+use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
+
+my PDFTiny $pdf .= new;
+
+my $page = $pdf.add-page;
+my $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
+my $body-font = $page.core-font: :family<Helvetica>;
+
+$page.graphics: -> $gfx {
+    my PDF::Content::Tag $tag;
+
+    $tag = $gfx.mark: Header1, {
+        .say('Header text',
+             :font($header-font),
+             :font-size(15),
+             :position[50, 120]);
+    }
+
+    say $tag.name.Str; # 'H1'
+    say $tag.mcid;     # marked content id of 0
+
+    $tag = $gfx.mark: Paragraph, {
+        .say('Paragraph that contains a figure', :position[50, 100], :font($body-font), :font-size(12));
+
+        # nested tag. Note: marks cannot be nested
+        .tag: Figure, {
+            my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
+            .do($img);
+        }
+
+    }
+
+    say $tag.name.Str;         # 'P'
+    say $tag.mcid;             # marked content id of 1
+    say $tag.kids[0].name.Str; # 'Figure'
+}
+
+say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
+
+```
 
 ## See Also
 

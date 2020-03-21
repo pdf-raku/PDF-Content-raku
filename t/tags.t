@@ -1,10 +1,10 @@
 use v6;
 use Test;
-plan 6;
+plan 7;
 
 use lib 't';
 use PDFTiny;
-use PDF::Content::Tag :ParagraphTags, :InlineElemTags, :IllustrationTags, :StructureTags;
+use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
 use PDF::Content::XObject;
 
 # ensure consistant document ID generation
@@ -30,32 +30,20 @@ $page.graphics: -> $gfx {
     is $tag.mcid, 0, 'mark tag mcid';
 
     $tag = $gfx.mark: Paragraph, {
-        .say('Some body text', :position[50, 100], :font($body-font), :font-size(12));
-    }
-    is $tag.name, 'P', 'inner tag name';
+        .say('Paragraph that contains a figure', :position[50, 100], :font($body-font), :font-size(12));
 
-    sub outer-rect(*@rects) {
-        [
-            @rects.map(*[0].round).min, @rects.map(*[1].round).min,
-            @rects.map(*[2].round).max, @rects.map(*[3].round).max,
-        ]
-    }
-
-    my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-
-    my  PDF::Content::XObject $form = $page.xobject-form: :BBox[0, 0, 200, 50];
-    $gfx.tag: Figure, {
-        $form.text: {
-            my $font-size = 12;
-            .text-position = [10, 38];
-            .mark: Header1, { .say: "Tagged XObject header", :font($header-font), :$font-size};
-            .mark: Paragraph, { .say: "Some sample tagged text", :font($body-font), :$font-size};
+        .tag: Figure, {
+            my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
+            .do($img);
         }
+
     }
 
+    is $tag.name, 'P', 'outer tag name';
+    is $tag.kids[0].name, 'Figure', 'innter tag name';
 }
 
-is $page.gfx.tags.gist, '<H1 MCID="0"/><P MCID="1"/><Figure/>';
+is $page.gfx.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }
 
@@ -63,6 +51,6 @@ lives-ok { $pdf.save-as: "t/tags.pdf" }
 
 $pdf .= open: "t/tags.pdf";
 
-is $pdf.page(1).render.tags.gist, '<H1 MCID="0"/><P MCID="1"/><Figure/>';
+is $pdf.page(1).render.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 
 done-testing;
