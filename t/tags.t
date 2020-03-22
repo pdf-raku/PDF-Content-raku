@@ -34,7 +34,7 @@ $page.graphics: -> $gfx {
 
         .tag: Figure, {
             my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-            .do($img);
+            .do: $img, :position[50,70];
         }
 
     }

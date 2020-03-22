@@ -70,14 +70,6 @@ multi method add-kid(PDF::Content::Tag $kid) {
     $kid;
 }
 
-multi method add-kid(Hash $object, :$owner = self.owner) {
-    $.add-kid((require ::('PDF::Content::Tag::Object')).new: :$object, :$owner);
-}
-
-multi method add-kid(Str:D $name, *%attributes) {
-    $.add-kid((require ::('PDF::Content::Tag::Elem')).new: :$name, :%attributes);
-}
-
 method !attributes-gist {
     given %!attributes {
         my %a = $_;
@@ -95,29 +87,19 @@ method gist {
         !! "<{$.name}$attributes/>";
 }
 
-method build-struct-node(|) { ... }
-
 method take-descendants {
     take self;
     $!kids.take-descendants;
 }
-method descendants { gather self.take-descendants }
 
-method build-struct-tree {
-    .build-struct-tree
-        given PDF::Content::Tag::Set.new: :tags[self];
-}
+method descendants { gather self.take-descendants }
 
 our class Set {
     my subset Node where PDF::Content::Tag | Str;
     has Node @.tags handles<grep map AT-POS Bool shift push elems>;
-    method  children { @!tags }
+
+    method children { @!tags }
     method take-descendants { @!tags.grep(PDF::Content::Tag).map(*.take-descendants) }
     method descendants { gather self.take-descendants }
-
-    method build-struct-kids($parent, |c) {
-        [ @!tags.map(*.build-struct-node(:$parent, |c)).grep(*.defined) ];
-    }
-
     method gist { @!tags.map(*.gist).join }
 }

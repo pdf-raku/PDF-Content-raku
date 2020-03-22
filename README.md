@@ -134,7 +134,7 @@ $page.graphics: -> $gfx {
         # nested tag. Note: marks cannot be nested
         .tag: Figure, {
             my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
-            .do($img);
+            .do: $img, :position[50,70];
         }
 
     }
@@ -156,4 +156,4 @@ say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 
 - [PDF::API6](https://github.com/p6-pdf/PDF-API6) PDF manipulation library. Uses this module. Adds handling of outlines, options annotations, separations and device-n colors
 
-- [PDF::Tags](https://github.com/p6-pdf/PDF-Tags-raku) DOM-like reading and searching of tagged PDF content (under construction)
+- [PDF::Tags](https://github.com/p6-pdf/PDF-Tags-raku) DOM-like creation and reading of tagged PDF structure (under construction)
