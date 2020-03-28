@@ -2,6 +2,9 @@ Release 0.4.4
 - Remove PDF::Content::Tag::* subclasses. Strip back to content
   related tags only. Fuctionality exported to PDF::Tags (under
   construction).
+- PDF::Content.print() method now aggregates printed text in $*ActualText
+  if this variable is present in the lexpad. Utilized by the .mark()
+  method in PDF::TAGS::Elem.
   
 Release 0.4.3
 - withdrew implicit content tagging in .print() and .do() methods

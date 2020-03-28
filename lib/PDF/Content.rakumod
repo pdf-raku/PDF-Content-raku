@@ -323,6 +323,12 @@ class PDF::Content:ver<0.4.4>
 
         self.EndText() unless in-text;
 
+        with $*ActualText {
+            # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
+            $_ ~= $text-block.text;
+            $_ ~= "\n" if $nl;
+        }
+
         my \x0 = $x + $dx;
         my \y0 = $y + $dy;
         my \x1 = x0 + $text-block.width;
