@@ -333,7 +333,8 @@ class PDF::Content::Ops {
             STORE => -> $, Pair $_ {
                 my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
                 unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
-                    with device-colorspace($key) -> $cs {
+                    my $cs := device-colorspace($key);
+                    if $cs {
                         self."SetStroke$cs"(|.value.clone);
                     }
                     else {
