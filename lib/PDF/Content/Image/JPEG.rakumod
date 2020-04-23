@@ -50,7 +50,7 @@ class PDF::Content::Image::JPEG
         }
 
         $fh.seek(0, SeekFromBeginning);
-        $!encoded = $fh.read.decode: "latin-1";
+        $!encoded = $fh.slurp-rest(:bin).decode: "latin-1";
         $fh.close;
         self;
     }
