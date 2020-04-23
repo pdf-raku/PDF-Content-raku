@@ -46,19 +46,19 @@ role PDF::Content::Page
     }
 
     #| produce an XObject form for this page
-    method to-xobject($from = self, Array :$BBox = $from.trim-box.clone) {
-        my $Resources = $from.Resources.clone,
+    method to-xobject($page = self, Array :$BBox = $page.trim-box.clone) {
+        my $Resources = $page.Resources.clone,
 	# copy unflushed graphics
         my $xobject = self.xobject-form( :$BBox, :$Resources);
-        $xobject.pre-gfx.ops($from.pre-gfx.ops);
-        $xobject.gfx.ops($from.gfx.ops);
+        $xobject.pre-gfx.ops($page.pre-gfx.ops);
+        $xobject.gfx.ops($page.gfx.ops);
 
 	# copy content streams
-	my $contents = $from.contents;
+	my $contents = $page.contents;
         if $contents {
             $xobject.edit-stream: :append($contents);
             # inherit compression from the first stream segment
-            for $from<Contents>[0] {
+            for $page<Contents>[0] {
                 $xobject<Filter> = .clone
                     with .<Filter>;
                 $xobject<DecodeParms> = .clone
