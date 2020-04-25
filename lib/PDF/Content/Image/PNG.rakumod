@@ -281,13 +281,14 @@ class PDF::Content::Image::PNG
 	%dict<DecodeParms><Colors>--;
 
 	my uint $n = $bpc div 8;
+        my uint $nc = $n * 3;
 	my uint $i = 0;
         my uint $stream-len = +$stream;
 
 	my buf8 $rgb-channels  .= new;
 	my buf8 $alpha-channel .= new;
 	while $i < $stream-len {
-	    $rgb-channels.push( $stream[$i++] ) xx ($n*3);
+	    $rgb-channels.push( $stream[$i++] )  xx $nc;
 	    $alpha-channel.push( $stream[$i++] ) xx $n;
 	}
 

@@ -5,7 +5,6 @@ class PDF::Content:ver<0.4.5>
     is PDF::Content::Ops {
 
     use PDF::COS;
-    use PDF::COS::Stream;
     use PDF::Content::Text::Block;
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
@@ -112,7 +111,7 @@ class PDF::Content:ver<0.4.5>
 
     #| extract any inline images from the content stream. returns an array of XObject Images
     method inline-images returns Array {
-	my PDF::COS::Stream @images;
+	my PDF::Content::XObject @images;
 	for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
 	    my $bi = $.ops[$i];
 	    my $id = $.ops[$i+1];
@@ -139,7 +138,7 @@ class PDF::Content:ver<0.4.5>
     }
 
     #| place an image, or form object
-    multi method do(PDF::COS::Stream $obj! where .<Subtype> ~~ 'Image'|'Form',
+    multi method do(PDF::Content::XObject $obj!,
               Position :$position = [0, 0],
               Numeric  :$width is copy,
               Numeric  :$height is copy,
@@ -160,8 +159,6 @@ class PDF::Content:ver<0.4.5>
         my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
         my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
-        $obj does PDF::Content::XObject[$obj<Subtype>]
-            unless $obj ~~ PDF::Content::XObject;
         my $obj-width = $obj.width || 1;
         my $obj-height = $obj.height || 1;
 
