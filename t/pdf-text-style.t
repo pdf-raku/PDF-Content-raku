@@ -29,7 +29,7 @@ is-deeply $gfx.content-dump, $(
     "[ (W) 60 (orld!) ] TJ",
     "T*",
     "ET",
-    ), "hello world (with kerning)";
+     ), "hello world (with kerning)";
 
 $width = 100;
 my $height = 150;

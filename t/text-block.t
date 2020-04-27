@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 6;
+plan 8;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Block;
@@ -20,7 +20,7 @@ my $font-size = 16;
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my PDFTiny $pdf .= new;
 my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :$font-size );
-is-approx $text-block.content-width, 360.88, '$.content-width';
+is-approx $text-block.content-width, 365.328, '$.content-width';
 is-approx $text-block.content-height, 17.6, '$.content-height';
 my $gfx = $pdf.add-page.gfx;
 $gfx.Save;
@@ -30,6 +30,9 @@ $gfx.FillColor = color Blue;
 is-deeply $gfx.text-position, (100.0, 350.0), 'text position';
 $gfx.say( $text-block );
 is-deeply $gfx.text-position, (100.0, 350 - 17.6), 'text position';
+$text-block .= new( :$text, :$font, :$font-size, :squish );
+is-approx $text-block.content-width, 360.88, '$.content-width (squished)';
+is-approx $text-block.content-height, 17.6, '$.content-height (squished)';
 $text-block.TextRise = $text-block.baseline-shift('bottom');
 $gfx.print( $text-block, :!preserve );
 $gfx.EndText;
@@ -43,7 +46,7 @@ is-json-equiv [ $gfx.ops ], [
              :real(100), :real(350), ],
         :rg[ :real(0), :real(0), :real(1) ],
         :Tf[:name<F1>,   :real(16)],
-        :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
+        :Tj[ :literal("Hello.  Ting, ting-ting. Attention! \x[85] ATTENTION!")],
         :TL[:real(17.6)],
         'T*' => [],
         :Ts[ :real(3.648) ],

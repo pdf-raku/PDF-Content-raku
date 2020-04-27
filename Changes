@@ -1,6 +1,10 @@
 Release 0.4.5
 - Fix PDF::API6 #8 - truncation of large JPEG images
 - Renamed github project/repo
+- Text blocks now preserve multi spaces by default. :squish option
+  gives old behaviour - collapse multiple spaces to a single space;
+  Thanks Tom Browder
+
 Release 0.4.4
 - Remove PDF::Content::Tag::* subclasses. Strip back to content
   related tags only. Fuctionality exported to PDF::Tags (under

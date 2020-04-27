@@ -131,7 +131,7 @@ $page.graphics: -> $gfx {
     $tag = $gfx.mark: Paragraph, {
         .say('Paragraph that contains a figure', :position[50, 100], :font($body-font), :font-size(12));
 
-        # nested tag. Note: marks cannot be nested
+        # nested tag. Note: marks cannot be nested, but tags can
         .tag: Figure, {
             my PDF::Content::XObject $img .= open: "t/images/lightbulb.gif";
             .do: $img, :position[50,70];

@@ -2,6 +2,7 @@ use v6;
 use PDF;
 use PDF::Content::Interface;
 class PDFTiny is PDF does PDF::Content::Interface {
+    # tiny test class for boot-strapping of PDF::Lite, PDF::Class, etc
     use PDF::COS;
     use PDF::COS::Tie;
     use PDF::COS::Loader;

@@ -19,6 +19,7 @@ class PDF::Content::Text::Block {
     has @.overflow is rw;
     has @.images;
     has Str $.text;
+    has Bool $!squish;
 
     method content-width  { @!lines.map( *.content-width ).max }
     method content-height {
@@ -40,7 +41,7 @@ class PDF::Content::Text::Block {
         self.TWEAK( :@chunks, |c );
     }
 
-    multi submethod TWEAK(:@chunks!, |c) is default {
+    multi submethod TWEAK(:@chunks!, Bool :$!squish, |c) is default {
 	$!style .= new(|c);
         $!text = @chunks.map(*.Str).join;
 	self!layup(@chunks);
@@ -48,7 +49,7 @@ class PDF::Content::Text::Block {
 
     method !layup(@atoms is copy) is default {
         my @line-atoms;
-        my Bool $follows-ws = flush-space(@atoms);
+        my UInt $preceding-spaces = self!flush-spaces(@atoms);
         my $word-gap = self!word-gap;
 	my $height = $!style.font-size;
 
@@ -61,7 +62,7 @@ class PDF::Content::Text::Block {
             my Bool $reserving = False;
 	    my $word-width;
             my $word;
-            my $pre-word-gap = $follows-ws ?? $word-gap !! 0.0;
+            my $pre-word-gap = $preceding-spaces * $word-gap;
 
             given $atom {
                 when Str {
@@ -89,7 +90,7 @@ class PDF::Content::Text::Block {
                 $line = $line.new: :$word-gap, :$height;
                 @!lines.push: $line;
                 @line-atoms = [];
-                $follows-ws = False;
+                $preceding-spaces = 0;
                 $pre-word-gap = 0;
             }
             if $reserving {
@@ -114,23 +115,27 @@ class PDF::Content::Text::Block {
             }
 
             @line-atoms.push: $atom;
-            $line.word-boundary[+$line.words] = $follows-ws;
+            $line.spaces[+$line.words] = $preceding-spaces;
             $line.words.push: $word;
             $line.word-width += $word-width;
 	    $line.height = $height
 		if $height > $line.height;
 
-            $follows-ws = flush-space(@atoms);
+            $preceding-spaces = self!flush-spaces(@atoms);
         }
 
         @!overflow.append: @atoms;
 
     }
 
-    sub flush-space(@words) returns Bool {
-        my Bool \flush = ? (@words && @words[0] ~~ /<Text::space>/);
-        @words.shift if flush;
-        flush;
+    method !flush-spaces(@words) returns UInt {
+        if @words && @words[0] ~~ /<Text::space>/ {
+            @words.shift;
+            $!squish ?? 1 !! $/.chars;
+        }
+        else {
+            0;
+        }
     }
 
     #| calculates actual spacing between words

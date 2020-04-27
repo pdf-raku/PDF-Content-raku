@@ -9,15 +9,15 @@ class PDF::Content::Text::Line {
     has Numeric $.word-width is rw = 0; #| sum of word widths
     has Numeric $.word-gap = 0;
     has Numeric $.indent is rw = 0;
-    has Bool @.word-boundary;
+    has UInt @.spaces;
 
     method content-width returns Numeric {
-        $!word-width + @!word-boundary.grep(*.so) * $!word-gap;
+        $!word-width + @!spaces.sum * $!word-gap;
     }
 
     multi method align('justify', Numeric :$width! ) {
         my Numeric \content-width = $.content-width;
-        my Numeric \wb = +@!word-boundary.grep: *.so;
+        my Numeric \wb = +@!spaces.sum;
         my Numeric \stretch = $width / content-width;
 
         if content-width && wb && 1.0 < stretch < 2.0 {
@@ -51,11 +51,13 @@ class PDF::Content::Text::Line {
         my int $wc = 0;
 
         # flatten words. insert spaces and space adjustments.
-        # Ensure we add a space - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
+        # Ensure we add spaces - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
         for 0 ..^ +@!words -> $i {
-            if @!word-boundary[$i] {
-	        @line.push: Space;
-                @line.push: $space-pad unless $space-pad =~= 0;
+            my $spaces := @!spaces[$i];
+            if $spaces {
+	        @line.push: Space x $spaces;
+                @line.push: $space-pad * $spaces
+                    unless $space-pad =~= 0;
             }
             @line.append: @!words[$i].list;
         }
