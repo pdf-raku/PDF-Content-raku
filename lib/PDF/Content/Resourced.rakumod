@@ -2,19 +2,19 @@ use v6;
 
 role PDF::Content::Resourced {
 
-    method !resources { self.Resources //= {} }
+    method !resource-dict { self.Resources //= {} }
 
     method core-font(|c) {
-	self!resources.core-font(|c);
+	self!resource-dict.core-font(|c);
     }
     method use-font($obj, |c) {
-	self!resources.use-font($obj, |c);
+	self!resource-dict.use-font($obj, |c);
     }
     method use-resource($obj, |c) {
-	self!resources.resource($obj, |c);
+	self!resource-dict.resource($obj, |c);
     }
     method resource-key($obj, |c) {
-	self!resources.resource-key($obj, |c);
+	self!resource-dict.resource-key($obj, |c);
     }
 
     #| my %fonts = $pdf.page(1).resources('Font');

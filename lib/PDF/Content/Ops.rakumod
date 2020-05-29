@@ -209,10 +209,11 @@ class PDF::Content::Ops {
             STORE => -> $, \v {
                 unless $att.get_value(self) eqv v {
                     given self.parent {
-                        my  &grepper = sub (Hash $_) {
+                        # Match any reusable GS entry; otherwise create a new entry
+                        my &match = -> Hash $_ {
                             .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
                         }
-                        my $gs = .find-resource(&grepper, :type<ExtGState>)
+                        my $gs = .find-resource(&match, :type<ExtGState>)
                             // PDF::COS.coerce({ :Type{ :name<ExtGState> }, $key => v });
                         my Str $gs-entry = .resource-key($gs, :eqv);
 	                self.SetGraphicsState($gs-entry);

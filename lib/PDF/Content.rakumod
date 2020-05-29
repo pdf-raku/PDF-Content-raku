@@ -140,10 +140,10 @@ class PDF::Content:ver<0.4.5>
     #| place an image, or form object
     multi method do(PDF::Content::XObject $obj!,
               Position :$position = [0, 0],
-              Numeric  :$width is copy,
-              Numeric  :$height is copy,
               Align    :$align is copy  = 'left',
               Valign   :$valign is copy = 'bottom',
+              Numeric  :$width is copy,
+              Numeric  :$height is copy,
               Bool     :$inline = False,
         )  {
 
@@ -156,8 +156,6 @@ class PDF::Content:ver<0.4.5>
             when YPos-Pair { $valign = .key; $y = .value; }
             default        { $y = $_;}
         }
-        my Numeric $dx = { :left(0),   :center(-.5), :right(-1) }{$align};
-        my Numeric $dy = { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
         my $obj-width = $obj.width || 1;
         my $obj-height = $obj.height || 1;
@@ -181,11 +179,8 @@ class PDF::Content:ver<0.4.5>
             $height /= $obj-height;
         }
 
-        $dx *= $width;
-        $dy *= $height;
-
-        my \x0 = $x + $dx;
-        my \y0 = $y + $dy;
+        my \x0 = $x + $width  * { :left(0),   :center(-.5), :right(-1) }{$align};
+        my \y0 = $y + $height * { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
         self.graphics: {
             $.op(ConcatMatrix, $width, 0, 0, $height, x0, y0);
@@ -207,23 +202,29 @@ class PDF::Content:ver<0.4.5>
     }
 
     my subset Pattern of Hash where .<PatternType> ~~ 1|2;
-    my subset TilingPattern of Pattern where .<PatternType> == 1;
+    my subset TilingPattern of Pattern where .<PatternType> ~~ 1;
     method use-pattern(Pattern $pat!) {
         $pat.finish
             if $pat ~~ TilingPattern;
         :Pattern(self.resource-key($pat));
     }
 
-    multi method paint(Bool :$fill! where .so, Bool :$even-odd,
-                       Bool :$close, Bool :$stroke) {
+    method paint(Bool :$fill,  Bool :$even-odd,
+                 Bool :$close, Bool :$stroke) {
         my @paint-ops = do {
-            when $even-odd {
-                when $close { $stroke ?? <CloseEOFillStroke> !! <Close EOFill> }
-                default     { $stroke ?? <EOFillStroke>      !! <EOFill>       }
+            if $fill {
+                if $even-odd {
+                    if $close { $stroke ?? <CloseEOFillStroke> !! <Close EOFill> }
+                    else      { $stroke ?? <EOFillStroke>      !! <EOFill>       }
+                }
+                else {
+                    if $close { $stroke ?? <CloseFillStroke>   !! <Close Fill>   }
+                    else      { $stroke ?? <FillStroke>        !! <Fill>         }
+                }
             }
-            default {
-                when $close { $stroke ?? <CloseFillStroke>   !! <Close Fill>   }
-                default     { $stroke ?? <FillStroke>        !! <Fill>         }
+            else {
+                if $stroke    { $close ?? <CloseStroke> !! <Stroke> }
+                else          { <EndPath> }
             }
         }
                     
@@ -231,30 +232,21 @@ class PDF::Content:ver<0.4.5>
             for @paint-ops;
     }
 
-    multi method paint(Bool :$stroke! where .so, Bool :$close) {
-        $close ?? self.CloseStroke !! self.Stroke
-    }
-
-    multi method paint() is default {
-        self.EndPath;
-    }
-
-    method text-block($font = self!current-font[0], |c) {
+    method text-block($font = self!current-font[0], *%opt) {
         # detect and use the current text-state font
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Block.new(
-            :gfx(self), :$font, :$font-size,
-            |c,
+            :gfx(self), :$font, :$font-size, |%opt,
             );
     }
 
     #| output text leave the text position at the end of the current line
-    multi method print(Str $text,
-                       |c,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
-        ) {
-
-        my $text-block = self.text-block( :$text, |c);
-        @.print( $text-block, |c);
+    multi method print(
+        Str $text,
+        *%opt,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
+    ) {
+        my $text-block = self.text-block( :$text, |%opt);
+        @.print( $text-block, |%opt);
     }
 
     method !set-position($text-block, $position,
@@ -335,8 +327,8 @@ class PDF::Content:ver<0.4.5>
     }
 
     #| output text; move the text position down one line
-    method say($text = '', |c) {
-        @.print($text, :nl, |c);
+    method say($text = '', *%opt) {
+        @.print($text, :nl, |%opt);
     }
 
     #| thin wrapper to $.op(SetFont, ...)
@@ -376,8 +368,7 @@ class PDF::Content:ver<0.4.5>
         (
             flat @coords.map: -> $x is copy, $y is copy {
                 ($x, $y) = dot($.TextMatrix, $x, $y) if $text;
-                ($x, $y) = dot($.CTM, $x, $y) if $user;
-                $x, $y;
+                $user ?? dot($.CTM, $x, $y) !! ($x, $y);
             }
         )
     }
