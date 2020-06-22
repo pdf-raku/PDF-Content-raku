@@ -62,11 +62,12 @@ class PDFTiny is PDF does PDF::Content::Interface {
     has Catalog $.Root is entry(:required, :indirect);
 
     my class Loader is PDF::COS::Loader {
+        constant %Classes = %( :Form(XObject-Form), :Image(XObject-Image), :Page(Page), :Pages(Pages) );
         multi method load-delegate(Hash :$dict! where { from-ast($_) ~~ 'Form'|'Image' with .<Subtype> }) {
-            %( :Form(XObject-Form), :Image(XObject-Image) ){ from-ast($dict<Subtype>) };
+            %Classes{ from-ast($dict<Subtype>) };
         }
         multi method load-delegate(Hash :$dict! where { from-ast($_) ~~ 'Page'|'Pages' with .<Type> }) {
-            %( :Page(Page), :Pages(Pages) ){ from-ast($dict<Type>) };
+            %Classes{ from-ast($dict<Type>) };
         }
         multi method load-delegate(Hash :$dict! where { from-ast($_) == 1 with .<PatternType> }) {
             Tiling-Pattern
@@ -75,7 +76,11 @@ class PDFTiny is PDF does PDF::Content::Interface {
     PDF::COS.loader = Loader;
 
     method cb-init {
-	self<Root> //= { :Type( :name<Catalog> ), :Pages{ :Type( :name<Pages> ), :Kids[], :Count(0), } };
+	self<Root> //= %(
+            :Type( :name<Catalog> ),
+            :Pages{ :Type( :name<Pages> ),
+                    :Kids[], :Count(0), },
+        );
     }
 
     method Pages handles <page add-page delete-page insert-page page-count media-box crop-box bleed-box trim-box art-box core-font use-font rotate> {

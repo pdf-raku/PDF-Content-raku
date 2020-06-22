@@ -46,7 +46,7 @@ $g.Save;
 
 lives-ok {$g.SetStrokeColorSpace('DeviceRGB')};
 lives-ok {$g.SetStrokeColor(.2, .3, .4)};
-throws-like {$g.SetStrokeColor(.2, .3)}, X::PDF::Content::OP::ArgCount, :message("Incorrect number of arguments in SC command, expected 3 DeviceRGB colors, got: 2");
+throws-like {$g.SetStrokeColor(.2, .3)}, X::PDF::Content::OP::ArgCount, :message("Incorrect number of arguments in 'SC' (SetStrokeColor) command, expected 3 DeviceRGB colors, got: 2");
 
 lives-ok {$g.SetStrokeColorSpace('C1')};
 
