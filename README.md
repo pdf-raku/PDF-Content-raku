@@ -1,9 +1,12 @@
+[[Raku PDF Project]](https://pdf-raku.github.io)
+ / [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku)
+
 # PDF::Content
 
 This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, basic colors, core fonts, marked content and general graphics.
 
 It is centered around implementing a graphics state machine and provding support for the operators and graphics variables
-as listed in the [PDF::API6 Graphics Documentation](https://github.com/pdf-raku/PDF-API6#appendix-i-graphics).
+as listed in the [PDF::API6 Graphics Documentation](https://pdf-raku.github.io/PDF-API6#appendix-i-graphics).
 
 ## Key roles and classes:
 
@@ -150,10 +153,10 @@ say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 
 ## See Also
 
-- [PDF::Font::Loader](https://github.com/pdf-raku/PDF-Font-Loader-raku) provides the ability to load and embed Type-1 and True-Type fonts.
+- [PDF::Font::Loader](https://pdf-raku.github.io/PDF-Font-Loader-raku) provides the ability to load and embed Type-1 and True-Type fonts.
 
-- [PDF::Lite](https://github.com/pdf-raku/PDF-Lite-raku) minimal creation and manipulation of PDF documents. Built directly from PDF and this module.
+- [PDF::Lite](https://pdf-raku.github.io/PDF-Lite-raku) minimal creation and manipulation of PDF documents. Built directly from PDF and this module.
 
-- [PDF::API6](https://github.com/pdf-raku/PDF-API6) PDF manipulation library. Uses this module. Adds handling of outlines, options annotations, separations and device-n colors
+- [PDF::API6](https://pdf-raku.github.io/PDF-API6) PDF manipulation library. Uses this module. Adds handling of outlines, options annotations, separations and device-n colors
 
-- [PDF::Tags](https://github.com/pdf-raku/PDF-Tags-raku) DOM-like creation and reading of tagged PDF structure (under construction)
+- [PDF::Tags](https://pdf-raku.github.io/PDF-Tags-raku) DOM-like creation and reading of tagged PDF structure (under construction)
