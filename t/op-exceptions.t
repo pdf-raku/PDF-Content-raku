@@ -27,8 +27,6 @@ sub warns-like(&code, $ex-type, $desc = 'warning') {
     }
 }
 
-my $dummy-font = %() does role { method cb-finish {} }
-
 my PDF::Content $g = PDFTiny.new.add-page.gfx;
 $g.Save;
 $g.core-font( :family<Helvetica> ); # define resource /F1
@@ -67,6 +65,12 @@ lives-ok {$g.EndText};
 warns-like {$g.ShowText('there')}, X::PDF::Content::OP::Unexpected;
 
 warns-like {$g.SetLineWidth(2)}, X::PDF::Content::OP::Unexpected;
+
+$g.BeginText;
+todo "PDF::Grammar v0.2.4+ needed for bad-args test"
+    unless PDF::Grammar.^ver >= v0.2.4;
+throws-like {$g.ops("(extra-arg) 10 20 Td");}, X::PDF::Content::OP::BadArgs, :message(q{Bad 'Td' (TextMove) argument list: "extra-arg", 10, 20});
+$g.EndText;
 
 $g.Save;
 throws-like {$g.finish}, X::PDF::Content::Unclosed, :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream");

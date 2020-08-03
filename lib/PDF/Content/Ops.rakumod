@@ -47,6 +47,12 @@ class X::PDF::Content::OP::BadArg
     method message { "Bad '$.op' ($.mnemonic) argument: {$!arg.perl}" }
 }
 
+class X::PDF::Content::OP::BadArgs
+    is X::PDF::Content::OP {
+    has @.args is required;
+    method message { "Bad '$.op' ($.mnemonic) argument list: {@!args.map(*.raku).join: ', '}" }
+}
+
 class X::PDF::Content::OP::TooFewArgs
     is X::PDF::Content {
     method message { "Too few arguments to '$.op' ($.mnemonic)" }
@@ -94,6 +100,7 @@ class PDF::Content::Ops {
     has Bool  $.strict  is rw = True;
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
     method owner { $.parent }
+    has UInt $.extended-ops = 0;
 
     # some convenient mnemomic names
     my Str enum OpCode is export(:OpCode) «
@@ -618,7 +625,7 @@ class PDF::Content::Ops {
             die X::PDF::Content::OP::TooFewArgs.new: :$op, :mnemonic(%OpName{$op})
                 unless @args;
 
-            @args = @args.map: {
+            @args .= map: {
                 when Pair    {$_}
                 when Numeric { :real($_) }
                 default {
@@ -652,12 +659,16 @@ class PDF::Content::Ops {
 
             @args
         },
+
+        # unknown operator. Could be valid in a BX .. EX block
+        '??' => sub (Str, $raw) { '??' => $raw },
      );
 
     proto sub op(|c) returns Pair {*}
     # semi-raw and a little dwimmy e.g:  op('TJ' => [[:literal<a>, :hex-string<b>, 'c']])
     #                                     --> :TJ( :array[ :literal<a>, :hex-string<b>, :literal<c> ] )
     my subset Comment of Pair where {.key eq 'comment'}
+    my subset SuspectOp of Pair where {.key eq '??'}
     multi sub op(Comment $comment) { $comment }
     multi sub op(Pair $raw!) {
         my Str $op = $raw.key;
@@ -693,6 +704,27 @@ class PDF::Content::Ops {
     method is-graphics-op($op-name) {
         my constant GraphicsOps = GeneralGraphicOps ∪ ColorOps ∪ set <cm>;
         $op-name ∈ GraphicsOps;
+    }
+
+    multi method op(SuspectOp $_) is default {
+        # quaranteed by PDF::Grammar::Content as either an unknown operator
+        # or having an incorrect argument list
+        given .value {
+            my $op = .key;
+            if %OpName{$op}:exists {
+                my @args = .value.map: *.value;
+                die X::PDF::Content::OP::BadArgs.new: :$op, :@args, :mnemonic(%OpName{$op}) ;
+            }
+            else {
+                if $!extended-ops {
+                    # preserve, if we're in a BX .. EX block
+                    @!ops.push: $_;
+                }
+                else {
+                    die X::PDF::Content::OP::Unknown.new: :op(.key);
+                }
+            }
+        }
     }
 
     multi method op(*@args is copy) {
@@ -742,7 +774,7 @@ class PDF::Content::Ops {
                     for @!callback;
             }
 
-            if $op ne 'ID' {
+            unless $op eq 'ID' {
                 if $!comment {
                     my $comment = %OpName{$op};
                     $comment ~= self!show-updates($op)
@@ -807,7 +839,7 @@ class PDF::Content::Ops {
     }
 
     multi method ops(Str $ops!) {
-	$.ops( self.parse($ops) );
+	$.ops: self.parse($ops);
     }
 
     multi method ops(List $ops?) {
@@ -825,7 +857,7 @@ class PDF::Content::Ops {
     method parse(Str $content) {
 	use PDF::Grammar::Content::Fast;
 	use PDF::Grammar::Content::Actions;
-	state $actions = PDF::Grammar::Content::Actions.new: :strict;
+	state $actions = PDF::Grammar::Content::Actions.new;
 	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
 	    // die X::PDF::Content::ParseError.new :$content;
 	p.ast
@@ -1004,6 +1036,14 @@ class PDF::Content::Ops {
     multi method track-graphics('d1', $!char-width, $!char-height, *@!char-bbox) {
     }
 
+    multi method track-graphics('BX') {
+        $!extended-ops++;
+    }        
+    multi method track-graphics('EX') {
+	die X::PDF::Content::OP::BadNesting.new: :op<EX>, :mnemonic(%OpName<EX>), :opener("'BX' (BeginExtended)")
+	    unless $!extended-ops;
+        $!extended-ops--;
+    }
     multi method track-graphics($op, *@args) is default {
         .(self,|@args) with %PostOp{$op};
     }
