@@ -460,20 +460,20 @@ class PDF::Content::Ops {
         );
 
         my Bool $ok-here = False;
-        my $prev-context = $!context;
+        my $context = $!context;
         $ok-here = $op ∈ $_
             with %InSitu{$!context};
 
         with %Transition{$op} {
-            $ok-here ||= ?(.key == $!context);
-            $!context = .value;
+            $ok-here ||= ?(.key == $context);
+            $context = .value;
         }
 
         if !$ok-here && $!strict {
             # Found an op we didn't expect. Raise a warning.
             my $type;
             my $where;
-            if $!context == Text && $op ∈ SpecialGraphicOps {
+            if $context == Text && $op ∈ SpecialGraphicOps {
                 $type = 'special graphics';
                 $where = 'in a BT ... ET text block';
             }
@@ -488,7 +488,7 @@ class PDF::Content::Ops {
                 loop (my int $n = +@!ops-2; $n >= 0; $n--) {
                     with @!ops[$n].key {
                         unless $_ ~~ 'comment' {
-                            $where = "in $prev-context context, following '$_' (%OpName{$_})";
+                            $where = "in $!context context, following '$_' (%OpName{$_})";
                             last;
                         }
                     }
@@ -496,6 +496,7 @@ class PDF::Content::Ops {
             }
             warn X::PDF::Content::OP::Unexpected.new: :$type, :$op, :mnemonic(%OpName{$op}), :$where;
         }
+        $context;
     }
 
     my Routine %Ops = BEGIN %(
@@ -748,15 +749,13 @@ class PDF::Content::Ops {
             warn X::PDF::Content::OP::Unexpected.new: :$op, :mnemonic(%OpName{$op}), :type('graphics operator'), :where("outside of a 'q' ... 'Q' (Save .. Restore) graphics block");
 	}
 
-	@!ops.push(opn);
-
         if $op ~~ 'comment' {
             note '% ' ~ opn if $!trace && ! $!comment;
         }
         else {
             if $op ~~ 'BDC'|'DP'|'TJ'|'d' {
                 # operation may have array or dict operands
-                @args = @args.map: {
+                @args .= map: {
                     when List { [ .map: *.value ] }
                     when Hash { %( .map: {.key => .value.value} ) }
                     default { $_ }
@@ -764,7 +763,7 @@ class PDF::Content::Ops {
             }
 
             # built-in callbacks
-            self!track-context($op);
+            my $new-context = self!track-context($op);
             self.track-graphics($op, |@args );
 
             # user supplied callbacks
@@ -785,8 +784,11 @@ class PDF::Content::Ops {
                     self!trace($op, opn) if $!trace;
                 }
             }
+
+            $!context = $new-context;
         }
 
+	@!ops.push(opn);
 	opn;
     }
 

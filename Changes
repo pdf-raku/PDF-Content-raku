@@ -1,3 +1,6 @@
+Release 0.4.6
+- Allow unknown operations in 'BX' .. 'EX' extension blocks
+
 Release 0.4.5
 - Fix PDF::API6 #8 - truncation of large JPEG images
 - Renamed github project/repo
@@ -23,7 +26,7 @@ Release 0.4.3
 Release 0.4.2
 - rename class PDF::Content::Tag::Marked -> PDF::Content::Tag::Mark
 - remove tag-name check on marked content tags. Anything is allowed (it's
-  only struct elem nodes thayt next to be named correctly).
+  only struct elem nodes that need to be named correctly).
 - also remove BBox attribute from Marked cotnent and rename tags to /Text
   and /Image respectively.
 
