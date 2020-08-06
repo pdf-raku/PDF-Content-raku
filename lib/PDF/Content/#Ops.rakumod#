@@ -462,7 +462,7 @@ class PDF::Content::Ops {
         my Bool $ok-here = False;
         my $rv = $!context;
         $ok-here = $op ∈ $_
-            with %InSitu{$!context};
+            with %InSitu{$rv};
 
         with %Transition{$op} {
             $ok-here ||= ?(.key == $rv);
