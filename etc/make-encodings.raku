@@ -1,7 +1,5 @@
 use v6;
 
-use Font::AFM;
-
 class Build {
 
     method !save-glyph(Str $glyph-name, $chr, $ord, Hash :$encoding, Hash :$glyphs) {
@@ -48,7 +46,7 @@ class Build {
         }
         for <mac win std> -> $type {
             say "    #-- {$type.uc} encoding --#";
-            say "    constant \${$type}-encoding = {%encodings{$type}.perl};";
+            say "    constant \${$type}-encoding is export(:{$type}-encoding) = {%encodings{$type}.perl};";
             say "";
         }
     }
@@ -76,9 +74,9 @@ class Build {
             @encodings[$encoding] ||= $code-point;
         }
         say "    #-- {$type.uc} encoding --#";
-        say "    constant \${$type}-glyphs = {%glyphs.perl};"
+        say "    constant \${$type}-glyphs is export(:{$type}-glyphs) = {%glyphs.perl};"
             if $glyphs;
-        say "    constant \${$type}-encoding = {@encodings.perl};";
+        say "    constant \${$type}-encoding is export(:{$type}-encoding) = {@encodings.perl};";
         say ""
     }
 
@@ -101,7 +99,7 @@ class Build {
         mkdir( $lib-dir, 0o755);
 
         my $module-name = "PDF::Content::Font::Encodings";
-        my $gen-path = $*SPEC.catfile($lib-dir, "Encodings.pm");
+        my $gen-path = $*SPEC.catfile($lib-dir, "Encodings.rakumod");
         my $*OUT = open( $gen-path, :w);
         self!write-enc-header;
         self!build-enc("etc/encodings.txt".IO);
