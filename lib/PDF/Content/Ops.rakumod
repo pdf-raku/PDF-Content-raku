@@ -839,7 +839,7 @@ class PDF::Content::Ops {
     }
 
     multi method ops(Str $ops!) {
-	$.ops: self.parse($ops);
+	$.ops(self.parse($ops));
     }
 
     multi method ops(List $ops?) {
