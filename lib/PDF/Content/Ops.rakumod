@@ -50,7 +50,7 @@ class X::PDF::Content::OP::BadArg
 class X::PDF::Content::OP::BadArgs
     is X::PDF::Content::OP {
     has @.args is required;
-    method message { "Bad '$.op' ($.mnemonic) argument list: {@!args.map(*.raku).join: ', '}" }
+    method message { "Bad '$.op' ($.mnemonic) argument list: {@!args.map(*.perl).join: ', '}" }
 }
 
 class X::PDF::Content::OP::TooFewArgs
