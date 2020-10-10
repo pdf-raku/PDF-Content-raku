@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 45;
+plan 47;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Font::CoreFont;
@@ -18,7 +18,7 @@ is $tsym.font-name, 'Symbol', 'font-name';
 is $tsym.enc, 'sym', 'enc';
 
 my PDF::Content::Font::CoreFont $hb-afm .= load-font( 'Helvetica-Bold' );
-isa-ok $hb-afm.metrics, 'Font::AFM'; 
+isa-ok $hb-afm.metrics, 'Font::AFM';
 is $hb-afm.font-name, 'Helvetica-Bold', 'font-name';
 is $hb-afm.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
@@ -27,11 +27,16 @@ is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
 is-approx $hb-afm.height(12, :hanging), 11.1, 'font hanging height @ 12pt';
 is $hb-afm.encode("A♥♣✔B", :str), "A\x[1]\x[2]B", '.encode(...) sanity';
+# - 'A' & 'B' are in the encoding scheme and font
+# - '♥', '♣' are in the font, but not the encoding scheme
+# - '✔' is in neither
+is-deeply $hb-afm.encoder.charset, (my UInt %{UInt} = 'A'.ord => 'A'.ord, 'B'.ord => 'B'.ord, '♥'.ord => 1, '♣'.ord => 2), 'charset';
+is-json-equiv $hb-afm.encoder.differences, (1, "heart", "club"), 'differences';
 
 my PDF::Content::Font::CoreFont $ab-afm .= load-font( 'Arial-Bold' );
-isa-ok $hb-afm.metrics, 'Font::AFM'; 
-is $hb-afm.font-name, 'Helvetica-Bold', 'font-name';
-is $hb-afm.encode("A♥♣✔B", :str), "A\x[1]\x[2]B", '.encode(...) sanity';
+isa-ok $ab-afm.metrics, 'Font::AFM'; 
+is $ab-afm.font-name, 'Helvetica-Bold', 'font-name';
+is $ab-afm.encode("A♥♣✔B", :str), "A\x[1]\x[2]B", '.encode(...) sanity';
 
 my PDF::Content::Font::CoreFont $hbi-afm .= load-font( :family<Helvetica>, :weight<Bold>, :style<Italic> );
 is $hbi-afm.font-name, 'Helvetica-BoldOblique', ':font-family => font-name';

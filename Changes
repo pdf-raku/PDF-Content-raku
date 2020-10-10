@@ -1,5 +1,7 @@
 Release 0.4.6
 - Allow unknown operations in 'BX' .. 'EX' extension blocks
+- Fix accidential error supression in resource cb-finish() invocations
+- Added encode %.charset accessor; used for font subsetting
 
 Release 0.4.5
 - Fix PDF::API6 #8 - truncation of large JPEG images

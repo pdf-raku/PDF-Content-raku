@@ -10,9 +10,9 @@ class PDF::Content::Font::Enc::Type1
     does PDF::Content::Font::Enc::Glyphic {
     use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs;
     has UInt %!from-unicode;  #| all encoding mappings
-    has UInt %!charset;       #| used characters
+    has UInt %.charset{UInt}; #| used characters (useful for subsetting)
     has uint16 @.to-unicode[256];
-    has uint8 @!fallback-cids;
+    has uint8 @!spare-codes;  #| unmapped codes in the encoding scheme
     my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std';
     has EncodingScheme $.enc = 'win';
 
@@ -27,20 +27,23 @@ class PDF::Content::Font::Enc::Type1
             if $!enc eq 'zapf';
 
         @!to-unicode = $encoding.list;
-        my uint16 @encoded-cids;
+        my uint16 @allocated-codes;
         for 1 .. 255 -> $idx {
             my uint16 $code-point = @!to-unicode[$idx];
             if $code-point {
                 %!from-unicode{$code-point} = $idx;
                 # CID used in this encoding schema. rellocate as a last resort
-                @encoded-cids.unshift: $idx;
+                @allocated-codes.unshift: $idx;
             }
             else {
                 # spare CID use it first
-                @!fallback-cids.push($idx)
+                @!spare-codes.push($idx)
             }
         }
-        @!fallback-cids.append: @encoded-cids;
+        # also keep track of codes that are allocated in the encoding scheme, but
+        # have not been used in this encoding instance's charset. These can potentially
+        # be added to differences to squeeze the most out of our 8-bit encoding scheme.
+        @!spare-codes.append: @allocated-codes;
         # map non-breaking space to a regular space
         %!from-unicode{"\c[NO-BREAK SPACE]".ord} //= %!from-unicode{' '.ord};
     }
@@ -61,8 +64,8 @@ class PDF::Content::Font::Enc::Type1
             my $glyph-name = self.lookup-glyph($chr-code);
             if $glyph-name && $glyph-name ne '.notdef' {
                 # try to remap the glyph to a spare encoding or other unused glyph
-                while @!fallback-cids && !$idx {
-                    $idx = @!fallback-cids.shift;
+                while @!spare-codes && !$idx {
+                    $idx = @!spare-codes.shift;
                     my $old-chr-code = @!to-unicode[$idx];
                     if $old-chr-code && %!charset{$old-chr-code} {
                         # already inuse

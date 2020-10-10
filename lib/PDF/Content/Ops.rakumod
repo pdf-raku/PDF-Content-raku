@@ -1057,7 +1057,7 @@ class PDF::Content::Ops {
             if $!strict && $!context != Page;
 
         given $!parent {
-            try .cb-finish for .resources('Font').values;
+            .?cb-finish() for .resources('Font').values;
         }
     }
 
