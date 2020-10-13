@@ -7,9 +7,6 @@ use PDFTiny;
 use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
 use PDF::Content::XObject;
 
-# ensure consistant document ID generation
-srand(123456);
-
 my PDFTiny $pdf .= new;
 
 my $page = $pdf.add-page;
@@ -47,6 +44,9 @@ $page.graphics: -> $gfx {
 }
 
 is $page.gfx.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
+
+# ensure consistant document ID generation
+srand(123456);
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }
 

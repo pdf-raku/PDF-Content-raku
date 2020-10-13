@@ -5,8 +5,6 @@ use lib 't';
 use PDF;
 use PDF::Content::Ops :OpCode;
 use PDFTiny;
-# ensure consistant document ID generation
-srand(123456);
 
 my PDFTiny $pdf .= new;
 my $page = $pdf.add-page;
@@ -86,6 +84,9 @@ for (
 }
 
 $gfx.EndText;
+
+# ensure consistant document ID generation
+srand(123456);
 
 lives-ok { $pdf.save-as('t/pdf-text-style.pdf');}
 

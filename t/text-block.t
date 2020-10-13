@@ -8,9 +8,6 @@ use PDF::Content::Font::CoreFont;
 use PDF::Content::Color :color, :ColorName;
 use PDFTiny;
 
-# ensure consistant document ID generation
-srand(123456);
-
 my \nbsp = "\c[NO-BREAK SPACE]";
 my @chunks =  PDF::Content::Text::Block.comb: "z80 a-b. -3   {nbsp}A{nbsp}bc{nbsp} 42";
 is-deeply @chunks, ["z80", " ", "a-", "b.", " ", "-", "3", "   ", "{nbsp}A{nbsp}bc{nbsp}", " ", "42"], 'text-block comb';
@@ -54,5 +51,8 @@ is-json-equiv [ $gfx.ops ], [
       :ET[],
     :Q[],
     ], 'simple text block';
+
+# ensure consistant document ID generation
+srand(123456);
 
 $pdf.save-as: "t/text-block.pdf";

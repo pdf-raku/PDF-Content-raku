@@ -4,8 +4,6 @@ plan 1;
 use lib 't';
 use PDF::Content::Ops :OpCode;
 use PDFTiny;
-# ensure consistant document ID generation
-srand(123456);
 
 my PDFTiny $pdf .= new;
 my $page = $pdf.add-page;
@@ -42,6 +40,9 @@ for <top center bottom> -> $valign {
    $x += 125;
 }
 $gfx.EndText;
+
+# ensure consistant document ID generation
+srand(123456);
 
 lives-ok {$pdf.save-as('t/pdf-text-align.pdf')};
 

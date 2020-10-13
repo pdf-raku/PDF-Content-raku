@@ -3,9 +3,6 @@ use Test;
 use lib 't';
 use PDFTiny;
 
-# ensure consistant document ID generation
-srand(123456);
-
 my PDFTiny $pdf .= new;
 my $page = $pdf.add-page;
 
@@ -26,6 +23,10 @@ lives-ok {
         $gfx.Rectangle(0, 20, 100, 250);
         $gfx.Fill;
     }
+
+    # ensure consistant document ID generation
+    srand(123456);
+
     $pdf.save-as: "t/patterns.pdf";
 };
 

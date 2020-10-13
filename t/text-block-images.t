@@ -10,9 +10,6 @@ use PDFTiny;
 
 # experimental feature to flow text and images
 
-# ensure consistant document ID generation
-srand(123456);
-
 my PDFTiny $pdf .= new;
 my $page = $pdf.add-page;
 
@@ -78,5 +75,8 @@ $page.graphics: -> $gfx {
 }
 
 $text-block.place-images($page.gfx);
+
+# ensure consistant document ID generation
+srand(123456);
 
 $pdf.save-as: "t/text-block-images.pdf";

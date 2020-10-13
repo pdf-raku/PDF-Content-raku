@@ -5,8 +5,6 @@ use PDF::Grammar::Test :is-json-equiv;
 use lib 't';
 use PDF::Content::XObject;
 use PDFTiny;
-# ensure consistant document ID generation
-srand(123456);
 
 my Pair @images;
 
@@ -209,6 +207,9 @@ sub save-images(@images) {
 	}
     }
     
+    # ensure consistant document ID generation
+    srand(123456);
+
     $doc.save-as: "t/images.pdf";
 }
 

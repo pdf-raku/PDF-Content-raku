@@ -5,9 +5,6 @@ use lib 't';
 use PDF::Content::Color :rgb;
 use PDFTiny;
 
-# ensure consistant document ID generation
-srand(123456);
-
 my PDFTiny $pdf .= new;
 
 $pdf.media-box = [0, 0, 400, 120];
@@ -33,5 +30,8 @@ $page.graphics: {
     .transform: :translate(10,40), :rotate(.1), :scale(.75);
     .do($form, :position(10, 10));
 }
+
+# ensure consistant document ID generation
+srand(123456);
 
 lives-ok {$pdf.save-as: "t/forms.pdf"};

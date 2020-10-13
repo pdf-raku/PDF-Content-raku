@@ -5,8 +5,6 @@ plan 7;
 use lib 't';
 use PDF::Content::Page :PageSizes;
 use PDFTiny;
-# ensure consistant document ID generation
-srand(123456);
 
 my PDFTiny $doc .= new;
 my $page = $doc.page;
