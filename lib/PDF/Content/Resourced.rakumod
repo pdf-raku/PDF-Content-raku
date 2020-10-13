@@ -20,19 +20,20 @@ role PDF::Content::Resourced {
     #| my %fonts = $pdf.page(1).resources('Font');
     multi method resources('ProcSet') {
 	my @entries;
-	my $resource-entries = .ProcSet with self.Resources;
-	@entries = .keys.map( { $resource-entries[$_] } )
-	    with $resource-entries;
+	with self.Resources {
+            with <ProcSet> -> List $r {
+	        @entries = $r.keys.map: { $r[$_] };
+            }
+        }
 	@entries;
     }
     multi method resources(Str $type) is default {
-        my Hash $resource-entries;
-	with self.Resources -> $resources {
-            $resource-entries = $resources{$type}
-              if $resources{$type}:exists;
+        my %entries;
+	with self.Resources {
+            with .{$type} -> Hash $r {
+                %entries = $r.keys.map: { $_ => $r{$_} };
+            }
         }
-	my %entries = .keys.map( { $_ => $resource-entries{$_} } )
-	    with $resource-entries;
 	%entries;
     }
 

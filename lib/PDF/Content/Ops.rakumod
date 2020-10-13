@@ -209,7 +209,7 @@ class PDF::Content::Ops {
             FETCH => { $att.get_value(self) },
             STORE => -> $, \v {
                 unless $att.get_value(self) eqv v {
-                    given self.parent {
+                    given $!parent {
                         # Match any reusable GS entry; otherwise create a new entry
                         my &match = -> Hash $_ {
                             .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
@@ -1056,9 +1056,7 @@ class PDF::Content::Ops {
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")
             if $!strict && $!context != Page;
 
-        given $!parent {
-            .?cb-finish() for .resources('Font').values;
-        }
+        try .?cb-finish() for $!parent.resources('Font').values;
     }
 
     #| serialize content into a string. indent blocks for readability
