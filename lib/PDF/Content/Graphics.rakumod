@@ -6,7 +6,7 @@ role PDF::Content::Graphics {
     use PDF::Content;
     use PDF::Content::Ops :OpCode;
     use PDF::Content::Tag;
-    use PDF::COS;
+    use PDF::COS::Stream;
 
     has PDF::Content $!pre-gfx; #| prepended graphics
     method has-pre-gfx { ? .ops with $!pre-gfx }
@@ -114,7 +114,7 @@ role PDF::Content::Graphics {
         %dict<BBox> //= [0, 0, 612, 792];
         %dict<Group> //= %( :S( :name<Transparency> ) )
             if $group;
-        PDF::COS.coerce( :stream{ :%dict });
+        PDF::COS::Stream.COERCE: { :%dict };
     }
 
     #| create a new Type 1 (Tiling) Pattern
@@ -130,7 +130,7 @@ role PDF::Content::Graphics {
                      for (:Type(:name<Pattern>), :PatternType(1),
                           :$PaintType, :$TilingType,
                           :$BBox, :$XStep, :$YStep, :$Resources);
-        PDF::COS.coerce( :stream{ :%dict });
+        PDF::COS::Stream.COERCE: { :%dict };
     }
     my subset ImageFile of Str where /:i '.'('png'|'svg'|'pdf') $/;
     method save-as-image(ImageFile $outfile) {

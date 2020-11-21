@@ -78,8 +78,8 @@ class PDF::Content::Image::JPEG
         %dict<Filter> = :name<DCTDecode>
             if $!is-dct;
 
-        need PDF::COS;
-        PDF::COS.coerce: :stream{ :%dict, :$!encoded };
+        need PDF::COS::Stream;
+        PDF::COS::Stream.COERCE: { :%dict, :$!encoded };
     }
 
 }

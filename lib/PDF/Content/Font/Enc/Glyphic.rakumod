@@ -32,7 +32,7 @@ role PDF::Content::Font::Enc::Glyphic {
                         self.set-encoding(.ord, $idx)
                             with %glyph-map{$_};
                         $idx++;
-                        PDF::COS.coerce($_, PDF::COS::Name);
+                        PDF::COS::Name.COERCE($_);
                     }
                     default { die "bad difference entry: .perl" }
                 }
@@ -47,9 +47,8 @@ role PDF::Content::Font::Enc::Glyphic {
                             @!differences.push: $_;
                             $cur-idx = $_;
                         }
-                        my $glyph-name = PDF::COS.coerce(
+                        my PDF::COS::Name $glyph-name .= COERCE(
                             self.lookup-glyph( @.to-unicode[$_] ) // '.notdef',
-                            PDF::COS::Name
                         );
                         @!differences.push: $glyph-name;
                     }

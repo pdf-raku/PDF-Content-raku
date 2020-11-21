@@ -215,7 +215,7 @@ class PDF::Content::Ops {
                             .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
                         }
                         my $gs = .find-resource(&match, :type<ExtGState>)
-                            // PDF::COS.coerce({ :Type{ :name<ExtGState> }, $key => v });
+                            // PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
                         my Str $gs-entry = .resource-key($gs, :eqv);
 	                self.SetGraphicsState($gs-entry);
                     }

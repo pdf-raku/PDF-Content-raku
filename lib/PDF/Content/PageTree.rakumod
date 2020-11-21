@@ -6,7 +6,7 @@ role PDF::Content::PageTree
     does PDF::Content::Resourced {
 
     use PDF::Content::PageNode;
-    use PDF::COS;
+    use PDF::COS::Dict;
     my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids && .[0] ~~ PDF::Content::PageNode;
 
     #| add new last page
@@ -24,7 +24,7 @@ role PDF::Content::PageTree
 	    }
 	}
 	else {
-	    $_ = PDF::COS.coerce: :dict{ :Type( :name<Page> ) };
+	    $_ = PDF::COS::Dict.COERCE: { :Type( :name<Page> ) };
 	}
 
         if $right-node && $right-node.can('add-page') {

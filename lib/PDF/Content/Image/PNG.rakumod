@@ -7,6 +7,7 @@ class PDF::Content::Image::PNG
     is PDF::Content::Image {
 
     use PDF::COS;
+    use PDF::COS::Name;
     use PDF::COS::Stream;
     use PDF::IO::Filter;
     use PDF::IO::Util :pack;
@@ -149,7 +150,7 @@ class PDF::Content::Image::PNG
             %dict<Mask> = [ $vals.min, $vals.max ]
         }
         my $encoded = $stream.decode: 'latin-1';
-        PDF::COS.coerce: :stream{ :%dict, :$encoded };
+        PDF::COS::Stream.COERCE: { :%dict, :$encoded };
     }
 
     multi sub png-to-stream(PNG-CS::RGB,
@@ -171,7 +172,7 @@ class PDF::Content::Image::PNG
             %dict<Mask> = [ $vals.map: { (*.min, *.max) } ];
         }
         my $encoded = $stream.decode: 'latin-1';
-        PDF::COS.coerce: :stream{ :%dict, :$encoded };
+        PDF::COS::Stream.COERCE: { :%dict, :$encoded };
     }
 
     multi sub png-to-stream(PNG-CS::RGB-Palette,
@@ -189,7 +190,7 @@ class PDF::Content::Image::PNG
         %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
 
         my $encoded = $palette.decode('latin-1');
-        my $color-stream = PDF::COS.coerce: :stream{ :$encoded };
+        my $color-stream = PDF::COS::Stream.COERCE: { :$encoded };
         my $hival = +$palette div 3  -  1;
         %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, $hival, $color-stream, ];
 
@@ -199,7 +200,7 @@ class PDF::Content::Image::PNG
             $decoded.append( 0xFF xx $padding)
                 if $padding;
 
-            %dict<SMask> = PDF::COS.coerce: :stream{
+            %dict<SMask> = PDF::COS::Stream.COERCE: {
                 :dict{:Type( :name<XObject> ),
 		      :Subtype( :name<Image> ),
 		      :Width($w),
@@ -212,7 +213,7 @@ class PDF::Content::Image::PNG
 	    };
 	}
 	$encoded = $stream.decode: 'latin-1';
-	PDF::COS.coerce: :stream{ :%dict, :$encoded };
+	PDF::COS::Stream.COERCE: { :%dict, :$encoded };
     }
 
     multi sub png-to-stream(PNG-CS::Gray-Alpha,
@@ -224,7 +225,7 @@ class PDF::Content::Image::PNG
 			    Bool :$alpha,
 	) {
 
-	%dict<Filter> = PDF::COS.coerce: :name<FlateDecode>;
+	%dict<Filter> = PDF::COS::Name.COERCE: 'FlateDecode';
 	%dict<ColorSpace> = :name<DeviceGray>;
 	%dict<DecodeParms> = { :Predictor(15), :Colors(2), :Columns($w), :BitsPerComponent($bpc) };
 	%dict<BitsPerComponent> = $bpc;
@@ -246,7 +247,7 @@ class PDF::Content::Image::PNG
 
 	if $alpha {
 	    my $decoded = $alpha-channel.decode: 'latin-1';
-	    %dict<SMask> = PDF::COS.coerce: :stream{
+	    %dict<SMask> = PDF::COS::Stream.COERCE: {
 		:dict{:Type( :name<XObject> ),
 		      :Subtype( :name<Image> ),
 		      :Width($w),
@@ -260,7 +261,7 @@ class PDF::Content::Image::PNG
 	}
 
 	my $decoded = $gray-channel.decode: 'latin-1';
-	PDF::COS.coerce: :stream{ :%dict, :$decoded };
+	PDF::COS::Stream.COERCE: { :%dict, :$decoded };
     }
 
     multi sub png-to-stream(PNG-CS::RGB-Alpha,
@@ -272,7 +273,7 @@ class PDF::Content::Image::PNG
 			    Buf :$trns,
 			    Bool :$alpha,
 	) {
-	%dict<Filter> = PDF::COS.coerce: :name<FlateDecode>;
+	%dict<Filter> = PDF::COS::Name.COERCE: 'FlateDecode';
 	%dict<ColorSpace> = :name<DeviceRGB>;
 	%dict<BitsPerComponent> = $bpc;
 	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(4), :Columns($w) };
@@ -294,7 +295,7 @@ class PDF::Content::Image::PNG
 
 	if $alpha {
 	    my $decoded = $alpha-channel.decode: 'latin-1';
-	    %dict<SMask> = PDF::COS.coerce: :stream{
+	    %dict<SMask> = PDF::COS::Stream.COERCE: {
 		:dict{:Type( :name<XObject> ),
 		      :Subtype( :name<Image> ),
 		      :Width($w),
@@ -308,7 +309,7 @@ class PDF::Content::Image::PNG
 	}
 
 	my $decoded = $rgb-channels.decode: 'latin-1';
-	PDF::COS.coerce: :stream{ :%dict, :$decoded };
+	PDF::COS::Stream.COERCE: { :%dict, :$decoded };
     }
 
 }

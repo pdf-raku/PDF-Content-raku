@@ -153,7 +153,7 @@ class PDF::Content::Font::CoreFont {
 
    method to-dict {
         $!dict //= PDF::Content::Font.make-font(
-            PDF::COS::Dict.coerce(self!make-dict),
+            PDF::COS::Dict.COERCE(self!make-dict),
             self);
     }
 

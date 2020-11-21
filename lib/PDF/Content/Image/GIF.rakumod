@@ -181,7 +181,7 @@ class PDF::Content::Image::GIF
     }
 
     method to-dict(Bool :$trans = True) {
-        need PDF::COS;
+        need PDF::COS::Stream;
 
         my %dict = ( :Type( :name<XObject> ),
                      :Subtype( :name<Image> ),
@@ -194,7 +194,7 @@ class PDF::Content::Image::GIF
             my $cols = .elems div 3;
             my $encoded = $!color-table.decode("latin-1");
             my $color-data = $cols > 64
-                ?? PDF::COS.coerce( :stream{ :$encoded } )
+                ?? PDF::COS::Stream.COERCE: { :$encoded }
                 !! :hex-string($encoded);
 
             %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>,
@@ -210,7 +210,7 @@ class PDF::Content::Image::GIF
         }
 
         my Str $encoded = $!data.decode: 'latin-1';
-        PDF::COS.coerce: :stream{ :%dict, :$encoded };
+        PDF::COS::Stream.COERCE: { :%dict, :$encoded };
     }
 
 }

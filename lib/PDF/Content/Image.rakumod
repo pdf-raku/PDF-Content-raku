@@ -61,7 +61,7 @@ class PDF::Content::Image {
 	    $data = base64-decode($data).decode("latin-1");
 	}
 
-        my $source = PDF::IO.coerce($data, :$path);
+        my $source = PDF::IO.COERCE($data, :$path);
         self!image-handler(:$image-type).new: :$source, :$data-uri, :$image-type;
     }
 

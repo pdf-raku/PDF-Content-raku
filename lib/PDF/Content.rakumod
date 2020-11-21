@@ -4,7 +4,7 @@ use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 class PDF::Content:ver<0.4.6>
     is PDF::Content::Ops {
 
-    use PDF::COS;
+    use PDF::COS::Stream;
     use PDF::Content::Text::Block;
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
@@ -121,7 +121,7 @@ class PDF::Content:ver<0.4.6>
 	    my %dict = PDF::Content::XObject['Image'].inline-to-xobject($bi.value[0]<dict>);
 	    my $encoded = $id.value[0]<encoded>;
 
-	    @images.push: PDF::COS.coerce( :stream{ :%dict, :$encoded } );
+	    @images.push: PDF::COS::Stream.COERCE: { :%dict, :$encoded };
 	}
 	@images;
     }
