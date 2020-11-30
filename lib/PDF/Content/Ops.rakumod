@@ -1056,8 +1056,7 @@ class PDF::Content::Ops {
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")
             if $!strict && $!context != Page;
 
-        .?cb-finish()
-            for $!parent.resources('Font').values;
+        try .?cb-finish() for $!parent.resources('Font').values;
     }
 
     #| serialize content into a string. indent blocks for readability
