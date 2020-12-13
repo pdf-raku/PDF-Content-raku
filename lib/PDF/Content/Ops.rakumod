@@ -1092,9 +1092,14 @@ class PDF::Content::Ops {
     method dispatch:<.?>(\name, |c) is raw {
         self.can(name) || %OpCode{name} ?? self."{name}"(|c) !! Nil
     }
-    method ShowSpaceText(Array $args) {
+    #++ avoid flattening issues on lists
+    method ShowSpaceText(List $args) {
         self.op(OpCode::ShowSpaceText, $args);
     }
+    method SetDashPattern(List $args, Numeric $phase) {
+        self.op(OpCode::SetDashPattern, $args, $phase);
+    }
+    #-- avoid flattening issues on lists
     method FALLBACK(\name, |c) {
         with %OpCode{name} -> \op {
             # e.g. $.Restore :== $.op('Q', [])

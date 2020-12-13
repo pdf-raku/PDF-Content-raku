@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 109;
+plan 110;
 
 use lib 't';
 use PDF;
@@ -88,6 +88,8 @@ $g.CharSpacing = -.5;
 is $g.CharSpacing, -.5, '$g.CharSpacing - updated';
 
 is $g.DashPattern, [[], 0], 'DashPattern - initial';
+$g.SetDashPattern([2, 3,], 4);
+is $g.DashPattern, [[2, 3], 4], 'DashPattern - updated';
 $g.DashPattern = [[3, 5], 6];
 is $g.DashPattern, [[3, 5], 6], 'DashPattern - updated';
 
