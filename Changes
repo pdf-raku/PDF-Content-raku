@@ -1,3 +1,7 @@
+Release 0.4.7
+- Update to PDF 0.4.5. PDF::Writer has been renamed to PDF::IO::Writer
+  to free up PDF::Writer for ecosystem usage.
+
 Release 0.4.6
 - Allow unknown operations in 'BX' .. 'EX' extension blocks
 - Fix accidential error supression in resource cb-finish() invocations

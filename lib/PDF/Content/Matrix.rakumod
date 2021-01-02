@@ -10,7 +10,7 @@ module PDF::Content::Matrix {
     #
     # where a b c d e f are stored in a six digit array and the third column is implied.
 
-    subset TransformMatrix of List where {.elems == 6}
+    subset TransformMatrix is export(:TransformMatrix) of List where {.elems == 6}
     my Int enum TransformMatrixElem « :a(0) :b(1) :c(2) :d(3) :e(4) :f(5) »;
 
     our sub identity returns TransformMatrix is export(:identity) {
@@ -115,7 +115,7 @@ module PDF::Content::Matrix {
 
     #| Compute: $a = $a X $b
     our sub apply(TransformMatrix $a! is rw, TransformMatrix $b! --> TransformMatrix) is export(:apply) {
-	$a = multiply($a, $b);
+	$a .= &multiply($b);
     }
 
     # return true of this is the identity matrix =~= [1, 0, 0, 1, 0, 0 ]
@@ -134,16 +134,14 @@ module PDF::Content::Matrix {
     #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
 
     our sub transform(
-	:$matrix,
+	:$matrix = identity(),
 	:$translate,
 	:$rotate,
 	:$scale,
 	:$skew,
 	--> TransformMatrix
 	) is export(:transform) {
-	my TransformMatrix $t = $matrix
-            ?? [$matrix.list]
-            !! identity();
+	my TransformMatrix $t = $matrix.Array;
 	apply($t, translate( |$_ )) with $translate;
 	apply($t, rotate( $_ ))     with $rotate;
 	apply($t, scale( |$_ ))     with $scale;

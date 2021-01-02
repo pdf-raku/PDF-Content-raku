@@ -84,11 +84,11 @@ class X::PDF::Content::UnknownResource
 
 class PDF::Content::Ops {
 
-    use PDF::Writer;
+    use PDF::IO::Writer;
     use PDF::COS;
     use PDF::COS::Dict;
     use PDF::COS::Util :from-ast, :to-ast;
-    use PDF::Content::Matrix :inverse, :multiply, :is-identity;
+    use PDF::Content::Matrix :inverse, :multiply, :is-identity, :TransformMatrix;
     use PDF::Content::Tag;
     use JSON::Fast;
 
@@ -306,10 +306,9 @@ class PDF::Content::Ops {
         Proxy.new(
             FETCH => { @!CTM },
             STORE => -> $, List $gm {
-                my @ctm-inv = inverse(@!CTM);
-                my @diff = multiply($gm, @ctm-inv);
-                self.ConcatMatrix( |@diff )
-                    unless is-identity(@diff);
+                my @diff = $gm.&multiply: @!CTM.&inverse();
+                self.ConcatMatrix: |@diff
+                    unless @diff.&is-identity();
                 @!CTM;
             });
     }
@@ -523,7 +522,7 @@ class PDF::Content::Ops {
         # dictname                gs
         # intent                  ri
         'BMC'|'cs'|'CS'|'Do'|'gs'|'MP'|'ri'|'sh' => sub (Str, Str $name!) {
-            [ :$name ]
+             [ :$name ]
         },
 
         # string                  Tj | '
@@ -829,7 +828,7 @@ class PDF::Content::Ops {
         $nesting++ if $!context == Text;
         $nesting-- if $op ∈ Openers;
         my $indent = '  ' x $nesting;
-        my PDF::Writer $writer .= new;
+        my PDF::IO::Writer $writer .= new;
 
         my $str = $indent ~ $writer.write-content(opn);
         my $op-name := %OpName{$op};
@@ -890,8 +889,8 @@ class PDF::Content::Ops {
         @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
     }
 
-    multi method track-graphics('cm', \a, \b, \c, \d, \e, \f) {
-        @!CTM = multiply([a, b, c, d, e, f], @!CTM);
+    multi method track-graphics('cm', *@mtx where TransformMatrix) {
+        @!CTM = @mtx.&multiply: @!CTM;
     }
 
     multi method track-graphics('rg', \r, \g, \b) {
@@ -1002,7 +1001,7 @@ class PDF::Content::Ops {
     }
 
     method !text-move(Numeric $tx, Numeric $ty) {
-        @!TextMatrix = multiply([1, 0, 0, 1, $tx, $ty], @!TextMatrix);
+        @!TextMatrix = [1, 0, 0, 1, $tx, $ty].&multiply: @!TextMatrix;
     }
 
     method !new-line {
@@ -1064,7 +1063,7 @@ class PDF::Content::Ops {
     method Str { $!content-cache //= self!content }
 
     method !content returns Str {
-        my PDF::Writer $writer .= new;
+        my PDF::IO::Writer $writer .= new;
 
 	$.finish;
 	my UInt $nesting = 0;
@@ -1085,7 +1084,7 @@ class PDF::Content::Ops {
 
     # serialized current content as a sequence of strings - for debugging/testing
     method content-dump {
-        my PDF::Writer $writer .= new;
+        my PDF::IO::Writer $writer .= new;
         @!ops.map: { $writer.write-content($_) };
     }
 
