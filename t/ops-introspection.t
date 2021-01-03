@@ -7,7 +7,7 @@ use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
 use PDF::Content::Ops :OpCode, :LineCaps, :LineJoin, :GraphicsContext;
 use PDF::Content::Matrix :scale;
-use PDF::Writer;
+use PDF::IO::Writer;
 use PDFTiny;
 
 my $dummy-font = %() does role { method cb-finish {} }
@@ -53,7 +53,7 @@ is-json-equiv $g.ops, [
     :q[],
     :cm[:real(10), :real(1), :real(15), :real(2), :real(3), :real(4)],
 ], '.ops)_';
-is PDF::Writer.write-content($g.ops).lines, ('q', '10 1 15 2 3 4 cm'), 'PDF write content';
+is PDF::IO::Writer.write-content($g.ops).lines, ('q', '10 1 15 2 3 4 cm'), 'PDF write content';
 is-deeply $g.content-dump, ('q', '10 1 15 2 3 4 cm'), 'content-dump';
 $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
 
