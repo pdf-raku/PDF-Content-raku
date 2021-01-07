@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.4.8>
+class PDF::Content:ver<0.4.9>
     is PDF::Content::Ops {
 
     use PDF::COS::Stream;

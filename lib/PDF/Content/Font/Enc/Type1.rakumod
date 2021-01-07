@@ -8,18 +8,19 @@ use PDF::Content::Font::Enc::Glyphic;
 #| that have not been used.
 class PDF::Content::Font::Enc::Type1
     does PDF::Content::Font::Enc::Glyphic {
-    use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs;
+    use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs, :mac-extra-encoding;
     has UInt %!from-unicode;  #| all encoding mappings
     has UInt %.charset{UInt}; #| used characters (useful for subsetting)
     has uint16 @.to-unicode[256];
     has uint8 @!spare-codes;  #| unmapped codes in the encoding scheme
-    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std';
+    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std'|'mac-extra';
     has EncodingScheme $.enc = 'win';
 
     submethod TWEAK {
         my array $encoding = %(
             :mac($mac-encoding),   :win($win-encoding),
             :sym($sym-encoding),   :std($std-encoding),
+            :mac-extra($mac-extra-encoding),
             :zapf($zapf-encoding),
         ){$!enc};
 
