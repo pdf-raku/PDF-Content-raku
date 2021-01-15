@@ -1,7 +1,8 @@
 {{$NEXT}}
+  - Fix nesting of text blocks in :trace output
 
 0.4.9  2021-01-12T06:12:47+13:00
-  - Support IS0-32000 MacExpertEncoding (max-extra). This is a supplement
+  - Support IS0-32000 MacExpertEncoding (mac-extra). This is a supplement
     to MacRomanEncoding that includes various additional characters
 
 Release 0.4.8

@@ -825,8 +825,8 @@ class PDF::Content::Ops {
 
     method !trace(Str $op, Pair \opn) {
         my $nesting = @!gsaves.elems + @.open-tags.elems;
-        $nesting++ if $!context == Text;
-        $nesting-- if $op ∈ Openers;
+        $nesting++ if $!context == Text && $op ne 'ET';
+        $nesting-- if $op ∈ Openers && $op ne 'BT';
         my $indent = '  ' x $nesting;
         my PDF::IO::Writer $writer .= new;
 
