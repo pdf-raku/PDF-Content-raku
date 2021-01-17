@@ -214,11 +214,11 @@ class PDF::Content:ver<0.4.9>
         my @paint-ops = do {
             if $fill {
                 if $even-odd {
-                    if $close { $stroke ?? <CloseEOFillStroke> !! <Close EOFill> }
+                    if $close { $stroke ?? <CloseEOFillStroke> !! <ClosePath EOFill> }
                     else      { $stroke ?? <EOFillStroke>      !! <EOFill>       }
                 }
                 else {
-                    if $close { $stroke ?? <CloseFillStroke>   !! <Close Fill>   }
+                    if $close { $stroke ?? <CloseFillStroke>   !! <ClosePath Fill>   }
                     else      { $stroke ?? <FillStroke>        !! <Fill>         }
                 }
             }
