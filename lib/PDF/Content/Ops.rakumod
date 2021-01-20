@@ -400,7 +400,7 @@ class PDF::Content::Ops {
         @gs.push: $.graphics-state;
         delta(@gs);
     }
-    multi method gsaves is default { @!gsaves }
+    multi method gsaves { @!gsaves }
 
     # looks too much like a verb
     method gsave is DEPRECATED('gsaves') { @!gsaves }
@@ -413,7 +413,7 @@ class PDF::Content::Ops {
             Nil;
         }
     }
-    multi method graphics-state is default {
+    multi method graphics-state {
         %(
             %GraphicVars.pairs.map: {
                 my Str $key       = .key;
@@ -683,7 +683,7 @@ class PDF::Content::Ops {
 	$op => [ @ast-values ];
     }
 
-    multi sub op(Str $op, |c) is default {
+    multi sub op(Str $op, |c) {
         with %Ops{$op} {
             CATCH {
                 when X::PDF::Content {.rethrow }
@@ -704,7 +704,7 @@ class PDF::Content::Ops {
     }
 
     multi method op(SuspectOp $_) is default {
-        # quaranteed by PDF::Grammar::Content as either an unknown operator
+        # quarantined by PDF::Grammar::Content as either an unknown operator
         # or having an incorrect argument list
         given .value {
             my $op = .key;
@@ -760,7 +760,12 @@ class PDF::Content::Ops {
 
             # built-in callbacks
             my $new-context = self!track-context($op);
-            self.track-graphics($op, |@args );
+            with %Store{$op} {
+                .(self, |@args)
+            }
+            else {
+                self.track-graphics($op, |@args );
+            }
 
             # user supplied callbacks
 	    if @!callback {
@@ -1042,8 +1047,7 @@ class PDF::Content::Ops {
 	    unless $!extended-ops;
         $!extended-ops--;
     }
-    multi method track-graphics($op, *@args) is default {
-        .(self,|@args) with %Store{$op};
+    multi method track-graphics($, *@) {
     }
 
     method finish {
