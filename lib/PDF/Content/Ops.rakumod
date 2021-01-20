@@ -223,11 +223,18 @@ class PDF::Content::Ops {
             });
     }
 
-    my Method %PostOp;
+    my Method %Store;
     my Attribute %GraphicVars;
     my Str %ExtGStateEntries;
 
-    multi trait_mod:<is>(Attribute $att, :$graphics!) {
+    multi trait_mod:<is>(Attribute $att, :stored(&meth)!) {
+        my \setter = 'Set' ~ $att.accessor-name;
+        my Str \op = %OpCode{setter}
+            or die "No OpCode::{setter} entry for {$att.name}";
+        %Store{op} = &meth;
+    }
+
+    multi trait_mod:<is>(Attribute $att, Bool :$graphics! where .so) {
 
         my role GraphicsAttHOW {
             method accessor-name { self.name.substr(2) }
@@ -243,20 +250,9 @@ class PDF::Content::Ops {
 
         $att does GraphicsAttHOW;
         %GraphicVars{$att.accessor-name} = $att;
-
-        if $graphics ~~ Method {
-            my \setter = 'Set' ~ $att.accessor-name;
-            my Str \op = %OpCode{setter}
-                or die "No OpCode::{setter} entry for {$att.name}";
-            %PostOp{op} = $graphics;
-        }
-        else {
-	    warn "ignoring graphics trait"
-                unless $graphics ~~ Bool;
-        }
     }
 
-    multi trait_mod:<is>(Attribute $att, :$ext-graphics!) {
+    multi trait_mod:<is>(Attribute $att, Bool :$ext-graphics! where .so) {
 
         my role ExtGraphicsAttHOW {
             method accessor-name { self.name.substr(2) }
@@ -282,20 +278,21 @@ class PDF::Content::Ops {
     }
 
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing   is graphics(method ($!CharSpacing)  {}) is rw = 0;
-    has Numeric $.WordSpacing   is graphics(method ($!WordSpacing)  {}) is rw = 0;
-    has Numeric $.HorizScaling  is graphics(method ($!HorizScaling) {}) is rw = 100;
-    has Numeric $.TextLeading   is graphics(method ($!TextLeading)  {}) is rw = 0;
-    has Numeric $.TextRender    is graphics(method ($!TextRender)   {}) is rw = 0;
-    has Numeric $.TextRise      is graphics(method ($!TextRise)     {}) is rw = 0;
-    has Numeric @.TextMatrix    is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Array   $.Font          is graphics(method (Str $key, Numeric $size!) {
-        with $!parent.resource-entry('Font', $key) -> \font-face {
-            $!Font = [font-face, $size];
-        }
-        else {
-            die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;
-        }
+    has Numeric $.CharSpacing   is graphics is stored(method ($!CharSpacing)  {}) is rw = 0;
+    has Numeric $.WordSpacing   is graphics is stored(method ($!WordSpacing)  {}) is rw = 0;
+    has Numeric $.HorizScaling  is graphics is stored(method ($!HorizScaling) {}) is rw = 100;
+    has Numeric $.TextLeading   is graphics is stored(method ($!TextLeading)  {}) is rw = 0;
+    has Numeric $.TextRender    is graphics is stored(method ($!TextRender)   {}) is rw = 0;
+    has Numeric $.TextRise      is graphics is stored(method ($!TextRise)     {}) is rw = 0;
+    has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Array   $.Font          is graphics is stored(
+        method (Str $key, Numeric $size!) {
+            with $!parent.resource-entry('Font', $key) -> \font-face {
+                $!Font = [font-face, $size];
+            }
+            else {
+                die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;
+            }
     }) is rw;
     method font-face {$!Font[0]}
     method font-size {$!Font[1]}
@@ -305,17 +302,19 @@ class PDF::Content::Ops {
     method CTM is rw {
         Proxy.new(
             FETCH => { @!CTM },
-            STORE => -> $, List $gm {
-                my @diff = $gm.&multiply: @!CTM.&inverse();
+            STORE => -> $, List $lval {
+                # matrices are usually concatonated, but allow assignment. Work backwards
+                # finding a @diff matrix that concatonates to @!CTM to produce $lval
+                my @diff = $lval.&multiply: @!CTM.&inverse();
                 self.ConcatMatrix: |@diff
                     unless @diff.&is-identity();
                 @!CTM;
             });
     }
-    has Numeric $.LineWidth   is graphics(method ($!LineWidth) {}) is rw = 1.0;
-    has UInt    $.LineCap     is graphics(method ($!LineCap) {}) is rw = ButtCaps;
-    has UInt    $.LineJoin    is graphics(method ($!LineJoin) {}) is rw = MiterJoin;
-    has         @.DashPattern is graphics(
+    has Numeric $.LineWidth   is graphics is stored(method ($!LineWidth) {}) is rw = 1.0;
+    has UInt    $.LineCap     is graphics is stored(method ($!LineCap) {}) is rw = ButtCaps;
+    has UInt    $.LineJoin    is graphics is stored(method ($!LineJoin) {}) is rw = MiterJoin;
+    has         @.DashPattern is graphics is stored(
         method (Array $a, Numeric $p ) {
             @!DashPattern = [ $a.clone, $p];
         }
@@ -326,7 +325,7 @@ class PDF::Content::Ops {
         $cs ~~ 'RGB'|'Gray'|'CMYK' ?? $cs !! Str;
     }
 
-    has Str $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
+    has Str $.StrokeColorSpace is graphics is stored(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
     has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
         Proxy.new(
@@ -347,7 +346,7 @@ class PDF::Content::Ops {
         );
     }
 
-    has Str $.FillColorSpace is graphics(method ($!FillColorSpace) { }) is rw = 'DeviceGray';
+    has Str $.FillColorSpace is graphics is stored(method ($!FillColorSpace) { }) is rw = 'DeviceGray';
     has @!FillColor is graphics = [0.0];
     method FillColor is rw {
         Proxy.new(
@@ -369,10 +368,10 @@ class PDF::Content::Ops {
     }
 
     my subset RenderingIntention of Str where 'AbsoluteColorimetric'|'RelativeColorimetric'|'Saturation'|'Perceptual';
-    has RenderingIntention $.RenderingIntent is graphics(method ($!RenderingIntent)  {}) is rw = 'RelativeColorimetric';
+    has RenderingIntention $.RenderingIntent is graphics is stored(method ($!RenderingIntent)  {}) is rw = 'RelativeColorimetric';
 
     my subset FlatnessTolerance of Numeric where 0 .. 100;
-    has FlatnessTolerance $.Flatness is graphics(method ($!Flatness)  {}) is rw = 0;
+    has FlatnessTolerance $.Flatness is graphics is stored(method ($!Flatness)  {}) is rw = 0;
 
     # *** Extended Graphics STATE ***
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
@@ -1044,7 +1043,7 @@ class PDF::Content::Ops {
         $!extended-ops--;
     }
     multi method track-graphics($op, *@args) is default {
-        .(self,|@args) with %PostOp{$op};
+        .(self,|@args) with %Store{$op};
     }
 
     method finish {

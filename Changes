@@ -1,5 +1,5 @@
 {{$NEXT}}
-  - Fix paint() method call to ClosePath op
+  - Fix paint() method use of ClosePath op
   - Fix nesting of text blocks in :trace output
 
 0.4.9  2021-01-12T06:12:47+13:00
