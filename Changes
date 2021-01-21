@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.4.10  2021-01-21T14:04:44+13:00
   - Fix paint() method use of ClosePath op
   - Fix nesting of text blocks in :trace output
   - Refactor Ops class. Remove track-graphics method.
@@ -21,7 +23,7 @@ Release 0.4.6
 - Fix array flattening issue in SetDashPattern.
 
 Release 0.4.5
-- Fix PDF::API6 #8 - truncation of large JPEG images
+- Fix for PDF::API6 #8 - truncation of large JPEG images
 - Renamed github project/repo
 - Text blocks now preserve multi spaces by default. :squish option
   gives old behaviour - collapse multiple spaces to a single space;
