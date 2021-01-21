@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 110;
+plan 111;
 
 use lib 't';
 use PDF;
@@ -293,6 +293,20 @@ $g.SetCharWidthBBox(20,25, 1, 2, 25, 30);
 is $g.char-width, 20, "SetCharWidthBBox";
 is $g.char-height, 25, "SetCharWidthBBox";
 is-deeply $g.char-bbox.List, (1, 2, 25, 30), "SetCharWidthBBox";
+
+$g .= new( :$parent);
+$g.Save;
+$g.Rectangle(10,10, 150, 100);
+$g.paint: :close, :fill;
+$g.Restore;
+
+is-json-equiv $g.ops, [
+    :q[],
+        :re[:real(10), :real(10), :real(150), :real(100)],
+        :h[],
+         :f[],
+    :Q[]
+], 'drawing and painting';
 
 todo "failing on rakudo bleed";
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';

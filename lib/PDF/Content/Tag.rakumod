@@ -55,7 +55,7 @@ my enum InlineElemTags is export(:InlineElemTags,:Tags) (
 );
 
 my enum IllustrationTags is export(:IllustrationTags,:Tags) (
-    :Figure<Figure>, :Forumla<Formula>, :Form<Form>
+    :Figure<Figure>, :Formula<Formula>, :Form<Form>
 );
 
 constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums );

@@ -5,6 +5,7 @@ class PDF::Content::Font::CoreFont {
     use PDF::Content::Font;
     use PDF::Content::Font::Enc::Type1;
     use PDF::COS::Dict;
+    use PDF::COS::Name;
     has Font::AFM $.metrics handles <kern>;
     has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode enc>;
     has PDF::Content::Font $!dict;
@@ -136,7 +137,7 @@ class PDF::Content::Font::CoreFont {
     }
 
     method !encoding-name {
-        my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>;
+        my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>, :mac-extra<MacExpertEncoding>;
         with %enc-name{self.enc} -> $name {
             :$name;
         }

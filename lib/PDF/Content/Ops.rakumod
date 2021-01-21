@@ -223,11 +223,148 @@ class PDF::Content::Ops {
             });
     }
 
-    my Method %PostOp;
     my Attribute %GraphicVars;
     my Str %ExtGStateEntries;
+    my Method %Store; # handles graphics state updates
+    BEGIN %Store = (
+        OpCode::BeginText|OpCode::EndText => method {
+            @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
+        },
+        OpCode::Save => method {
+            my %gstate := $.graphics-state;
+            @!gsaves.push: %gstate;
+        },
+        OpCode::Restore => method {
+            die X::PDF::Content::OP::BadNesting.new: :op<Q>, :mnemonic(%OpName<Q>), :opener("'q' (%OpName<q>)")
+                unless @!gsaves;
 
-    multi trait_mod:<is>(Attribute $att, :$graphics!) {
+            my %gstate = @!gsaves.pop;
+
+            for %gstate.pairs {
+                my Str $key       = .key;
+                my Attribute $att = %GraphicVars{$key};
+                my $val           = .value;
+                $att.set_value(self, $val);
+            }
+        },
+        OpCode::ConcatMatrix => method (*@mtx where TransformMatrix) {
+            @!CTM = @mtx.&multiply: @!CTM;
+        },
+        OpCode::SetFillRGB => method ( \r, \g, \b) {
+            $!FillColorSpace = 'DeviceRGB';
+            @!FillColor = [r, g, b];
+        },
+        OpCode::SetStrokeRGB => method ( \r, \g, \b) {
+            $!StrokeColorSpace = 'DeviceRGB';
+            @!StrokeColor = [r, g, b];
+        },
+        OpCode::SetFillGray => method ( \gray) {
+            $!FillColorSpace = 'DeviceGray';
+            @!FillColor = [ gray, ];
+        },
+        OpCode::SetStrokeGray => method ( \gray) {
+            $!StrokeColorSpace = 'DeviceGray';
+            @!StrokeColor = [ gray, ];
+        },
+        OpCode::SetFillCMYK => method ( \c, \m, \y, \k) {
+            $!FillColorSpace = 'DeviceCMYK';
+            @!FillColor = [ c, m, y, k ];
+        },
+        OpCode::SetStrokeCMYK => method ( \c, \m, \y, \k) {
+            $!StrokeColorSpace = 'DeviceCMYK';
+            @!StrokeColor = [ c, m, y, k ];
+        },
+        OpCode::SetFillColor => method (*@!FillColor where self!color-args-ok('sc',  $_)) {
+        },
+        OpCode::SetStrokeColor => method (*@!StrokeColor where self!color-args-ok('SC',  $_)) {
+        },
+        OpCode::SetFillColorN => method (*@!FillColor where self!color-args-ok('scn',  $_)) {
+        },
+        OpCode::SetStrokeColorN => method (*@!StrokeColor where self!color-args-ok('SCN',  $_)) {
+        },
+        OpCode::BeginMarkedContent => method (Str $name) {
+            self.open-tag: PDF::Content::Tag.new: :op<BMC>, :$name, :$.owner, :start(+@!ops);
+        },
+        OpCode::BeginMarkedContentDict => method (Str $name, $p where Str|Hash) {
+            my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
+            my UInt $mcid = $_ with %attributes<MCID>:delete;
+            $!parent.use-mcid($_) with $mcid;
+            self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%attributes, :$.owner, :start(+@!ops), :$mcid;
+        },
+        OpCode::EndMarkedContent => method {
+	    die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
+	        unless @.open-tags;
+            given self.close-tag {
+                .end = +@!ops;
+            }
+        },
+        OpCode::MarkPoint => method ( Str $name!) {
+            my $start = my $end = +@!ops;
+            self.add-tag: PDF::Content::Tag.new: :op<MP>, :$name, :$.owner, :$start, :$end;
+        },
+        OpCode::MarkPointDict => method ( Str $name!, $p where Str|Hash) {
+            my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
+            my UInt $mcid = $_ with %attributes<MCID>:delete;
+            $!parent.use-mcid($_) with $mcid;
+            my $start = my $end = +@!ops;
+            self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%attributes, :$.owner, :$start, :$end, :$mcid;
+        },
+        OpCode::SetGraphicsState => method (Str $key) {
+             given $!parent {
+                with .resource-entry('ExtGState', $key) {
+                    with .<CA>   { $!StrokeAlpha = $_ }
+                    with .<ca>   { $!FillAlpha = $_ }
+                    with .<D>    { @!DashPattern = .list }
+                    with .<Font> { $!Font = $_ }
+                    with .<FT>   { $!Flatness = $_ }
+                    with .<LC>   { $!LineCap = $_ }
+                    with .<LJ>   { $!LineJoin = $_ }
+                    with .<LW>   { $!LineWidth = $_ }
+                    with .<RI>   { $!RenderingIntent = $_ }
+                }
+                else {
+                    die X::PDF::Content::UnknownResource.new: :type<ExtGState>, :$key;
+                }
+            }
+        },
+        OpCode::TextMove => method (Numeric $tx!, Numeric $ty) {
+            self!text-move($tx, $ty);
+        },
+        OpCode::TextMoveSet => method (Numeric $tx!, Numeric $ty) {
+            $!TextLeading = - $ty;
+            self!text-move($tx, $ty);
+        },
+        OpCode::TextNextLine => method {
+            self!new-line();
+        },
+        OpCode::MoveShowText => method ($) {
+            self!new-line();
+        },
+        OpCode::MoveSetShowText => method ($!WordSpacing, $!CharSpacing, $) {
+            self!new-line();
+        },
+        OpCode::SetCharWidth => method ($!char-width, $!char-height) {
+        },
+        OpCode::SetCharWidthBBox => method ($!char-width, $!char-height, *@!char-bbox) {
+        },
+        OpCode::BeginExtended => method {
+                    $!extended-ops++;
+        },
+        OpCode::EndExtended => method {
+	    die X::PDF::Content::OP::BadNesting.new: :op<EX>, :mnemonic(%OpName<EX>), :opener("'BX' (BeginExtended)")
+	        unless $!extended-ops;
+            $!extended-ops--;
+        },
+    );
+
+    multi trait_mod:<is>(Attribute $att, :stored(&meth)!) {
+        my \setter = 'Set' ~ $att.accessor-name;
+        my Str \op = %OpCode{setter}
+            or die "No OpCode::{setter} entry for {$att.name}";
+        %Store{op} = &meth;
+    }
+
+    multi trait_mod:<is>(Attribute $att, Bool :$graphics! where .so) {
 
         my role GraphicsAttHOW {
             method accessor-name { self.name.substr(2) }
@@ -243,20 +380,9 @@ class PDF::Content::Ops {
 
         $att does GraphicsAttHOW;
         %GraphicVars{$att.accessor-name} = $att;
-
-        if $graphics ~~ Method {
-            my \setter = 'Set' ~ $att.accessor-name;
-            my Str \op = %OpCode{setter}
-                or die "No OpCode::{setter} entry for {$att.name}";
-            %PostOp{op} = $graphics;
-        }
-        else {
-	    warn "ignoring graphics trait"
-                unless $graphics ~~ Bool;
-        }
     }
 
-    multi trait_mod:<is>(Attribute $att, :$ext-graphics!) {
+    multi trait_mod:<is>(Attribute $att, Bool :$ext-graphics! where .so) {
 
         my role ExtGraphicsAttHOW {
             method accessor-name { self.name.substr(2) }
@@ -282,20 +408,21 @@ class PDF::Content::Ops {
     }
 
     # *** TEXT STATE ***
-    has Numeric $.CharSpacing   is graphics(method ($!CharSpacing)  {}) is rw = 0;
-    has Numeric $.WordSpacing   is graphics(method ($!WordSpacing)  {}) is rw = 0;
-    has Numeric $.HorizScaling  is graphics(method ($!HorizScaling) {}) is rw = 100;
-    has Numeric $.TextLeading   is graphics(method ($!TextLeading)  {}) is rw = 0;
-    has Numeric $.TextRender    is graphics(method ($!TextRender)   {}) is rw = 0;
-    has Numeric $.TextRise      is graphics(method ($!TextRise)     {}) is rw = 0;
-    has Numeric @.TextMatrix    is graphics(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
-    has Array   $.Font          is graphics(method (Str $key, Numeric $size!) {
-        with $!parent.resource-entry('Font', $key) -> \font-face {
-            $!Font = [font-face, $size];
-        }
-        else {
-            die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;
-        }
+    has Numeric $.CharSpacing   is graphics is stored(method ($!CharSpacing)  {}) is rw = 0;
+    has Numeric $.WordSpacing   is graphics is stored(method ($!WordSpacing)  {}) is rw = 0;
+    has Numeric $.HorizScaling  is graphics is stored(method ($!HorizScaling) {}) is rw = 100;
+    has Numeric $.TextLeading   is graphics is stored(method ($!TextLeading)  {}) is rw = 0;
+    has Numeric $.TextRender    is graphics is stored(method ($!TextRender)   {}) is rw = 0;
+    has Numeric $.TextRise      is graphics is stored(method ($!TextRise)     {}) is rw = 0;
+    has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Array   $.Font          is graphics is stored(
+        method (Str $key, Numeric $size!) {
+            with $!parent.resource-entry('Font', $key) -> \font-face {
+                $!Font = [font-face, $size];
+            }
+            else {
+                die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;
+            }
     }) is rw;
     method font-face {$!Font[0]}
     method font-size {$!Font[1]}
@@ -305,17 +432,19 @@ class PDF::Content::Ops {
     method CTM is rw {
         Proxy.new(
             FETCH => { @!CTM },
-            STORE => -> $, List $gm {
-                my @diff = $gm.&multiply: @!CTM.&inverse();
+            STORE => -> $, List $lval {
+                # matrices are usually concatonated, but allow assignment. Work backwards
+                # finding a @diff matrix that concatonates to @!CTM to produce $lval
+                my @diff = $lval.&multiply: @!CTM.&inverse();
                 self.ConcatMatrix: |@diff
                     unless @diff.&is-identity();
                 @!CTM;
             });
     }
-    has Numeric $.LineWidth   is graphics(method ($!LineWidth) {}) is rw = 1.0;
-    has UInt    $.LineCap     is graphics(method ($!LineCap) {}) is rw = ButtCaps;
-    has UInt    $.LineJoin    is graphics(method ($!LineJoin) {}) is rw = MiterJoin;
-    has         @.DashPattern is graphics(
+    has Numeric $.LineWidth   is graphics is stored(method ($!LineWidth) {}) is rw = 1.0;
+    has UInt    $.LineCap     is graphics is stored(method ($!LineCap) {}) is rw = ButtCaps;
+    has UInt    $.LineJoin    is graphics is stored(method ($!LineJoin) {}) is rw = MiterJoin;
+    has         @.DashPattern is graphics is stored(
         method (Array $a, Numeric $p ) {
             @!DashPattern = [ $a.clone, $p];
         }
@@ -326,7 +455,7 @@ class PDF::Content::Ops {
         $cs ~~ 'RGB'|'Gray'|'CMYK' ?? $cs !! Str;
     }
 
-    has Str $.StrokeColorSpace is graphics(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
+    has Str $.StrokeColorSpace is graphics is stored(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
     has @!StrokeColor is graphics = [0.0];
     method StrokeColor is rw {
         Proxy.new(
@@ -347,7 +476,7 @@ class PDF::Content::Ops {
         );
     }
 
-    has Str $.FillColorSpace is graphics(method ($!FillColorSpace) { }) is rw = 'DeviceGray';
+    has Str $.FillColorSpace is graphics is stored(method ($!FillColorSpace) { }) is rw = 'DeviceGray';
     has @!FillColor is graphics = [0.0];
     method FillColor is rw {
         Proxy.new(
@@ -369,10 +498,10 @@ class PDF::Content::Ops {
     }
 
     my subset RenderingIntention of Str where 'AbsoluteColorimetric'|'RelativeColorimetric'|'Saturation'|'Perceptual';
-    has RenderingIntention $.RenderingIntent is graphics(method ($!RenderingIntent)  {}) is rw = 'RelativeColorimetric';
+    has RenderingIntention $.RenderingIntent is graphics is stored(method ($!RenderingIntent)  {}) is rw = 'RelativeColorimetric';
 
     my subset FlatnessTolerance of Numeric where 0 .. 100;
-    has FlatnessTolerance $.Flatness is graphics(method ($!Flatness)  {}) is rw = 0;
+    has FlatnessTolerance $.Flatness is graphics is stored(method ($!Flatness)  {}) is rw = 0;
 
     # *** Extended Graphics STATE ***
     has $.StrokeAlpha is ext-graphics is rw = 1.0;
@@ -401,7 +530,7 @@ class PDF::Content::Ops {
         @gs.push: $.graphics-state;
         delta(@gs);
     }
-    multi method gsaves is default { @!gsaves }
+    multi method gsaves { @!gsaves }
 
     # looks too much like a verb
     method gsave is DEPRECATED('gsaves') { @!gsaves }
@@ -414,7 +543,7 @@ class PDF::Content::Ops {
             Nil;
         }
     }
-    multi method graphics-state is default {
+    multi method graphics-state {
         %(
             %GraphicVars.pairs.map: {
                 my Str $key       = .key;
@@ -662,11 +791,11 @@ class PDF::Content::Ops {
 
      );
 
+    my subset Comment of Pair where {.key eq 'comment'}
+    my subset SuspectOp of Pair where {.key eq '??'}
     proto sub op(|c) returns Pair {*}
     # semi-raw and a little dwimmy e.g:  op('TJ' => [[:literal<a>, :hex-string<b>, 'c']])
     #                                     --> :TJ( :array[ :literal<a>, :hex-string<b>, :literal<c> ] )
-    my subset Comment of Pair where {.key eq 'comment'}
-    my subset SuspectOp of Pair where {.key eq '??'}
     multi sub op(Comment $comment) { $comment }
     multi sub op(Pair $raw!) {
         my Str $op = $raw.key;
@@ -683,8 +812,7 @@ class PDF::Content::Ops {
 	};
 	$op => [ @ast-values ];
     }
-
-    multi sub op(Str $op, |c) is default {
+    multi sub op(Str $op, |c) {
         with %Ops{$op} {
             CATCH {
                 when X::PDF::Content {.rethrow }
@@ -705,7 +833,7 @@ class PDF::Content::Ops {
     }
 
     multi method op(SuspectOp $_) is default {
-        # quaranteed by PDF::Grammar::Content as either an unknown operator
+        # quarantined by PDF::Grammar::Content as either an unknown operator
         # or having an incorrect argument list
         given .value {
             my $op = .key;
@@ -761,7 +889,9 @@ class PDF::Content::Ops {
 
             # built-in callbacks
             my $new-context = self!track-context($op);
-            self.track-graphics($op, |@args );
+            with %Store{$op} {
+                .(self, |@args)
+            }
 
             # user supplied callbacks
 	    if @!callback {
@@ -825,8 +955,8 @@ class PDF::Content::Ops {
 
     method !trace(Str $op, Pair \opn) {
         my $nesting = @!gsaves.elems + @.open-tags.elems;
-        $nesting++ if $!context == Text;
-        $nesting-- if $op ∈ Openers;
+        $nesting++ if $!context == Text && $op ne 'ET';
+        $nesting-- if $op ∈ Openers && $op ne 'BT';
         my $indent = '  ' x $nesting;
         my PDF::IO::Writer $writer .= new;
 
@@ -862,73 +992,11 @@ class PDF::Content::Ops {
 	p.ast
     }
 
-    multi method track-graphics('q') {
-        my %gstate := $.graphics-state;
-        @!gsaves.push: %gstate;
-    }
-
-    multi method track-graphics('Q') {
-        die X::PDF::Content::OP::BadNesting.new: :op<Q>, :mnemonic(%OpName<Q>), :opener("'q' (%OpName<q>)")
-            unless @!gsaves;
-
-        my %gstate = @!gsaves.pop;
-
-        for %gstate.pairs {
-            my Str $key       = .key;
-            my Attribute $att = %GraphicVars{$key};
-            my $val           = .value;
-            $att.set_value(self, $val);
-        }
-    }
-
-    multi method track-graphics('BT') {
-        @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
-    }
-
-    multi method track-graphics('ET') {
-        @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
-    }
-
-    multi method track-graphics('cm', *@mtx where TransformMatrix) {
-        @!CTM = @mtx.&multiply: @!CTM;
-    }
-
-    multi method track-graphics('rg', \r, \g, \b) {
-        $!FillColorSpace = 'DeviceRGB';
-        @!FillColor = [r, g, b];
-    }
-
-    multi method track-graphics('RG', \r, \g, \b) {
-        $!StrokeColorSpace = 'DeviceRGB';
-        @!StrokeColor = [r, g, b]
-    }
-
-    multi method track-graphics('g', \gray) {
-        $!FillColorSpace = 'DeviceGray';
-        @!FillColor = [ gray, ];
-    }
-
-    multi method track-graphics('G', \gray) {
-        $!StrokeColorSpace = 'DeviceGray';
-        @!StrokeColor = [ gray, ];
-    }
-
-    multi method track-graphics('k', \c, \m, \y, \k) {
-        $!FillColorSpace = 'DeviceCMYK';
-        @!FillColor = [ c, m, y, k ];
-    }
-
-    multi method track-graphics('K', \c, \m, \y, \k) {
-        $!StrokeColorSpace = 'DeviceCMYK';
-        @!StrokeColor = [ c, m, y, k ];
-    }
-
     method !color-args-ok($op, @colors) {
         my Str $cs = do given $op {
             when 'SC'|'SCN' {$!StrokeColorSpace}
             when 'sc'|'scn' {$!FillColorSpace}
         }
-
         constant %Arity = %(
             'DeviceGray'|'CalGray'|'Indexed' => 1,
             'DeviceRGB'|'CalRGB'|'Lab' => 3,
@@ -944,107 +1012,12 @@ class PDF::Content::Ops {
         True;
     }
 
-    multi method track-graphics('sc',  *@!FillColor   where self!color-args-ok('sc',  $_)) { }
-    multi method track-graphics('scn', *@!FillColor   where self!color-args-ok('scn', $_)) { }
-    multi method track-graphics('SC',  *@!StrokeColor where self!color-args-ok('SC',  $_)) { }
-    multi method track-graphics('SCN', *@!StrokeColor where self!color-args-ok('SCN', $_)) { }
-
-    multi method track-graphics('BMC', Str $name!) {
-        self.open-tag: PDF::Content::Tag.new: :op<BMC>, :$name, :$.owner, :start(+@!ops);
-    }
-
-    multi method track-graphics('BDC', Str $name, $p where Str|Hash) {
-        my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
-        my UInt $mcid = $_ with %attributes<MCID>:delete;
-        $!parent.use-mcid($_) with $mcid;
-        self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%attributes, :$.owner, :start(+@!ops), :$mcid;
-    }
-
-    multi method track-graphics('EMC') {
-	die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
-	    unless @.open-tags;
-        given self.close-tag {
-            .end = +@!ops;
-        }
-    }
-
-    multi method track-graphics('MP', Str $name!) {
-        my $start = my $end = +@!ops;
-        self.add-tag: PDF::Content::Tag.new: :op<MP>, :$name, :$.owner, :$start, :$end;
-    }
-
-    multi method track-graphics('DP', Str $name!, $p where Str|Hash) {
-        my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
-        my UInt $mcid = $_ with %attributes<MCID>:delete;
-        $!parent.use-mcid($_) with $mcid;
-        my $start = my $end = +@!ops;
-        self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%attributes, :$.owner, :$start, :$end, :$mcid;
-    }
-
-    multi method track-graphics('gs', Str $key) {
-         given $!parent {
-            with .resource-entry('ExtGState', $key) {
-                with .<CA>   { $!StrokeAlpha = $_ }
-                with .<ca>   { $!FillAlpha = $_ }
-                with .<D>    { @!DashPattern = .list }
-                with .<Font> { $!Font = $_ }
-                with .<FT>   { $!Flatness = $_ }
-                with .<LC>   { $!LineCap = $_ }
-                with .<LJ>   { $!LineJoin = $_ }
-                with .<LW>   { $!LineWidth = $_ }
-                with .<RI>   { $!RenderingIntent = $_ }
-            }
-            else {
-                die X::PDF::Content::UnknownResource.new: :type<ExtGState>, :$key;
-            }
-        }
-    }
-
     method !text-move(Numeric $tx, Numeric $ty) {
         @!TextMatrix = [1, 0, 0, 1, $tx, $ty].&multiply: @!TextMatrix;
     }
 
     method !new-line {
         self!text-move(0, - $!TextLeading);
-    }
-
-    multi method track-graphics('Td', Numeric $tx!, Numeric $ty) {
-        self!text-move($tx, $ty);
-    }
-
-    multi method track-graphics('TD', Numeric $tx!, Numeric $ty) {
-        $!TextLeading = - $ty;
-        self!text-move($tx, $ty);
-    }
-
-    multi method track-graphics('T*') {
-        self!new-line();
-    }
-
-    multi method track-graphics("'", $) {
-        self!new-line();
-    }
-
-    multi method track-graphics('"', $!WordSpacing, $!CharSpacing, $) {
-        self!new-line();
-    }
-
-    multi method track-graphics('d0', $!char-width, $!char-height) {
-    }
-
-    multi method track-graphics('d1', $!char-width, $!char-height, *@!char-bbox) {
-    }
-
-    multi method track-graphics('BX') {
-        $!extended-ops++;
-    }        
-    multi method track-graphics('EX') {
-	die X::PDF::Content::OP::BadNesting.new: :op<EX>, :mnemonic(%OpName<EX>), :opener("'BX' (BeginExtended)")
-	    unless $!extended-ops;
-        $!extended-ops--;
-    }
-    multi method track-graphics($op, *@args) is default {
-        .(self,|@args) with %PostOp{$op};
     }
 
     method finish {
@@ -1055,7 +1028,8 @@ class PDF::Content::Ops {
         warn X::PDF::Content::Unclosed.new: :message("unexpected end of content stream in $!context context")
             if $!strict && $!context != Page;
 
-        try .?cb-finish() for $!parent.resources('Font').values;
+        try { .?cb-finish() for $!parent.resources('Font').values; }
+        warn $_ with $!;
     }
 
     #| serialize content into a string. indent blocks for readability

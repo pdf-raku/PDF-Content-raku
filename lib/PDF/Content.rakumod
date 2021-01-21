@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
-class PDF::Content:ver<0.4.8>
+class PDF::Content:ver<0.4.10>
     is PDF::Content::Ops {
 
     use PDF::COS::Stream;
@@ -214,11 +214,11 @@ class PDF::Content:ver<0.4.8>
         my @paint-ops = do {
             if $fill {
                 if $even-odd {
-                    if $close { $stroke ?? <CloseEOFillStroke> !! <Close EOFill> }
+                    if $close { $stroke ?? <CloseEOFillStroke> !! <ClosePath EOFill> }
                     else      { $stroke ?? <EOFillStroke>      !! <EOFill>       }
                 }
                 else {
-                    if $close { $stroke ?? <CloseFillStroke>   !! <Close Fill>   }
+                    if $close { $stroke ?? <CloseFillStroke>   !! <ClosePath Fill>   }
                     else      { $stroke ?? <FillStroke>        !! <Fill>         }
                 }
             }

@@ -13,12 +13,10 @@ class Build {
     }
 
     method !build-enc(IO::Path $encoding-path) {
-        my $encoding-io = $encoding-path;
-
         die "unable to load encodings: $encoding-path"
             unless $encoding-path ~~ :e;
 
-        my %encodings = :mac(array[uint16].new(0 xx 256)), :win(array[uint16].new(0 xx 256)), :std(array[uint16].new(0 xx 256));
+        my %encodings = :mac(array[uint16].new(0 xx 256)), :win(array[uint16].new(0 xx 256)), :std(array[uint16].new(0 xx 256)), :mac-extra(array[uint16].new(0 xx 256));
 
         for $encoding-path.lines {
             next if /^ '#'/ || /^ $/;
@@ -46,13 +44,37 @@ class Build {
         }
         for <mac win std> -> $type {
             say "    #-- {$type.uc} encoding --#";
-            say "    constant \${$type}-encoding is export(:{$type}-encoding) = {%encodings{$type}.perl};";
+            say "    constant \${$type}-encoding is export(:{$type}-encoding) = {%encodings{$type}.raku};";
             say "";
         }
     }
 
+    method !build-mac-extra-enc(IO::Path $encoding-path, :$type='mac-extra', :$glyphs) {
+        my uint16 @encodings = 0 xx 256;
+        my %glyphs;
+
+        die "unable to load encodings: $encoding-path"
+            unless $encoding-path ~~ :e;
+
+        for $encoding-path.lines {
+            next if /^ '#'/ || /^ $/;
+            .chomp;
+            my ($chr, $glyph-name, $octal-code) = .split: ' ';
+warn [$chr, $glyph-name, $octal-code].raku;
+            my uint8  $encoding = :8($octal-code);
+            my uint16 $code-point = $chr.ord;
+
+            %glyphs{$code-point.chr} = $glyph-name;
+            @encodings[$encoding] ||= $code-point;
+        }
+        say "    #-- {$type.uc} encoding --#";
+        say "    constant \${$type}-glyphs is export(:{$type}-glyphs) = {%glyphs.raku};"
+            if $glyphs;
+        say "    constant \${$type}-encoding is export(:{$type}-encoding) = {@encodings.raku};";
+        say ""
+    }
+
     method !build-sym-enc(IO::Path $encoding-path, :$type!, :$glyphs) {
-        my $encoding-io = $encoding-path;
         my uint16 @encodings = 0 xx 256;
         my %glyphs;
 
@@ -74,9 +96,9 @@ class Build {
             @encodings[$encoding] ||= $code-point;
         }
         say "    #-- {$type.uc} encoding --#";
-        say "    constant \${$type}-glyphs is export(:{$type}-glyphs) = {%glyphs.perl};"
+        say "    constant \${$type}-glyphs is export(:{$type}-glyphs) = {%glyphs.raku};"
             if $glyphs;
-        say "    constant \${$type}-encoding is export(:{$type}-encoding) = {@encodings.perl};";
+        say "    constant \${$type}-encoding is export(:{$type}-encoding) = {@encodings.raku};";
         say ""
     }
 
@@ -105,6 +127,7 @@ class Build {
         self!build-enc("etc/encodings.txt".IO);
         self!build-sym-enc("etc/symbol.txt".IO, :type<sym>);
         self!build-sym-enc("etc/zdingbat.txt".IO, :type<zapf>, :glyphs);
+        self!build-mac-extra-enc("etc/mac-extra.txt".IO);
         say '}';
     }
 }
