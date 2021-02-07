@@ -21,6 +21,13 @@ module PDF::Content::Matrix {
         [1, 0, 0, 1, $x, $y];
     }
 
+    our sub reflect( Numeric \r --> TransformMatrix) is export(:reflect) {
+        my Numeric \cos2r = cos(2 * r);
+        my Numeric \sin2r = sin(2 * r);
+
+        [cos2r, sin2r, sin2r, -cos2r, 0, 0];
+    }
+
     our sub rotate( Numeric \r --> TransformMatrix) is export(:rotate) {
         my Numeric \cos-r = cos(r);
         my Numeric \sin-r = sin(r);
@@ -131,12 +138,13 @@ module PDF::Content::Matrix {
     }
 
     #| 3 [PDF 1.7 Section 4.2.2 Common Transforms]
-    #| order of transforms is: 1. Translate  2. Rotate 3. Scale/Skew
+    #| order of transforms is: 1. Translate  2. Rotate 3. Reflect 4. Scale/Skew
 
     our sub transform(
 	:$matrix = identity(),
 	:$translate,
 	:$rotate,
+	:$reflect,
 	:$scale,
 	:$skew,
 	--> TransformMatrix
@@ -144,6 +152,7 @@ module PDF::Content::Matrix {
 	my TransformMatrix $t = $matrix.Array;
 	apply($t, translate( |$_ )) with $translate;
 	apply($t, rotate( $_ ))     with $rotate;
+	apply($t, reflect( $_ ))    with $reflect;
 	apply($t, scale( |$_ ))     with $scale;
 	apply($t, skew( |$_ ))      with $skew;
 	[ $t.map: { round($_) } ];

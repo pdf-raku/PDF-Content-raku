@@ -1,6 +1,6 @@
 use v6;
 use Test;
-use PDF::Content::Matrix :transform, :dot, :inverse, :inverse-dot, :is-identity, :identity, :multiply;
+use PDF::Content::Matrix :transform, :dot, :inverse, :inverse-dot, :is-identity, :identity, :multiply, :reflect;
 
 my @identity = transform();
 is-deeply @identity, [1, 0, 0, 1, 0, 0], 'null transform';
@@ -9,6 +9,9 @@ my @translated = transform(:translate[10, 20]);
 is-deeply @translated, [1, 0, 0, 1, 10, 20], 'translate transform';
 
 is-deeply transform(:translate(30)), [1, 0, 0, 1, 30, 30], 'translate transform';
+
+my @reflected = transform(:reflect(pi/2) );
+is-deeply @reflected, [-1, 0, 0, 1, 0, 0], 'reflect transform';
 
 my @rotated = transform(:rotate(pi/2) );
 is-deeply @rotated, [0, 1, -1, 0, 0, 0], 'rotate transform';
@@ -38,8 +41,16 @@ my $chained = transform(
     :translate[10, 20],
     :rotate(1.5 * pi),
     :scale(2) );
-
 is-deeply $chained, [0, -2, 2, 0, 40, -20], 'chained transforms';
+
+my $phi = pi/2;
+my $theta = pi/4;
+$chained = transform(
+    :reflect($phi),
+    :rotate($theta),
+    );
+my $ref = transform(:reflect($phi - 0.5 * $theta));
+is-deeply $chained, $ref, 'chained reflect and rotate transforms';
 
 is-deeply multiply([1,2,3,4,5,6], [10,20,30,40,50,60]), [70, 100, 150, 220, 280, 400], 'multiply matrix';
 
