@@ -95,6 +95,8 @@ class PDF::Content::Ops {
     has Block @.callback is rw;
     has Pair  @.ops;
     has Bool  $.comment is rw = False;
+    multi method comment is rw { $!comment }
+    multi method comment($_ is raw) { self.add-comment($_); }
     method comment-ops is rw is DEPRECATED('comment') { $!comment }
     has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;

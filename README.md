@@ -56,8 +56,8 @@ say $font.stringwidth("RVX"); # 2166
 say $font.stringwidth("RVX", :kern); # 2111
 ```
 
-### `PDF::Content::Text::Block`
-a utility class for creating and outputting simple text lines and paragraphs:
+### `PDF::Content::Text::Box`
+a utility class for creating boxed text content for output by `print()` or `say()`:
 
 ```
 use lib 't';
@@ -68,10 +68,10 @@ use PDF::Content::Font::CoreFont;
 use PDF::Content::Text::Block;
 my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
-my PDF::Content::Text::Block $text-block .= new( :$text, :$font, :font-size(16) );
+my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :font-size(16) );
 my PDF::Content $gfx = $page.gfx;
 $gfx.BeginText;
-$text-block.render($gfx);
+$text-box.render($gfx);
 $gfx.EndText;
 say $gfx.Str;
 ```

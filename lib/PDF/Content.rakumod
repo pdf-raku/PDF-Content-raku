@@ -5,7 +5,8 @@ class PDF::Content:ver<0.4.10>
     is PDF::Content::Ops {
 
     use PDF::COS::Stream;
-    use PDF::Content::Text::Block;
+    use PDF::Content::Text::Box;
+    use PDF::Content::Text::Block; # deprecated
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
 
@@ -30,7 +31,7 @@ class PDF::Content:ver<0.4.10>
         $.op(BeginText);
         my \rv = meth(self);
         $.op(EndText);
-        rv;
+        return rv;
     }
 
     method marked-content($tag, &code, :$props) is DEPRECATED<mark> {
@@ -232,10 +233,10 @@ class PDF::Content:ver<0.4.10>
             for @paint-ops;
     }
 
-    method text-block($font = self!current-font[0], *%opt) {
+    method text-box($font = self!current-font[0], *%opt) {
         # detect and use the current text-state font
         my Numeric $font-size = $.font-size // self!current-font[1];
-        PDF::Content::Text::Block.new(
+        PDF::Content::Text::Box.new(
             :gfx(self), :$font, :$font-size, |%opt,
             );
     }
@@ -245,8 +246,16 @@ class PDF::Content:ver<0.4.10>
         Str $text,
         *%opt,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
     ) {
-        my $text-block = self.text-block( :$text, |%opt);
-        @.print( $text-block, |%opt);
+        my $text-box = self.text-box( :$text, |%opt);
+        @.print( $text-box, |%opt);
+    }
+
+    #| deprecated in favour of text-box()
+    method text-block($font = self!current-font[0], *%opt) is DEPRECATED('text-box') {
+        my Numeric $font-size = $.font-size // self!current-font[1];
+        PDF::Content::Text::Block.new(
+            :gfx(self), :$font, :$font-size, |%opt,
+            );
     }
 
     method !set-position($text-block, $position,
@@ -293,7 +302,7 @@ class PDF::Content:ver<0.4.10>
 	);
     }
 
-    multi method print(PDF::Content::Text::Block $text-block,
+    multi method print(PDF::Content::Text::Box $text-box,
                        Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
@@ -305,23 +314,23 @@ class PDF::Content:ver<0.4.10>
 
         self.BeginText unless in-text;
 
-        self!set-position($text-block, $_, :$left, :$top)
+        self!set-position($text-box, $_, :$left, :$top)
             with $position;
         my ($x, $y) = $.text-position;
-        my ($dx, $dy) = $text-block.render(self, :$nl, :$top, :$left, :$preserve);
+        my ($dx, $dy) = $text-box.render(self, :$nl, :$top, :$left, :$preserve);
 
         self.EndText() unless in-text;
 
         with $*ActualText {
             # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
-            $_ ~= $text-block.text;
+            $_ ~= $text-box.text;
             $_ ~= "\n" if $nl;
         }
 
         my \x0 = $x + $dx;
         my \y0 = $y + $dy;
-        my \x1 = x0 + $text-block.width;
-        my \y1 = y0 + $text-block.height;
+        my \x1 = x0 + $text-box.width;
+        my \y1 = y0 + $text-box.height;
 
         (x0, y0, x1, y1);
     }

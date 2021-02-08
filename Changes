@@ -3,6 +3,10 @@
     after rotation and before skew.
   - Add requirement for Font::AFM version 1.24.4+.
   - Add tests for the new method.
+  - Deprecate PDF::Content::Text::Block class in favor of
+    PDF::Content::Text::Box and text-block() method in favour of
+    text-block(). "Text blocks" already commonly refers to BeginText ..
+    EndText regions in a content stream. Call them "text boxes" instead.
 
 0.4.10  2021-01-21T14:04:44+13:00
   - Fix paint() method use of ClosePath op

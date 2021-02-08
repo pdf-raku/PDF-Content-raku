@@ -46,6 +46,7 @@
     "PDF::Content::Resourced": "lib/PDF/Content/Resourced.rakumod",
     "PDF::Content::Tag": "lib/PDF/Content/Tag.rakumod",
     "PDF::Content::Text::Block": "lib/PDF/Content/Text/Block.rakumod",
+    "PDF::Content::Text::Box": "lib/PDF/Content/Text/Box.rakumod",
     "PDF::Content::Text::Line": "lib/PDF/Content/Text/Line.rakumod",
     "PDF::Content::Text::Style": "lib/PDF/Content/Text/Style.rakumod",
     "PDF::Content::XObject": "lib/PDF/Content/XObject.rakumod"

@@ -16,6 +16,7 @@ lives-ok {$g.ops("BT BX 10 10 Td EX ET")}, 'regular op, extensions enabled';
 lives-ok {$g.ops("BX (extended-op) BAZINGA EX");}, 'extended sequence lives';
 
 dies-ok {$g.op("99 foo")}, "unknown single op";
+
 $g.BeginExtended;
 lives-ok {$g.ops("42 bar");}, "extended single op";
 $g.EndExtended;
