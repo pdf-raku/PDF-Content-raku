@@ -1,6 +1,8 @@
 [[Raku PDF Project]](https://pdf-raku.github.io)
  / [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku)
 
+[![Actions Status](https://github.com/pdf-raku/PDF-Content-raku/workflows/test/badge.svg)](https://github.com/pdf-raku/PDF-Content-raku/actions)
+
 # PDF::Content
 
 This Raku module is a library of roles and classes for basic PDF content creation and rendering, including text, images, basic colors, core fonts, marked content and general graphics.
