@@ -1,4 +1,7 @@
 {{$NEXT}}
+  - Fix use-font() method to simply check for uniqueness of the font
+    dictionary. The former (deep) equivalence check is incompatible
+    with PDF::Font::Loader 0.4.0+, which builds font dictionaries lazily.
 
 0.4.11  2021-02-08T16:42:42+13:00
   - Add matrix reflection method. Put its order to be applied

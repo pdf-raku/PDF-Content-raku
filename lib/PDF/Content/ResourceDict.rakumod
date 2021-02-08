@@ -10,7 +10,7 @@ role PDF::Content::ResourceDict {
     has Int %!counter;
 
     method resource-key($object, |c --> Str:D) {
-        self!register-resource($object, |c)
+        self!require-resource($object, |c)
             unless %!resource-key{$object.WHICH}:exists;
        %!resource-key{$object.WHICH};
     }
@@ -38,65 +38,58 @@ role PDF::Content::ResourceDict {
         }
     }
 
-    method find-resource( &match, Str :$type! ) {
-        my $entry;
+    method find-resource( $entry, Str :$type! ) {
+        my $found;
 
         with self{$type} -> $resources {
 
             for $resources.keys {
-                my $resource = $resources{$_};
-                if match($resource) {
-		    $entry = $resource;
-		    %!resource-key{$entry.WHICH} = $_;
+                if $entry === $resources{$_} {
+                    $found = True;
+		    %!resource-key{$entry.WHICH} //= $_;
                     last;
                 }
             }
         }
 
-        $entry;
+        $found ?? $entry !! Mu;
     }
 
     #| ensure that the object is registered as a page resource. Return a unique
     #| name for it.
-    method !register-resource(PDF::COS $object,
+    method !require-resource(PDF::COS $object,
                              Str :$type = self!resource-type($object),
 	) {
 
-	my constant %Prefix = %(
-	    :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>,
-            :Shading<Sh>, :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
-	    :Other<Obj>,
-	);
+        unless $.find-resource($object, :$type) {
+            my constant %Prefix = %(
+                :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>,
+                :Shading<Sh>, :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
+                :Other<Obj>,
+            );
 
-	my $prefix = $type eq 'XObject'
-	    ?? %Prefix{$type}{ $object<Subtype> }
-	    !! %Prefix{$type};
+            my $prefix = $type eq 'XObject'
+                ?? %Prefix{$type}{ $object<Subtype> }
+                !! %Prefix{$type};
 
-        my Str $key;
-        # make a unique resource key
-        repeat {
-            $key = $prefix ~ ++%!counter{$prefix};
-        } while self.keys.first: { self{$_}{$key}:exists };
+            my Str $key;
+            # make a unique resource key
+            repeat {
+                $key = $prefix ~ ++%!counter{$prefix};
+            } while self.keys.first: { self{$_}{$key}:exists };
 
-        self{$type}{$key} = $object;
-
-	%!resource-key{$object.WHICH} = $key;
+            self{$type}{$key} = $object;
+            %!resource-key{$object.WHICH} = $key;
+        }
         $object;
     }
 
-    multi method resource($object where { %!resource-key{.WHICH}:exists }) {
+    multi method resource(PDF::COS $object where { %!resource-key{.WHICH}:exists }) is default {
 	$object;
     }
 
-    multi method resource(PDF::COS $object, Bool :$eqv=False ) is default {
-        my Str $type = self!resource-type($object)
-            // die "not a resource object: {$object.WHAT}";
-
-	my &match = $eqv
-	    ?? sub ($_){$_ eqv $object}
-	    !! sub ($_){$_ === $object};
-        self.find-resource(&match, :$type)
-            // self!register-resource( $object );
+    multi method resource(PDF::COS $object, :$type = self!resource-type($object)) {
+        self!require-resource($object, :$type);
     }
 
     method resource-entry(Str:D $type!, Str:D $key!) {
@@ -104,20 +97,16 @@ role PDF::Content::ResourceDict {
     }
 
     method core-font(|c) {
-        self.use-font: (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
+        my $font := (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
+        self.resource: $font.to-dict(), :type<Font>;
     }
 
     multi method use-font(PDF::Content::Font $font) {
-        my $font-obj = $font.font-obj;
-        self.find-resource(sub ($_){ .?font-obj === $font-obj },
-			   :type<Font>)
-            // self!register-resource( $font );
+        self.resource: $font, :type<Font>;
     }
 
-    multi method use-font($font-obj) is default {
-        self.find-resource(sub ($_){ .?font-obj === $font-obj },
-			   :type<Font>)
-            // self!register-resource: $font-obj.to-dict;
+    multi method use-font($font-obj) {
+        self.resource: $font-obj.to-dict;
     }
 
 }

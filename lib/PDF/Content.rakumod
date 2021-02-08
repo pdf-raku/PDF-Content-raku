@@ -341,9 +341,9 @@ class PDF::Content:ver<0.4.11>
     }
 
     #| thin wrapper to $.op(SetFont, ...)
-    multi method set-font( Hash $font!, Numeric $size = 16) {
+    method set-font( Hash $font!, Numeric $size = 16) {
         $.op(SetFont, $.resource-key($font), $size)
-            if !$.font-face || $.font-size != $size || $.font-face !eqv $font;
+            if $.font-face !=== $font || $.font-size != $size;
     }
 
     method !current-font {
