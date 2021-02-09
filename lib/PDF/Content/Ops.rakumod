@@ -103,6 +103,8 @@ class PDF::Content::Ops {
     has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
     method owner { $.parent }
     has UInt $.extended-ops = 0;
+    has Numeric ($!cur-x, $!cur-y); # current point
+    has Numeric ($!close-x, $!close-y); # closepath end-point
 
     # some convenient mnemomic names
     my Str enum OpCode is export(:OpCode) «
@@ -357,6 +359,23 @@ class PDF::Content::Ops {
 	        unless $!extended-ops;
             $!extended-ops--;
         },
+        # path construction operators
+        OpCode::MoveTo => method ($!cur-x, $!cur-y) {
+            $!close-x = $!cur-x;
+            $!close-y = $!cur-y;
+        },
+        OpCode::Rectangle => method ($!cur-x, $!cur-y, $, $) {
+            $!close-x = $!cur-x;
+            $!close-y = $!cur-y;
+        },
+        OpCode::LineTo => method ($!cur-x, $!cur-y) { },
+        OpCode::CurveTo => method ($, $, $, $, $!cur-x, $!cur-y) { },
+        OpCode::CurveToInitial | OpCode::CurveToFinal => method ($, $, $!cur-x, $!cur-y) { },
+        OpCode::ClosePath => method {
+            $!cur-x = $!close-x;
+            $!cur-y = $!close-y;
+        },
+        
     );
 
     multi trait_mod:<is>(Attribute $att, :stored(&meth)!) {
@@ -834,6 +853,12 @@ class PDF::Content::Ops {
         $op-name ∈ GraphicsOps;
     }
 
+    method current-point {
+        unless $!context == Path {
+            $!cur-x = $!cur-y = Nil;
+        }
+        ($!cur-x, $!cur-y)
+    }
     multi method op(SuspectOp $_) is default {
         # quarantined by PDF::Grammar::Content as either an unknown operator
         # or having an incorrect argument list
