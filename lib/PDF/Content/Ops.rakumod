@@ -853,11 +853,20 @@ class PDF::Content::Ops {
         $op-name ∈ GraphicsOps;
     }
 
-    method current-point {
-        unless $!context == Path {
-            $!cur-x = $!cur-y = Nil;
-        }
-        ($!cur-x, $!cur-y)
+    my subset Vector of List is export(:Vector) where {.elems == 2 && all(.list) ~~ Numeric}
+    method current-point is rw returns Vector {
+        Proxy.new(
+            FETCH => {
+                $!context == Path
+                    ?? ($!cur-x, $!cur-y)
+                    !! (Numeric, Numeric)
+            },
+            STORE => -> $,  Vector \v {
+                unless $!context == Path && $!cur-x =~= v[0] && $!cur-x =~= v[1] {
+                    self.op(MoveTo, |v);
+                }
+            }
+        );
     }
     multi method op(SuspectOp $_) is default {
         # quarantined by PDF::Grammar::Content as either an unknown operator
