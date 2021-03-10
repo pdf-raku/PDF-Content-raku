@@ -1,7 +1,7 @@
 use v6;
-use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
+use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState, :Vector;
 
-class PDF::Content:ver<0.4.11>
+class PDF::Content:ver<0.4.12>
     is PDF::Content::Ops {
 
     use PDF::COS::Stream;
@@ -283,7 +283,6 @@ class PDF::Content:ver<0.4.11>
         self.text-position = [$x, $y];
     }
 
-    my subset Vector of List where {.elems == 2 && all(.list) ~~ Numeric}
     method text-position is rw returns Vector {
         warn '$.text-position accessor used outside of a text-block'
             unless $.context == GraphicsContext::Text;
