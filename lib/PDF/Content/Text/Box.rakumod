@@ -42,7 +42,7 @@ class PDF::Content::Text::Box {
     }
 
     multi submethod TWEAK(:@chunks!, :$!squish = False, |c) is default {
-	$!style .= new(|c);
+        $!style .= new(|c);
         $!text = @chunks.map(*.Str).join;
 	self!layup(@chunks);
     }
@@ -216,7 +216,7 @@ class PDF::Content::Text::Box {
 		@content.push: OpCode::TextNextLine;
 	    }
 
-            my $space-pad = scale * (line.word-gap - self!word-gap);
+            my $space-pad = scale * (line.word-gap - self.space-width);
             @content.push: line.content(:$.font, :$.font-size, :$x-shift, :$space-pad);
         }
 

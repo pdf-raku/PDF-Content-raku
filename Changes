@@ -1,4 +1,5 @@
 {{$NEXT}}
+  - Fix :WordSpacing option in text boxes #13
 
 0.4.12  2021-03-11T11:35:37+13:00
   - Fix use-font() method to simply check for uniqueness of the font
