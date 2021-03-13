@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.4.13  2021-03-13T14:33:18+13:00
   - Fix :WordSpacing option in text boxes #13
 
 0.4.12  2021-03-11T11:35:37+13:00
