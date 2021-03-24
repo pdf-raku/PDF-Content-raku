@@ -5,6 +5,7 @@ use lib 't';
 use PDF;
 use PDF::Content::Ops :OpCode;
 use PDFTiny;
+use PDF::Content::FontObj;
 
 my PDFTiny $pdf .= new;
 my $page = $pdf.add-page;
@@ -12,8 +13,8 @@ my $gfx = $page.gfx;
 my $width = 50;
 my $font-size = 18;
 
-my $bold-font = $page.core-font( :family<Helvetica>, :weight<bold> );
-my $font = $page.core-font( :family<Helvetica> );
+my PDF::Content::FontObj $bold-font = $page.core-font( :family<Helvetica>, :weight<bold> );
+my PDF::Content::FontObj $font = $page.core-font( :family<Helvetica> );
 
 $gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font), :$font-size);
 

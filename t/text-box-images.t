@@ -15,7 +15,7 @@ my $page = $pdf.add-page;
 
 my @chunks = PDF::Content::Text::Box.comb: 'I must go down to the seas';
 @chunks.append: ' ', 'aga','in';
-my $font = PDF::Content::Font::CoreFont.load-font( :family<helvetica>, :weight<bold> );
+my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
 my PDF::Content::XObject $image .= open: "t/images/lightbulb.gif";
 

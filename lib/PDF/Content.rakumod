@@ -9,6 +9,7 @@ class PDF::Content:ver<0.4.13>
     use PDF::Content::Text::Block; # deprecated
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
+    use PDF::Content::FontObj;
 
     my subset Align of Str where 'left' | 'center' | 'right';
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
@@ -340,9 +341,12 @@ class PDF::Content:ver<0.4.13>
     }
 
     #| thin wrapper to $.op(SetFont, ...)
-    method set-font( Hash $font!, Numeric $size = 16) {
+    multi method set-font( Hash $font!, Numeric $size = 16) {
         $.op(SetFont, $.resource-key($font), $size)
             if $.font-face !=== $font || $.font-size != $size;
+    }
+    multi method set-font( PDF::Content::FontObj $font-obj!, Numeric $size = 16) {
+        $.set-font($font-obj.to-dict, $size);
     }
 
     method !current-font {

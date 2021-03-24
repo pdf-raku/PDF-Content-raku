@@ -3,6 +3,7 @@ use Test;
 plan 2;
 use lib 't';
 use PDF::Content::Color :rgb;
+use PDF::Content::FontObj;
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
@@ -11,7 +12,7 @@ $pdf.media-box = [0, 0, 400, 120];
 my PDFTiny::Page $page = $pdf.add-page;
 
 $page.graphics: {
-    my $font = .core-font( :family<Helvetica> );
+    my PDF::Content::FontObj $font = .core-font( :family<Helvetica> );
     my PDFTiny::XObject-Form $form = .xobject-form(:BBox[0, 0, 95, 25]);
     $form.graphics: {
         # Set a background color

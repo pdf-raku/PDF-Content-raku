@@ -3,6 +3,7 @@ use Test;
 plan 1;
 use lib 't';
 use PDF::Content::Ops :OpCode;
+use PDF::Content::FontObj;
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
@@ -11,7 +12,7 @@ my $gfx = $page.gfx;
 my $width = 50;
 my $font-size = 18;
 
-my $font = $page.core-font( :family<Helvetica> );
+my PDF::Content::FontObj $font = $page.core-font( :family<Helvetica> );
 
 $width = 100;
 my $height = 80;

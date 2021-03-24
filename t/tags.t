@@ -6,12 +6,13 @@ use lib 't';
 use PDFTiny;
 use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
 use PDF::Content::XObject;
+use PDF::Content::FontObj;
 
 my PDFTiny $pdf .= new;
 
 my $page = $pdf.add-page;
-my $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
-my $body-font = $page.core-font: :family<Helvetica>;
+my PDF::Content::FontObj $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
+my PDF::Content::FontObj $body-font = $page.core-font: :family<Helvetica>;
 
 $page.graphics: -> $gfx {
     my PDF::Content::Tag $tag;

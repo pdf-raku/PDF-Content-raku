@@ -1,6 +1,9 @@
 use v6;
 
-class PDF::Content::Font::CoreFont {
+use PDF::Content::FontObj;
+
+class PDF::Content::Font::CoreFont
+    does PDF::Content::FontObj {
     use Font::AFM:ver(v1.23.5+);
     use PDF::Content::Font;
     use PDF::Content::Font::Enc::Type1;

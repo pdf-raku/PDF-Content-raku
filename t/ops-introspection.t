@@ -61,8 +61,8 @@ $g.BeginText;
 my $font = $g.core-font( :family<Helvetica> ); # define resource /F1
 $g.SetFont('F1', 16);
 
-is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[$font, 16]}, ], 'gsave saved :delta';
-is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[$font, 16]}, 'graphics-state :delta';
+is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[$font.to-dict, 16]}, ], 'gsave saved :delta';
+is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[$font.to-dict, 16]}, 'graphics-state :delta';
 is-deeply $g.context, GraphicsContext::Text;
 
 $g.tag: 'P', {

@@ -7,7 +7,7 @@ use PDF::Content::Page :PageSizes;
 use PDFTiny;
 
 my PDFTiny $doc .= new;
-my $page = $doc.page;
+my PDF::Content::Page $page = $doc.page;
 does-ok $page, PDF::Content::Page;
 $page.media-box = PageSizes::Letter;
 $page.bleed = 3;

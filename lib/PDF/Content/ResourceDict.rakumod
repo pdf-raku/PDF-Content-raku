@@ -5,6 +5,7 @@ role PDF::Content::ResourceDict {
     use PDF::COS;
     use PDF::COS::Name;
     use PDF::Content::Font;
+    use PDF::Content::FontObj;
 
     has Str %!resource-key; # {Any}
     has Int %!counter;
@@ -99,14 +100,15 @@ role PDF::Content::ResourceDict {
     method core-font(|c) {
         my $font := (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
         self.resource: $font.to-dict(), :type<Font>;
+        $font;
     }
 
     multi method use-font(PDF::Content::Font $font) {
         self.resource: $font, :type<Font>;
     }
 
-    multi method use-font($font-obj) {
-        self.resource: $font-obj.to-dict;
+    multi method use-font(PDF::Content::FontObj $font-obj) {
+        self.resource: $font-obj.to-dict, :type<Font>;
     }
 
 }
