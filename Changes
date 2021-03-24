@@ -1,9 +1,12 @@
 {{$NEXT}}
+
+0.5.0  2021-03-25T09:36:34+13:00
   - Add PDF::Content::FontObj - interface role for font manipulation
     objects.
   - core-font() method now returns the font-object of type
-    PDF::Content::FontObj, not the font dictionary for consistency
-    with PDF::Font::Loader.
+    PDF::Content::FontObj, rather than font dictionary. This is for
+    consistency with PDF::Font::Loader. This allows type-checking.
+    Also, a font object is more likely to be useful to an end user.
 
 0.4.13  2021-03-13T14:33:18+13:00
   - Fix :WordSpacing option in text boxes #13

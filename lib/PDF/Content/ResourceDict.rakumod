@@ -10,7 +10,7 @@ role PDF::Content::ResourceDict {
     has Str %!resource-key; # {Any}
     has Int %!counter;
 
-    method resource-key($object, |c --> Str:D) {
+    method resource-key(PDF::COS $object, |c --> Str:D) {
         self!require-resource($object, |c)
             unless %!resource-key{$object.WHICH}:exists;
        %!resource-key{$object.WHICH};
