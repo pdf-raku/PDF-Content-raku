@@ -68,8 +68,8 @@ role PDF::Content::Graphics {
         }
     }
 
-    method new-gfx(|c) {
-        PDF::Content.new( :parent(self), |c );
+    method new-gfx(PDF::Content::Graphics:D $parent: |c) {
+        PDF::Content.new: :$parent, |c;
     }
 
     method render(Bool :$tidy = True, |c) is default {

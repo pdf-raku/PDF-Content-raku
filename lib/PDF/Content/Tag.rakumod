@@ -58,7 +58,14 @@ my enum IllustrationTags is export(:IllustrationTags,:Tags) (
     :Figure<Figure>, :Formula<Formula>, :Form<Form>
 );
 
-constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums );
+#| These tags are meaningful within content streams, as opposed to the strucure-tree
+my enum ContentTags is export(:ContentTags,:Tags) (
+    :OptionalContent<OC>,  # [PDF 32000 8.11.3.2 Optional Content in Content Streams]
+    :TagSuspect<TagSuspect>, :ReversedChars<ReversedChars>, # [PDF 32000 14.8.2 Tagged PDF and Page Content]
+    :Clipped<Clip>, # [PDF 32000 14.6.3 Marked Content and Clipping
+);
+
+constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums, ContentTags.enums );
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
 multi method add-kid(PDF::Content::Tag $kid) {
