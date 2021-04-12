@@ -25,7 +25,7 @@ lives-ok {
     }
 
     # ensure consistant document ID generation
-    srand(123456);
+    $pdf.id = $*PROGRAM-NAME.fmt('%-16s').substr(0,16);
 
     $pdf.save-as: "t/patterns.pdf";
 };

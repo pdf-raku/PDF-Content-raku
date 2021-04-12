@@ -173,8 +173,8 @@ for (
 }
 
 sub save-images(@images) {
-    my PDFTiny $doc .= new;
-    my $page = $doc.add-page;
+    my PDFTiny $pdf .= new;
+    my $page = $pdf.add-page;
     $page.MediaBox = [0,0,612,792];
     my $x = 45;
     my $y = 650;
@@ -208,9 +208,9 @@ sub save-images(@images) {
     }
     
     # ensure consistant document ID generation
-    srand(123456);
+    $pdf.id = $*PROGRAM-NAME.fmt('%-16s').substr(0,16);
 
-    $doc.save-as: "t/images.pdf";
+    $pdf.save-as: "t/images.pdf";
 }
 
 lives-ok { save-images(@images) }, 'save-images - lives';

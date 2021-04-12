@@ -1,6 +1,6 @@
 {
   "api": "PDF-1.7",
-  "auth": "github:pdf-raku",
+  "auth": "cpan:WARRINGD",
   "authors": [
     "David Warring"
   ],
@@ -14,7 +14,7 @@
     "Native::Packing",
     "Method::Also",
     "JSON::Fast",
-    "PDF:ver<0.4.5+>",
+    "PDF:ver<0.4.6+>",
     "PDF::Grammar"
   ],
   "description": "PDF content related classes; including text, images, fonts and graphics",
