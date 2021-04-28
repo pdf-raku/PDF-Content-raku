@@ -43,7 +43,7 @@ for <top center bottom> -> $valign {
 $gfx.EndText;
 
 # ensure consistant document ID generation
-$pdf.id = $*PROGRAM-NAME.fmt('%-16s').substr(0,16);
+$pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 
 lives-ok {$pdf.save-as('t/pdf-text-align.pdf')};
 

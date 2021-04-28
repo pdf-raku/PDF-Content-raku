@@ -47,7 +47,7 @@ $page.graphics: -> $gfx {
 is $page.gfx.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 
 # ensure consistant document ID generation
-$pdf.id = $*PROGRAM-NAME.fmt('%-16s').substr(0,16);
+$pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 
 lives-ok { $pdf.save-as: "t/tags.pdf" }
 
