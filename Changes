@@ -1,5 +1,6 @@
 {{$NEXT}}
   - Declare additional content tags: /OC /TagSuspect /ReversedChars /Clip
+  - Pass through parameters in PDF::Content draw() method
 
 0.5.0  2021-03-25T09:36:34+13:00
   - Add PDF::Content::FontObj - interface role for font manipulation

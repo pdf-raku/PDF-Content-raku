@@ -101,10 +101,10 @@ class PDF::Content:ver<0.5.0>
         $!tagger //= Tagger.new: :gfx(self);
     }
 
-    method canvas( &mark-up! ) {
+    method canvas(&mark-up!, |c ) {
         my $canvas := (require HTML::Canvas).new;
         $canvas.context(&mark-up);
-        self.draw($canvas);
+        self.draw($canvas, |c);
     }
 
     method load-image($spec) {
@@ -370,7 +370,8 @@ class PDF::Content:ver<0.5.0>
         nextwith( $text, :$font, |c);
     }
 
-    method draw($canvas, :$renderer = (require HTML::Canvas::To::PDF).new: :gfx(self)) {
+    method draw(PDF::Content:D $gfx: $canvas, :$renderer is copy, |c) {
+        $renderer //= (require HTML::Canvas::To::PDF).new: :$gfx, |c;
         $canvas.render($renderer);
     }
 
