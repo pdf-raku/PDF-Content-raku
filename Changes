@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.5.1  2021-04-29T12:03:00+12:00
   - Declare additional content tags: /OC /TagSuspect /ReversedChars /Clip
   - Pass through parameters in PDF::Content draw() method
 
