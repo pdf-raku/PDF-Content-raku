@@ -89,7 +89,7 @@ method gist {
     my $attributes = self!attributes-gist();
     $.kids
         ?? [~] flat("<{$.name}$attributes>",
-                    $!kids.map(*.gist),
+                    $!kids».gist,
                     "</{$.name}>")
         !! "<{$.name}$attributes/>";
 }
@@ -108,5 +108,5 @@ our class Set {
     method children { @!tags }
     method take-descendants { @!tags.grep(PDF::Content::Tag).map(*.take-descendants) }
     method descendants { gather self.take-descendants }
-    method gist { @!tags.map(*.gist).join }
+    method gist { @!tags».gist.join }
 }

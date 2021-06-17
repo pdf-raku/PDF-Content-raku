@@ -21,9 +21,9 @@ class PDF::Content::Text::Box {
     has Str $.text;
     has Bool $!squish;
 
-    method content-width  { @!lines.map( *.content-width ).max }
+    method content-width  { @!lines».content-width.max }
     method content-height {
-        sum @!lines.map( *.height * $.leading )
+        @!lines».height.sum * $.leading;
     }
 
     my grammar Text {
@@ -43,7 +43,7 @@ class PDF::Content::Text::Box {
 
     multi submethod TWEAK(:@chunks!, :$!squish = False, |c) is default {
         $!style .= new(|c);
-        $!text = @chunks.map(*.Str).join;
+        $!text = @chunks».Str.join;
 	self!layup(@chunks);
     }
 
@@ -184,7 +184,7 @@ class PDF::Content::Text::Box {
             for @!lines;
 
         my @content;
-        @content.push: 'comment' => 'text: ' ~ @!lines.map(*.words.map(*.grep(Str).join)).join: ' '
+        @content.push: 'comment' => 'text: ' ~ @!lines».words.map(*.grep(Str).join).join: ' '
             if $gfx.comment;
 
         my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;

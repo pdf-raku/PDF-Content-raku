@@ -50,7 +50,7 @@ class X::PDF::Content::OP::BadArg
 class X::PDF::Content::OP::BadArgs
     is X::PDF::Content::OP {
     has @.args is required;
-    method message { "Bad '$.op' ($.mnemonic) argument list: {@!args.map(*.perl).join: ', '}" }
+    method message { "Bad '$.op' ($.mnemonic) argument list: {@!args».raku.join: ', '}" }
 }
 
 class X::PDF::Content::OP::TooFewArgs
@@ -874,7 +874,7 @@ class PDF::Content::Ops {
         given .value {
             my $op = .key;
             if %OpName{$op}:exists {
-                my @args = .value.map: *.value;
+                my @args = .value».value;
                 die X::PDF::Content::OP::BadArgs.new: :$op, :@args, :mnemonic(%OpName{$op}) ;
             }
             else {
@@ -895,7 +895,7 @@ class PDF::Content::Ops {
 	my Str $op = do given opn {
             when Comment { .key }
             when Pair {
-                @args = .value.map: *.value;
+                @args = .value».value;
                 .key.Str
             }
             default {
@@ -1057,7 +1057,7 @@ class PDF::Content::Ops {
     }
 
     method finish {
-	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@.open-tags.map(*.gist).join: ' '} at end of content stream")
+	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@.open-tags».gist.join: ' '} at end of content stream")
 	    if @.open-tags;
 	die X::PDF::Content::Unclosed.new: :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream")
 	    if @!gsaves;
