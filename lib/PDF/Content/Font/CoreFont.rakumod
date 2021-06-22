@@ -93,6 +93,11 @@ class PDF::Content::Font::CoreFont
         :zapfdingbats-bolditalic<zapfdingbats>,
     };
 
+    submethod TWEAK(PDF::Content::Font :$!dict) {
+        PDF::Content::Font.make-font($_, self)
+            with $!dict;
+    }
+
     method core-font-name(Str $family!, Str :$weight?, Str :$style?, ) is export(:core-font-name) {
         my Str $face = $family.lc;
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
