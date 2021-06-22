@@ -190,8 +190,9 @@ class PDF::Content::Font::CoreFont
     }
 
     method cb-finish {
-        my $Differences = $!encoder.differences;
-        if $Differences {
+        my $dict := self.to-dict;
+
+        if $!encoder.differences -> $Differences {
             my $Encoding = %(
                 :Type( :name<Encoding> ),
                 :$Differences,
@@ -199,7 +200,9 @@ class PDF::Content::Font::CoreFont
             $Encoding<BaseEncoding> = $_
                 with self!encoding-name;
 
-            self.to-dict<Encoding> = $Encoding;
+            $dict<Encoding> = $Encoding;
         }
+
+        $dict;
     }
 }
