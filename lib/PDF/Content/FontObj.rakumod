@@ -2,7 +2,7 @@ role PDF::Content::FontObj {
 
     # Interface role for PDF::Content compatible font objects. E.g.:
     # - PDF::Content::CoreFont
-    # - PDF::Font::Loader::FreeType
+    # - PDF::Font::Loader::FontObj
 
     method font-name {...}   # font name, including XXXXXX+ prefix for subsetted fonts
     method height {...}      # computed font height

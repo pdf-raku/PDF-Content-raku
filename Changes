@@ -1,5 +1,7 @@
 {{$NEXT}}
-  - Fix PDF::Content::Font::CoreFont cb-finish() finalization method
+
+0.5.2  2021-06-23T13:43:44+12:00
+  - Fix PDF::Content::Font cb-finish() method and invocation
 
 0.5.1  2021-04-29T12:03:00+12:00
   - Declare additional content tags: /OC /TagSuspect /ReversedChars /Clip

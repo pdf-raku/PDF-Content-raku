@@ -160,7 +160,7 @@ class PDF::Content::Font::CoreFont
         $dict;
     }
 
-   method to-dict {
+    method to-dict {
         $!dict //= PDF::Content::Font.make-font(
             PDF::COS::Dict.COERCE(self!make-dict),
             self);
@@ -168,21 +168,21 @@ class PDF::Content::Font::CoreFont
 
     method font-name { $!metrics.FontName }
 
-    method !load-core-font($font-name, :$enc!) {
+    method !load-core-font($font-name, :$enc!, |c) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
             my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
             my $metrics = Font::AFM.core-font( $font-name );
-            self.new( :$encoder, :$metrics );
+            self.new( :$encoder, :$metrics, |c);
         }
     }
 
     multi method load-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
-        self!load-core-font('zapfdingbats', :$enc );
+        self!load-core-font('zapfdingbats', :$enc, |c );
     }
 
     multi method load-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
-        self!load-core-font('symbol', :$enc );
+        self!load-core-font('symbol', :$enc, |c );
     }
 
     multi method load-font(Str $font-name!, :$enc = 'win', |c) is default {
