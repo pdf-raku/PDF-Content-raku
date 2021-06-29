@@ -21,16 +21,28 @@ role PDF::Content::Font::Enc::Glyphic {
         $!diff-cids-updated = True;
     }
 
+    method map-glyph($glyph-name, $idx) {
+        # default handling
+        warn "ignoring glyph /$glyph-name ($idx)";
+    }
+
     method differences is rw {
         Proxy.new(
             STORE => -> $, @diffs {
                 my %glyph-map := self.glyph-map;
                 my uint32 $idx = 0;
+                my $repack;
                 @!differences = @diffs.map: {
                     when UInt { $idx  = $_ }
                     when Str {
-                        self.set-encoding(.ord, $idx)
-                            with %glyph-map{$_};
+                        my $name = $_;
+                        with %glyph-map{$name} {
+                           self.set-encoding(.ord, $idx);
+                        }
+                        else {
+                            self.use-cid($idx);
+                            self.map-glyph($name, $idx);
+                        }
                         $idx++;
                         PDF::COS::Name.COERCE($_);
                     }

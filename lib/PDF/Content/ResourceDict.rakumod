@@ -34,7 +34,7 @@ role PDF::Content::ResourceDict {
             'ColorSpace'
         }
         default {
-	    warn "unrecognised graphics resource object: {.perl}";
+	    warn "unrecognised graphics resource object: {.raku}";
 	    'Other'
         }
     }

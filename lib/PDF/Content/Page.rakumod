@@ -36,7 +36,7 @@ role PDF::Content::Page
             my Array $streams = do {
                 when List { $_ }
                 when Hash { [$_] }
-                default   { die "unexpected page content: {.perl}" }
+                default   { die "unexpected page content: {.raku}" }
             }
             $streams.keys.map({ $streams[$_].decoded }).join: '';
         }

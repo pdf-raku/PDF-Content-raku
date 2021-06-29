@@ -96,7 +96,7 @@ role PDF::Content::PageTree
                 given $kids[$_] {
                     when PDF::Content::PageTree { @index.append: .page-index }
                     when PDF::Content::PageNode { @index.push: .ind-ref }
-                    default { die "unexpected object in page tree: {.perl}"; }
+                    default { die "unexpected object in page tree: {.raku}"; }
                 }
             }
         }
@@ -110,7 +110,7 @@ role PDF::Content::PageTree
             given $kids[$_] {
                 when PDF::Content::PageTree { @pages.append: .pages }
                 when PDF::Content::PageNode { @pages.push: $_ }
-                default { die "unexpected object in page tree: {.perl}"; }
+                default { die "unexpected object in page tree: {.raku}"; }
             }
         }
         @pages;

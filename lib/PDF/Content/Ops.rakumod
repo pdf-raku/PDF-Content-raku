@@ -38,13 +38,13 @@ class X::PDF::Content::OP::Unknown
 class X::PDF::Content::OP::BadArrayArg
     is X::PDF::Content::OP {
     has $.arg is required;
-    method message { "Invalid entry in '$.op' ($.mnemonic) array: {$!arg.perl}" }
+    method message { "Invalid entry in '$.op' ($.mnemonic) array: {$!arg.raku}" }
 }
 
 class X::PDF::Content::OP::BadArg
     is X::PDF::Content::OP {
     has $.arg is required;
-    method message { "Bad '$.op' ($.mnemonic) argument: {$!arg.perl}" }
+    method message { "Bad '$.op' ($.mnemonic) argument: {$!arg.raku}" }
 }
 
 class X::PDF::Content::OP::BadArgs
@@ -1056,7 +1056,7 @@ class PDF::Content::Ops {
         self!text-move(0, - $!TextLeading);
     }
 
-    method finish {
+    method finish is hidden-from-backtrace {
 	die X::PDF::Content::Unclosed.new: :message("Unclosed tags {@.open-tags».gist.join: ' '} at end of content stream")
 	    if @.open-tags;
 	die X::PDF::Content::Unclosed.new: :message("'q' (Save) unmatched by closing 'Q' (Restore) at end of content stream")
@@ -1070,9 +1070,9 @@ class PDF::Content::Ops {
 
     #| serialize content into a string. indent blocks for readability
     has Str $!content-cache;
-    method Str { $!content-cache //= self!content }
+    method Str is hidden-from-backtrace { $!content-cache //= self!content }
 
-    method !content returns Str {
+    method !content returns Str is hidden-from-backtrace {
         my PDF::IO::Writer $writer .= new;
 
 	$.finish;

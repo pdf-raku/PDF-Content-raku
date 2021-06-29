@@ -5,7 +5,7 @@ class X::PDF::Image::WrongHeader is Exception {
     has Str $.header is required;
     has $.path is required;
     method message {
-        "$!path image doesn't have a $!type header: {$.header.perl}"
+        "$!path image doesn't have a $!type header: {$.header.raku}"
     }
 }
 

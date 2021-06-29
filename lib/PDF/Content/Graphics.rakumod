@@ -16,7 +16,7 @@ role PDF::Content::Graphics {
     has Bool $!rendered = False;
     has UInt $.mcid = 0;
     method use-mcid(UInt:D $_) {
-        $!mcid = $_ unless $!mcid.defined && $!mcid >= $_;
+        $!mcid = $_ unless $!mcid >= $_;
     }
     method next-mcid { $!mcid++ }
 
@@ -84,7 +84,7 @@ role PDF::Content::Graphics {
         $gfx;
     }
 
-    method finish {
+    method finish is hidden-from-backtrace {
         if $!gfx.defined || $!pre-gfx.defined {
             # rebuild graphics, if they've been accessed
             my $decoded = do with $!pre-gfx { .Str } else { '' };
@@ -104,7 +104,7 @@ role PDF::Content::Graphics {
         }
     }
 
-    method cb-finish { $.finish }
+    method cb-finish is hidden-from-backtrace { $.finish }
 
     #| create a new XObject Form
     method xobject-form(:$group = True, *%dict) {

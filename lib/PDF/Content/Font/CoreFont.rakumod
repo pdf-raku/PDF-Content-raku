@@ -9,6 +9,7 @@ class PDF::Content::Font::CoreFont
     use PDF::Content::Font::Enc::Type1;
     use PDF::COS::Dict;
     use PDF::COS::Name;
+
     has Font::AFM $.metrics handles <kern>;
     has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode enc>;
     has PDF::Content::Font $!dict;
@@ -188,6 +189,10 @@ class PDF::Content::Font::CoreFont
     multi method load-font(Str $font-name!, :$enc = 'win', |c) is default {
         self!load-core-font( $.core-font-name($font-name, |c), :$enc );
     }
+
+    method is-embedded { False }
+    method is-subset   { False }
+    method is-core-font   { True }
 
     method cb-finish {
         my $dict := self.to-dict;
