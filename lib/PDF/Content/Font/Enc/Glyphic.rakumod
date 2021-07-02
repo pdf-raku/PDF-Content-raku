@@ -4,69 +4,63 @@ role PDF::Content::Font::Enc::Glyphic {
     use PDF::COS;
     use PDF::COS::Name;
     my subset NameOrUInt where PDF::COS::Name|UInt;
-    has NameOrUInt @!differences;
-    has uint8 @!diff-cids;
-    has Bool  $!diff-cids-updated = False;
+    has PDF::COS::Name %!diffs{UInt};
 
-    method lookup-glyph(UInt $chr-code) {
-        $!glyphs{$chr-code.chr}
+    method lookup-glyph(UInt $code-point) {
+        $!glyphs{$code-point.chr}
     }
 
     method glyph-map {
         %( $!glyphs.invert );
     }
 
-    method add-glyph-diff(UInt $idx) {
-        @!diff-cids.push: $idx;
-        $!diff-cids-updated = True;
+    method add-glyph-diff(UInt $cid) {
+        if @.to-unicode[$cid] -> $code-point {
+            my $glyph-name = self.lookup-glyph( $code-point ) // '.notdef';
+            %!diffs{$cid} = PDF::COS::Name.COERCE: $glyph-name
+                unless $glyph-name eq '.notdef';
+        }
     }
 
-    method map-glyph($glyph-name, $idx) {
+    method cid-map-glyph($glyph-name, $cid) {
         # default handling
-        warn "ignoring glyph /$glyph-name ($idx)";
+        warn "ignoring glyph /$glyph-name ($cid)";
     }
 
     method differences is rw {
         Proxy.new(
             STORE => -> $, @diffs {
                 my %glyph-map := self.glyph-map;
-                my uint32 $idx = 0;
-                my $repack;
-                @!differences = @diffs.map: {
-                    when UInt { $idx  = $_ }
+                my uint32 $cid = 0;
+
+                for @diffs {
+                    when UInt { $cid  = $_ }
                     when Str {
                         my $name = $_;
                         with %glyph-map{$name} {
-                           self.set-encoding(.ord, $idx);
+                           self.set-encoding(.ord, $cid);
                         }
                         else {
-                            self.use-cid($idx);
-                            self.map-glyph($name, $idx);
+                            self.use-cid($cid);
+                            self.cid-map-glyph($name, $cid);
                         }
-                        $idx++;
-                        PDF::COS::Name.COERCE($_);
+                        %!diffs{$cid++} = PDF::COS::Name.COERCE($_);
                     }
-                    default { die "bad difference entry: .perl" }
+                    default { die "bad difference entry: .raku" }
                 }
-                $!diff-cids-updated = False;
             },
             FETCH => {
-                if $!diff-cids-updated {
-                    @!differences = ();
-                    my int $cur-idx = -2;
-                    for @!diff-cids.list.sort {
-                        unless $_ == ++$cur-idx {
-                            @!differences.push: $_;
-                            $cur-idx = $_;
-                        }
-                        my PDF::COS::Name $glyph-name .= COERCE(
-                            self.lookup-glyph( @.to-unicode[$_] ) // '.notdef',
-                        );
-                        @!differences.push: $glyph-name;
+                my $cid := -2;
+                my @diffs;
+                %!diffs.pairs.sort.map: {
+                    unless .value eq '.notdef' {
+                        push @diffs: .key
+                            unless .key == $cid + 1;
+                        push @diffs: .value;
+                        $cid := .key;
                     }
-                    $!diff-cids-updated = False;
                 }
-                @!differences;
+                @diffs;
             },
         )
     }

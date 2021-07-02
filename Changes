@@ -1,4 +1,5 @@
 {{$NEXT}}
+  - Add cid-map-glyph() callback for PDF::Font::Loader
 
 0.5.2  2021-06-23T13:43:44+12:00
   - Fix PDF::Content::Font cb-finish() method and invocation

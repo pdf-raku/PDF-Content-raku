@@ -12,7 +12,7 @@ class PDF::Content::Font::Enc::Type1
     has UInt %!from-unicode;  #| all encoding mappings
     has UInt %.charset{UInt}; #| used characters (useful for subsetting)
     has uint16 @.to-unicode[256];
-    has uint8 @!spare-cids;  #| unmapped codes in the encoding scheme
+    has uint8 @!spare-cids;   #| unmapped codes in the encoding scheme
     my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std'|'mac-extra';
     has EncodingScheme $.enc = 'win';
 
@@ -29,16 +29,16 @@ class PDF::Content::Font::Enc::Type1
 
         @!to-unicode = $encoding.list;
         my uint16 @allocated-cids;
-        for 1 .. 255 -> $idx {
-            my uint16 $code-point = @!to-unicode[$idx];
+        for 1 .. 255 -> $cid {
+            my uint16 $code-point = @!to-unicode[$cid];
             if $code-point {
-                %!from-unicode{$code-point} = $idx;
+                %!from-unicode{$code-point} = $cid;
                 # CID used in this encoding schema. rellocate as a last resort
-                @allocated-cids.unshift: $idx;
+                @allocated-cids.unshift: $cid;
             }
             else {
                 # spare CID use it first
-                @!spare-cids.push($idx)
+                @!spare-cids.push($cid)
             }
         }
         # also keep track of codes that are allocated in the encoding scheme, but
@@ -55,40 +55,43 @@ class PDF::Content::Font::Enc::Type1
         }
     }
 
-    method set-encoding($chr-code, $idx) {
-        unless %!from-unicode{$chr-code} ~~ $idx {
-            %!from-unicode{$chr-code} = $idx;
-            @!to-unicode[$idx] = $chr-code;
-            %!charset{$chr-code} = $idx;
-            $.add-glyph-diff($idx);
+    method set-encoding($chr-code, $cid) {
+        unless %!from-unicode{$chr-code} ~~ $cid {
+            %!from-unicode{$chr-code} = $cid;
+            @!to-unicode[$cid] = $chr-code;
+            %!charset{$chr-code} = $cid;
+            $.add-glyph-diff($cid);
         }
     }
-    method add-encoding($chr-code, :$idx is copy = %!from-unicode{$chr-code} // 0) {
-        if $idx {
-            %!charset{$chr-code} = $idx;
+    method add-encoding($chr-code) {
+        my $cid = %!from-unicode{$chr-code} // 0;
+
+        if $cid {
+            %!charset{$chr-code} = $cid;
         }
         else {
-            my $glyph-name = self.lookup-glyph($chr-code);
-            if $glyph-name && $glyph-name ne '.notdef' {
+            my $glyph-name = self.lookup-glyph($chr-code) // '.notdef';
+            unless $glyph-name eq '.notdef' {
                 # try to remap the glyph to a spare encoding or other unused glyph
-                while @!spare-cids && !$idx {
-                    $idx = @!spare-cids.shift;
-                    if $idx {
-                        my $old-chr-code = @!to-unicode[$idx];
+                while @!spare-cids && !$cid {
+                    $cid = @!spare-cids.shift;
+                    if $cid {
+                        my $old-chr-code = @!to-unicode[$cid];
                         if $old-chr-code && %!charset{$old-chr-code} {
                             # already inuse
-                            $idx = 0;
+                            $cid = 0;
                         }
                         else {
                             # add it to the encoding scheme
-                            self.set-encoding($chr-code, $idx);
+                            self.set-encoding($chr-code, $cid);
                         }
                     }
                 }
             }
         }
-        $idx;
+        $cid;
     }
+
     multi method encode(Str $text, :$str! --> Str) {
         self.encode($text).decode: 'latin-1';
     }
