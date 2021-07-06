@@ -66,7 +66,7 @@ class PDF::Content::Text::Line {
         my $n = 0;
         my $prev := Int;
         for @line {
-            my $tk := $_ ~~ Str ?? $font.encode($_, :str) !! $_;
+            my $tk := $_ ~~ Str ?? $font.encode($_) !! $_;
             if $tk ~~ Str && $prev ~~ Str {
                 # coalesce adjacent strings
                 @out[$n-1] ~= $tk;

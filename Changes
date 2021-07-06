@@ -1,5 +1,10 @@
 {{$NEXT}}
-   - Add type-checking to text-box() method.
+   PDF::Font::Loader v0.5.5+ compatibility:
+   - Font decoding now has three stages decode($bytes, :cids), decode($bytes, :ords) and
+     decode() [text-string, default].
+   - Font encoding has two stages encode($text, :cids), encode($text) [byte-string, default].
+   - type-check text-box() arguments. Make sure we've got a font dictionary
+     or a font object
 
 0.5.3  2021-07-02T13:37:20+12:00
   - Add cid-map-glyph() callback for PDF::Font::Loader

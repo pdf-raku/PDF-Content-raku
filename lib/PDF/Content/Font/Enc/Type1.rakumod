@@ -92,18 +92,22 @@ class PDF::Content::Font::Enc::Type1
         $cid;
     }
 
-    multi method encode(Str $text, :$str! --> Str) {
-        self.encode($text).decode: 'latin-1';
-    }
-    multi method encode(Str $text --> buf8) is default {
+    multi method encode(Str $text, :cids($)! --> buf8) is default {
         buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) }).grep: {$_};
     }
 
-    multi method decode(Str $encoded, :$str! --> Str) {
-        $encoded.ords.map({@!to-unicode[$_]}).grep({$_}).map({.chr}).join;
+    multi method encode(Str $text --> Str) {
+        self.encode($text, :cids).decode: 'latin-1';
     }
-    multi method decode(Str $encoded --> buf16) {
-        buf16.new: $encoded.ords.map({@!to-unicode[$_]}).grep: {$_};
+
+    multi method decode(Str $encoded, :cids($)!) {
+        $encoded.ords;
+    }
+    multi method decode(Str $encoded, :ords($)!) {
+        $encoded.ords.map({@!to-unicode[$_]}).grep: {$_};
+    }
+    multi method decode(Str $encoded --> Str) {
+        self.decode($encoded, :ords)».chr.join;
     }
 
 }

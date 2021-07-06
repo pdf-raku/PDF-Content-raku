@@ -26,7 +26,7 @@ is $hb-afm.height(:hanging), 925, 'font height hanging';
 is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';
 is-approx $hb-afm.height(12, :hanging), 11.1, 'font hanging height @ 12pt';
-is $hb-afm.encode("A♥♣✔B", :str), "A\x[1]\x[2]B", '.encode(...) sanity';
+is $hb-afm.encode("A♥♣✔B"), "A\x[1]\x[2]B", '.encode(...) sanity';
 # - 'A' & 'B' are in the encoding scheme and font
 # - '♥', '♣' are in the font, but not the encoding scheme
 # - '✔' is in neither
@@ -36,7 +36,7 @@ is-json-equiv $hb-afm.encoder.differences, (1, "heart", "club"), 'differences';
 my PDF::Content::Font::CoreFont $ab-afm .= load-font( 'Arial-Bold' );
 isa-ok $ab-afm.metrics, 'Font::AFM'; 
 is $ab-afm.font-name, 'Helvetica-Bold', 'font-name';
-is $ab-afm.encode("A♥♣✔B", :str), "A\x[1]\x[2]B", '.encode(...) sanity';
+is $ab-afm.encode("A♥♣✔B"), "A\x[1]\x[2]B", '.encode(...) sanity';
 
 my PDF::Content::Font::CoreFont $hbi-afm .= load-font( :family<Helvetica>, :weight<Bold>, :style<Italic> );
 is $hbi-afm.font-name, 'Helvetica-BoldOblique', ':font-family => font-name';
@@ -45,9 +45,9 @@ my PDF::Content::Font::CoreFont $hb-afm-again .= load-font( 'Helvetica-Bold' );
 ok $hb-afm-again === $hb-afm, 'font caching';
 
 my $ext-chars = "ΨΩαΩ";
-my $enc = $hbi-afm.encode($ext-chars, :str);
+my $enc = $hbi-afm.encode($ext-chars);
 is $enc, "\x[1]\x[2]\x[3]\x[2]", "extended chars encoding";
-is $hbi-afm.decode($enc, :str), $ext-chars,  "extended chars decoding";
+is $hbi-afm.decode($enc), $ext-chars,  "extended chars decoding";
 
 $hbi-afm.cb-finish;
 my $hbi-afm-dict = $hbi-afm.to-dict;
@@ -72,26 +72,26 @@ for (win => "Á®ÆØ",
     my ($enc, $encoded) = .kv;
     my $fnt = PDF::Content::Font::CoreFont.load-font( 'helvetica', :$enc );
     my $decoded = "Á®ÆØ";
-    my $re-encoded = $fnt.encode($decoded, :str);
+    my $re-encoded = $fnt.encode($decoded);
     is-deeply $re-encoded, $encoded, "$enc encoding";
-    is-deeply $fnt.decode($encoded, :str), $decoded, "$enc decoding";
-    is-deeply $fnt.decode($encoded, ), buf16.new($decoded.ords), "$enc raw decoding";
+    is-deeply $fnt.decode($encoded), $decoded, "$enc decoding";
+    is-deeply $fnt.decode($encoded, :ords), buf16.new($decoded.ords), "$enc raw decoding";
 }
 
 my PDF::Content::Font::CoreFont $zapf .= load-font( 'ZapfDingbats' );
 isa-ok $zapf.metrics, 'Font::Metrics::zapfdingbats';
 is $zapf.enc, 'zapf', '.enc';
-is $zapf.encode("♥♣✔", :str), "ª¨4", '.encode(...)'; # /a110 /a112 /a20
-is $zapf.decode("ª¨4", :str), "♥♣✔", '.decode(...)';
-is $zapf.decode("\o251\o252", :str), "♦♥", '.decode(...)';
+is $zapf.encode("♥♣✔"), "ª¨4", '.encode(...)'; # /a110 /a112 /a20
+is $zapf.decode("ª¨4"), "♥♣✔", '.decode(...)';
+is $zapf.decode("\o251\o252"), "♦♥", '.decode(...)';
 
 isa-ok PDF::Content::Font::CoreFont.load-font('CourierNew,Bold').metrics, 'Font::Metrics::courier-bold';
 
 my PDF::Content::Font::CoreFont $sym .= load-font( 'Symbol' );
 isa-ok $sym.metrics, 'Font::Metrics::symbol';
 is $sym.enc, 'sym', '.enc';
-is $sym.encode("ΑΒΓ", :str), "ABG", '.encode(...)'; # /Alpha /Beta /Gamma
-is $sym.decode("ABG", :str), "ΑΒΓ", '.decode(...)';
+is $sym.encode("ΑΒΓ"), "ABG", '.encode(...)'; # /Alpha /Beta /Gamma
+is $sym.decode("ABG"), "ΑΒΓ", '.decode(...)';
 
 use Font::AFM;
 use PDF::Content::Font::Enc::Type1;
@@ -100,7 +100,7 @@ my @differences = [1, 'x', 'y', 10, 'a', 'b'];
 my PDF::Content::Font::Enc::Type1 $encoder .= new: :enc<win>;
 $encoder.differences = @differences;
 my PDF::Content::Font::CoreFont $tr .= new: :$metrics, :$encoder;
-is-deeply $tr.encode('abcxyz'), buf8.new(10,11,99,1,2,122), 'win differences encoding';
+is-deeply $tr.encode('abcxyz', :cids), buf8.new(10,11,99,1,2,122), 'win differences encoding';
 $tr.cb-finish;
 is-json-equiv $tr.to-dict<Encoding><Differences>, [1, "x", "y", 10, "a", "b"], 'dfferences to-dict';
 
@@ -109,8 +109,8 @@ $encoder.differences = @differences;
 $tr .= new: :$metrics, :$encoder;
 my $dec = 'abcxyz½';
 $enc = buf8.new(10,11,3,1,2,4,72);
-is-deeply $tr.encode($dec), $enc, 'mac-extra differences encoding';
-is-deeply $tr.decode($enc.decode, :str), $dec, 'mac-extra differences decoding';
+is-deeply $tr.encode($dec, :cids), $enc, 'mac-extra differences encoding';
+is-deeply $tr.decode($enc.decode), $dec, 'mac-extra differences decoding';
 $tr.cb-finish;
 is-json-equiv $tr.to-dict<Encoding><Differences>, [1, "x", "y", "c", "z", 10, "a", "b"], 'dfferences to-dict';
 
