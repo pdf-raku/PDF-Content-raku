@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.5.4  2021-07-07T11:28:02+12:00
    PDF::Font::Loader v0.5.5+ compatibility:
    - Font decoding now has three stages decode($bytes, :cids), decode($bytes, :ords) and
      decode() [text-string, default].

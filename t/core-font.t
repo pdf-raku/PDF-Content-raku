@@ -75,7 +75,7 @@ for (win => "Á®ÆØ",
     my $re-encoded = $fnt.encode($decoded);
     is-deeply $re-encoded, $encoded, "$enc encoding";
     is-deeply $fnt.decode($encoded), $decoded, "$enc decoding";
-    is-deeply $fnt.decode($encoded, :ords), buf16.new($decoded.ords), "$enc raw decoding";
+    is-deeply $fnt.decode($encoded, :ords), $decoded.ords, "$enc raw decoding";
 }
 
 my PDF::Content::Font::CoreFont $zapf .= load-font( 'ZapfDingbats' );
