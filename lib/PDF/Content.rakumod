@@ -211,8 +211,11 @@ class PDF::Content:ver<0.5.4>
         :Pattern(self.resource-key($pat));
     }
 
-    method paint(Bool :$fill,  Bool :$even-odd,
-                 Bool :$close, Bool :$stroke) {
+    multi method paint(
+        Code $meth?,
+        Bool :$fill,  Bool :$even-odd,
+        Bool :$close, Bool :$stroke,
+    ) {
         my @paint-ops = do {
             if $fill {
                 if $even-odd {
@@ -229,9 +232,16 @@ class PDF::Content:ver<0.5.4>
                 else          { <EndPath> }
             }
         }
-                    
+
         self."$_"()
             for @paint-ops;
+    }
+
+    multi method paint(&meth, *%o) {
+        self.Save;
+        &meth(self);
+        my \rv = self.paint: |%o;
+        self.Restore;
     }
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}

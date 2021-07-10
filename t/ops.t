@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 111;
+plan 112;
 
 use lib 't';
 use PDF;
@@ -300,13 +300,22 @@ $g.Rectangle(10,10, 150, 100);
 $g.paint: :close, :fill;
 $g.Restore;
 
-is-json-equiv $g.ops, [
+my @painted = [
     :q[],
         :re[:real(10), :real(10), :real(150), :real(100)],
         :h[],
          :f[],
     :Q[]
-], 'drawing and painting';
+];
+
+is-json-equiv $g.ops, @painted, 'drawing and painting';
+
+$g .= new( :$parent);
+$g.paint: :close, :fill, {
+    .Rectangle(10,10, 150, 100);
+}
+
+is-json-equiv $g.ops, @painted, 'drawing/painting, block form';
 
 todo "failing on rakudo bleed";
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';
