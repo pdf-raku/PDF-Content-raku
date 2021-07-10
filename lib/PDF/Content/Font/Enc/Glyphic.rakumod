@@ -6,8 +6,8 @@ role PDF::Content::Font::Enc::Glyphic {
     my subset NameOrUInt where PDF::COS::Name|UInt;
     has PDF::COS::Name %!diffs{UInt};
 
-    method lookup-glyph(UInt $code-point) {
-        $!glyphs{$code-point.chr}
+    method lookup-glyph(UInt $ord) {
+        $!glyphs{$ord.chr}
     }
 
     method glyph-map {
@@ -15,8 +15,8 @@ role PDF::Content::Font::Enc::Glyphic {
     }
 
     method add-glyph-diff(UInt $cid) {
-        if @.to-unicode[$cid] -> $code-point {
-            my $glyph-name = self.lookup-glyph( $code-point ) // '.notdef';
+        if @.to-unicode[$cid] -> $ord {
+            my $glyph-name = self.lookup-glyph( $ord ) // '.notdef';
             %!diffs{$cid} = PDF::COS::Name.COERCE: $glyph-name
                 unless $glyph-name eq '.notdef';
         }

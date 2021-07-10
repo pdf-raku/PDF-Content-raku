@@ -9,7 +9,7 @@ use PDF::Content::Font::Enc::Glyphic;
 class PDF::Content::Font::Enc::Type1
     does PDF::Content::Font::Enc::Glyphic {
     use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs, :mac-extra-encoding;
-    has UInt %!from-unicode;  #| all encoding mappings
+    has UInt %!from-unicode{UInt};  #| all encoding mappings
     has UInt %.charset{UInt}; #| used characters (useful for subsetting)
     has uint16 @.to-unicode[256];
     has uint8 @!spare-cids;   #| unmapped codes in the encoding scheme
@@ -30,9 +30,8 @@ class PDF::Content::Font::Enc::Type1
         @!to-unicode = $encoding.list;
         my uint16 @allocated-cids;
         for 1 .. 255 -> $cid {
-            my uint16 $code-point = @!to-unicode[$cid];
-            if $code-point {
-                %!from-unicode{$code-point} = $cid;
+            if @!to-unicode[$cid] -> uint16 $ord {
+                %!from-unicode{$ord} = $cid;
                 # CID used in this encoding schema. rellocate as a last resort
                 @allocated-cids.unshift: $cid;
             }
@@ -55,35 +54,35 @@ class PDF::Content::Font::Enc::Type1
         }
     }
 
-    method set-encoding($chr-code, $cid) {
-        unless %!from-unicode{$chr-code} ~~ $cid {
-            %!from-unicode{$chr-code} = $cid;
-            @!to-unicode[$cid] = $chr-code;
-            %!charset{$chr-code} = $cid;
+    method set-encoding($ord, $cid) {
+        unless %!from-unicode{$ord} ~~ $cid {
+            %!from-unicode{$ord} = $cid;
+            @!to-unicode[$cid] = $ord;
+            %!charset{$ord} = $cid;
             $.add-glyph-diff($cid);
         }
     }
-    method add-encoding($chr-code) {
-        my $cid = %!from-unicode{$chr-code} // 0;
+    method add-encoding($ord) {
+        my $cid = %!from-unicode{$ord} // 0;
 
         if $cid {
-            %!charset{$chr-code} = $cid;
+            %!charset{$ord} = $cid;
         }
         else {
-            my $glyph-name = self.lookup-glyph($chr-code) // '.notdef';
+            my $glyph-name = self.lookup-glyph($ord) // '.notdef';
             unless $glyph-name eq '.notdef' {
                 # try to remap the glyph to a spare encoding or other unused glyph
                 while @!spare-cids && !$cid {
                     $cid = @!spare-cids.shift;
                     if $cid {
-                        my $old-chr-code = @!to-unicode[$cid];
-                        if $old-chr-code && %!charset{$old-chr-code} {
+                        my $old-ord = @!to-unicode[$cid];
+                        if $old-ord && %!charset{$old-ord} {
                             # already inuse
                             $cid = 0;
                         }
                         else {
                             # add it to the encoding scheme
-                            self.set-encoding($chr-code, $cid);
+                            self.set-encoding($ord, $cid);
                         }
                     }
                 }
