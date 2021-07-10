@@ -212,7 +212,6 @@ class PDF::Content:ver<0.5.4>
     }
 
     multi method paint(
-        Code $meth?,
         Bool :$fill,  Bool :$even-odd,
         Bool :$close, Bool :$stroke,
     ) {
