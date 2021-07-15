@@ -1,4 +1,6 @@
 {{$NEXT}}
+   - Added block form of paint() method. $gfx.paint(&code, |c)) is equivalent to
+     $gfx.Save; code(gfx); $gfx.paint(|c); $gfx.Restore;
 
 0.5.4  2021-07-07T11:28:02+12:00
    PDF::Font::Loader v0.5.5+ compatibility:

@@ -8,7 +8,7 @@ class PDF::Content::Image::GIF
 
     use Native::Packing :Endian;
 
-    class LogicalDescriptor does Native::Packing[Vax] {
+    class LogicalDescriptor is repr('CStruct') does Native::Packing[Vax] {
         has uint16 $.width;
         has uint16 $.height;
         has uint8 $.flags;
@@ -17,7 +17,7 @@ class PDF::Content::Image::GIF
     }
     has LogicalDescriptor $!descr;
 
-    class ImageDescriptor does Native::Packing[Vax] {
+    class ImageDescriptor is repr('CStruct') does Native::Packing[Vax] {
         has uint16 $.left;
         has uint16 $.top;
         has uint16 $.width;
@@ -26,7 +26,7 @@ class PDF::Content::Image::GIF
     }
     has ImageDescriptor $!img;
 
-    class GCDescriptor does Native::Packing[Vax] {
+    class GCDescriptor is repr('CStruct') does Native::Packing[Vax] {
         has uint8 $.cFlags;
         has uint16 $.delay;
         has uint8 $.transIndex

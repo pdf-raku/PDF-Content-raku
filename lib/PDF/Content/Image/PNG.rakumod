@@ -18,7 +18,13 @@ class PDF::Content::Image::PNG
     use NativeCall;
     need Compress::Zlib::Raw;
 
-    class Header does Native::Packing[Network] {
+    class Magic is repr('CStruct') does Native::Packing[Host] {
+        constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
+        has uint64 $.buf;
+        method Str(Magic:D:) { self.pack.decode('latin-1') }
+        method is-png { self.Str eq PNG-Header }
+    }
+    class Header is repr('CStruct') does Native::Packing[Network] {
         has uint32 $.width;
         has uint32 $.height;
         has uint8  $.bit-depth;
@@ -27,14 +33,13 @@ class PDF::Content::Image::PNG
         has uint8  $.filter-type;
         has uint8  $.interlace-type;
     }
-    class Quad does Native::Packing[Network] {
+    class Quad is repr('CStruct') does Native::Packing[Network] {
         has uint32 $.Numeric;
     }
     has Header $.hdr;
     has Blob $.palette is rw;
     has Blob $.trns is rw;
     has Blob $.stream;
-    constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
     constant NullPointer = nativecast(CArray,Pointer.new(0));
 
     method !crc($hdr, $buf) {
@@ -46,10 +51,9 @@ class PDF::Content::Image::PNG
     }
 
     method read($fh = $.source) {
-
-        my Str $header = $fh.read(8).decode('latin-1');
-        die X::PDF::Image::WrongHeader.new( :type<PNG>, :$header, :path($fh.path) )
-            unless $header eq PNG-Header;
+        my Magic $magic .= read($fh);
+        die X::PDF::Image::WrongHeader.new( :type<PNG>, :header($magic.Str), :path($fh.path) )
+            unless $magic.is-png;
 
         $!stream  = Nil;
         $!palette = Nil;
@@ -105,7 +109,7 @@ class PDF::Content::Image::PNG
     }
 
     method Buf {
-        my $buf = buf8.new: PNG-Header.encode: "latin-1";
+        my $buf = buf8.new: Magic::PNG-Header.encode: "latin-1";
         self!add-chunk($buf, 'IHDR', $!hdr.pack);
         self!add-chunk($buf, 'PLTE', $_) with $!palette;
         self!add-chunk($buf, 'tRNS', $_) with $!trns;

@@ -6,12 +6,12 @@ use PDF::Content::Image;
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
     use Native::Packing :Endian;
-    class Atts does Native::Packing[Network] {
+    class Atts is repr('CStruct') does Native::Packing[Network] {
         has uint8 $.bit-depth;
         has uint16 ($.height, $.width);
         has uint8 $.color-channels
     }
-    class BlockHeader does Native::Packing[Network] {
+    class BlockHeader is repr('CStruct') does Native::Packing[Network] {
         has uint8 ($.ff, $.mark);
         has uint16 $.len
     }
