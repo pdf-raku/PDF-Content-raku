@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.5.5  2021-07-16T14:26:05+12:00
    - Added block form of paint() method. $gfx.paint(&code, |c)) is equivalent to
      $gfx.Save; code(gfx); $gfx.paint(|c); $gfx.Restore;
    - make page bbox() method order from bottom left corner. So a page with
