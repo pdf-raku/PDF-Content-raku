@@ -32,13 +32,29 @@ role PDF::Content::XObject['Form']
     does PDF::Content::XObject {
     has Numeric $.width;
     has Numeric $.height;
+
+    my proto sub from-origin($) is export(:from-origin) {*} 
+
+    multi sub from-origin(List:D $_) {
+        enum <x0 y0 x1 y1>;
+        when .[x1] < .[x0] {
+            from-origin([ .[x1], .[y0], .[x0], .[y1] ]);
+        }
+        when .[y1] < .[y0] {
+            from-origin([ .[x0], .[y1], .[x1], .[y0] ]);
+        }
+        default { $_ }
+    }
+
+    multi sub from-origin(Any:U) { Any }
+
     method width  { with $!width  { $_ } else { self!size()[0] } }
     method height { with $!height { $_ } else { self!size()[1] } }
-    method bbox { self<BBox> }
+    method bbox { from-origin(self<BBox>) }
     method !size {
-        my $bbox = self<BBox>;
-        $!width  = abs($bbox[2] - $bbox[0]);
-        $!height = abs($bbox[3] - $bbox[1]);
+        my $bbox = self.bbox();
+        $!width  = $bbox[2] - $bbox[0];
+        $!height = $bbox[3] - $bbox[1];
         ($!width, $!height);
     }
 }

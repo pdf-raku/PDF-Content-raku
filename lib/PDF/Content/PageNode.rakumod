@@ -4,6 +4,8 @@ use PDF::COS::Tie::Hash;
 
 role PDF::Content::PageNode {
     use PDF::Content::Page :PageSizes;
+    use PDF::Content::XObject :&from-origin;
+
     #| source: http://www.gnu.org/software/gv/
     my subset Box of List where {.elems == 4}
     my subset BoxOrStr where Box|Str;
@@ -25,9 +27,9 @@ role PDF::Content::PageNode {
 
     method bbox(BoxName $box-name = 'media') is rw {
         my &FETCH := do given $box-name {
-            when 'media' { -> $ { self.MediaBox // [0, 0, 612, 792] } }
-            when 'crop'  { -> $ { self.CropBox // self.bbox('media') } }
-            default      { -> $ { self!get-prop($box-name) // self.bbox('crop') } }
+            when 'media' { -> $ { from-origin(self.MediaBox) // [0, 0, 612, 792] } }
+            when 'crop'  { -> $ { from-origin(self.CropBox) // self.bbox('media') } }
+            default      { -> $ { from-origin(self!get-prop($box-name)) // self.bbox('crop') } }
         };
 
         Proxy.new(
