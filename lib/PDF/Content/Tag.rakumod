@@ -88,9 +88,9 @@ method !attributes-gist {
 method gist {
     my $attributes = self!attributes-gist();
     $.kids
-        ?? [~] flat("<{$.name}$attributes>",
-                    $!kids».gist,
-                    "</{$.name}>")
+        ?? [~] ("<{$.name}$attributes>",
+                $!kids».gist.Slip,
+                "</{$.name}>")
         !! "<{$.name}$attributes/>";
 }
 

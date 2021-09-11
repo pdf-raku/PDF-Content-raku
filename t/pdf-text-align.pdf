@@ -23,7 +23,7 @@ endobj
 BT
   /F1 10 Tf
   1 0 0 1 110 700 Tm
-  -9.31 Ts
+  -7.18 Ts
   (*** top left*** Lorem) Tj
   11 TL
   T*
@@ -41,7 +41,7 @@ BT
   T*
   0 Ts
   1 0 0 1 110 530 Tm
-  -9.31 Ts
+  -7.18 Ts
   [ 3530 (*** top center***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -58,7 +58,7 @@ BT
   T*
   0 Ts
   1 0 0 1 110 360 Tm
-  -9.31 Ts
+  -7.18 Ts
   [ 9337 (*** top right*** Lorem) ] TJ
   T*
   [ 9225 (ipsum dolor sit amet,) ] TJ
@@ -75,7 +75,7 @@ BT
   T*
   0 Ts
   1 0 0 1 110 190 Tm
-  -9.31 Ts
+  -7.18 Ts
   [ (*** ) -17 (top ) -17 (justify*** ) -17 (Lorem) ] TJ
   T*
   [ (ipsum ) -258 (dolor ) -258 (sit ) -258 (amet,) ] TJ
@@ -92,7 +92,7 @@ BT
   T*
   0 Ts
   1 0 0 1 235 700 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 40 Td
   (*** center left***) Tj
   T*
@@ -110,7 +110,7 @@ BT
   T*
   0 Ts
   1 0 0 1 235 530 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 40 Td
   [ 4224 (*** center center***) ] TJ
   T*
@@ -128,7 +128,7 @@ BT
   T*
   0 Ts
   1 0 0 1 235 360 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 40 Td
   [ 7614 (*** center right***) ] TJ
   T*
@@ -146,7 +146,7 @@ BT
   T*
   0 Ts
   1 0 0 1 235 190 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 40 Td
   [ (*** ) -887 (center ) -887 (justify***) ] TJ
   T*
@@ -164,7 +164,7 @@ BT
   T*
   0 Ts
   1 0 0 1 360 700 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 80 Td
   (*** bottom left***) Tj
   T*
@@ -182,7 +182,7 @@ BT
   T*
   0 Ts
   1 0 0 1 360 530 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 80 Td
   [ 4363 (*** bottom center***) ] TJ
   T*
@@ -200,7 +200,7 @@ BT
   T*
   0 Ts
   1 0 0 1 360 360 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 80 Td
   [ 7892 (*** bottom right***) ] TJ
   T*
@@ -218,7 +218,7 @@ BT
   T*
   0 Ts
   1 0 0 1 360 190 Tm
-  -9.31 Ts
+  -7.18 Ts
   0 80 Td
   [ (*** ) -748 (bottom ) -748 (justify***) ] TJ
   T*

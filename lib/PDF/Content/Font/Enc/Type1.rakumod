@@ -61,6 +61,7 @@ class PDF::Content::Font::Enc::Type1
             %!charset{$ord} = $cid;
             $.add-glyph-diff($cid);
         }
+        $cid;
     }
     method add-encoding($ord) {
         my $cid = %!from-unicode{$ord} // 0;
@@ -92,7 +93,7 @@ class PDF::Content::Font::Enc::Type1
     }
 
     multi method encode(Str $text, :cids($)! --> buf8) is default {
-        buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) }).grep: {$_};
+        buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) || Empty });
     }
 
     multi method encode(Str $text --> Str) {
@@ -103,7 +104,7 @@ class PDF::Content::Font::Enc::Type1
         $encoded.ords;
     }
     multi method decode(Str $encoded, :ords($)!) {
-        $encoded.ords.map({@!to-unicode[$_]}).grep: {$_};
+        $encoded.ords.map: {@!to-unicode[$_] || Empty};
     }
     multi method decode(Str $encoded --> Str) {
         self.decode($encoded, :ords)».chr.join;

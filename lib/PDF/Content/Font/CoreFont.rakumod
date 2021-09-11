@@ -190,9 +190,9 @@ class PDF::Content::Font::CoreFont
         self!load-core-font( $.core-font-name($font-name, |c), :$enc );
     }
 
-    method is-embedded { False }
-    method is-subset   { False }
-    method is-core-font   { True }
+    method is-embedded  { False }
+    method is-subset    { False }
+    method is-core-font { True }
 
     method cb-finish {
         my $dict := self.to-dict;

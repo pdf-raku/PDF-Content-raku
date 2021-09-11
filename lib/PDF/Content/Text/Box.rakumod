@@ -184,7 +184,7 @@ class PDF::Content::Text::Box {
             for @!lines;
 
         my @content;
-        @content.push: 'comment' => 'text: ' ~ @!lines».words.map(*.grep(Str).join).join: ' '
+        @content.push: 'comment' => 'text: ' ~ @!lines».words.map(*.grep(Str).Slip).join: ' '
             if $gfx.comment;
 
         my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;

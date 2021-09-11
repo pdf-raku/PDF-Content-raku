@@ -133,11 +133,11 @@ role PDF::Content::Graphics {
         PDF::COS::Stream.COERCE: { :%dict };
     }
     my subset ImageFile of Str where /:i '.'('png'|'svg'|'pdf') $/;
-    method save-as-image(ImageFile $outfile) {
+    method save-as-image(ImageFile $outfile, |c) {
         # experimental draft rendering via Cairo
         (try require PDF::To::Cairo) !=== Nil
              or die "save-as-image method is only supported if PDF::To::Cairo is installed";
-        ::('PDF::To::Cairo').save-as-image(self, $outfile);
+        ::('PDF::To::Cairo').save-as-image(self, $outfile, |c);
     }
     # *** Marked Content Tags ***
     my class TagSetBuilder is PDF::Content::Tag::Set {

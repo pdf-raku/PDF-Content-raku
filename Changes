@@ -1,4 +1,6 @@
 {{$NEXT}}
+   - Changed PDF::Context::Text::Style handling of :$baseline option. Use
+     font.ascender as top point, rather than font.bbox.y
 
 0.5.5  2021-07-16T14:26:05+12:00
    - Added block form of paint() method. $gfx.paint(&code, |c)) is equivalent to

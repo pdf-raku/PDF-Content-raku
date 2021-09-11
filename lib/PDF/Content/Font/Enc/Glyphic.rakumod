@@ -4,10 +4,15 @@ role PDF::Content::Font::Enc::Glyphic {
     use PDF::COS;
     use PDF::COS::Name;
     my subset NameOrUInt where PDF::COS::Name|UInt;
-    has PDF::COS::Name %!diffs{UInt};
+    has PDF::COS::Name %.diffs{UInt}; # custom or standard glyph name
 
-    method lookup-glyph(UInt $ord) {
-        $!glyphs{$ord.chr}
+    # Get the standard glyph name
+    method lookup-glyph(UInt $ord --> Str) {
+        $!glyphs{$ord.chr} // Str
+    }
+
+    method local-glyph-name(UInt $cid) {
+        %!diffs{$cid};
     }
 
     method glyph-map {

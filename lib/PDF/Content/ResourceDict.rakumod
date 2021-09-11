@@ -58,10 +58,10 @@ role PDF::Content::ResourceDict {
 
     #| ensure that the object is registered as a page resource. Return a unique
     #| name for it.
-    method !require-resource(PDF::COS $object,
-                             Str :$type = self!resource-type($object),
-	) {
-
+    method !require-resource(
+        PDF::COS $object,
+        Str :$type = self!resource-type($object),
+    ) {
         unless $.find-resource($object, :$type) {
             my constant %Prefix = %(
                 :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>,
