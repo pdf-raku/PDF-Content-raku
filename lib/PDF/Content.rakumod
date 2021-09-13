@@ -175,14 +175,16 @@ class PDF::Content:ver<0.5.5>
             }
         }
 
+        my \x0 = $x  +  $width  * { :left(0),   :center(-.5), :right(-1) }{$align};
+        my \y0 = $y  +  $height * { :bottom(0), :center(-.5), :top(-1)   }{$valign};
+        my \x1 = x0  +  $width;
+        my \y1 = y0  +  $height;
+
         if $obj<Subtype> ~~ 'Form' {
             $obj.finish;
             $width /= $obj-width;
             $height /= $obj-height;
         }
-
-        my \x0 = $x + $width  * { :left(0),   :center(-.5), :right(-1) }{$align};
-        my \y0 = $y + $height * { :bottom(0), :center(-.5), :top(-1)   }{$valign};
 
         self.graphics: {
             $.op(ConcatMatrix, $width, 0, 0, $height, x0, y0);
@@ -197,7 +199,7 @@ class PDF::Content:ver<0.5.5>
         }
 
         # return the display rectangle for the image
-        (x0, y0, x0 + $width, y0 + $height);
+        (x0, y0, x1, y1);
     }
     multi method do($img, Numeric $x, Numeric $y = 0, *%opt) is default {
         self.do($img, :position[$x, $y], |%opt);

@@ -1,4 +1,5 @@
 {{$NEXT}}
+   - Fix PDF::Content do() positioning for XObject Forms
    - Changed PDF::Context::Text::Style handling of :$baseline option. Use
      font.ascender as top point, rather than font.bbox.y
 
