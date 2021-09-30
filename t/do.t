@@ -34,7 +34,7 @@ $page.graphics: {
     my @p2 = .do($jpeg, :position(100, 30), :width(80), :height(30), :valign<top>);
     is-deeply @p2, [100, 0, 180, 30], 'image position';
 
-    # The should form a grid
+    # This should form a grid
     .do($form, :position(10, 50), :width(80), :height(30), :valign<center>);
     .do($jpeg, :position(100, 50), :width(80), :height(30), :valign<center>);
     .do($form, :position(10, 70), :width(80), :height(30), :valign<bottom>);

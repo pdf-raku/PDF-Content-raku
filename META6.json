@@ -22,6 +22,7 @@
   "perl": "6.*",
   "provides": {
     "PDF::Content": "lib/PDF/Content.rakumod",
+    "PDF::Content::Canvas": "lib/PDF/Content/Canvas.rakumod",
     "PDF::Content::Color": "lib/PDF/Content/Color.rakumod",
     "PDF::Content::Font": "lib/PDF/Content/Font.rakumod",
     "PDF::Content::Font::CoreFont": "lib/PDF/Content/Font/CoreFont.rakumod",

@@ -53,7 +53,6 @@ role PDF::Content::Graphics {
     method gfx(|c) is default {	$!gfx //= self.new-gfx(|c) }
     method graphics(&code) { self.gfx.graphics( &code ) }
     method text(&code) { self.gfx.text( &code ) }
-    method canvas(&code) { self.gfx.canvas( &code ) }
 
     method contents-parse {
         PDF::Content.parse($.contents);

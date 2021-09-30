@@ -1,16 +1,14 @@
 use v6;
 
-use PDF::Content::Graphics;
-use PDF::Content::Resourced;
-use PDF::Content::XObject;
+use PDF::Content::Canvas;
 
 role PDF::Content::Page
-    does PDF::Content::Resourced
-    does PDF::Content::Graphics {
+    does PDF::Content::Canvas {
 
     use PDF::COS;
     use PDF::COS::Tie;
     use PDF::COS::Stream;
+    use PDF::Content::XObject;
 
     my Array enum PageSizes is export(:PageSizes) «
 	    :Letter[0,0,612,792]

@@ -1,4 +1,6 @@
 {{$NEXT}}
+   - Add PDF::Content::Canvas - abstract role for pages, xobject forms
+     and tiling patterns
 
 0.5.6  2021-09-14T09:24:28+12:00
    - Fix PDF::Content do() positioning for XObject Forms

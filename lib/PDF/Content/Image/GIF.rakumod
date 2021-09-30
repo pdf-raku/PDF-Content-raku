@@ -54,10 +54,10 @@ class PDF::Content::Image::GIF
         my uint8 @out;
         my int $outptr = 0;
 
-        my @d = (0 ..^ reset-code).map: {[$_, ]};
+        my @d = (^reset-code).map: {[$_, ]};
 
         while ($ptr + $bits) <= maxptr {
-            my UInt \tag = [+] (0 ..^ $bits).map: { vec(stream, $ptr + $_) +< $_ };
+            my UInt \tag = [+] (^$bits).map: { vec(stream, $ptr + $_) +< $_ };
             $ptr += $bits;
             $bits++
                 if $next-code == 1 +< $bits and $bits < 12;

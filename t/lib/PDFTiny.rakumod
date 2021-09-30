@@ -13,16 +13,14 @@ class PDFTiny is PDF does PDF::Content::Interface {
     use PDF::Content::PageNode;
     use PDF::Content::PageTree;
     use PDF::Content::ResourceDict;
-    use PDF::Content::Resourced;
-    use PDF::Content::XObject;
+    use PDF::Content::Canvas;
     my role ResourceDict
 	does PDF::COS::Tie::Hash
 	does PDF::Content::ResourceDict { }
     our class XObject-Form
         is PDF::COS::Stream
         does PDF::Content::XObject['Form']
-        does PDF::Content::Resourced
-        does PDF::Content::Graphics {
+        does PDF::Content::Canvas {
             has ResourceDict $.Resources is entry;
     }
     our class XObject-Image

@@ -2,15 +2,15 @@ use v6;
 use Test;
 plan 3;
 use PDF::Grammar::Test :is-json-equiv;
-use PDF::Content::Graphics;
+use PDF::Content::Canvas;
 use PDF::Content::Ops :OpCode;
 
-class Graphics does PDF::Content::Graphics {
+class Canvas does PDF::Content::Canvas {
     has Str $.decoded;
-    method resources($) { %() }
+    has %.Resources;
 };
 
-my Graphics $gfx .= new(:decoded("BT ET .5 0 0 rg"));
+my Canvas $gfx .= new(:decoded("BT ET .5 0 0 rg"));
 is-deeply $gfx.render.Str.lines, ("q", "  BT", "  ET",  "  0.5 0 0 rg", "Q"), "unsafe content has been wrapped";
 
 $gfx .= new(:decoded("BT ET .5 0 0 rg"));

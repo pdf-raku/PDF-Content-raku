@@ -52,7 +52,7 @@ class PDF::Content::Text::Line {
 
         # flatten words. insert spaces and space adjustments.
         # Ensure we add spaces - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
-        for 0 ..^ +@!words -> $i {
+        for ^+@!words -> $i {
             my $spaces := @!spaces[$i];
             if $spaces {
 	        @line.push: Space x $spaces;

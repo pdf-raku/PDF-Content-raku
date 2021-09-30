@@ -92,7 +92,7 @@ role PDF::Content::PageTree
         }
         else {
             my $kids := self.Kids;
-            for 0 ..^ + $kids {
+            for ^+$kids {
                 given $kids[$_] {
                     when PDF::Content::PageTree { @index.append: .page-index }
                     when PDF::Content::PageNode { @index.push: .ind-ref }
@@ -106,7 +106,7 @@ role PDF::Content::PageTree
     method pages {
         my @pages;
         my $kids := self.Kids;
-        for 0 ..^ + $kids {
+        for ^+$kids {
             given $kids[$_] {
                 when PDF::Content::PageTree { @pages.append: .pages }
                 when PDF::Content::PageNode { @pages.push: $_ }
