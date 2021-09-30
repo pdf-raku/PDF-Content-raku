@@ -15,9 +15,9 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-          #- windows-latest
+          - windows-latest
         raku-version:
-##          - 'latest'
+          - 'latest'
           - '2020.11'
           - '2020.05.1'
     runs-on: ${{ matrix.os }}
@@ -34,6 +34,7 @@ jobs:
           #sudo apt-get install -y libcsv-dev
           #sudo apt-get install -y libcairo2-dev libfreetype6-dev
           zef install --/test App::Prove6
+          zef install PathTools # OpenSSL #90
           zef install --deps-only .
       - name: Run Tests
         run: prove6 -I. t
