@@ -28,14 +28,8 @@ jobs:
           raku-version: ${{ matrix.raku-version }}
       - name: Install Dependencies
         run: |
-          # install and test if need be (includes [test-depends])
-          #sudo apt-get install -y libperl-dev libexcel-writer-xlsx-perl libspreadsheet-read-perl cpanminus
-          #sudo cpanm Spreadsheet::Reader::ExcelXML Spreadsheet::ParseXLSX
-          #sudo apt-get install -y libcsv-dev
-          #sudo apt-get install -y libcairo2-dev libfreetype6-dev
           zef install --/test App::Prove6
-          zef install PathTools # OpenSSL #90
-          zef install --verbose OpenSSL
+          zef install --verbose -force install OpenSSL # OpenSSL issue #90
           zef install --deps-only .
       - name: Run Tests
         run: prove6 -I. t
