@@ -52,9 +52,8 @@ role PDF::Content::Page
         $xobject.gfx.ops($page.gfx.ops);
 
 	# copy content streams
-	my $contents = $page.contents;
-        if $contents {
-            $xobject.edit-stream: :append($contents);
+        if $page.contents -> $append {
+            $xobject.edit-stream: :$append;
             # inherit compression from the first stream segment
             for $page<Contents>[0] {
                 $xobject<Filter> = .clone
