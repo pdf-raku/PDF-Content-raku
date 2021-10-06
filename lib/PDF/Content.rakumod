@@ -381,9 +381,8 @@ class PDF::Content:ver<0.5.7>
         nextwith( $text, :$font, |c);
     }
 
-    method draw(PDF::Content:D $gfx: $canvas, :$renderer is copy, |c) {
-        $renderer //= (require HTML::Canvas::To::PDF).new: :$gfx, |c;
-        $canvas.render($renderer);
+    method draw(PDF::Content:D $gfx: $canvas, :$renderer, |c) {
+        $canvas.render($renderer // (require HTML::Canvas::To::PDF).new: :$gfx, |c);
     }
 
     # map transformed user coordinates to untransformed (default) coordinates

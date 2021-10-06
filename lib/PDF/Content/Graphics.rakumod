@@ -7,6 +7,8 @@ role PDF::Content::Graphics {
     use PDF::Content::Ops :OpCode;
     use PDF::Content::Tag;
     use PDF::COS::Stream;
+    use PDF::COS::Name;
+    sub name($_) { PDF::COS::Name.COERCE: $_ }
 
     has PDF::Content $!pre-gfx; #| prepended graphics
     method has-pre-gfx { ? .ops with $!pre-gfx }
@@ -105,13 +107,13 @@ role PDF::Content::Graphics {
 
     method cb-finish is hidden-from-backtrace { $.finish }
 
-    #| create a new XObject Form
+    #| create a child XObject Form
     method xobject-form(:$group = True, *%dict) {
-        %dict<Type> = :name<XObject>;
-        %dict<Subtype> = :name<Form>;
+        %dict<Type> = name 'XObject';
+        %dict<Subtype> = name 'Form';
         %dict<Resources> //= {};
         %dict<BBox> //= [0, 0, 612, 792];
-        %dict<Group> //= %( :S( :name<Transparency> ) )
+        %dict<Group> //= %( :S( name 'Transparency' ) )
             if $group;
         PDF::COS::Stream.COERCE: { :%dict };
     }
@@ -126,7 +128,7 @@ role PDF::Content::Graphics {
                           *%dict
                          ) {
         %dict.push: $_
-                     for (:Type(:name<Pattern>), :PatternType(1),
+                     for (:Type(name 'Pattern'), :PatternType(1),
                           :$PaintType, :$TilingType,
                           :$BBox, :$XStep, :$YStep, :$Resources);
         PDF::COS::Stream.COERCE: { :%dict };

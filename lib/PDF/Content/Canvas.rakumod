@@ -6,6 +6,6 @@ role PDF::Content::Canvas
     does PDF::Content::Graphics
     does PDF::Content::Resourced {
 
-    method Resources {...}
     method canvas(&code) { self.gfx.canvas( &code ) }
+
 }
