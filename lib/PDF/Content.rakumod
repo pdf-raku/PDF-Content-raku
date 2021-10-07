@@ -41,12 +41,12 @@ class PDF::Content:ver<0.5.7>
 
     method !setup-mcid(Bool :$mark, :%props) {
         with %props<MCID> {
-            $.parent.use-mcid($_);
+            $.canvas.use-mcid($_);
         }
         elsif $mark {
             die "illegal nesting of marked content tags"
                 if self.open-tags.grep(*.mcid.defined);
-            %props<MCID> = $.parent.next-mcid()
+            %props<MCID> = $.canvas.next-mcid()
         }
     }
 
@@ -99,12 +99,6 @@ class PDF::Content:ver<0.5.7>
     has Tagger $!tagger;
     multi method tag is default {
         $!tagger //= Tagger.new: :gfx(self);
-    }
-
-    method canvas(&mark-up!, |c ) {
-        my $canvas := (require HTML::Canvas).new;
-        $canvas.context(&mark-up);
-        self.draw($canvas, |c);
     }
 
     method load-image($spec) {
@@ -371,7 +365,7 @@ class PDF::Content:ver<0.5.7>
             },
             STORE => -> $, $v {
                 my @v = $v.isa(List) ?? @$v !! $v;
-                @v[0] = .use-font(@v[0]) with $.parent;
+                @v[0] = .use-font(@v[0]) with $.canvas;
                 self.set-font(|@v);
             },
         );
@@ -379,6 +373,16 @@ class PDF::Content:ver<0.5.7>
 
     multi method print(Str $text, :$font = self!current-font[0], |c) {
         nextwith( $text, :$font, |c);
+    }
+
+    multi method canvas(&mark-up!, |c ) is DEPRECATED<html-canvas> {
+        self.html-canvas(&mark-up, |c );
+    }
+
+    method html-canvas(&mark-up!, |c ) {
+        my $canvas := (require HTML::Canvas).new;
+        $canvas.context(&mark-up);
+        self.draw($canvas, |c);
     }
 
     method draw(PDF::Content:D $gfx: $canvas, :$renderer, |c) {

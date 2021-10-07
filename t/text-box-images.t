@@ -5,13 +5,14 @@ use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
 use PDF::Content::Font::CoreFont;
+use PDF::Content::Page;
 use PDF::Content::XObject;
 use PDFTiny;
 
 # experimental feature to flow text and images
 
 my PDFTiny $pdf .= new;
-my $page = $pdf.add-page;
+my PDF::Content::Page $page = $pdf.add-page;
 
 my @chunks = PDF::Content::Text::Box.comb: 'I must go down to the seas';
 @chunks.append: ' ', 'aga','in';

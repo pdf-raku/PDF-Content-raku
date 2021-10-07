@@ -17,9 +17,10 @@ implements a PDF graphics state machine for composition, or rendering:
 ```
 use lib 't';
 use PDF::Content;
+use PDF::Content::Canvas;
 use PDFTiny;
-my $parent = PDFTiny.new.add-page;
-my PDF::Content $gfx .= new: :$parent;
+my PDF::Content::Canvas $canvas = PDFTiny.new.add-page;
+my PDF::Content $gfx .= new: :$canvas;
 $gfx.use-font: $gfx.core-font('Courier'); # define /F1 font
 $gfx.BeginText;
 $gfx.Font = 'F1', 16;

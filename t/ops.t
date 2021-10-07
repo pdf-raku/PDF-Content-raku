@@ -1,11 +1,12 @@
 use v6;
 use Test;
-plan 112;
+plan 113;
 
 use lib 't';
 use PDF;
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content;
+use PDF::Content::Canvas;
 use PDF::Content::Ops :OpCode;
 use PDF::Content::Matrix :scale;
 use PDFTiny;
@@ -41,7 +42,7 @@ is $ops2, +$g.ops, 'StrokeColor Op optimised';
 
 is $g.StrokeColorSpace, 'DeviceRGB', '$g.StrokeColorSpace - initial';
 
-dies-ok { $g.StrokeColor = :DeviceRGB[.4, .5, .6, .8] }, 'wrong number of colors - dies';
+dies-ok { $g.StrokeColor = :DeviceRGB[.3, .5, .7, .9] }, 'wrong number of colors - dies';
 
 is-deeply $g.StrokeColor, (:DeviceRGB[.4, .5, .6]), '$g.StrokeColor - updated again';
 
@@ -121,13 +122,14 @@ is $g.WordSpacing, 10.0, '$g.WordSpacing - MoveSetShow';
 is $g.CharSpacing, 20.0, '$g.CharSpacing - MoveSetShow';
 
 $g.FillAlpha = 1.0;
-my $parent = $g.parent;
-nok $parent<ExtGState>, 'FillAlpha Optimized';
+my $canvas = $g.canvas;
+does-ok $canvas, PDF::Content::Canvas;
+nok $canvas<ExtGState>, 'FillAlpha Optimized';
 $g.FillAlpha = 0.4;
 is $g.ops[*-1], (:gs([:name<GS1>])), 'FillAlpha op';
-is-json-equiv $parent<Resources><ExtGState><GS1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';
+is-json-equiv $canvas<Resources><ExtGState><GS1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';
 $g.FillAlpha = 1.0;
-is-json-equiv $parent<Resources><ExtGState><GS2>, { :Type<ExtGState>, :ca(1.0)}, 'FillAlpha graphics resource';
+is-json-equiv $canvas<Resources><ExtGState><GS2>, { :Type<ExtGState>, :ca(1.0)}, 'FillAlpha graphics resource';
 
 is-json-equiv $g.op('scn', 0.30, 'int' => 1, 0.21, 'P2'), (:scn[ :real(.30), :int(1), :real(.21), :name<P2> ]), 'scn';
 is-json-equiv $g.op('TJ', $[ 'hello', 42, 'world']), (:TJ[ :array[ :literal<hello>, :int(42), :literal<world> ] ]), 'TJ';
@@ -164,7 +166,7 @@ $g.Restore;
 is $g.RenderingIntent, 'RelativeColorimetric', 'RenderingIntent, restored';
 is $g.Flatness, 0, 'Flatness, restored';
 
-$g .= new: :$parent;
+$g .= new: :$canvas;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 is-json-equiv $g.ops, [:m[:int(175), :int(720)],
@@ -225,7 +227,7 @@ is-json-equiv [ $g.ops[*-4..*] ], [
     :ET[],
 ], 'Text block parse';
 
-$g .= new( :comment, :$parent);
+$g .= new( :comment, :$canvas);
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 $g.add-comment("That's all♥!");
@@ -249,7 +251,7 @@ is-deeply $g.content-dump, $(
     "% That's all#2665!",
 ), 'content with comments';
 
-my PDF::Content $g1 .= new: :$parent;
+my PDF::Content $g1 .= new: :$canvas;
 lives-ok {$g1.ops: $g.ops;}, "comments import - lives";
 is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), ]), 'comments import - head';
 is-json-equiv $g1.ops.tail(2).List, (:S[ ], :comment["That's all♥!"]), 'comments import - tail';
@@ -294,7 +296,7 @@ is $g.char-width, 20, "SetCharWidthBBox";
 is $g.char-height, 25, "SetCharWidthBBox";
 is-deeply $g.char-bbox.List, (1, 2, 25, 30), "SetCharWidthBBox";
 
-$g .= new( :$parent);
+$g .= new( :$canvas);
 $g.Save;
 $g.Rectangle(10,10, 150, 100);
 $g.paint: :close, :fill;
@@ -310,7 +312,7 @@ my @painted = [
 
 is-json-equiv $g.ops, @painted, 'drawing and painting';
 
-$g .= new( :$parent);
+$g .= new( :$canvas);
 $g.paint: :close, :fill, {
     .Rectangle(10,10, 150, 100);
 }

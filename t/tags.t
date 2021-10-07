@@ -5,12 +5,13 @@ plan 9;
 use lib 't';
 use PDFTiny;
 use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
-use PDF::Content::XObject;
 use PDF::Content::FontObj;
+use PDF::Content::Page;
+use PDF::Content::XObject;
 
 my PDFTiny $pdf .= new;
 
-my $page = $pdf.add-page;
+my PDF::Content::Page $page = $pdf.add-page;
 my PDF::Content::FontObj $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
 my PDF::Content::FontObj $body-font = $page.core-font: :family<Helvetica>;
 

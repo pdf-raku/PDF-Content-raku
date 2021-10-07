@@ -12,7 +12,7 @@ role PDF::Content::Graphics {
 
     has PDF::Content $!pre-gfx; #| prepended graphics
     method has-pre-gfx { ? .ops with $!pre-gfx }
-    method pre-gfx { $!pre-gfx //= PDF::Content.new( :parent(self) ) }
+    method pre-gfx { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
     method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
     has PDF::Content $!gfx;     #| appended graphics
     has Bool $!rendered = False;
@@ -69,8 +69,8 @@ role PDF::Content::Graphics {
         }
     }
 
-    method new-gfx(PDF::Content::Graphics:D $parent: |c) {
-        PDF::Content.new: :$parent, |c;
+    method new-gfx(PDF::Content::Graphics:D $canvas: |c) {
+        PDF::Content.new: :$canvas, |c;
     }
 
     method render(Bool :$tidy = True, |c) is default {

@@ -4,7 +4,7 @@ use lib 't';
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
-my $page = $pdf.add-page;
+my PDFTiny::Page $page = $pdf.add-page;
 
 lives-ok {
     $page.graphics: -> $gfx {

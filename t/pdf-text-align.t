@@ -2,13 +2,15 @@ use v6;
 use Test;
 plan 1;
 use lib 't';
+use PDF::Content;
 use PDF::Content::Ops :OpCode;
 use PDF::Content::FontObj;
+use PDF::Content::Page;
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
-my $page = $pdf.add-page;
-my $gfx = $page.gfx;
+my PDF::Content::Page $page = $pdf.add-page;
+my PDF::Content $gfx = $page.gfx;
 my $width = 50;
 my $font-size = 18;
 

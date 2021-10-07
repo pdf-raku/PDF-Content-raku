@@ -100,8 +100,10 @@ class PDF::Content::Ops {
     method comment-ops is rw is DEPRECATED('comment') { $!comment }
     has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;
-    has $.parent handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
-    method owner { $.parent }
+    has $.canvas handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
+    method owner { $!canvas }
+    multi method canvas { $!canvas }
+    method parent is DEPRECATED<canvas> { $!canvas }
     has UInt $.extended-ops = 0;
     has Numeric ($!cur-x, $!cur-y); # current point
     has Numeric ($!close-x, $!close-y); # closepath end-point
@@ -199,6 +201,10 @@ class PDF::Content::Ops {
 	:MiterJoin(0) :RoundJoin(1) :BevelJoin(2)
     »;
 
+    multi method new(:parent($canvas)!, |c) is DEPRECATED('new: :$canvas') {
+        self.new: :$canvas, |c;
+    }
+
     method graphics-accessor(Attribute $att, $setter) is rw {
         Proxy.new(
             FETCH => { $att.get_value(self) },
@@ -213,7 +219,7 @@ class PDF::Content::Ops {
             FETCH => { $att.get_value(self) },
             STORE => -> $, \v {
                 unless $att.get_value(self) eqv v {
-                    given $!parent {
+                    given $!canvas {
                         # Match any reusable GS entry; otherwise create a new entry
                         my &match = -> Hash $_ {
                             .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
@@ -292,7 +298,7 @@ class PDF::Content::Ops {
         OpCode::BeginMarkedContentDict => method (Str $name, $p where Str|Hash) {
             my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
             my UInt $mcid = $_ with %attributes<MCID>:delete;
-            $!parent.use-mcid($_) with $mcid;
+            $!canvas.use-mcid($_) with $mcid;
             self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%attributes, :$.owner, :start(+@!ops), :$mcid;
         },
         OpCode::EndMarkedContent => method {
@@ -309,12 +315,12 @@ class PDF::Content::Ops {
         OpCode::MarkPointDict => method ( Str $name!, $p where Str|Hash) {
             my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
             my UInt $mcid = $_ with %attributes<MCID>:delete;
-            $!parent.use-mcid($_) with $mcid;
+            $!canvas.use-mcid($_) with $mcid;
             my $start = my $end = +@!ops;
             self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%attributes, :$.owner, :$start, :$end, :$mcid;
         },
         OpCode::SetGraphicsState => method (Str $key) {
-             given $!parent {
+             given $!canvas {
                 with .resource-entry('ExtGState', $key) {
                     with .<CA>   { $!StrokeAlpha = $_ }
                     with .<ca>   { $!FillAlpha = $_ }
@@ -438,7 +444,7 @@ class PDF::Content::Ops {
     has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
     has Array   $.Font          is graphics is stored(
         method (Str $key, Numeric $size!) {
-            with $!parent.resource-entry('Font', $key) -> \font-face {
+            with $!canvas.resource-entry('Font', $key) -> \font-face {
                 $!Font = [font-face, $size];
             }
             else {
@@ -529,7 +535,7 @@ class PDF::Content::Ops {
     has $.FillAlpha   is ext-graphics is rw = 1.0;
 
     method tags handles<open-tag close-tag add-tag open-tags closed-tag descendants> {
-        $!parent.tags;
+        $!canvas.tags;
     }
 
     # *** Graphics Stack ***
@@ -797,7 +803,7 @@ class PDF::Content::Ops {
             my Str $name = @args.pop
                 if @args.tail ~~ Str;
 
-            @args = @args.map: {
+            @args .= map: {
                 when Pair    {$_}
                 when Numeric { :real($_) }
                 default {
@@ -874,12 +880,14 @@ class PDF::Content::Ops {
         given .value {
             my $op = .key;
             if %OpName{$op}:exists {
+                # known opereator with incorrect arguments
                 my @args = .value».value;
                 die X::PDF::Content::OP::BadArgs.new: :$op, :@args, :mnemonic(%OpName{$op}) ;
             }
             else {
+                # unknown operator
                 if $!extended-ops {
-                    # preserve, if we're in a BX .. EX block
+                    # preserve, if we're in a BX .. EX extension block
                     @!ops.push: $_;
                 }
                 else {
@@ -1065,7 +1073,7 @@ class PDF::Content::Ops {
             if $!strict && $!context != Page;
 
         .cb-finish()
-            for $!parent.resources('Font').values;
+            for $!canvas.resources('Font').values;
     }
 
     #| serialize content into a string. indent blocks for readability

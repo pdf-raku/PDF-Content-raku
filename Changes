@@ -1,4 +1,8 @@
 {{$NEXT}}
+  - Deprecate canvas(&code) for drawing to an HTML::Canvas in favour
+    of html-canvas(&code).
+  - canvas() method now returns the PDF::Content::Canvas containing
+    object, either a Page, XObject Form or Pattern.
 
 0.5.7  2021-10-02T08:19:46+13:00
   - Use PDF::Content v0.5.7+ PDF::Content::Canvas role for composing
