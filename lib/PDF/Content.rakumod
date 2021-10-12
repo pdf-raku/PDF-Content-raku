@@ -365,8 +365,8 @@ class PDF::Content:ver<0.5.8>
             },
             STORE => -> $, $v {
                 my @v = $v.isa(List) ?? @$v !! $v;
-                @v[0] = .use-font(@v[0]) with $.canvas;
-                self.set-font(|@v);
+                @v[0] = .use-font: @v[0] with $.canvas;
+                self.set-font: |@v;
             },
         );
     }

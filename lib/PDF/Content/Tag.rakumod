@@ -7,14 +7,13 @@ use PDF::COS::Array;
 use PDF::COS::Dict;
 use PDF::COS::Stream;
 
-my subset PageLike of Hash where .<Type> ~~ 'Page';
-my subset Owner where PageLike|PDF::COS::Stream;
 our class Set {...}
 
 has Str $.name is rw;
 has Str $.op;
 has %.attributes;
-has Owner $.owner is required;
+has $.canvas is required;
+method owner  is DEPRECATED<canvas> { $!canvas }
 has UInt $.start is rw;
 has UInt $.end is rw;
 has UInt $.mcid is rw; # marked content identifer

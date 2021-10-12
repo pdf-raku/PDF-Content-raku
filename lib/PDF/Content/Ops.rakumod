@@ -101,9 +101,9 @@ class PDF::Content::Ops {
     has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;
     has $.canvas handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
-    method owner { $!canvas }
     multi method canvas { $!canvas }
     method parent is DEPRECATED<canvas> { $!canvas }
+    method owner  is DEPRECATED<canvas> { $!canvas }
     has UInt $.extended-ops = 0;
     has Numeric ($!cur-x, $!cur-y); # current point
     has Numeric ($!close-x, $!close-y); # closepath end-point
@@ -293,13 +293,13 @@ class PDF::Content::Ops {
         OpCode::SetStrokeColorN => method (*@!StrokeColor where self!color-args-ok('SCN',  $_)) {
         },
         OpCode::BeginMarkedContent => method (Str $name) {
-            self.open-tag: PDF::Content::Tag.new: :op<BMC>, :$name, :$.owner, :start(+@!ops);
+            self.open-tag: PDF::Content::Tag.new: :op<BMC>, :$name, :$.canvas, :start(+@!ops);
         },
         OpCode::BeginMarkedContentDict => method (Str $name, $p where Str|Hash) {
             my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
             my UInt $mcid = $_ with %attributes<MCID>:delete;
             $!canvas.use-mcid($_) with $mcid;
-            self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%attributes, :$.owner, :start(+@!ops), :$mcid;
+            self.open-tag: PDF::Content::Tag.new: :op<BDC>, :$name, :%attributes, :$.canvas, :start(+@!ops), :$mcid;
         },
         OpCode::EndMarkedContent => method {
 	    die X::PDF::Content::OP::BadNesting.new: :op<EMC>, :mnemonic(%OpName<EMC>), :opener("'BMC' or 'BDC' (BeginMarkedContent)")
@@ -310,14 +310,14 @@ class PDF::Content::Ops {
         },
         OpCode::MarkPoint => method ( Str $name!) {
             my $start = my $end = +@!ops;
-            self.add-tag: PDF::Content::Tag.new: :op<MP>, :$name, :$.owner, :$start, :$end;
+            self.add-tag: PDF::Content::Tag.new: :op<MP>, :$name, :$.canvas, :$start, :$end;
         },
         OpCode::MarkPointDict => method ( Str $name!, $p where Str|Hash) {
             my %attributes = .List with ($p ~~ Str ?? $.resource-entry('Properties', $p) !! $p );
             my UInt $mcid = $_ with %attributes<MCID>:delete;
             $!canvas.use-mcid($_) with $mcid;
             my $start = my $end = +@!ops;
-            self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%attributes, :$.owner, :$start, :$end, :$mcid;
+            self.add-tag: PDF::Content::Tag.new: :op<DP>, :$name, :%attributes, :$.canvas, :$start, :$end, :$mcid;
         },
         OpCode::SetGraphicsState => method (Str $key) {
              given $!canvas {
