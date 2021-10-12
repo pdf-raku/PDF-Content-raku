@@ -1,7 +1,7 @@
 use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState, :Vector;
 
-class PDF::Content:ver<0.5.8>
+class PDF::Content:ver<0.5.9>
     is PDF::Content::Ops {
 
     use PDF::COS::Stream;
@@ -380,13 +380,13 @@ class PDF::Content:ver<0.5.8>
     }
 
     method html-canvas(&mark-up!, |c ) {
-        my $canvas := (require HTML::Canvas).new;
-        $canvas.context(&mark-up);
-        self.draw($canvas, |c);
+        my $html-canvas := (require HTML::Canvas).new;
+        $html-canvas.context(&mark-up);
+        self.draw($html-canvas, |c);
     }
 
-    method draw(PDF::Content:D $gfx: $canvas, :$renderer, |c) {
-        $canvas.render($renderer // (require HTML::Canvas::To::PDF).new: :$gfx, |c);
+    method draw(PDF::Content:D $gfx: $html-canvas, :$renderer, |c) {
+        $html-canvas.render($renderer // (require HTML::Canvas::To::PDF).new: :$gfx, |c);
     }
 
     # map transformed user coordinates to untransformed (default) coordinates

@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.5.9  2021-10-12T17:38:03+13:00
+  - Deprecate PDF::Content::Tags owner() in favour of canvas()
+
 0.5.8  2021-10-08T14:36:22+13:00
   - Deprecate canvas(&code) for drawing to an HTML::Canvas in favour
     of html-canvas(&code).
