@@ -65,6 +65,7 @@ role PDF::Content::XObject['Image']
     has Numeric $.height;
     method width  { $!width //= self<Width> }
     method height { $!height //= self<Height> }
+    method bbox   {[0, 0, $.width, $.height]}
     has $.image-obj is rw handles <data-uri source image-type>;
     method Str { with $!image-obj  {.data-uri} else {nextsame} }
 
