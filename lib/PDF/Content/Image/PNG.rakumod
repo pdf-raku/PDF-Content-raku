@@ -151,7 +151,7 @@ class PDF::Content::Image::PNG
 
         if $alpha && $trns && +$trns {
             my $vals = network-words($trns);
-            %dict<Mask> = [ $vals.min, $vals.max ]
+            %dict<Mask> = $vals.minmax.minmax;
         }
         my $encoded = $stream.decode: 'latin-1';
         PDF::COS::Stream.COERCE: { :%dict, :$encoded };
@@ -173,7 +173,7 @@ class PDF::Content::Image::PNG
 
         if $alpha && $trns && +$trns {
             my $vals = network-words($trns);
-            %dict<Mask> = [ $vals.map: { (*.min, *.max) } ];
+            %dict<Mask> = $vals.minmax.minmax;
         }
         my $encoded = $stream.decode: 'latin-1';
         PDF::COS::Stream.COERCE: { :%dict, :$encoded };
