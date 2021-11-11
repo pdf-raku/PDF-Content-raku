@@ -10,6 +10,7 @@ class PDF::Content::Text::Box {
 
     has Numeric $.width;
     has Numeric $.height;
+    has Numeric $.indent = 0;
     my subset Alignment of Str is export(:Alignment) where 'left'|'center'|'right'|'justify';
     has Alignment $.align = 'left';
     my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
@@ -53,7 +54,7 @@ class PDF::Content::Text::Box {
         my $word-gap = self!word-gap;
 	my $height = $!style.font-size;
 
-        my PDF::Content::Text::Line $line .= new: :$word-gap, :$height;
+        my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
 	@!lines = [ $line ];
 
         while @atoms {
@@ -62,13 +63,17 @@ class PDF::Content::Text::Box {
             my Bool $reserving = False;
 	    my $word-width;
             my $word;
-            my $pre-word-gap = $preceding-spaces * $word-gap;
+            my $pad = $preceding-spaces * $word-gap;
 
             given $atom {
                 when Str {
                     if $!style.kern {
-                        ($word, $word-width) = $!style.font.kern($atom);
-                        $_ = -$_ for $word.list.grep(Numeric);
+                        given $!style.font.kern($atom) {
+                            $word = .[0].list.map: {
+                                .does(Numeric) ?? -$_ !! $_;
+                            }
+                            $word-width = .[1];
+                        }
                     }
                     else {
                         $word = [ $atom, ];
@@ -85,13 +90,13 @@ class PDF::Content::Text::Box {
                 }
             }
 
-            if $!width && $line.words && $line.content-width + $pre-word-gap + $word-width > $!width {
+            if $!width && $line.words && $line.content-width + $pad + $word-width > $!width {
                 # line break
                 $line = $line.new: :$word-gap, :$height;
                 @!lines.push: $line;
                 @line-atoms = [];
                 $preceding-spaces = 0;
-                $pre-word-gap = 0;
+                $pad = 0;
             }
             if $reserving {
                 given $atom.height {
@@ -107,7 +112,7 @@ class PDF::Content::Text::Box {
             }
 
             if $reserving {
-                my $Tx = $line.content-width + $pre-word-gap;
+                my $Tx = $line.content-width + $pad;
                 my $Ty = @!lines
                     ?? @!lines[0].height * $.leading  -  self.content-height
                     !! 0.0;

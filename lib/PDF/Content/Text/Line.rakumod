@@ -9,10 +9,11 @@ class PDF::Content::Text::Line {
     has Numeric $.word-width is rw = 0; #| sum of word widths
     has Numeric $.word-gap = 0;
     has Numeric $.indent is rw = 0;
+    has Numeric $.align is rw = 0;
     has UInt @.spaces;
 
     method content-width returns Numeric {
-        $!word-width + @!spaces.sum * $!word-gap;
+        $!indent  +  $!word-width  +  @!spaces.sum * $!word-gap;
     }
 
     multi method align('justify', Numeric :$width! ) {
@@ -22,20 +23,20 @@ class PDF::Content::Text::Line {
 
         if content-width && wb && 1.0 < stretch < 2.0 {
             $!word-gap += ($width - content-width) / wb;
-            $!indent = 0;
+            $!align = 0;
         }
     }
 
     multi method align('left') {
-        $!indent = 0;
+        $!align = 0;
     }
 
     multi method align('right') {
-        $!indent = - $.content-width;
+        $!align = - $.content-width;
     }
 
     multi method align('center') {
-        $!indent = - $.content-width  /  2;
+        $!align = - $.content-width  /  2;
     }
 
     method content(:$font!, Numeric :$font-size!, Numeric :$x-shift = 0, :$space-pad = 0) {
@@ -44,7 +45,7 @@ class PDF::Content::Text::Line {
         my Str-or-Pos @line;
         constant Space = ' ';
 
-        my Numeric $indent = $!indent + $x-shift;
+        my Numeric $indent = $!align + $!indent + $x-shift;
         $indent = ($indent * scale).round.Int;
         @line.push: $indent
             if $indent;

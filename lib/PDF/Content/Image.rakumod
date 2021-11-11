@@ -45,7 +45,7 @@ class PDF::Content::Image {
         }
     }
 
-    multi method load(Str $data-uri where /^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
+    multi method load(Str $data-uri where m/^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
         my $path = ~ $0;
         my Str $mime-type = ( $0<t> // '(missing)').lc;
         my Str $mime-subtype = ( $0<s> // '').lc;
@@ -107,8 +107,7 @@ class PDF::Content::Image {
         )
     }
 
-    method open(|c) {
-        state $ = warn "PDF::Content::Image.open is deprecated; please use PDF::Content::XObject.open";
+    method open(|c) is DEPRECATED<PDF::Content::XObject.open> {
         (require ::('PDF::Content::XObject')).open(|c);
     }
 }

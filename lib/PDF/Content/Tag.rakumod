@@ -26,7 +26,7 @@ my enum StructureTags is export(:StructureTags,:Tags) (
     :Document<Document>, :Part<Part>, :Article<Art>, :Section<Sect>,
     :Division<Div>, :BlockQuotation<BlockQuote>, :Caption<Caption>,
     :TableOfContents<TOC>, :TableOfContentsItem<TOCI>, :Index<Index>,
-    :NonstructuralElement<NonStruct>, :PrivateElement<Private>,
+    :NonStructural<NonStruct>, :Private<Private>,
 );
 
 #| See [PDF 32000 Tables 334-337 - Block-level structure elements]
@@ -48,8 +48,8 @@ my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Span<Span>, :Quotation<Quote>, :Note<Note>, :Reference<Reference>,
     :BibliographyEntry<BibEntry>, :Code<Code>, :Link<Link>,
     :Annotation<Annot>,
-    :Ruby<Ruby>, :RubyPunctutation<RP>, :RubyBaseText<RB>, :RubyText<RT>,
-    :Warichu<Warichu>, :WarichuPunctutation<RP>, :WarichuText<RT>,
+    :Ruby<Ruby>, :RubyPunctuation<RP>, :RubyBaseText<RB>, :RubyText<RT>,
+    :Warichu<Warichu>, :WarichuPunctuation<RP>, :WarichuText<RT>,
     :Artifact<Artifact>,
 );
 

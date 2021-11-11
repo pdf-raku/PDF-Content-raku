@@ -4,4 +4,3 @@
 Makefile
 blib/
 PDF-Content-*
-t/*.pdf

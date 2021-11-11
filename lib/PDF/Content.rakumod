@@ -240,10 +240,10 @@ class PDF::Content:ver<0.5.9>
     }
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
-    method text-box(MadeFont:D $font = self!current-font[0], *%opt) is hidden-from-backtrace {
+    method text-box($gfx: MadeFont:D $font = self!current-font[0], *%opt) is hidden-from-backtrace {
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Box.new(
-            :gfx(self), :$font, :$font-size, |%opt,
+            :$gfx, :$font, :$font-size, |%opt,
             );
     }
 
