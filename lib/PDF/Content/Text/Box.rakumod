@@ -61,9 +61,9 @@ class PDF::Content::Text::Box {
             my subset StrOrImage where Str | PDF::Content::XObject;
             my StrOrImage $atom = @atoms.shift;
             my Bool $reserving = False;
-	    my $word-width;
             my $word;
-            my $pad = $preceding-spaces * $word-gap;
+	    my $word-width;
+            my $word-pad = $preceding-spaces * $word-gap;
 
             given $atom {
                 when Str {
@@ -90,13 +90,13 @@ class PDF::Content::Text::Box {
                 }
             }
 
-            if $!width && $line.words && $line.content-width + $pad + $word-width > $!width {
+            if $!width && ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width {
                 # line break
                 $line = $line.new: :$word-gap, :$height;
                 @!lines.push: $line;
                 @line-atoms = [];
                 $preceding-spaces = 0;
-                $pad = 0;
+                $word-pad = 0;
             }
             if $reserving {
                 given $atom.height {
@@ -112,7 +112,7 @@ class PDF::Content::Text::Box {
             }
 
             if $reserving {
-                my $Tx = $line.content-width + $pad;
+                my $Tx = $line.content-width + $word-pad;
                 my $Ty = @!lines
                     ?? @!lines[0].height * $.leading  -  self.content-height
                     !! 0.0;
