@@ -21,6 +21,7 @@ class PDF::Content::Text::Box {
     has @.images;
     has Str $.text;
     has Bool $!squish;
+    has Bool $.verbatum;
 
     method content-width  { @!lines».content-width.max }
     method content-height {
@@ -61,13 +62,19 @@ class PDF::Content::Text::Box {
             my subset StrOrImage where Str | PDF::Content::XObject;
             my StrOrImage $atom = @atoms.shift;
             my Bool $reserving = False;
+            my $line-breaks = 0;
             my $word;
 	    my $word-width;
             my $word-pad = $preceding-spaces * $word-gap;
 
             given $atom {
                 when Str {
-                    if $!style.kern {
+                    if $!verbatum && +.match("\n", :g) -> $n {
+                        $line-breaks = $n;
+                        $word = [ ' ' x $preceding-spaces ];
+                        $word-width = $word-pad;
+                    }
+                    elsif $!style.kern {
                         given $!style.font.kern($atom) {
                             $word = .[0].list.map: {
                                 .does(Numeric) ?? -$_ !! $_;
@@ -90,8 +97,10 @@ class PDF::Content::Text::Box {
                 }
             }
 
-            if $!width && ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width {
-                # line break
+            $line-breaks ||= ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
+                if $!width;
+
+            while $line-breaks--  {
                 $line = $line.new: :$word-gap, :$height;
                 @!lines.push: $line;
                 @line-atoms = [];
@@ -134,13 +143,19 @@ class PDF::Content::Text::Box {
     }
 
     method !flush-spaces(@words) returns UInt {
+        my $n = 0; # space count for padding purposes
         if @words && @words[0] ~~ /<Text::space>/ {
-            @words.shift;
-            $!squish ?? 1 !! $/.chars;
+            $n = @words[0].chars;
+            if $!verbatum && (my $last-nl = @words[0].rindex("\n")).defined {
+                # count spaces after last new-line
+                $n -= $last-nl + 1;
+            }
+            else {
+                @words.shift;
+            }
+            $n = 1 if $n && $!squish;
         }
-        else {
-            0;
-        }
+        $n;
     }
 
     #| calculates actual spacing between words

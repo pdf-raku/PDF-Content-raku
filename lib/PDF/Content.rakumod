@@ -45,7 +45,7 @@ class PDF::Content:ver<0.5.9>
         }
         elsif $mark {
             die "illegal nesting of marked content tags"
-                if self.open-tags.grep(*.mcid.defined);
+                if self.open-tags.first(*.mcid.defined);
             %props<MCID> = $.canvas.next-mcid()
         }
     }
@@ -328,6 +328,7 @@ class PDF::Content:ver<0.5.9>
 
         with $*ActualText {
             # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
+            $_ ~= ' ' if .so && !.ends-with(' '|"\n");
             $_ ~= $text-box.text;
             $_ ~= "\n" if $nl;
         }

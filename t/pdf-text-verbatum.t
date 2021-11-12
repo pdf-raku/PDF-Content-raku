@@ -24,29 +24,36 @@ $gfx.BeginText;
 $gfx.set-font( $font, 10);
 
 my $sample = q:to"--ENOUGH!!--";
+First Line
+ Line2, leading space
+Wrapping text follows...
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-ut labore et dolore magna aliqua.
+last line
 --ENOUGH!!--
 
 my $baseline = 'top';
 
-for -10, 15, 30, $width - 3 -> $indent {
+for False, True -> $verbatum {
+    for True, False -> $chomp {
 
-    my $y = 700;
+        my $y = 700;
 
-    for <left center right justify> -> $align {
-        $gfx.text-position = ($x, $y);
-        $gfx.say( "*** text-indent:$indent $align*** " ~ $sample, :$width, :$height, :$indent, :$align, :$baseline );
-        $y -= 170;
+        for <left center right justify> -> $align {
+            $gfx.text-position = ($x, $y);
+            my $text = "*** verbatum:$verbatum chomp:$chomp $align *** " ~ $sample;
+            $text .= chomp if $chomp;
+            $gfx.say($text, :$width, :$height, :$verbatum, :$align, :$baseline );
+            $y -= 120;
+        }
+
+        $x += 125;
     }
-
-   $x += 125;
 }
 $gfx.EndText;
 
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 
-lives-ok {$pdf.save-as('t/pdf-text-indent.pdf')};
+lives-ok {$pdf.save-as('t/pdf-text-verbatum.pdf')};
 
 done-testing;

@@ -1,0 +1,323 @@
+%PDF-1.3
+%¥±ë¼
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [ 3 0 R ] >>
+endobj
+
+3 0 obj
+<<
+  /Type /Page
+  /Contents 4 0 R
+  /MediaBox [ 0 0 612 792 ]
+  /Parent 2 0 R
+  /Resources << /Font << /F1 5 0 R >> >>
+>>
+endobj
+
+4 0 obj
+<< /Length 4916 >> stream
+BT
+  /F1 10 Tf
+  1 0 0 1 110 700 Tm
+  -7.18 Ts
+  (*** verbatum:False) Tj
+  11 TL
+  T*
+  (chomp:True left ***) Tj
+  T*
+  (First Line  Line2,) Tj
+  T*
+  (leading space) Tj
+  T*
+  (Wrapping text) Tj
+  T*
+  (follows... Lorem ipsum) Tj
+  T*
+  (dolor sit amet,) Tj
+  T*
+  0 Ts
+  1 0 0 1 110 580 Tm
+  -7.18 Ts
+  [ 4168 (*** verbatum:False) ] TJ
+  T*
+  [ 4919 (chomp:True center ***) ] TJ
+  T*
+  [ 3696 (First Line  Line2,) ] TJ
+  T*
+  [ 3085 (leading space) ] TJ
+  T*
+  [ 3085 (Wrapping text) ] TJ
+  T*
+  [ 4974 (follows... Lorem ipsum) ] TJ
+  T*
+  [ 3140 (dolor sit amet,) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 110 460 Tm
+  -7.18 Ts
+  [ 8336 (*** verbatum:False) ] TJ
+  T*
+  [ 9003 (chomp:True right ***) ] TJ
+  T*
+  [ 7392 (First Line  Line2,) ] TJ
+  T*
+  [ 6170 (leading space) ] TJ
+  T*
+  [ 6169 (Wrapping text) ] TJ
+  T*
+  [ 9947 (follows... Lorem ipsum) ] TJ
+  T*
+  [ 6280 (dolor sit amet,) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 110 340 Tm
+  -7.18 Ts
+  [ (*** ) -1664 (verbatum:False) ] TJ
+  T*
+  [ (chomp:True ) -193 (justify ) -193 (***) ] TJ
+  T*
+  [ (First ) -869 (Line  ) -1738 (Line2,) ] TJ
+  T*
+  [ (leading ) -3830 (space) ] TJ
+  T*
+  [ (Wrapping ) -3831 (text) ] TJ
+  T*
+  [ (follows... ) -26 (Lorem ) -26 (ipsum) ] TJ
+  T*
+  [ (dolor ) -1860 (sit ) -1860 (amet,) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 235 700 Tm
+  -7.18 Ts
+  (*** verbatum:False) Tj
+  T*
+  (chomp:False left ***) Tj
+  T*
+  (First Line  Line2,) Tj
+  T*
+  (leading space) Tj
+  T*
+  (Wrapping text) Tj
+  T*
+  (follows... Lorem ipsum) Tj
+  T*
+  (dolor sit amet,) Tj
+  T*
+  0 Ts
+  1 0 0 1 235 580 Tm
+  -7.18 Ts
+  [ 4168 (*** verbatum:False) ] TJ
+  T*
+  [ 4391 (chomp:False center) ] TJ
+  T*
+  [ 4419 (*** First Line  Line2,) ] TJ
+  T*
+  [ 3085 (leading space) ] TJ
+  T*
+  [ 3085 (Wrapping text) ] TJ
+  T*
+  [ 4974 (follows... Lorem ipsum) ] TJ
+  T*
+  [ 3140 (dolor sit amet,) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 235 460 Tm
+  -7.18 Ts
+  [ 8336 (*** verbatum:False) ] TJ
+  T*
+  [ 9392 (chomp:False right ***) ] TJ
+  T*
+  [ 7392 (First Line  Line2,) ] TJ
+  T*
+  [ 6170 (leading space) ] TJ
+  T*
+  [ 6169 (Wrapping text) ] TJ
+  T*
+  [ 9947 (follows... Lorem ipsum) ] TJ
+  T*
+  [ 6280 (dolor sit amet,) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 235 340 Tm
+  -7.18 Ts
+  [ (*** ) -1664 (verbatum:False) ] TJ
+  T*
+  [ (chomp:False ) -1442 (justify) ] TJ
+  T*
+  [ (*** ) -290 (First ) -290 (Line  ) -581 (Line2,) ] TJ
+  T*
+  [ (leading ) -3830 (space) ] TJ
+  T*
+  [ (Wrapping ) -3831 (text) ] TJ
+  T*
+  [ (follows... ) -26 (Lorem ) -26 (ipsum) ] TJ
+  T*
+  [ (dolor ) -1860 (sit ) -1860 (amet,) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 360 700 Tm
+  -7.18 Ts
+  (*** verbatum:True) Tj
+  T*
+  (chomp:True left ***) Tj
+  T*
+  (First Line) Tj
+  T*
+  ( Line2, leading space) Tj
+  T*
+  (Wrapping text) Tj
+  T*
+  (follows...) Tj
+  T*
+  (Lorem ipsum dolor sit) Tj
+  T*
+  0 Ts
+  1 0 0 1 360 580 Tm
+  -7.18 Ts
+  [ 3974 (*** verbatum:True) ] TJ
+  T*
+  [ 4919 (chomp:True center ***) ] TJ
+  T*
+  [ 2056 (First Line) ] TJ
+  T*
+  [ 4587 ( Line2, leading space) ] TJ
+  T*
+  [ 3085 (Wrapping text) ] TJ
+  T*
+  [ 1945 (follows...) ] TJ
+  T*
+  [ 4779 (Lorem ipsum dolor sit) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 360 460 Tm
+  -7.18 Ts
+  [ 7947 (*** verbatum:True) ] TJ
+  T*
+  [ 9003 (chomp:True right ***) ] TJ
+  T*
+  [ 4112 (First Line) ] TJ
+  T*
+  [ 9175 ( Line2, leading space) ] TJ
+  T*
+  [ 6169 (Wrapping text) ] TJ
+  T*
+  [ 3890 (follows...) ] TJ
+  T*
+  [ 9558 (Lorem ipsum dolor sit) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 360 340 Tm
+  -7.18 Ts
+  [ (*** ) -2053 (verbatum:True) ] TJ
+  T*
+  [ (chomp:True ) -193 (justify ) -193 (***) ] TJ
+  T*
+  (First Line) Tj
+  T*
+  [ ( Line2, ) -412 (leading ) -412 (space) ] TJ
+  T*
+  [ (Wrapping ) -3831 (text) ] TJ
+  T*
+  (follows...) Tj
+  T*
+  [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 485 700 Tm
+  -7.18 Ts
+  (*** verbatum:True) Tj
+  T*
+  (chomp:False left ***) Tj
+  T*
+  (First Line) Tj
+  T*
+  ( Line2, leading space) Tj
+  T*
+  (Wrapping text) Tj
+  T*
+  (follows...) Tj
+  T*
+  (Lorem ipsum dolor sit) Tj
+  T*
+  0 Ts
+  1 0 0 1 485 580 Tm
+  -7.18 Ts
+  [ 3974 (*** verbatum:True) ] TJ
+  T*
+  [ 4391 (chomp:False center) ] TJ
+  T*
+  [ 2779 (*** First Line) ] TJ
+  T*
+  [ 4587 ( Line2, leading space) ] TJ
+  T*
+  [ 3085 (Wrapping text) ] TJ
+  T*
+  [ 1945 (follows...) ] TJ
+  T*
+  [ 4779 (Lorem ipsum dolor sit) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 485 460 Tm
+  -7.18 Ts
+  [ 7947 (*** verbatum:True) ] TJ
+  T*
+  [ 9392 (chomp:False right ***) ] TJ
+  T*
+  [ 4112 (First Line) ] TJ
+  T*
+  [ 9175 ( Line2, leading space) ] TJ
+  T*
+  [ 6169 (Wrapping text) ] TJ
+  T*
+  [ 3890 (follows...) ] TJ
+  T*
+  [ 9558 (Lorem ipsum dolor sit) ] TJ
+  T*
+  0 Ts
+  1 0 0 1 485 340 Tm
+  -7.18 Ts
+  [ (*** ) -2053 (verbatum:True) ] TJ
+  T*
+  [ (chomp:False ) -1442 (justify) ] TJ
+  T*
+  [ (*** ) -2221 (First ) -2221 (Line) ] TJ
+  T*
+  [ ( Line2, ) -412 (leading ) -412 (space) ] TJ
+  T*
+  [ (Wrapping ) -3831 (text) ] TJ
+  T*
+  (follows...) Tj
+  T*
+  [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
+  T*
+  0 Ts
+ET
+endstream
+endobj
+
+5 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000065 00000 n 
+0000000125 00000 n 
+0000000264 00000 n 
+0000005233 00000 n 
+trailer
+<< /ID [ (t/pdf-text-verba) (t/pdf-text-verba) ] /Root 1 0 R /Size 6 >>
+startxref
+5339
+%%EOF
