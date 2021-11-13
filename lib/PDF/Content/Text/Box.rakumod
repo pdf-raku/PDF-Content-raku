@@ -63,7 +63,7 @@ class PDF::Content::Text::Box {
             my StrOrImage $atom = @atoms.shift;
             my Bool $reserving = False;
             my $line-breaks = 0;
-            my $word;
+            my List() $word;
 	    my $word-width;
             my $word-pad = $preceding-spaces * $word-gap;
 
