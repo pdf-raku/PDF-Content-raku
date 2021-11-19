@@ -21,7 +21,7 @@ class PDF::Content::Text::Box {
     has @.images;
     has Str $.text;
     has Bool $!squish;
-    has Bool $.verbatum;
+    has Bool $.verbatim;
 
     method content-width  { @!lines».content-width.max }
     method content-height {
@@ -69,7 +69,7 @@ class PDF::Content::Text::Box {
 
             given $atom {
                 when Str {
-                    if $!verbatum && +.match("\n", :g) -> $n {
+                    if $!verbatim && +.match("\n", :g) -> $n {
                         $line-breaks = $n;
                         $word = [ ' ' x $preceding-spaces ];
                         $word-width = $word-pad;
@@ -146,7 +146,7 @@ class PDF::Content::Text::Box {
         my $n = 0; # space count for padding purposes
         if @words && @words[0] ~~ /<Text::space>/ {
             $n = @words[0].chars;
-            if $!verbatum && (my $last-nl = @words[0].rindex("\n")).defined {
+            if $!verbatim && (my $last-nl = @words[0].rindex("\n")).defined {
                 # count spaces after last new-line
                 $n -= $last-nl + 1;
                 $n = 0 if $!squish;

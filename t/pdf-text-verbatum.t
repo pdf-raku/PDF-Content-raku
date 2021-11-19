@@ -33,16 +33,16 @@ last line
 
 my $baseline = 'top';
 
-for False, True -> $verbatum {
+for False, True -> $verbatim {
     for True, False -> $chomp {
 
         my $y = 700;
 
         for <left center right justify> -> $align {
             $gfx.text-position = ($x, $y);
-            my $text = "*** verbatum:$verbatum chomp:$chomp $align *** " ~ $sample;
+            my $text = "*** verbatim:$verbatim chomp:$chomp $align *** " ~ $sample;
             $text .= chomp if $chomp;
-            $gfx.say($text, :$width, :$height, :$verbatum, :$align, :$baseline );
+            $gfx.say($text, :$width, :$height, :$verbatim, :$align, :$baseline );
             $y -= 120;
         }
 
@@ -54,6 +54,6 @@ $gfx.EndText;
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 
-lives-ok {$pdf.save-as('t/pdf-text-verbatum.pdf')};
+lives-ok {$pdf.save-as('t/pdf-text-verbatim.pdf')};
 
 done-testing;
