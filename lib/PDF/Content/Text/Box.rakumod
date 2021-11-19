@@ -63,7 +63,7 @@ class PDF::Content::Text::Box {
             my StrOrImage $atom = @atoms.shift;
             my Bool $reserving = False;
             my $line-breaks = 0;
-            my List() $word;
+            my List $word;
 	    my $word-width;
             my $word-pad = $preceding-spaces * $word-gap;
 
@@ -76,7 +76,7 @@ class PDF::Content::Text::Box {
                     }
                     elsif $!style.kern {
                         given $!style.font.kern($atom) {
-                            $word = .[0].list.map: {
+                            $word = .List given .[0].list.map: {
                                 .does(Numeric) ?? -$_ !! $_;
                             }
                             $word-width = .[1];
