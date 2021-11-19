@@ -80,6 +80,9 @@ class PDF::Content::Font::CoreFont
         :timesnewromanpsmt-bolditalic<times-bolditalic>,
         :timesnewromanpsmt-italic<times-italic>,
 
+        :sans-serif<helvetica>,
+        :serif<times-roman>,
+
         :symbol-bold<symbol>,
         :symbol-italic<symbol>,
         :symbol-bolditalic<symbol>,
@@ -99,9 +102,9 @@ class PDF::Content::Font::CoreFont
             with $!dict;
     }
 
-    method core-font-name(Str $family!, Str :$weight?, Str :$style?, ) is export(:core-font-name) {
+    method core-font-name(Str:D $family!, Str :$weight?, Str :$style?, ) is export(:core-font-name) {
         my Str $face = $family.lc;
-        my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]00/
+        my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]\d\d/
             ?? 'bold' !! '';
 
         # italic & oblique can be treated as synonyms for core fonts
@@ -169,7 +172,7 @@ class PDF::Content::Font::CoreFont
 
     method font-name { $!metrics.FontName }
 
-    method !load-core-font($font-name, :$enc!, |c) {
+    method !load-core-font(Str:D $font-name, :$enc!, |c) {
         state %core-font-cache;
         %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
             my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
@@ -178,16 +181,17 @@ class PDF::Content::Font::CoreFont
         }
     }
 
-    multi method load-font(Str $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
+    multi method load-font(Str:D $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
         self!load-core-font('zapfdingbats', :$enc, |c );
     }
 
-    multi method load-font(Str $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
+    multi method load-font(Str:D $font-name! where /:i ^Symbol/, :$enc='sym', |c) {
         self!load-core-font('symbol', :$enc, |c );
     }
 
-    multi method load-font(Str $font-name!, :$enc = 'win', |c) is default {
-        self!load-core-font( $.core-font-name($font-name, |c), :$enc );
+    multi method load-font(Str:D $font-name!, :$enc = 'win', |c) is default {
+        self!load-core-font($_, :$enc )
+            with $.core-font-name($font-name, |c);
     }
 
     method is-embedded  { False }

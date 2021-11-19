@@ -15,7 +15,7 @@ class PDF::Content::Text::Box {
     has Alignment $.align = 'left';
     my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
     has VerticalAlignment $.valign = 'top';
-    has PDF::Content::Text::Style $!style handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width>;
+    has PDF::Content::Text::Style $.style is built is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width>;
     has PDF::Content::Text::Line @.lines;
     has @.overflow is rw;
     has @.images;
@@ -149,11 +149,12 @@ class PDF::Content::Text::Box {
             if $!verbatum && (my $last-nl = @words[0].rindex("\n")).defined {
                 # count spaces after last new-line
                 $n -= $last-nl + 1;
+                $n = 0 if $!squish;
             }
             else {
                 @words.shift;
+                $n = 1 if $!squish;
             }
-            $n = 1 if $n && $!squish;
         }
         $n;
     }

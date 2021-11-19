@@ -2,6 +2,7 @@
   - Added PDF::Content:Text::Box option/attributes:
     -- indent:  Similar to CSS text-indent property; indents the first line.
     -- verbatum: Breaks on new-lines similar to Latex /verbatum mode
+  - Fixes to PDF::Content::CoreFont load-font() method
 
 0.5.9  2021-10-12T17:38:03+13:00
   - Deprecate PDF::Content::Tags owner() in favour of canvas()
