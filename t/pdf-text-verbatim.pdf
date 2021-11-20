@@ -24,7 +24,7 @@ BT
   /F1 10 Tf
   1 0 0 1 110 700 Tm
   -7.18 Ts
-  (*** verbatum:False) Tj
+  (*** verbatim:False) Tj
   11 TL
   T*
   (chomp:True left ***) Tj
@@ -42,7 +42,7 @@ BT
   0 Ts
   1 0 0 1 110 580 Tm
   -7.18 Ts
-  [ 4168 (*** verbatum:False) ] TJ
+  [ 4001 (*** verbatim:False) ] TJ
   T*
   [ 4919 (chomp:True center ***) ] TJ
   T*
@@ -59,7 +59,7 @@ BT
   0 Ts
   1 0 0 1 110 460 Tm
   -7.18 Ts
-  [ 8336 (*** verbatum:False) ] TJ
+  [ 8002 (*** verbatim:False) ] TJ
   T*
   [ 9003 (chomp:True right ***) ] TJ
   T*
@@ -76,7 +76,7 @@ BT
   0 Ts
   1 0 0 1 110 340 Tm
   -7.18 Ts
-  [ (*** ) -1664 (verbatum:False) ] TJ
+  [ (*** ) -1998 (verbatim:False) ] TJ
   T*
   [ (chomp:True ) -193 (justify ) -193 (***) ] TJ
   T*
@@ -93,7 +93,7 @@ BT
   0 Ts
   1 0 0 1 235 700 Tm
   -7.18 Ts
-  (*** verbatum:False) Tj
+  (*** verbatim:False) Tj
   T*
   (chomp:False left ***) Tj
   T*
@@ -110,7 +110,7 @@ BT
   0 Ts
   1 0 0 1 235 580 Tm
   -7.18 Ts
-  [ 4168 (*** verbatum:False) ] TJ
+  [ 4001 (*** verbatim:False) ] TJ
   T*
   [ 4391 (chomp:False center) ] TJ
   T*
@@ -127,7 +127,7 @@ BT
   0 Ts
   1 0 0 1 235 460 Tm
   -7.18 Ts
-  [ 8336 (*** verbatum:False) ] TJ
+  [ 8002 (*** verbatim:False) ] TJ
   T*
   [ 9392 (chomp:False right ***) ] TJ
   T*
@@ -144,7 +144,7 @@ BT
   0 Ts
   1 0 0 1 235 340 Tm
   -7.18 Ts
-  [ (*** ) -1664 (verbatum:False) ] TJ
+  [ (*** ) -1998 (verbatim:False) ] TJ
   T*
   [ (chomp:False ) -1442 (justify) ] TJ
   T*
@@ -161,7 +161,7 @@ BT
   0 Ts
   1 0 0 1 360 700 Tm
   -7.18 Ts
-  (*** verbatum:True) Tj
+  (*** verbatim:True) Tj
   T*
   (chomp:True left ***) Tj
   T*
@@ -178,7 +178,7 @@ BT
   0 Ts
   1 0 0 1 360 580 Tm
   -7.18 Ts
-  [ 3974 (*** verbatum:True) ] TJ
+  [ 3807 (*** verbatim:True) ] TJ
   T*
   [ 4919 (chomp:True center ***) ] TJ
   T*
@@ -195,7 +195,7 @@ BT
   0 Ts
   1 0 0 1 360 460 Tm
   -7.18 Ts
-  [ 7947 (*** verbatum:True) ] TJ
+  [ 7613 (*** verbatim:True) ] TJ
   T*
   [ 9003 (chomp:True right ***) ] TJ
   T*
@@ -212,7 +212,7 @@ BT
   0 Ts
   1 0 0 1 360 340 Tm
   -7.18 Ts
-  [ (*** ) -2053 (verbatum:True) ] TJ
+  [ (*** ) -2387 (verbatim:True) ] TJ
   T*
   [ (chomp:True ) -193 (justify ) -193 (***) ] TJ
   T*
@@ -229,7 +229,7 @@ BT
   0 Ts
   1 0 0 1 485 700 Tm
   -7.18 Ts
-  (*** verbatum:True) Tj
+  (*** verbatim:True) Tj
   T*
   (chomp:False left ***) Tj
   T*
@@ -246,7 +246,7 @@ BT
   0 Ts
   1 0 0 1 485 580 Tm
   -7.18 Ts
-  [ 3974 (*** verbatum:True) ] TJ
+  [ 3807 (*** verbatim:True) ] TJ
   T*
   [ 4391 (chomp:False center) ] TJ
   T*
@@ -263,7 +263,7 @@ BT
   0 Ts
   1 0 0 1 485 460 Tm
   -7.18 Ts
-  [ 7947 (*** verbatum:True) ] TJ
+  [ 7613 (*** verbatim:True) ] TJ
   T*
   [ 9392 (chomp:False right ***) ] TJ
   T*
@@ -280,7 +280,7 @@ BT
   0 Ts
   1 0 0 1 485 340 Tm
   -7.18 Ts
-  [ (*** ) -2053 (verbatum:True) ] TJ
+  [ (*** ) -2387 (verbatim:True) ] TJ
   T*
   [ (chomp:False ) -1442 (justify) ] TJ
   T*
