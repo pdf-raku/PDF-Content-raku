@@ -97,30 +97,27 @@ class PDF::Content::Text::Box {
                 }
             }
 
+            @line-atoms.push: $atom;
+
             $line-breaks ||= ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
                 if $!width;
 
             while $line-breaks--  {
-                $line = $line.new: :$word-gap, :$height;
+                $line .= new: :$word-gap, :$height;
                 @!lines.push: $line;
-                @line-atoms = [];
+                last if self!height-exceeded(@line-atoms);
+                @line-atoms := [];
                 $preceding-spaces = 0;
                 $word-pad = 0;
             }
+
             if $reserving {
                 given $atom.height {
                     $line.height = $_
                         if $_ > $line.height;
+                    last if self!height-exceeded(@line-atoms)
                 }
-            }
-            if $!height && self.content-height > $!height {
-                # height exceeded
-                @!lines.pop if @!lines;
-                @!overflow.append: @line-atoms;
-                last;
-            }
 
-            if $reserving {
                 my $Tx = $line.content-width + $word-pad;
                 my $Ty = @!lines
                     ?? @!lines[0].height * $.leading  -  self.content-height
@@ -128,7 +125,6 @@ class PDF::Content::Text::Box {
                 @!images.push( { :$Tx, :$Ty, :xobject($atom) } )
             }
 
-            @line-atoms.push: $atom;
             $line.spaces[+$line.words] = $preceding-spaces;
             $line.words.push: $word;
             $line.word-width += $word-width;
@@ -140,6 +136,13 @@ class PDF::Content::Text::Box {
 
         @!overflow.append: @atoms;
 
+    }
+
+    method !height-exceeded(@line-atoms) {
+        if $!height && self.content-height > $!height {
+            @!lines.pop if @!lines;
+            @!overflow.append: @line-atoms;
+        }
     }
 
     method !flush-spaces(@words) returns UInt {
