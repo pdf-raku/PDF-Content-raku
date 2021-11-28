@@ -40,18 +40,18 @@ class PDF::Content::Text::Box {
 
     multi submethod TWEAK(Str :$!text!, |c) {
         my Str @chunks = self.comb: $!text;
-        self.TWEAK( :@chunks, |c );
+        self.TWEAK: :@chunks, |c;
     }
 
     multi submethod TWEAK(:@chunks!, :$!squish = False, |c) is default {
-        $!style .= new(|c);
+        $!style .= new: |c;
         $!text = @chunks».Str.join;
-	self!layup(@chunks);
+	self!layup: @chunks;
     }
 
     method !layup(@atoms is copy) is default {
         my @line-atoms;
-        my UInt $preceding-spaces = self!flush-spaces(@atoms);
+        my UInt $preceding-spaces = self!flush-spaces: @atoms;
         my $word-gap = self!word-gap;
 	my $height = $!style.font-size;
 
@@ -61,7 +61,7 @@ class PDF::Content::Text::Box {
         while @atoms {
             my subset StrOrImage where Str | PDF::Content::XObject;
             my StrOrImage $atom = @atoms.shift;
-            my Bool $reserving = False;
+            my Bool $xobject = False;
             my $line-breaks = 0;
             my List $word;
 	    my $word-width;
@@ -91,7 +91,7 @@ class PDF::Content::Text::Box {
                         if $.CharSpacing > -$!style.font-size;
                 }
                 when PDF::Content::XObject {
-                    $reserving = True;
+                    $xobject = True;
                     $word = [-$atom.width * $.HorizScaling * 10 / $!style.font-size, ];
                     $word-width = $atom.width;
                 }
@@ -111,7 +111,7 @@ class PDF::Content::Text::Box {
                 $word-pad = 0;
             }
 
-            if $reserving {
+            if $xobject {
                 given $atom.height {
                     $line.height = $_
                         if $_ > $line.height;

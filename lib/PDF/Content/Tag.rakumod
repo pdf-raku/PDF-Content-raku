@@ -46,7 +46,7 @@ my enum TableTags is export(:TableTags,:Tags) (
 #| See [PDF 32000 Table 338 - Standard structure types for inline-level structure elements]
 my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Span<Span>, :Quotation<Quote>, :Note<Note>, :Reference<Reference>,
-    :BibliographyEntry<BibEntry>, :Code<Code>, :Link<Link>,
+    :BibliographyEntry<BibEntry>, :CODE<Code>, :Link<Link>,
     :Annotation<Annot>,
     :Ruby<Ruby>, :RubyPunctuation<RP>, :RubyBaseText<RB>, :RubyText<RT>,
     :Warichu<Warichu>, :WarichuPunctuation<RP>, :WarichuText<RT>,
