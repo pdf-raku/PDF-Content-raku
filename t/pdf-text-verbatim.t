@@ -17,15 +17,15 @@ my $font-size = 18;
 my PDF::Content::FontObj $font = $page.core-font( :family<Helvetica> );
 
 $width = 100;
-my $height = 80;
+my $height = 100;
 my $x = 110;
 
 $gfx.BeginText;
 $gfx.set-font( $font, 10);
 
 my $sample = q:to"--ENOUGH!!--";
-First Line
- Line2, leading space
+First   Line
+  Line2, leading spaces
 Wrapping text follows...
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
 last line
@@ -34,16 +34,15 @@ last line
 my $baseline = 'top';
 
 for False, True -> $verbatim {
-    for True, False -> $chomp {
+    for False, True -> $squish {
 
         my $y = 700;
 
         for <left center right justify> -> $align {
             $gfx.text-position = ($x, $y);
-            my $text = "*** verbatim:$verbatim chomp:$chomp $align *** " ~ $sample;
-            $text .= chomp if $chomp;
-            $gfx.say($text, :$width, :$height, :$verbatim, :$align, :$baseline );
-            $y -= 120;
+            my $text = "*** verbatim:$verbatim squish:$squish $align *** " ~ $sample;
+            $gfx.say($text, :$width, :$height, :$verbatim, :$align, :$baseline, :$squish );
+            $y -= 125;
         }
 
         $x += 125;

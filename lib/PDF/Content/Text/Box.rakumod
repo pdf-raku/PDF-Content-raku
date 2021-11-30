@@ -64,17 +64,19 @@ class PDF::Content::Text::Box {
             my Bool $xobject = False;
             my $line-breaks = 0;
             my List $word;
-	    my $word-width;
+	    my $word-width = 0;
             my $word-pad = $preceding-spaces * $word-gap;
 
             given $atom {
                 when Str {
-                    if $!verbatim && +.match("\n", :g) -> $n {
-                        $line-breaks = $n;
-                        $word = [ ' ' x $preceding-spaces ];
-                        $word-width = $word-pad;
+                    if $!verbatim && +.match("\n", :g) -> $nl {
+                        # todo: handle tabs
+                        $line-breaks = $nl;
+                        $atom = ' ' x $preceding-spaces;
+                        $word-pad = 0;
                     }
-                    elsif $!style.kern {
+
+                    if $!style.kern {
                         given $!style.font.kern($atom) {
                             $word = .List given .[0].list.map: {
                                 .does(Numeric) ?? -$_ !! $_;
