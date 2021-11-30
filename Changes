@@ -2,6 +2,8 @@
    - Renamed PDF::Content::Tag enumeration InlineElemTags::Code ->
      InlineElemTags::CODE; to avoid clashes with standard Raku classes.
    - Fixes to newly introduced text-box verbatim mode
+   - Add missing tag enumeration :TableHead<THead>,
+     renamed enumeration :TableFooter<TFoot> -> :TableFoot<TFoot>
 
 0.5.10  2021-11-20T17:02:59+13:00
   - Added PDF::Content:Text::Box option/attributes:

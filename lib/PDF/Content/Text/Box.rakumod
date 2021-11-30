@@ -170,8 +170,8 @@ class PDF::Content::Text::Box {
         $word-gap * $.HorizScaling / 100;
     }
 
-    method width  { $!width  // self.content-width }
-    method height { $!height // self.content-height }
+    method width  { $!width  || self.content-width }
+    method height { $!height || self.content-height }
     method !dy {
         %( :center(0.5), :bottom(1.0) ){$!valign}
             // 0;

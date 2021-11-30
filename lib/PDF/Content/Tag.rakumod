@@ -39,17 +39,18 @@ my enum ListElemTags is export(:ListElemTags,:Tags) (
     :List<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
 );
 my enum TableTags is export(:TableTags,:Tags) (
-    :Table<Table>,  :TableRow<TR>,     :TableHeader<TH>,
-    :TableData<TD>, :TableBody<TBody>, :TableFooter<TFoot>, 
+    :Table<Table>,     :TableHead<THead>, :TableBody<TBody>,
+    :TableFoot<TFoot>, :TableHeader<TH>,  :TableRow<TR>,
+    :TableData<TD>,
 );
 
 #| See [PDF 32000 Table 338 - Standard structure types for inline-level structure elements]
 my enum InlineElemTags is export(:InlineElemTags,:Tags) (
-    :Span<Span>, :Quotation<Quote>, :Note<Note>, :Reference<Reference>,
-    :BibliographyEntry<BibEntry>, :CODE<Code>, :Link<Link>,
-    :Annotation<Annot>,
-    :Ruby<Ruby>, :RubyPunctuation<RP>, :RubyBaseText<RB>, :RubyText<RT>,
-    :Warichu<Warichu>, :WarichuPunctuation<RP>, :WarichuText<RT>,
+    :Span<Span>, :Quotation<Quote>,   :Note<Note>, :Reference<Reference>,
+    :BibliographyEntry<BibEntry>,     :CODE<Code>, :Link<Link>,
+    :Annotation<Annot>, :Ruby<Ruby>,  :RubyPunctuation<RP>,
+    :RubyBaseText<RB>,  :RubyText<RT>,
+    :Warichu<Warichu>,  :WarichuPunctuation<RP>, :WarichuText<RT>,
     :Artifact<Artifact>,
 );
 
