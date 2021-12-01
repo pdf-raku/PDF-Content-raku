@@ -15,12 +15,12 @@ class PDF::Content::Text::Box {
     has Alignment $.align = 'left';
     my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
     has VerticalAlignment $.valign = 'top';
-    has PDF::Content::Text::Style $.style is built is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width>;
-    has PDF::Content::Text::Line @.lines;
-    has @.overflow is rw;
-    has @.images;
+    has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width>;
+    has PDF::Content::Text::Line @.lines is built;
+    has @.overflow is rw is built;
+    has @.images is built;
     has Str $.text;
-    has Bool $!squish;
+    has Bool $.squish = False;;
     has Bool $.verbatim;
 
     method content-width  { @!lines».content-width.max }
@@ -38,14 +38,22 @@ class PDF::Content::Text::Box {
         .comb(/<Text::word> | <Text::space>/);
     }
 
+    method clone(PDF::Content::Text::Box:D: |c) {
+        my $text = $!text ~ @!overflow.join;
+        given callwith(|c) {
+            .TWEAK: :$text;
+            $_;
+        }
+    }
+
     multi submethod TWEAK(Str :$!text!, |c) {
         my Str @chunks = self.comb: $!text;
         self.TWEAK: :@chunks, |c;
     }
 
-    multi submethod TWEAK(:@chunks!, :$!squish = False, |c) is default {
-        $!style .= new: |c;
-        $!text = @chunks».Str.join;
+    multi submethod TWEAK(:@chunks!, |c) {
+        $_ .= new(|c) without $!style;
+        $!text //= @chunks».Str.join;
 	self!layup: @chunks;
     }
 
@@ -57,6 +65,7 @@ class PDF::Content::Text::Box {
 
         my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
 	@!lines = [ $line ];
+        @!overflow = [];
 
         while @atoms {
             my subset StrOrImage where Str | PDF::Content::XObject;

@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 8;
+plan 19;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -14,11 +14,23 @@ is-deeply @chunks, ["z80", " ", "a-", "b.", " ", "-", "3", "   ", "{nbsp}A{nbsp}
 
 my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
+my $height = 20;
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my PDFTiny $pdf .= new;
-my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :$font-size );
+my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :$font-size, :$height );
 is-approx $text-box.content-width, 365.328, '$.content-width';
 is-approx $text-box.content-height, 17.6, '$.content-height';
+is +$text-box.lines, 1;
+
+$text-box .= clone;
+is $text-box.text, $text, '$.text cloned';
+is +$text-box.lines, 1, '$.lines cloned';
+is-approx $text-box.content-width, 365.328, '$.content-width cloned';
+is-approx $text-box.content-height, 17.6, '$.content-height cloned';
+is $text-box.font-size, $font-size, '$.font-size cloned';
+is-deeply $text-box.font, $font, '$.font cloned';
+is $text-box.height, $height, '$.height cloned';
+
 my $gfx = $pdf.add-page.gfx;
 $gfx.Save;
 $gfx.BeginText;
@@ -34,6 +46,14 @@ $text-box.TextRise = $text-box.baseline-shift('bottom');
 $gfx.print( $text-box, :!preserve );
 $gfx.EndText;
 $gfx.Restore;
+
+$text-box .= clone: :width(250);
+is +$text-box.width, 250, '$.clone with width constraint';
+given $text-box.content-width {
+    ok $_ <= 250, '$.clone content-width'
+        or diag "content-width: $_ !<= 250"
+}
+is +$text-box.lines, 2, '$.clone with width constraint';
 
 is-json-equiv [ $gfx.ops ], [
     :q[],
