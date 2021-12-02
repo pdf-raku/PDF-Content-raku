@@ -1,10 +1,12 @@
 {{$NEXT}}
+
+0.5.11  2021-12-03T12:10:07+13:00
    - Renamed PDF::Content::Tag enumeration InlineElemTags::Code ->
      InlineElemTags::CODE; to avoid clashes with standard Raku classes.
    - Fixes to newly introduced text-box verbatim mode
    - Add missing tag enumeration :TableHead<THead>,
      renamed enumeration :TableFooter<TFoot> -> :TableFoot<TFoot>
-   - Fix PDF::Context::Text::Box clone() method
+   - Implement PDF::Context::Text::Box clone() method
 
 0.5.10  2021-11-20T17:02:59+13:00
   - Added PDF::Content:Text::Box option/attributes:
