@@ -12,5 +12,5 @@ role PDF::Content::FontObj {
     method kern {...}        # kern text
     method to-dict {...}     # create a PDF Font dictionary
     method cb-finish {...}   # finish the font. e.g. embed and create CMaps and Widths
-    # todo: is-subset is-core-font is-embedded
+    # todo: is-subset is-core-font is-embedded underline-position underline-thickness
 }

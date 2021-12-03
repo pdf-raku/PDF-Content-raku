@@ -1,6 +1,7 @@
 use v6;
 
 class PDF::Content::Text::Style is rw {
+
     use PDF::Content::Color :&color;
 
     has $.font is required;
@@ -17,7 +18,7 @@ class PDF::Content::Text::Style is rw {
 
     my subset Baseline of Str is export(:BaseLine) where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging'|Any:U;
 
-    multi submethod TWEAK(:$gfx, Baseline :$baseline) is default {
+    multi submethod TWEAK(:$gfx, Baseline :$baseline) {
         $!CharSpacing  //= do with $gfx {.CharSpacing}  else {0.0};
 	$!WordSpacing  //= do with $gfx {.WordSpacing}  else {0.0};
 	$!HorizScaling //= do with $gfx {.HorizScaling} else {100};
@@ -42,5 +43,13 @@ class PDF::Content::Text::Style is rw {
 
     method space-width {
         $!font.stringwidth(' ', $!font-size );
+    }
+
+    method underline-position {
+        ($!font.underline-position // -100) * $!font-size / 1000;
+    }
+
+    method underline-thickness {
+        ($!font.underline-thickness // 50) * $!font-size / 1000;
     }
 }

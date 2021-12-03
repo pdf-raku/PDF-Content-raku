@@ -171,6 +171,8 @@ class PDF::Content::Font::CoreFont
     }
 
     method font-name { $!metrics.FontName }
+    method underline-position  { $!metrics.UnderlinePosition }
+    method underline-thickness { $!metrics.UnderlineThickness }
 
     method !load-core-font(Str:D $font-name, :$enc!, |c) {
         state %core-font-cache;
