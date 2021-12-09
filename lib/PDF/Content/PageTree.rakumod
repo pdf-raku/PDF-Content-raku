@@ -11,9 +11,6 @@ role PDF::Content::PageTree
 
     #| add new last page
     method add-page( PDF::Content::PageNode $page? is copy ) {
-        my $right-node = self.Kids.tail
-            if self.Kids;
-
 	with $page {
 	    unless .<Resources>:exists {
 		# import resources, if inherited and outside our hierarchy
@@ -27,16 +24,15 @@ role PDF::Content::PageTree
 	    $_ = PDF::COS::Dict.COERCE: { :Type( :name<Page> ) };
 	}
 
-        if $right-node && $right-node.can('add-page') {
-            $page = $right-node.add-page( $page );
-        }
-        else {
-            self.Kids.push: $page;
-	    $page = self.Kids.tail;
-	    $page<Parent> = self.link;
+        self.Kids.push: $page;
+	$page = self.Kids.tail;
+	$page<Parent> = self.link;
+        my $node = self;
+        while $node.defined {
+            $node<Count>++;
+            $node = $node<Parent>;
         }
 
-        self<Count>++;
         $page
     }
 
@@ -61,7 +57,7 @@ role PDF::Content::PageTree
         for self.Kids.keys {
             my $kid = self.Kids[$_];
 
-            if $kid.can('page') {
+            if $kid.does($?ROLE) {
                 my Int $sub-pages = $kid<Count>;
                 my Int $sub-page-num = $page-num - $page-count;
 
@@ -124,7 +120,7 @@ role PDF::Content::PageTree
         for self.Kids.keys -> $i {
             my $kid = self.Kids[$i];
 
-            if $kid.can('page') {
+            if $kid.does($?ROLE) {
                 my $sub-pages = $kid<Count>;
                 my $sub-page-num = $page-num - $page-count;
 
@@ -151,6 +147,57 @@ role PDF::Content::PageTree
     }
 
     method page-count returns UInt { self.Count }
+
+    # iterates all child page nodes
+    method iterate(PDF::Content::PageTree:D $node:) {
+        my class PageIterator does Iterable does Iterator {
+            has PDF::Content::PageTree:D $.node is required;
+            has Int $!i = -1;
+            has UInt $!n;
+            has PageIterator $.kid;
+            has PDF::Content::PageNode $!page;
+            submethod TWEAK {
+                $!n = +$!node<Kids>;
+                self!get-next;
+            }
+            method !get-next {
+                $!kid = Nil;
+                $!page = Nil;
+                if ++$!i < $!n {
+                    given $!node<Kids>[$!i] {
+                        if .does(PDF::Content::PageTree) {
+                            $!kid = PageIterator.new: :node($_);
+                        }
+                        else {
+                            $!page = $_;
+                        }
+                    }
+                }
+            }
+            method dump { [:$!i, :$!n,] };
+
+            method pull-one {
+                my $rv = IterationEnd;
+                with $!page {
+                    $rv = $_;
+                    self!get-next;
+                }
+                else {
+                    with $!kid {
+                        $rv = .pull-one;
+                        unless $rv.does(PDF::Content::PageNode) {
+                            self!get-next;
+                            $rv = self.pull-one;
+                        }
+                    }
+                }
+                $rv;
+            }
+            method iterator { self }
+        }
+        my class  {};
+        PageIterator.new: :$node;
+    }
 
     # allow array indexing of pages $pages[9] :== $.pages.page(10);
     method AT-POS(UInt $pos) is rw {
