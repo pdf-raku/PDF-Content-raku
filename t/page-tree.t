@@ -66,10 +66,10 @@ subtest 'pages by page number', {
     }
 }
 
-subtest 'pages by iterator', {
+subtest 'iterate-pages', {
     plan 10;
     $page-number = 0;
-    for $pdf.Pages.iterate {
+    for $pdf.iterate-pages {
         $page-number++;
         ok $_ === expected-page($page-number), "page iteration $page-number";
     }

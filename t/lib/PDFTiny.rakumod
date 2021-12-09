@@ -81,7 +81,7 @@ class PDFTiny is PDF does PDF::Content::Interface {
         );
     }
 
-    method Pages handles <page add-page delete-page insert-page page-count media-box crop-box bleed-box trim-box art-box core-font use-font rotate> {
+    method Pages handles <page add-page delete-page insert-page page-count media-box crop-box bleed-box trim-box art-box core-font use-font rotate iterate-pages> {
         self.Root.Pages;
     }
 

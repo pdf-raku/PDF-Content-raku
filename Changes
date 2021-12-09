@@ -2,6 +2,7 @@
    - Add underline-position() and underline-thickness() methods. Unscaled in
      PDF::Content::FontObj and scaled in PDF::Content::Text::Box. Available
      also in PDF::Font::Loader::FontObj v0.5.16+.
+   - Add iterate-pages() method
 
 0.5.11  2021-12-03T12:10:07+13:00
    - Renamed PDF::Content::Tag enumeration InlineElemTags::Code ->

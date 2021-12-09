@@ -149,13 +149,15 @@ role PDF::Content::PageTree
     method page-count returns UInt { self.Count }
 
     # iterates all child page nodes
-    method iterate(PDF::Content::PageTree:D $node:) {
-        my class PageIterator does Iterable does Iterator {
+    method iterate-pages(PDF::Content::PageTree:D $node:) {
+        my class PageIterator {
+            also does Iterator;
+            also does Iterable;
             has PDF::Content::PageTree:D $.node is required;
+            has PDF::Content::PageNode $!page;
             has Int $!i = -1;
             has UInt $!n;
             has PageIterator $.kid;
-            has PDF::Content::PageNode $!page;
             submethod TWEAK {
                 $!n = +$!node<Kids>;
                 self!get-next;
@@ -174,8 +176,6 @@ role PDF::Content::PageTree
                     }
                 }
             }
-            method dump { [:$!i, :$!n,] };
-
             method pull-one {
                 my $rv = IterationEnd;
                 with $!page {
@@ -195,7 +195,6 @@ role PDF::Content::PageTree
             }
             method iterator { self }
         }
-        my class  {};
         PageIterator.new: :$node;
     }
 
