@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.5.12  2021-12-11T08:23:28+13:00
    - Add underline-position() and underline-thickness() methods. Unscaled in
      PDF::Content::FontObj and scaled in PDF::Content::Text::Box. Available
      also in PDF::Font::Loader::FontObj v0.5.16+.

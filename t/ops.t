@@ -306,7 +306,7 @@ my @painted = [
     :q[],
         :re[:real(10), :real(10), :real(150), :real(100)],
         :h[],
-         :f[],
+        :f[],
     :Q[]
 ];
 

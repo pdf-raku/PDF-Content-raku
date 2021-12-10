@@ -64,22 +64,21 @@ class PDF::Content::Text::Line {
         }
 
         my @out;
-        my $n = 0;
         my $prev := Int;
         for @line {
             my $tk := $_ ~~ Str ?? $font.encode($_) !! $_;
             if $tk ~~ Str && $prev ~~ Str {
                 # coalesce adjacent strings
-                @out[$n-1] ~= $tk;
+                @out.tail ~= $tk;
             }
             else {
-                @out[$n++] = $tk;
+                @out.push: $tk;
             }
             $prev := $tk;
         }
 
-        @out == 1 && @out[0].isa(Str)
-            ?? ((OpCode::ShowText) => [@out[0],])
+        @out == 1 && @out.head.isa(Str)
+            ?? ((OpCode::ShowText) => [@out.head,])
             !! ((OpCode::ShowSpaceText) => [@out,]);
 
     }

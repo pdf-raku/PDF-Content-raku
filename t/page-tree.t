@@ -26,7 +26,7 @@ my PDFTiny::Page $first-page = $pdf.&add-page;
 
 role SimpleAddPage {
     method add-page {
-        my $page =  PDF::COS::Dict.COERCE: { :Type( :name<Page> ) };
+        my PDFTiny::Page $page = PDF::COS::Dict.COERCE: { :Type( :name<Page> ) };
         self.Kids.push: $page;
 	$page = self.Kids.tail;
 	$page<Parent> = self.link;
