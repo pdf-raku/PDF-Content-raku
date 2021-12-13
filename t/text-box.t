@@ -18,14 +18,14 @@ my $height = 20;
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my PDFTiny $pdf .= new;
 my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :$font-size, :$height );
-is-approx $text-box.content-width, 365.328, '$.content-width';
+is-approx $text-box.content-width, 369.776, '$.content-width';
 is-approx $text-box.content-height, 17.6, '$.content-height';
 is +$text-box.lines, 1;
 
 $text-box .= clone;
 is $text-box.text, $text, '$.text cloned';
 is +$text-box.lines, 1, '$.lines cloned';
-is-approx $text-box.content-width, 365.328, '$.content-width cloned';
+is-approx $text-box.content-width, 369.776, '$.content-width cloned';
 is-approx $text-box.content-height, 17.6, '$.content-height cloned';
 is $text-box.font-size, $font-size, '$.font-size cloned';
 is-deeply $text-box.font, $font, '$.font cloned';
@@ -42,7 +42,7 @@ is-deeply $gfx.text-position, (100.0, 350.0), 'text position';
 $gfx.say( $text-box );
 is-deeply $gfx.text-position, (100.0, 350 - 17.6), 'text position';
 $text-box .= new( :$text, :$font, :$font-size, :squish );
-is-approx $text-box.content-width, 360.88, '$.content-width (squished)';
+is-approx $text-box.content-width, 365.328, '$.content-width (squished)';
 is-approx $text-box.content-height, 17.6, '$.content-height (squished)';
 $text-box.TextRise = $text-box.baseline-shift('bottom');
 $gfx.print( $text-box, :!preserve );
@@ -65,11 +65,11 @@ is-json-equiv [ $gfx.ops ], [
              :real(100), :real(350), ],
         :rg[ :real(0),   :real(0), :real(1) ],
         :Tf[:name<F1>,   :real(16)],
-        :Tj[ :literal("Hello.  Ting, ting-ting. Attention! \x[85] ATTENTION!")],
+        :Tj[ :literal("Hello.  Ting, ting-ting. Attention! \x[85] ATTENTION! ")],
         :TL[:real(17.6)],
         'T*' => [],
         :Ts[ :real(3.312) ],
-        :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION!")],
+        :Tj[ :literal("Hello. Ting, ting-ting. Attention! \x[85] ATTENTION! ")],
       :ET[],
     :Q[],
     ], 'simple text box';

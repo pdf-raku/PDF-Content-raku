@@ -11,6 +11,8 @@ class PDF::Content:ver<0.5.12>
     use PDF::Content::Tag :ParagraphTags;
     use PDF::Content::FontObj;
 
+    has Str $.actual-text is rw;
+
     my subset Align of Str where 'left' | 'center' | 'right';
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
     my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
@@ -326,7 +328,7 @@ class PDF::Content:ver<0.5.12>
 
         self.EndText() unless in-text;
 
-        with $*ActualText {
+        with $!actual-text {
             # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
             $_ ~= ' ' if .so && !.ends-with(' '|"\n");
             $_ ~= $text-box.text;

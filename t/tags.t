@@ -18,7 +18,7 @@ my PDF::Content::FontObj $body-font = $page.core-font: :family<Helvetica>;
 $page.graphics: -> $gfx {
     my PDF::Content::Tag $tag;
 
-    my $*ActualText = '';
+    temp $gfx.actual-text = '';
     $tag = $gfx.mark: Header1, {
         .say('Header text',
              :font($header-font),
@@ -28,7 +28,7 @@ $page.graphics: -> $gfx {
 
     is $tag.name, 'H1', 'mark tag name';
     is $tag.mcid, 0, 'mark tag mcid';
-    is-deeply $*ActualText.lines, ('Header text',), '$*ActualText';
+    is-deeply $gfx.actual-text.lines, ('Header text',), '$.actual-text';
 
     $tag = $gfx.mark: Paragraph, {
         .say('Paragraph that contains a figure', :position[50, 100], :font($body-font), :font-size(12));
@@ -42,7 +42,7 @@ $page.graphics: -> $gfx {
 
     is $tag.name, 'P', 'outer tag name';
     is $tag.kids[0].name, 'Figure', 'inner tag name';
-    is-deeply $*ActualText.lines, ('Header text', 'Paragraph that contains a figure'), '$*ActualText';
+    is-deeply $gfx.actual-text.lines, ('Header text', 'Paragraph that contains a figure'), '$.actual-text';
 }
 
 is $page.gfx.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';

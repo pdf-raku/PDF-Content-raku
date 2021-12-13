@@ -23,7 +23,7 @@ my $x = 110;
 $gfx.BeginText;
 $gfx.set-font( $font, 10);
 
-my $sample = q:to"--ENOUGH!!--";
+my $sample = q:to"--ENOUGH!!--".chomp;
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
 ut labore et dolore magna aliqua.
 --ENOUGH!!--

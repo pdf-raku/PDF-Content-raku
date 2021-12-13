@@ -51,7 +51,7 @@ $text-box.place-images($page.gfx);
 
 $page.graphics: -> $gfx {
     $gfx.HorizScaling = 120;
-    my $text = q:to<END-QUOTE>;
+    my $text = q:to<END-QUOTE>.chomp;
     To be, or not to be, that is the question:
     Whether 'tis nobler in the mind to suffer
     The slings and arrows of outrageous fortune,
