@@ -116,10 +116,10 @@ class PDF::Content::Text::Box {
             while $line-breaks--  {
                 $line .= new: :$word-gap, :$height;
                 @!lines.push: $line;
-                last if self!height-exceeded(@line-atoms);
-                @line-atoms := [];
                 $preceding-spaces = 0;
                 $word-pad = 0;
+                last if self!height-exceeded(@line-atoms);
+                @line-atoms := [];
             }
 
             if $xobject {
@@ -143,6 +143,11 @@ class PDF::Content::Text::Box {
 		if $height > $line.height;
 
             $preceding-spaces = self!flush-spaces(@atoms);
+        }
+
+        if $preceding-spaces {
+            $line.spaces.push($preceding-spaces);
+            $line.words.push: [];
         }
 
         @!overflow.append: @atoms;
