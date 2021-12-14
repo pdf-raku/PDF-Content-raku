@@ -17,11 +17,7 @@ class PDF::Content:ver<0.5.12>
     my subset Valign of Str where 'top'  | 'center' | 'bottom';
     my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
     my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
-    my subset Position of List where {
-        .elems <= 2
-        && .[0] ~~ Numeric|XPos-Pair|Any:U
-        && .[1] ~~ Numeric|YPos-Pair|Any:U
-    }
+    my subset Position of List where { .elems <= 2 }
 
     method graphics( &meth! ) {
         $.op(Save);
@@ -397,8 +393,8 @@ class PDF::Content:ver<0.5.12>
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
             @coords.map: -> $x is copy, $y is copy {
-                ($x, $y) = dot($.TextMatrix, $x, $y) if $text;
-                slip($user ?? dot($.CTM, $x, $y) !! ($x, $y));
+                ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
+                slip($user ?? $.CTM.&dot($x, $y) !! ($x, $y));
             }
         )
     }
