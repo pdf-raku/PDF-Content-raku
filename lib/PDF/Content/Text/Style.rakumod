@@ -8,6 +8,7 @@ class PDF::Content::Text::Style is rw {
     has Numeric $.font-size = 16;
     has Numeric $.leading = 1.1;
     has Bool    $.kern;
+    has Numeric $!space-width;
 
     # directly mapped to graphics state
     has Numeric $.WordSpacing;
@@ -42,7 +43,7 @@ class PDF::Content::Text::Style is rw {
     }
 
     method space-width {
-        $!font.stringwidth(' ', $!font-size );
+        ($!space-width //= $!font.stringwidth: ' ') * $!font-size / 1000;
     }
 
     method underline-position {

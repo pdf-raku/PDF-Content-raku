@@ -99,8 +99,7 @@ role PDF::Content::ResourceDict {
 
     method core-font(|c) {
         my $font := (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
-        my Hash $dict = $font.to-dict;
-        self.resource: $dict, :type<Font>;
+        self.resource: $font.to-dict, :type<Font>;
         $font;
     }
 
@@ -109,8 +108,7 @@ role PDF::Content::ResourceDict {
     }
 
     multi method use-font(PDF::Content::FontObj $font-obj is raw) {
-        my Hash $dict = $font-obj.to-dict;
-        self.resource: $dict, :type<Font>;
+        self.resource: $font-obj.to-dict, :type<Font>;
     }
 
 }
