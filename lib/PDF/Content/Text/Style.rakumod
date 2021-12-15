@@ -8,7 +8,7 @@ class PDF::Content::Text::Style is rw {
     has Numeric $.font-size = 16;
     has Numeric $.leading = 1.1;
     has Bool    $.kern;
-    has Numeric $!space-width;
+    has Numeric $!space-width = 300;
 
     # directly mapped to graphics state
     has Numeric $.WordSpacing;
@@ -29,6 +29,11 @@ class PDF::Content::Text::Style is rw {
 	} else {
 	    with $gfx {.TextRise} else {0.0};
 	}
+        with $!font {
+            if .stringwidth(' ') -> $sw {
+                $!space-width = $sw;
+            }
+        }
     }
 
     method baseline-shift(Baseline $_) {
@@ -43,7 +48,7 @@ class PDF::Content::Text::Style is rw {
     }
 
     method space-width {
-        ($!space-width //= $!font.stringwidth: ' ') * $!font-size / 1000;
+        $!space-width * $!font-size / 1000;
     }
 
     method underline-position {

@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.5.13  2021-12-16T09:14:53+13:00
    - Replaced $*ActualText with PDF::Content.actual-text() attribute
    - Treat trailing space as significant in print() method
    - Performance tweaks in PDF::Content and PDF::Content::ResourceDict

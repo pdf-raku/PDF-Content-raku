@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 21;
+plan 22;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -18,6 +18,7 @@ my $height = 20;
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
 my PDFTiny $pdf .= new;
 my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :$font-size, :$height );
+is-approx $text-box.space-width, 4.448, 'space-width';
 is-approx $text-box.content-width, 369.776, '$.content-width';
 is-approx $text-box.content-height, 17.6, '$.content-height';
 is +$text-box.lines, 1;
