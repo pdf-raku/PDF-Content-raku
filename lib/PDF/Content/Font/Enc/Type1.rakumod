@@ -15,14 +15,15 @@ class PDF::Content::Font::Enc::Type1
     has uint8 @!spare-cids;   #| unmapped codes in the encoding scheme
     my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std'|'mac-extra';
     has EncodingScheme $.enc = 'win';
-
-    submethod TWEAK {
-        my array $encoding = %(
+    my constant %Encoding = %(
             :mac($mac-encoding),   :win($win-encoding),
             :sym($sym-encoding),   :std($std-encoding),
             :mac-extra($mac-extra-encoding),
             :zapf($zapf-encoding),
-        ){$!enc};
+        );
+
+    submethod TWEAK {
+        my array $encoding = %Encoding{$!enc};
 
 	self.glyphs = $zapf-glyphs
             if $!enc eq 'zapf';
