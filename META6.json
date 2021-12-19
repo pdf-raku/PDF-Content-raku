@@ -9,7 +9,7 @@
     "Base64::Native",
     "Color",
     "Compress::Zlib::Raw",
-    "Font::AFM:ver<1.24.4+>",
+    "Font::AFM:ver<1.24.5+>",
     "Native::Packing",
     "Method::Also",
     "JSON::Fast",

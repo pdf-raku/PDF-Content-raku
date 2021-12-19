@@ -40,20 +40,13 @@ role PDF::Content::ResourceDict {
     }
 
     method find-resource($entry is raw, Str :$type! ) {
-        my $found;
+        my $key;
 
         with self{$type} -> $resources {
-
-            for $resources.keys {
-                if $entry === $resources{$_} {
-                    $found = True;
-		    %!resource-key{$entry} //= $_;
-                    last;
-                }
-            }
+            $key = $resources.keys.first: { $entry === $resources{$_} }
         }
 
-        $found ?? $entry !! Mu;
+        $key ?? $entry !! Mu;
     }
 
     #| ensure that the object is registered as a page resource. Return a unique

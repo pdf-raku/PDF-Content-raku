@@ -221,12 +221,18 @@ class PDF::Content::Ops {
                 unless $att.get_value(self) eqv v {
                     given $!canvas {
                         # Match any reusable GS entry; otherwise create a new entry
-                        my &match = -> Hash $_ {
-                            .keys.grep(* ne 'Type') eqv ($key, ) && .{$key} eqv v;
+                        my Str $gs-entry;
+                        with $!canvas<Resources> {
+                            with .<ExtGState> -> $ext {
+
+                                $gs-entry = $ext.keys.first: {
+                                    given $ext{$_} {
+                                        +.keys - (.<Type>:exists) == 1 && .{$key} eqv v;
+                                    }
+                                }
+                            }
                         }
-                        my $gs = .find-resource(&match, :type<ExtGState>)
-                            // PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
-                        my Str $gs-entry = .resource-key($gs, :eqv);
+                        $gs-entry //= $!canvas.resource-key: PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
 	                self.SetGraphicsState($gs-entry);
                     }
                 }
