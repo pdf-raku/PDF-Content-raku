@@ -7,16 +7,16 @@ role PDF::Content::ResourceDict {
     use PDF::Content::Font;
     use PDF::Content::FontObj;
 
-    has Str %!resource-key{PDF::COS};
+    has Str %!resource-key{PDF::COS}; # resource cache
     has Int %!counter;
 
-    method resource-key(PDF::COS $object is raw, |c --> Str:D) {
+    method resource-key(PDF::COS:D $object is raw, |c --> Str:D) {
         self!require-resource($object, |c)
             unless %!resource-key{$object}:exists;
        %!resource-key{$object};
     }
 
-    method !resource-type( PDF::COS $_ ) {
+    method !resource-type(PDF::COS:D $_ ) {
         when Hash {
             when .<Type> ~~ 'ExtGState'|'Font'|'XObject'|'Pattern' {
                 .<Type>
@@ -40,22 +40,22 @@ role PDF::Content::ResourceDict {
     }
 
     method find-resource($entry is raw, Str :$type! ) {
-        my $key;
-
-        with self{$type} -> $resources {
-            $key = $resources.keys.first: { $entry === $resources{$_} }
+        my $key = %!resource-key{$entry};
+        $key //= do with self{$type} -> $resources {
+            with $resources.keys.first({ $entry === $resources{$_}}) {
+                %!resource-key{$entry} = $_;
+            }
         }
-
         $key ?? $entry !! Mu;
     }
 
     #| ensure that the object is registered as a page resource. Return a unique
     #| name for it.
     method !require-resource(
-        PDF::COS $object is raw,
+        PDF::COS:D $object is raw,
         Str :$type = self!resource-type($object),
     ) {
-        unless $.find-resource($object, :$type) {
+        without $.find-resource($object, :$type) {
             my constant %Prefix = %(
                 :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>,
                 :Shading<Sh>, :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
@@ -78,11 +78,11 @@ role PDF::Content::ResourceDict {
         $object;
     }
 
-    multi method resource(PDF::COS $object is raw where { %!resource-key{$_}:exists }) is default {
+    multi method resource(PDF::COS:D $object is raw where { %!resource-key{$_}:exists }) is default {
 	$object;
     }
 
-    multi method resource(PDF::COS $object is raw, :$type = self!resource-type($object)) {
+    multi method resource(PDF::COS:D $object is raw, :$type = self!resource-type($object)) {
         self!require-resource($object, :$type);
     }
 
@@ -96,11 +96,11 @@ role PDF::Content::ResourceDict {
         $font;
     }
 
-    multi method use-font(PDF::Content::Font $font is raw) {
+    multi method use-font(PDF::Content::Font:D $font is raw) {
         self.resource: $font, :type<Font>;
     }
 
-    multi method use-font(PDF::Content::FontObj $font-obj is raw) {
+    multi method use-font(PDF::Content::FontObj:D $font-obj is raw) {
         self.resource: $font-obj.to-dict, :type<Font>;
     }
 
