@@ -60,6 +60,7 @@ class PDFTiny is PDF does PDF::Content::Interface {
     has Catalog $.Root is entry(:required, :indirect);
 
     my class Loader is PDF::COS::Loader {
+        method owner { PDFTiny }
         constant %Classes = %( :Form(XObject-Form), :Image(XObject-Image), :Page(Page), :Pages(Pages) );
         multi method load-delegate(Hash :$dict! where { from-ast($_) ~~ 'Form'|'Image' with .<Subtype> }) {
             %Classes{ from-ast($dict<Subtype>) };
