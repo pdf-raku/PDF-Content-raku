@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.5.15  2021-12-20T12:38:25+13:00
+   - Fix PDF::Font::Loader regression in 0.5.14 release
+
 0.5.14  2021-12-20T09:19:19+13:00
    - Fixed duplication in ExtGState graphics resources. For example
      `$gfx.FillAlpha = 0.5; $gfx.FillAlpha = 0.5` was resulting in
