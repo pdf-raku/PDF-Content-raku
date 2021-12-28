@@ -19,7 +19,7 @@ class PDF::Content::Text::Box {
     has PDF::Content::Text::Line @.lines is built;
     has @.overflow is rw is built;
     has @.images is built;
-    has Str $.text;
+    has Str $.text is built;
     has Bool $.squish = False;;
     has Bool $.verbatim;
 
@@ -38,38 +38,37 @@ class PDF::Content::Text::Box {
         .comb(/<Text::word> | <Text::space>/);
     }
 
-    method clone(PDF::Content::Text::Box:D: |c) {
-        my $text = $!text ~ @!overflow.join;
+    method clone(PDF::Content::Text::Box:D: :$text = $!text ~ @!overflow.join, |c) {
         given callwith(|c) {
             .TWEAK: :$text;
             $_;
         }
     }
 
-    multi submethod TWEAK(Str :$!text!, |c) {
-        my Str @chunks = self.comb: $!text;
-        self.TWEAK: :@chunks, |c;
+    multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
+        $_ .= new(|c) without $!style;
+	self!layup: @chunks;
     }
 
-    multi submethod TWEAK(:@chunks!, |c) {
+    multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
         $_ .= new(|c) without $!style;
-        $!text //= @chunks».Str.join;
 	self!layup: @chunks;
     }
 
     method !layup(@atoms is copy) is default {
-        my @line-atoms;
-        my UInt $preceding-spaces = self!flush-spaces: @atoms;
+        my int $i = 0;
+        my int $line-start = 0;
+        my int $n = +@atoms;
+        my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
         my $word-gap = self!word-gap;
 	my $height = $!style.font-size;
 
         my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
 	@!lines = [ $line ];
-        @!overflow = [];
 
-        while @atoms {
+        LAYUP: while $i < $n {
             my subset StrOrImage where Str | PDF::Content::XObject;
-            my StrOrImage $atom = @atoms.shift;
+            my StrOrImage $atom = @atoms[$i++];
             my Bool $xobject = False;
             my $line-breaks = 0;
             my List $word;
@@ -108,25 +107,30 @@ class PDF::Content::Text::Box {
                 }
             }
 
-            @line-atoms.push: $atom;
-
             $line-breaks ||= ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
                 if $!width;
 
             while $line-breaks--  {
+                $line-start = $i;
                 $line .= new: :$word-gap, :$height;
                 @!lines.push: $line;
                 $preceding-spaces = 0;
                 $word-pad = 0;
-                last if self!height-exceeded(@line-atoms);
-                @line-atoms := [];
+                if self!height-exceeded {
+                    @!lines.pop;
+                    last LAYUP;
+                }
             }
 
             if $xobject {
                 given $atom.height {
                     $line.height = $_
                         if $_ > $line.height;
-                    last if self!height-exceeded(@line-atoms)
+                    if self!height-exceeded {
+                        @!lines.pop;
+                        $i = $line-start;
+                        last LAYUP;
+                    }
                 }
 
                 my $Tx = $line.content-width + $word-pad;
@@ -142,7 +146,7 @@ class PDF::Content::Text::Box {
 	    $line.height = $height
 		if $height > $line.height;
 
-            $preceding-spaces = self!flush-spaces(@atoms);
+            $preceding-spaces = self!flush-spaces(@atoms, $i);
         }
 
         if $preceding-spaces {
@@ -150,29 +154,27 @@ class PDF::Content::Text::Box {
             $line.words.push: [];
         }
 
-        @!overflow.append: @atoms;
-
+        @!overflow = @atoms[$i..*];
     }
 
-    method !height-exceeded(@line-atoms) {
-        if $!height && self.content-height > $!height {
-            @!lines.pop if @!lines;
-            @!overflow.append: @line-atoms;
-        }
+    method !height-exceeded {
+        $!height && self.content-height > $!height;
     }
 
-    method !flush-spaces(@words) returns UInt {
+    method !flush-spaces(@words is raw, $i is rw) returns UInt {
         my $n = 0; # space count for padding purposes
-        if @words && @words[0] ~~ /<Text::space>/ {
-            $n = @words[0].chars;
-            if $!verbatim && (my $last-nl = @words[0].rindex("\n")).defined {
-                # count spaces after last new-line
-                $n -= $last-nl + 1;
-                $n = 0 if $!squish;
-            }
-            else {
-                @words.shift;
-                $n = 1 if $!squish;
+        with  @words[$i] {
+            when /<Text::space>/ {
+                $n = .chars;
+                if $!verbatim && (my $last-nl = .rindex("\n")).defined {
+                    # count spaces after last new-line
+                    $n -= $last-nl + 1;
+                    $n = 0 if $!squish;
+                }
+                else {
+                    $i++;
+                    $n = 1 if $!squish;
+                }
             }
         }
         $n;

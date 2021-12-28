@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 22;
+plan 23;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -74,6 +74,25 @@ is-json-equiv [ $gfx.ops ], [
       :ET[],
     :Q[],
     ], 'simple text box';
+
+subtest 'overflow', {
+    $gfx.text: {
+        $text = q:to<END>.chomp;
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        END
+        my $width = 200;
+        $height = 50;
+        $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
+        .text-position = 100, 500;
+        .say: $text-box;
+        is $text-box.overflow.join, " elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        $text = '...' ~ $text-box.overflow.join;
+        $text-box .= clone: :$text;
+        .say: $text-box;
+        is $text-box.overflow.join, ' et dolore magna aliqua.';
+        .say: '...' ~ $text-box.overflow.join;
+    }
+}
 
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');

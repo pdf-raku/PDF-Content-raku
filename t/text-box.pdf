@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 212 >> stream
+<< /Length 435 >> stream
 q
   BT
     1 0 0 1 100 350 Tm
@@ -32,6 +32,21 @@ q
     (Hello. Ting, ting-ting. Attention! … ATTENTION! ) Tj
   ET
 Q
+BT
+  1 0 0 1 100 500 Tm
+  /F1 16 Tf
+  (Lorem ipsum dolor sit) Tj
+  17.6 TL
+  T*
+  (amet, consectetur) Tj
+  T*
+  (... elit, sed do eiusmod) Tj
+  T*
+  (tempor incididunt ut) Tj
+  T*
+  (... et dolore magna aliqua.) Tj
+  T*
+ET
 endstream
 endobj
 
@@ -51,9 +66,9 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000264 00000 n 
-0000000528 00000 n 
+0000000751 00000 n 
 trailer
 << /ID [ (t/text-box.t    ) (t/text-box.t    ) ] /Root 1 0 R /Size 6 >>
 startxref
-639
+862
 %%EOF

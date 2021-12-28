@@ -1,4 +1,5 @@
 {{$NEXT}}
+    - Fix text-box overflow handling.
 
 0.5.15  2021-12-20T12:38:25+13:00
    - Fix PDF::Font::Loader regression in 0.5.14 release
