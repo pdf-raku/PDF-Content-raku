@@ -124,12 +124,13 @@ class PDF::Content::Text::Box {
 
             if $xobject {
                 given $atom.height {
-                    $line.height = $_
-                        if $_ > $line.height;
-                    if self!height-exceeded {
-                        @!lines.pop;
-                        $i = $line-start;
-                        last LAYUP;
+                    if $_ > $line.height {
+                        $line.height = $_;
+                        if self!height-exceeded {
+                            @!lines.pop;
+                            $i = $line-start;
+                            last LAYUP;
+                        }
                     }
                 }
 
