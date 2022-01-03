@@ -20,7 +20,7 @@ class PDF::Content::Text::Box {
     has @.overflow is rw is built;
     has @.images is built;
     has Str $.text is built;
-    has Bool $.squish = False;;
+    has Bool $.squish = False;
     has Bool $.verbatim;
 
     method content-width  { @!lines».content-width.max }
@@ -135,9 +135,7 @@ class PDF::Content::Text::Box {
                 }
 
                 my $Tx = $line.content-width + $word-pad;
-                my $Ty = @!lines
-                    ?? @!lines[0].height * $.leading  -  self.content-height
-                    !! 0.0;
+                my $Ty = @!lines.head.height * $.leading  -  self.content-height;
                 @!images.push( { :$Tx, :$Ty, :xobject($atom) } )
             }
 
@@ -151,6 +149,7 @@ class PDF::Content::Text::Box {
         }
 
         if $preceding-spaces {
+            # trailing space
             $line.spaces.push($preceding-spaces);
             $line.words.push: [];
         }
@@ -227,7 +226,7 @@ class PDF::Content::Text::Box {
             for @!lines;
 
         my @content;
-        @content.push: 'comment' => 'text: ' ~ @!lines».words.map(*.grep(Str).Slip).join: ' '
+        @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join: ' '
             if $gfx.comment;
 
         my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
@@ -289,4 +288,7 @@ class PDF::Content::Text::Box {
         }
     }
 
+    method Str {
+        @!lines>>.text.join: "\n";
+    }
 }

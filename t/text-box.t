@@ -85,6 +85,9 @@ subtest 'overflow', {
         $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
         .text-position = 100, 500;
         .say: $text-box;
+        is $text-box.lines[0].text, 'Lorem ipsum dolor sit';
+        is $text-box.lines[1].text, 'amet, consectetur';
+        is-deeply  $text-box.Str.lines, ('Lorem ipsum dolor sit', 'amet, consectetur');
         is $text-box.overflow.join, " elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         $text = '...' ~ $text-box.overflow.join;
         $text-box .= clone: :$text;

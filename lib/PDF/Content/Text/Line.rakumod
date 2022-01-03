@@ -3,6 +3,7 @@ use v6;
 class PDF::Content::Text::Line {
 
     use PDF::Content::Ops :OpCode;
+    use Method::Also;
 
     has List @.words;
     has Numeric $.height is rw is required;
@@ -83,4 +84,9 @@ class PDF::Content::Text::Line {
 
     }
 
+    method text is also<Str> {
+        join '', @!words.kv.map: -> $i, $w {
+            ((' ' x @!spaces[$i]).Slip, $w.grep(Str).Slip)
+        }
+    }
 }

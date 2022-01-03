@@ -58,7 +58,7 @@ my enum IllustrationTags is export(:IllustrationTags,:Tags) (
     :Figure<Figure>, :Formula<Formula>, :Form<Form>
 );
 
-#| These tags are meaningful within content streams, as opposed to the strucure-tree
+#| These tags are meaningful within content streams, as opposed to the structure-tree
 my enum ContentTags is export(:ContentTags,:Tags) (
     :OptionalContent<OC>,  # [PDF 32000 8.11.3.2 Optional Content in Content Streams]
     :TagSuspect<TagSuspect>, :ReversedChars<ReversedChars>, # [PDF 32000 14.8.2 Tagged PDF and Page Content]
