@@ -254,7 +254,7 @@ class PDF::Content::Text::Box {
 	    if .key {
                 my \lead = line.height * $.leading;
 		@content.push: ( OpCode::SetTextLeading => [ $leading = lead ] )
-		    if $leading !=~= lead;
+		    unless $leading =~= lead;
 		@content.push: OpCode::TextNextLine;
 	    }
 
@@ -262,10 +262,11 @@ class PDF::Content::Text::Box {
             @content.push: line.content(:$.font, :$.font-size, :$x-shift, :$space-pad);
         }
 
-	if $nl {
+	if $nl || @!overflow {
 	    my $height = @!lines ?? @!lines.tail.height !! $.font-size;
-	    @content.push: ( OpCode::SetTextLeading => [ $leading = $height * $.leading ] )
-                unless $.font-size * $.leading =~= $leading;
+            my \lead = $height * $.leading;
+	    @content.push: ( OpCode::SetTextLeading => [ lead ] )
+                unless $leading =~= lead;
 	    @content.push: OpCode::TextNextLine;
 	}
 
