@@ -11,24 +11,27 @@ class PDF::Content::Text::Style is rw {
     has Numeric $!space-width = 300;
 
     # directly mapped to graphics state
-    has Numeric $.WordSpacing;
-    has Numeric $.CharSpacing;
-    has Numeric $.HorizScaling;
-    has Numeric $.TextRise;
-    has UInt    $.TextRender;
+    has Numeric $.WordSpacing  is built;
+    has Numeric $.CharSpacing  is built;
+    has Numeric $.HorizScaling is built;
+    has UInt    $.TextRender   is built;
+    has Numeric $.TextRise     is built;
 
     my subset Baseline of Str is export(:BaseLine) where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging'|Any:U;
 
-    multi submethod TWEAK(:$gfx, Baseline :$baseline) {
-        $!CharSpacing  //= do with $gfx {.CharSpacing}  else {0.0};
-	$!WordSpacing  //= do with $gfx {.WordSpacing}  else {0.0};
-	$!HorizScaling //= do with $gfx {.HorizScaling} else {100};
-        $!TextRender   //= do with $gfx {.TextRender}   else { 0 }
-	$!TextRise     //= do with $baseline {
+    submethod TWEAK(
+        :$gfx,
+        Baseline :$baseline,
+        :$!CharSpacing  = do with $gfx {.CharSpacing}  else { 0.0 },
+	:$!WordSpacing  = do with $gfx {.WordSpacing}  else { 0.0 },
+	:$!HorizScaling = do with $gfx {.HorizScaling} else { 100 },
+        :$!TextRender   = do with $gfx {.TextRender}   else { 0 },
+	:$!TextRise     = do with $baseline {
 	    self.baseline-shift($_);
 	} else {
-	    with $gfx {.TextRise} else {0.0};
+	    with $gfx { .TextRise } else { 0.0 };
 	}
+    ) {
         with $!font {
             if .stringwidth(' ') -> $sw {
                 $!space-width = $sw;

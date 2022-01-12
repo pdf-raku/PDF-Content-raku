@@ -1,5 +1,8 @@
 {{$NEXT}}
    - Add text box Str() method
+   - Add final TextNewLine (T*) Op on text overflow. This sets the text
+     position to the bottom of the rendered text. Also assists PDF::Tags::Reader
+     (at least) to accurately detect new-lines.
 
 0.5.16  2021-12-29T08:09:53+13:00
     - Fix text-box overflow handling.
