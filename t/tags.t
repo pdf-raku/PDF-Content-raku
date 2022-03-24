@@ -4,7 +4,7 @@ plan 9;
 
 use lib 't';
 use PDFTiny;
-use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
+use PDF::Content::Tag :Tags;
 use PDF::Content::FontObj;
 use PDF::Content::Page;
 use PDF::Content::XObject;
@@ -24,6 +24,9 @@ $page.graphics: -> $gfx {
              :font($header-font),
              :font-size(15),
              :position[50, 120]);
+        .tag: Artifact, {
+            .say: '_' x 10, :position[50, 117]
+        }
     }
 
     is $tag.name, 'H1', 'mark tag name';
@@ -45,7 +48,7 @@ $page.graphics: -> $gfx {
     is-deeply $gfx.actual-text.lines, ('Header text', 'Paragraph that contains a figure'), '$.actual-text';
 }
 
-is $page.gfx.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
+is $page.gfx.tags.gist, '<H1 MCID="0"><Artifact/></H1><P MCID="1"><Figure/></P>';
 
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
@@ -56,6 +59,6 @@ lives-ok { $pdf.save-as: "t/tags.pdf" }
 
 $pdf .= open: "t/tags.pdf";
 
-is $pdf.page(1).render.tags.gist, '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
+is $pdf.page(1).render.tags.gist, '<H1 MCID="0"><Artifact/></H1><P MCID="1"><Figure/></P>';
 
 done-testing;

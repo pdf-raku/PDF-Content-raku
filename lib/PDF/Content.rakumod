@@ -324,11 +324,13 @@ class PDF::Content:ver<0.5.16>
 
         self.EndText() unless in-text;
 
-        with $!actual-text {
-            # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
-            $_ ~= ' ' if .so && !.ends-with(' '|"\n");
-            $_ ~= $text-box.text;
-            $_ ~= "\n" if $nl;
+        unless $.artifact {
+            with $!actual-text {
+                # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
+                $_ ~= ' ' if .so && !.ends-with(' '|"\n");
+                $_ ~= $text-box.text;
+                $_ ~= "\n" if $nl;
+            }
         }
 
         my \x0 = $x + $dx;

@@ -126,7 +126,7 @@ my $canvas = $g.canvas;
 does-ok $canvas, PDF::Content::Canvas;
 nok $canvas<ExtGState>, 'FillAlpha Optimized';
 $g.FillAlpha = 0.4;
-is $g.ops[*-1], (:gs([:name<GS1>])), 'FillAlpha op';
+is $g.ops[*-1], (:gs[:name<GS1>]), 'FillAlpha op';
 is-json-equiv $canvas<Resources><ExtGState><GS1>, { :Type<ExtGState>, :ca(0.4)}, 'FillAlpha graphics resource';
 $g.FillAlpha = 1.0;
 is-json-equiv $canvas<Resources><ExtGState><GS2>, { :Type<ExtGState>, :ca(1.0)}, 'FillAlpha graphics resource';

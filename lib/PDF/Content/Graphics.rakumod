@@ -144,8 +144,10 @@ role PDF::Content::Graphics {
     my class TagSetBuilder is PDF::Content::Tag::Set {
         has PDF::Content::Tag @.open-tags;            # currently open descendant tags
         has PDF::Content::Tag $.closed-tag;
+        has UInt $.artifact is built;
 
         method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
+            $!artifact++ if $tag.name eq 'Artifact';
             with @!open-tags.tail {
                 .add-kid: $tag;
             }
@@ -154,6 +156,7 @@ role PDF::Content::Graphics {
 
         method close-tag {                            # close innermost descendant
             $!closed-tag = @!open-tags.pop;
+            $!artifact-- if $!closed-tag.name eq 'Artifact';
             @.tags.push: $!closed-tag
                 without $!closed-tag.parent;
             $!closed-tag;
