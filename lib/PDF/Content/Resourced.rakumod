@@ -27,7 +27,7 @@ role PDF::Content::Resourced {
         }
 	@entries;
     }
-    multi method resources(Str $type) is default {
+    multi method resources(Str $type) {
         my %entries;
 	with self.Resources {
             with .{$type} -> Hash $r {

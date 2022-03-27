@@ -880,7 +880,7 @@ class PDF::Content::Ops {
             }
         );
     }
-    multi method op(SuspectOp $_) is default {
+    multi method op(SuspectOp $_) {
         # quarantined by PDF::Grammar::Content as either an unknown operator
         # or having an incorrect argument list
         given .value {

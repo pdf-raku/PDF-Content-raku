@@ -52,9 +52,9 @@ role PDF::Content::Graphics {
         @ops;
     }
 
-    method gfx(|c) is default {	$!gfx //= self.new-gfx(|c) }
+    method gfx(|c)         { $!gfx //= self.new-gfx(|c) }
     method graphics(&code) { self.gfx.graphics( &code ) }
-    method text(&code) { self.gfx.text( &code ) }
+    method text(&code)     { self.gfx.text( &code ) }
 
     method contents-parse {
         PDF::Content.parse($.contents);
@@ -73,7 +73,7 @@ role PDF::Content::Graphics {
         PDF::Content.new: :$canvas, |c;
     }
 
-    method render(Bool :$tidy = True, |c) is default {
+    method render(Bool :$tidy = True, |c) {
         my $gfx := $.gfx(|c);
         $!rendered ||= do {
             my Pair @ops = self.contents-parse;

@@ -76,7 +76,7 @@ role PDF::Content::PageTree
         die "unable to locate page: $page-num";
     }
 
-    multi method page(Int $page-num) is default {
+    multi method page(Int $page-num) {
 	die "no such page: $page-num";
     }
 

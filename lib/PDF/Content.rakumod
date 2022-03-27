@@ -95,7 +95,7 @@ class PDF::Content:ver<0.5.17>
         }
     }
     has Tagger $!tagger;
-    multi method tag is default {
+    multi method tag {
         $!tagger //= Tagger.new: :gfx(self);
     }
 
@@ -193,7 +193,7 @@ class PDF::Content:ver<0.5.17>
         # return the display rectangle for the image
         (x0, y0, x1, y1);
     }
-    multi method do($img, Numeric $x, Numeric $y = 0, *%opt) is default {
+    multi method do($img, Numeric $x, Numeric $y = 0, *%opt) {
         self.do($img, :position[$x, $y], |%opt);
     }
 

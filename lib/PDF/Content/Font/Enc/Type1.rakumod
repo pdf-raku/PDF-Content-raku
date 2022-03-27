@@ -93,7 +93,7 @@ class PDF::Content::Font::Enc::Type1
         $cid;
     }
 
-    multi method encode(Str $text, :cids($)! --> buf8) is default {
+    multi method encode(Str $text, :cids($)! --> buf8) {
         buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) || Empty });
     }
 

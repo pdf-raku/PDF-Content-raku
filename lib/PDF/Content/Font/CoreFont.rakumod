@@ -191,7 +191,7 @@ class PDF::Content::Font::CoreFont
         self!load-core-font('symbol', :$enc, |c );
     }
 
-    multi method load-font(Str:D $font-name!, :$enc = 'win', |c) is default {
+    multi method load-font(Str:D $font-name!, :$enc = 'win', |c) {
         self!load-core-font($_, :$enc )
             with $.core-font-name($font-name, |c);
     }

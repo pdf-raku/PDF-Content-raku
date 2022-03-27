@@ -15,7 +15,7 @@ role PDF::Content::XObject {
     }
 
     #| load from a file or data-uri
-    multi method open(\fh = self, |c) is default {
+    multi method open(\fh = self, |c) {
         my PDF::Content::Image $image-obj .= load(fh, |c);
         $image-obj.read;
         my PDF::COS::Stream $xobject = $image-obj.to-dict;

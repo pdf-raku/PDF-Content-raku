@@ -55,7 +55,7 @@ class PDF::Content::Text::Box {
 	self!layup: @chunks;
     }
 
-    method !layup(@atoms is copy) is default {
+    method !layup(@atoms is copy) {
         my int $i = 0;
         my int $line-start = 0;
         my int $n = +@atoms;

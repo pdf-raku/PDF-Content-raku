@@ -78,7 +78,7 @@ role PDF::Content::ResourceDict {
         $object;
     }
 
-    multi method resource(PDF::COS:D $object is raw where { %!resource-key{$_}:exists }) is default {
+    multi method resource(PDF::COS:D $object is raw where { %!resource-key{$_}:exists }) {
 	$object;
     }
 
