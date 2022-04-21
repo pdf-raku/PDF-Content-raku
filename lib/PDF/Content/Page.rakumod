@@ -1,5 +1,3 @@
-use v6;
-
 use PDF::Content::Canvas;
 
 role PDF::Content::Page

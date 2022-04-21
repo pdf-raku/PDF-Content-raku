@@ -1,8 +1,6 @@
-use v6;
 use PDF::Content::Image;
 
-# adapted from Perl 5's PDF::API2::Resource::XObject::Image::JPEG
-
+# adapted from Perl's PDF::API2::Resource::XObject::Image::JPEG
 class PDF::Content::Image::JPEG
     is PDF::Content::Image {
     use Native::Packing :Endian;
@@ -16,6 +14,7 @@ class PDF::Content::Image::JPEG
         has uint16 $.len
     }
     # work-around for Rakudo RT #131122 - sign handling
+    # (fixed in Rakudo 2022.03+)
     has Atts $!atts;
     has Bool $!is-dct;
     has Str $!encoded;

@@ -1,5 +1,3 @@
-use v6;
-
 class PDF::Content::Text::Style is rw {
 
     use PDF::Content::Color :&color;

@@ -1,8 +1,6 @@
-use v6;
 use PDF::Content::Image;
 
-# adapted from Perl 5's PDF::API::Resource::XObject::Image::GIF
-
+# adapted from Perl's PDF::API::Resource::XObject::Image::GIF
 class PDF::Content::Image::GIF
     is PDF::Content::Image {
 

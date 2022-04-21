@@ -1,5 +1,3 @@
-use v6;
-
 class Build {
 
     method !save-glyph(Str $glyph-name, $chr, $ord, Hash :$encoding, Hash :$glyphs) {
@@ -105,7 +103,6 @@ warn [$chr, $glyph-name, $octal-code].raku;
     method !write-enc-header {
 
         print q:to"--CODE-GEN--";
-        use v6;
         # Single Byte Font Encodings
         #
         # DO NOT EDIT!!!

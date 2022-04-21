@@ -1,8 +1,5 @@
-use v6;
-
-use PDF::COS::Tie::Hash;
-
 role PDF::Content::PageNode {
+    use PDF::COS::Tie::Hash;
     use PDF::Content::Page :PageSizes;
     use PDF::Content::XObject :&from-origin;
 
@@ -18,7 +15,7 @@ role PDF::Content::PageNode {
     my constant %BBoxEntry = %(
 	:media<MediaBox>, :crop<CropBox>, :bleed<BleedBox>, :trim<TrimBox>, :art<ArtBox>
     );
-    my subset BoxName of Str where %%BBoxEntry{$_}:exists;
+    my subset BoxName of Str where %BBoxEntry{$_}:exists;
 
     method !get-prop(BoxName $box) is rw {
 	my $bbox = %BBoxEntry{$box};

@@ -1,5 +1,3 @@
-use v6;
-
 role PDF::Content::Resourced {
 
     method !resource-dict { self.Resources //= {} }

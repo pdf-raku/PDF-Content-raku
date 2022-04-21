@@ -1,5 +1,3 @@
-use v6;
-
 class X::PDF::Content is Exception {
 }
 
@@ -364,7 +362,7 @@ class PDF::Content::Ops {
         OpCode::SetCharWidthBBox => method ($!char-width, $!char-height, *@!char-bbox) {
         },
         OpCode::BeginExtended => method {
-                    $!extended-ops++;
+            $!extended-ops++;
         },
         OpCode::EndExtended => method {
 	    die X::PDF::Content::OP::BadNesting.new: :op<EX>, :mnemonic(%OpName<EX>), :opener("'BX' (BeginExtended)")

@@ -1,4 +1,3 @@
-use v6;
 module PDF::Content::Color {
 
     use Color;

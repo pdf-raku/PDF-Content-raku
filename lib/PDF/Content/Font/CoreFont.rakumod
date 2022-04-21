@@ -1,5 +1,3 @@
-use v6;
-
 use PDF::Content::FontObj;
 
 class PDF::Content::Font::CoreFont

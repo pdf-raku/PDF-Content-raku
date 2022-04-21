@@ -1,5 +1,3 @@
-use v6;
-
 use PDF::Content::Resourced;
 
 role PDF::Content::PageTree

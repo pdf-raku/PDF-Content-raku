@@ -1,4 +1,3 @@
-use v6;
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState, :Vector;
 
 class PDF::Content:ver<0.5.17>
@@ -259,7 +258,7 @@ class PDF::Content:ver<0.5.17>
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Block.new(
             :gfx(self), :$font, :$font-size, |%opt,
-            );
+        );
     }
 
     method !set-position($text-block, $position,
@@ -391,7 +390,7 @@ class PDF::Content:ver<0.5.17>
     }
 
     # map transformed user coordinates to untransformed (default) coordinates
-    use PDF::Content::Matrix :dot;
+    use PDF::Content::Matrix :&dot;
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
             @coords.map: -> $x is copy, $y is copy {

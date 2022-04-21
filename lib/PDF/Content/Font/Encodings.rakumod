@@ -1,4 +1,3 @@
-use v6;
 # Single Byte Font Encodings
 #
 # DO NOT EDIT!!!

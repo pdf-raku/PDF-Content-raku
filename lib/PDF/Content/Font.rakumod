@@ -1,5 +1,3 @@
-use v6;
-
 role PDF::Content::Font {
     use PDF::COS;
     use PDF::COS::Dict;

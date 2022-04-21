@@ -1,5 +1,3 @@
-use v6;
-
 role PDF::Content::ResourceDict {
 
     use PDF::COS;

@@ -1,5 +1,3 @@
-use v6;
-
 class PDF::Content::Text::Line {
 
     use PDF::Content::Ops :OpCode;
@@ -45,12 +43,11 @@ class PDF::Content::Text::Line {
         my subset Str-or-Pos where Str|Numeric;
         my Str-or-Pos @line;
         constant Space = ' ';
-
-        my Numeric $indent = $!align + $!indent + $x-shift;
-        $indent = ($indent * scale).round.Int;
-        @line.push: $indent
-            if $indent;
         my int $wc = 0;
+
+        if $!align + $!indent + $x-shift -> $indent {
+            @line.push: ($indent * scale).round.Int;
+        }
 
         # flatten words. insert spaces and space adjustments.
         # Ensure we add spaces - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]

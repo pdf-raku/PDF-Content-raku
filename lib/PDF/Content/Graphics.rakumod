@@ -1,5 +1,3 @@
-use v6;
-
 #| this role is applied to PDF::Content::Type::Page, PDF::Content::Type::Pattern and PDF::Content::Type::XObject::Form
 role PDF::Content::Graphics {
 

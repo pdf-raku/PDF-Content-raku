@@ -1,5 +1,3 @@
-use v6;
-
 class X::PDF::Image::WrongHeader is Exception {
     has Str $.type is required;
     has Str $.header is required;

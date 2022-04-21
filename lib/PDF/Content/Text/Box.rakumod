@@ -1,5 +1,3 @@
-use v6;
-
 #| simple plain-text blocks
 class PDF::Content::Text::Box {
 
@@ -23,10 +21,8 @@ class PDF::Content::Text::Box {
     has Bool $.squish = False;
     has Bool $.verbatim;
 
-    method content-width  { @!lines».content-width.max }
-    method content-height {
-        @!lines».height.sum * $.leading;
-    }
+    method content-width  { @!lines».content-width.max; }
+    method content-height { @!lines».height.sum * $.leading; }
 
     my grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }

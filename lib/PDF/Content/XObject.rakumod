@@ -1,5 +1,3 @@
-use v6;
-
 role PDF::Content::XObject {
     use PDF::Content::Image;
     use PDF::COS::Stream;

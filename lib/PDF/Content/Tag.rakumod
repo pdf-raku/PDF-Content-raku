@@ -1,5 +1,3 @@
-use v6;
-
 unit class PDF::Content::Tag;
 
 use PDF::COS;
