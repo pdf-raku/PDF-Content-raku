@@ -72,7 +72,7 @@ class PDF::Content::Image {
     }
 
     method !image-handler(Str :$image-type!) {
-        require ::('PDF::Content::Image')::($image-type);
+        PDF::COS.required("PDF::Content::Image::$image-type");
     }
 
     multi method load(IO::Handle $source!) {
@@ -106,6 +106,6 @@ class PDF::Content::Image {
     }
 
     method open(|c) is DEPRECATED<PDF::Content::XObject.open> {
-        (require ::('PDF::Content::XObject')).open(|c);
+        PDF::COS.required('PDF::Content::XObject').open(|c);
     }
 }

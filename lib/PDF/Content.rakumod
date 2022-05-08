@@ -3,6 +3,7 @@ use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState, :Vector;
 class PDF::Content:ver<0.5.17>
     is PDF::Content::Ops {
 
+    use PDF::COS;
     use PDF::COS::Stream;
     use PDF::Content::Text::Box;
     use PDF::Content::Text::Block; # deprecated
@@ -241,7 +242,7 @@ class PDF::Content:ver<0.5.17>
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Box.new(
             :$gfx, :$font, :$font-size, |%opt,
-            );
+        );
     }
 
     #| output text leave the text position at the end of the current line
@@ -380,13 +381,13 @@ class PDF::Content:ver<0.5.17>
     }
 
     method html-canvas(&mark-up!, |c ) {
-        my $html-canvas := (require HTML::Canvas).new;
+        my $html-canvas := PDF::COS.required('HTML::Canvas').new;
         $html-canvas.context(&mark-up);
         self.draw($html-canvas, |c);
     }
 
     method draw(PDF::Content:D $gfx: $html-canvas, :$renderer, |c) {
-        $html-canvas.render($renderer // (require HTML::Canvas::To::PDF).new: :$gfx, |c);
+        $html-canvas.render($renderer // PDF::COS.required('HTML::Canvas::To::PDF').new: :$gfx, |c);
     }
 
     # map transformed user coordinates to untransformed (default) coordinates

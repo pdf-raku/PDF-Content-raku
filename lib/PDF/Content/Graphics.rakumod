@@ -1,6 +1,7 @@
 #| this role is applied to PDF::Content::Type::Page, PDF::Content::Type::Pattern and PDF::Content::Type::XObject::Form
 role PDF::Content::Graphics {
 
+    use PDF::COS;
     use PDF::Content;
     use PDF::Content::Ops :OpCode;
     use PDF::Content::Tag;

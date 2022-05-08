@@ -14,13 +14,14 @@ class PDF::Content::Font::Enc::Type1
     has uint16 @.to-unicode[256];
     has uint8 @!spare-cids;   #| unmapped codes in the encoding scheme
     my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std'|'mac-extra';
+    has Lock $.lock handles<protect> .= new;
     has EncodingScheme $.enc = 'win';
     my constant %Encoding = %(
-            :mac($mac-encoding),   :win($win-encoding),
-            :sym($sym-encoding),   :std($std-encoding),
-            :mac-extra($mac-extra-encoding),
-            :zapf($zapf-encoding),
-        );
+        :mac($mac-encoding),   :win($win-encoding),
+        :sym($sym-encoding),   :std($std-encoding),
+        :mac-extra($mac-extra-encoding),
+        :zapf($zapf-encoding),
+    );
 
     submethod TWEAK {
         my array $encoding = %Encoding{$!enc};
@@ -94,7 +95,7 @@ class PDF::Content::Font::Enc::Type1
     }
 
     multi method encode(Str $text, :cids($)! --> buf8) {
-        buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) || Empty });
+        self.protect: {buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) || Empty });}
     }
 
     multi method encode(Str $text --> Str) {
@@ -105,7 +106,7 @@ class PDF::Content::Font::Enc::Type1
         $encoded.ords;
     }
     multi method decode(Str $encoded, :ords($)!) {
-        $encoded.ords.map: {@!to-unicode[$_] || Empty};
+        self.protect: { $encoded.ords.map: {@!to-unicode[$_] || Empty} };
     }
     multi method decode(Str $encoded --> Str) {
         self.decode($encoded, :ords)».chr.join;

@@ -5,59 +5,61 @@ role PDF::Content::PageTree
 
     use PDF::Content::PageNode;
     use PDF::COS::Dict;
+    use PDF::COS::Name;
     my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids && .[0] ~~ PDF::Content::PageNode;
+    sub name(PDF::COS::Name() $_) { $_ }
+
+    method page-fragment  { PDF::COS::Dict.COERCE: %( :Type( name 'Page'), ) }
+    method pages-fragment { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
 
     #| add new last page
-    method add-page( PDF::Content::PageNode $page? is copy ) {
-	with $page {
-	    unless .<Resources>:exists {
-		# import resources, if inherited and outside our hierarchy
-		with .Resources -> $resources {
-                    .<Resources> = $resources.clone
-		        unless $resources === self.Resources;
-                }
-	    }
-	}
-	else {
-	    $_ = PDF::COS::Dict.COERCE: { :Type( :name<Page> ) };
-	}
+    method add-page(::?ROLE:D: PDF::Content::PageNode:D $page = $.page-fragment) {
 
         self.Kids.push: $page;
-	$page = self.Kids.tail;
 	$page<Parent> = self.link;
         my $node = self;
+        my $n = 0;
         while $node.defined {
             $node<Count>++;
             $node = $node<Parent>;
+            die "maximum page tree depth exceeded"
+                if ++$n > 1000;
         }
 
         $page
     }
 
     #| append page subtree
-    method add-pages( PDF::Content::PageNode $pages ) {
-	self<Count> += $pages<Count>;
-	self<Kids>.push: $pages;
-	$pages<Parent> = self;
+    method add-pages(::?ROLE:D: PDF::Content::PageNode:D $pages = $.new-pages) {
+	$pages<Parent> = self.link;
+        if $pages<Count> -> $count {
+            my $node = self;
+            my $n = 0;
+            while $node.defined {
+                $node<Count> += $count;
+                $node = $node<Parent>;
+                die "maximum page tree depth exceeded"
+                    if ++$n > 1000;
+            }
+        }
         $pages;
     }
 
     #| $.page(0?) - adds a new page
-    multi method page(Int $page-num where 0 = 0
-	--> PDF::Content::PageNode) {
+    multi method page(::?ROLE:D: Int $page-num where 0 = 0 --> PDF::Content::PageNode) {
         self.add-page;
     }
 
     #| traverse page tree
-    multi method page(Int $page-num where { 0 < $_ <= self<Count> }) {
+    multi method page(::?ROLE:D: UInt $page-num) {
         my Int $page-count = 0;
 
         for self.Kids.keys {
             my $kid = self.Kids[$_];
 
             if $kid.does($?ROLE) {
-                my Int $sub-pages = $kid<Count>;
-                my Int $sub-page-num = $page-num - $page-count;
+                my UInt $sub-pages = $kid<Count>;
+                my UInt $sub-page-num = $page-num - $page-count;
 
                 return $kid.page( $sub-page-num )
                     if 0 < $sub-page-num <= $sub-pages;
@@ -111,7 +113,7 @@ role PDF::Content::PageTree
     }
 
     #| delete page from page tree
-    multi method delete-page(Int $page-num where { 0 < $_ <= self<Count>},
+    multi method delete-page(UInt $page-num,
 	--> PDF::Content::PageNode) {
         my $page-count = 0;
 
@@ -119,8 +121,8 @@ role PDF::Content::PageTree
             my $kid = self.Kids[$i];
 
             if $kid.does($?ROLE) {
-                my $sub-pages = $kid<Count>;
-                my $sub-page-num = $page-num - $page-count;
+                my UInt $sub-pages = $kid<Count>;
+                my Int $sub-page-num = $page-num - $page-count;
 
                 if 0 < $sub-page-num <= $sub-pages {
                     # found in descendant

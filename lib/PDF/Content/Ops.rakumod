@@ -1034,7 +1034,7 @@ class PDF::Content::Ops {
     method parse(Str $content) {
 	use PDF::Grammar::Content::Fast;
 	use PDF::Grammar::Content::Actions;
-	state $actions = PDF::Grammar::Content::Actions.new;
+	my PDF::Grammar::Content::Actions:D $actions .= new;
 	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
 	    // die X::PDF::Content::ParseError.new :$content;
 	p.ast

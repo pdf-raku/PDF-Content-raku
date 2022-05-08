@@ -9,11 +9,11 @@
     "Base64::Native",
     "Color",
     "Compress::Zlib::Raw",
-    "Font::AFM:ver<1.24.5+>",
+    "Font::AFM:ver<1.24.6+>",
     "Native::Packing",
     "Method::Also",
     "JSON::Fast",
-    "PDF:ver<0.4.6+>",
+    "PDF:ver<0.5.1+>",
     "PDF::Grammar"
   ],
   "description": "PDF content related classes; including text, images, fonts and graphics",

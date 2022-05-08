@@ -11,7 +11,7 @@ role PDF::Content::ResourceDict {
     method resource-key(PDF::COS:D $object is raw, |c --> Str:D) {
         self!require-resource($object, |c)
             unless %!resource-key{$object}:exists;
-       %!resource-key{$object};
+        %!resource-key{$object};
     }
 
     method !resource-type(PDF::COS:D $_ ) {
@@ -76,12 +76,10 @@ role PDF::Content::ResourceDict {
         $object;
     }
 
-    multi method resource(PDF::COS:D $object is raw where { %!resource-key{$_}:exists }) {
-	$object;
-    }
-
-    multi method resource(PDF::COS:D $object is raw, :$type = self!resource-type($object)) {
-        self!require-resource($object, :$type);
+    method  resource(PDF::COS:D $obj is raw, :$type) {
+        %!resource-key{$obj}:exists
+            ?? $obj
+            !! self!require-resource($obj, :$type);
     }
 
     method resource-entry(Str:D $type!, Str:D $key!) {
@@ -89,7 +87,7 @@ role PDF::Content::ResourceDict {
     }
 
     method core-font(|c) {
-        my $font := (require ::('PDF::Content::Font::CoreFont')).load-font( |c );
+        my $font := PDF::COS.required('PDF::Content::Font::CoreFont').load-font( |c );
         self.resource: $font.to-dict, :type<Font>;
         $font;
     }
