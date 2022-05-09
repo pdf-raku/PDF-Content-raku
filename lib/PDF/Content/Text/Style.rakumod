@@ -17,24 +17,30 @@ class PDF::Content::Text::Style is rw {
 
     my subset Baseline of Str is export(:BaseLine) where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging'|Any:U;
 
-    submethod TWEAK(
-        :$gfx,
-        Baseline :$baseline,
-        :$!CharSpacing  = do with $gfx {.CharSpacing}  else { 0.0 },
-	:$!WordSpacing  = do with $gfx {.WordSpacing}  else { 0.0 },
-	:$!HorizScaling = do with $gfx {.HorizScaling} else { 100 },
-        :$!TextRender   = do with $gfx {.TextRender}   else { 0 },
-	:$!TextRise     = do with $baseline {
-	    self.baseline-shift($_);
-	} else {
-	    with $gfx { .TextRise } else { 0.0 };
-	}
+    method !build(
+        :$!CharSpacing = 0,
+	:$!WordSpacing = 0,
+	:$!HorizScaling = 100,
+        :$!TextRender = 0,
+	:$!TextRise = 0,
     ) {
         with $!font {
             if .stringwidth(' ') -> $sw {
                 $!space-width = $sw;
             }
         }
+    }
+    submethod TWEAK(*%o) {
+        %o<TextRise> //= self.baseline-shift($_)
+            with %o<baseline>;
+        with %o<gfx> {
+            %o<CharSpacing>  //= .CharSpacing;
+            %o<WordSpacing>  //= .WordSpacing;
+            %o<HorizScaling> //= .HorizScaling;
+            %o<TextRender>   //= .TextRender;
+            %o<TextRise>     //= .TextRise;
+        }
+        self!build(|%o);
     }
 
     method baseline-shift(Baseline $_) {

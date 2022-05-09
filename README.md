@@ -154,6 +154,36 @@ say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 
 ```
 
+## PDF::Content::PageTree
+
+This class includes the methods:
+
+`page-fragment` - produce a single page fragment, not attached to any PDF
+`pages-fragment` - produce a page-tree fragment, not attached to any PDF
+
+These stand-alone fragments aim to be thread-safe to allow parallel construction of pages. The final PDF assembly needs to be synchronous.
+
+```
+use PDF::Content::Page;
+use PDF::Content::PageTree;
+use lib 't';
+use PDFTiny;
+
+my PDFTiny $pdf .= new;
+my PDF::Content::Page @pages;
+
+@pages = (1..20).race(:batch(1)).map: -> $page-num {
+    my PDF::Content::Page:D $page = PDF::Content::PageTree.page-fragment;
+    $page.text: {
+        .text-position = 50, 400;
+        .say: "Page $page-num";
+    }
+    $page;
+}
+
+$pdf.add-page($_) for @pages;
+```
+
 ## See Also
 
 - [PDF::Font::Loader](https://pdf-raku.github.io/PDF-Font-Loader-raku) provides the ability to load and embed Type-1 and True-Type fonts.

@@ -34,7 +34,7 @@ class PDF::Content::Text::Box {
         .comb(/<Text::word> | <Text::space>/);
     }
 
-    method clone(PDF::Content::Text::Box:D: :$text = $!text ~ @!overflow.join, |c) {
+    method clone(::?CLASS:D: :$text = $!text ~ @!overflow.join, |c) {
         given callwith(|c) {
             .TWEAK: :$text;
             $_;
