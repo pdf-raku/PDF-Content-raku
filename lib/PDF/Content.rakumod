@@ -238,7 +238,7 @@ class PDF::Content:ver<0.5.17>
     }
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
-    method text-box($gfx: MadeFont:D $font = self!current-font[0], *%opt) is hidden-from-backtrace {
+    method text-box(::?CLASS:D $gfx: MadeFont:D $font = self!current-font[0], *%opt) is hidden-from-backtrace {
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Box.new(
             :$gfx, :$font, :$font-size, |%opt,
@@ -255,10 +255,10 @@ class PDF::Content:ver<0.5.17>
     }
 
     #| deprecated in favour of text-box()
-    method text-block($font = self!current-font[0], *%opt) is DEPRECATED('text-box') {
+    method text-block(::?CLASS:D $gfx: $font = self!current-font[0], *%opt) is DEPRECATED('text-box') {
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Block.new(
-            :gfx(self), :$font, :$font-size, |%opt,
+            :$gfx, :$font, :$font-size, |%opt,
         );
     }
 

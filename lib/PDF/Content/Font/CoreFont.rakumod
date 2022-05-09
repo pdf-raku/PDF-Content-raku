@@ -11,6 +11,7 @@ class PDF::Content::Font::CoreFont
     has Font::AFM $.metrics handles <kern>;
     has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode enc>;
     has PDF::Content::Font $!dict;
+    my Lock $lock .= new; 
 
     constant coreFonts = set <
         courier courier-oblique courier-bold courier-boldoblique
@@ -163,9 +164,11 @@ class PDF::Content::Font::CoreFont
     }
 
     method to-dict {
-        $!dict //= PDF::Content::Font.make-font(
-            PDF::COS::Dict.COERCE(self!make-dict),
-            self);
+        $lock.protect: {
+            $!dict //= PDF::Content::Font.make-font(
+                PDF::COS::Dict.COERCE(self!make-dict),
+                self);
+        }
     }
 
     method font-name { $!metrics.FontName }
@@ -174,10 +177,12 @@ class PDF::Content::Font::CoreFont
 
     method !load-core-font(Str:D $font-name, :$enc!, |c) {
         state %core-font-cache;
-        %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
-            my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
-            my $metrics = Font::AFM.core-font( $font-name );
-            self.new( :$encoder, :$metrics, |c);
+        $lock.protect: {
+            %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
+                my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
+                my $metrics = Font::AFM.core-font( $font-name );
+                self.new( :$encoder, :$metrics, |c);
+            }
         }
     }
 
