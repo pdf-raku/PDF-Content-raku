@@ -1,10 +1,20 @@
 {{$NEXT}}
 
+0.6.0  2022-05-10T11:01:38+12:00
+   This release targets parallel thread-safe page construction
+   - Bump dependents PDF and Font::AFM to thread-safe versions
+   - Add PDF::Content::PageTree page-fragment() and pages-fragment() methods.
+     These are individual pages or page-trees for concurrent composition.
+     They can be built in parallel and in any order before being added
+     sequentially using the add-page() method.
+   - Make core-fonts and 'require' of classes thread safe. These seem to
+     be the main internal areas of thread-safety contention
+
 0.5.17  2022-03-25T08:53:53+13:00
    - Add text box Str() method
    - Add final TextNewLine (T*) Op on text overflow. This sets the text
      position to the bottom of the rendered text. Also assists PDF::Tags::Reader
-     (at least) to accurately detect new-lines.
+     to accurately detect new-lines.
    - Suppress actual-test collection in content marked as 'Artifact'
    - move module from CPAN to zef
 
