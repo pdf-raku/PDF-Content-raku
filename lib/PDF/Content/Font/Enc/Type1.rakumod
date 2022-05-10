@@ -34,7 +34,7 @@ class PDF::Content::Font::Enc::Type1
         for 1 .. 255 -> $cid {
             if @!to-unicode[$cid] -> uint16 $ord {
                 %!from-unicode{$ord} = $cid;
-                # CID used in this encoding schema. rellocate as a last resort
+                # CID used in this encoding schema. reallocate as a last resort
                 @allocated-cids.unshift: $cid;
             }
             else {
