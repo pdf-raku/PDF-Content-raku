@@ -76,10 +76,12 @@ role PDF::Content::ResourceDict {
         $object;
     }
 
-    method  resource(PDF::COS:D $obj is raw, :$type) {
-        %!resource-key{$obj}:exists
-            ?? $obj
-            !! self!require-resource($obj, :$type);
+    multi method resource(PDF::COS:D $object is raw where { %!resource-key{$_}:exists }) {
+        $object;
+    }
+
+    multi method resource(PDF::COS:D $object is raw, Str :$type = self!resource-type($object)) {
+        self!require-resource($object, :$type);
     }
 
     method resource-entry(Str:D $type!, Str:D $key!) {
