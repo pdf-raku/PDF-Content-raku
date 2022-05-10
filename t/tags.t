@@ -12,8 +12,8 @@ use PDF::Content::XObject;
 my PDFTiny $pdf .= new;
 
 my PDF::Content::Page $page = $pdf.add-page;
-my PDF::Content::FontObj $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
-my PDF::Content::FontObj $body-font = $page.core-font: :family<Helvetica>;
+my PDF::Content::FontObj $header-font = $pdf.core-font: :family<Helvetica>, :weight<bold>;
+my PDF::Content::FontObj $body-font = $pdf.core-font: :family<Helvetica>;
 
 $page.graphics: -> $gfx {
     my PDF::Content::Tag $tag;

@@ -11,8 +11,9 @@ use PDF::Content::Ops :OpCode;
 use PDF::Content::Matrix :scale;
 use PDFTiny;
 
-my PDF::Content $g = PDFTiny.new.add-page.gfx;
-$g.core-font( :family<Helvetica> ); # define resource /F1
+my PDFTiny $pdf .= new;
+my PDF::Content $g = $pdf.add-page.gfx;
+$g.use-font: $pdf.core-font( :family<Helvetica> ); # define resource /F1
 
 $g.op(Save);
 

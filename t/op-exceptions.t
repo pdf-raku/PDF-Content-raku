@@ -27,9 +27,10 @@ sub warns-like(&code, $ex-type, $desc = 'warning') {
     }
 }
 
-my PDF::Content $g = PDFTiny.new.add-page.gfx;
+my PDFTiny $pdf .= new;
+my PDF::Content $g = $pdf.add-page.gfx;
 $g.Save;
-$g.core-font( :family<Helvetica> ); # define resource /F1
+$g.use-font: $pdf.core-font( :family<Helvetica> ); # define resource /F1
 $g.StrokeAlpha = .5; # define resource /GS1
 
 throws-like {$g.Blah}, X::Method::NotFound, :message("No such method 'Blah' for invocant of type 'PDF::Content'");

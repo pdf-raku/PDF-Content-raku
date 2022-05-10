@@ -187,11 +187,11 @@ sub save-images(@images) {
     }
 
     $page.graphics: -> $gfx {
-	$gfx.font = $page.core-font( :family<Times-Roman>, :weight<bold>);
+	$gfx.font = $pdf.core-font( :family<Times-Roman>, :weight<bold>);
 	$gfx.print( "PDF::Content [t/images.t] - assorted images",
                     :position[30, 750] );
 
-	$gfx.font = ($page.core-font( :family<Times-Roman>), 12);
+	$gfx.font = ($pdf.core-font( :family<Times-Roman>), 12);
     
 	for @images {
 	    my ($desc, $img) = .kv;

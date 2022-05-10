@@ -13,7 +13,7 @@ $pdf.media-box = [0, 0, 400, 120];
 my PDFTiny::Page $page = $pdf.add-page;
 
 $page.graphics: {
-    my PDF::Content::FontObj $font = .core-font( :family<Helvetica> );
+    my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
     my PDFTiny::XObject-Form $form = .xobject-form(:BBox[0, 0, 95, 25]);
     $form.graphics: {
         # Set a background color

@@ -1,4 +1,7 @@
 {{$NEXT}}
+   - Fix PDF::Class regression in 0.6.0
+   - Add Cache subclass to PDF::Font::CoreFont. Use it in
+     PDFTiny test class. 
 
 0.6.0  2022-05-10T11:01:38+12:00
    This release targets parallel thread-safe page construction

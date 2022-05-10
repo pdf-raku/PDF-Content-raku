@@ -13,7 +13,7 @@ endobj
   /Type /Page
   /Contents 4 0 R
   /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R >> /XObject << /Fm1 6 0 R >> >>
+  /Resources << /XObject << /Fm1 5 0 R >> >>
 >>
 endobj
 
@@ -35,20 +35,11 @@ endobj
 
 5 0 obj
 <<
-  /Type /Font
-  /Subtype /Type1
-  /BaseFont /Helvetica
-  /Encoding /WinAnsiEncoding
->>
-endobj
-
-6 0 obj
-<<
   /Type /XObject
   /Subtype /Form
   /BBox [ 0 0 95 25 ]
   /Group << /S /Transparency >>
-  /Resources << /Font << /F1 5 0 R >> >>
+  /Resources << /Font << /F1 6 0 R >> >>
   /Length 172
 >> stream
 q
@@ -69,17 +60,26 @@ Q
 endstream
 endobj
 
+6 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
 xref
 0 7
 0000000000 65535 f 
 0000000015 00000 n 
 0000000065 00000 n 
 0000000151 00000 n 
-0000000288 00000 n 
-0000000480 00000 n 
-0000000586 00000 n 
+0000000266 00000 n 
+0000000458 00000 n 
+0000000813 00000 n 
 trailer
 << /ID [ (t/forms.t       ) (t/forms.t       ) ] /Root 1 0 R /Size 7 >>
 startxref
-941
+919
 %%EOF

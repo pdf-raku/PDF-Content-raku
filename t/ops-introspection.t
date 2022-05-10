@@ -36,7 +36,8 @@ my %gs-initial = %(
     :WordSpacing(0)
 );
 
-my PDF::Content $g = PDFTiny.new.add-page.gfx;
+my PDFTiny $pdf .= new;
+my PDF::Content $g = $pdf.add-page.gfx;
 
 is-json-equiv $g.gsaves, [], 'gsave initial';
 is-json-equiv $g.graphics-state, %gs-initial;
@@ -58,7 +59,8 @@ is-deeply $g.content-dump, ('q', '10 1 15 2 3 4 cm'), 'content-dump';
 $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
 
 $g.BeginText;
-my $font = $g.core-font( :family<Helvetica> ); # define resource /F1
+my $font = $pdf.core-font( :family<Helvetica> );
+$g.use-font($font); # define resource /F1
 $g.SetFont('F1', 16);
 
 is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[$font.to-dict, 16]}, ], 'gsave saved :delta';

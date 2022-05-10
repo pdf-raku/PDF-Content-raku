@@ -1,9 +1,11 @@
 use v6;
 use Test;
-plan 50;
+plan 54;
+use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
 use PDF::Content::Font::CoreFont;
+use PDFTiny;
 
 is PDF::Content::Font::CoreFont.core-font-name('Helvetica,Bold'), 'helvetica-bold', 'core-font-name';
 is PDF::Content::Font::CoreFont.core-font-name('Helvetica-BoldOblique'), 'helvetica-boldoblique', 'core-font-name';
@@ -113,5 +115,15 @@ is-deeply $tr.encode($dec, :cids), $enc, 'mac-extra differences encoding';
 is-deeply $tr.decode($enc.decode), $dec, 'mac-extra differences decoding';
 $tr.cb-finish;
 is-json-equiv $tr.to-dict<Encoding><Differences>, [1, "x", "y", "c", "z", 10, "a", "b"], 'dfferences to-dict';
+
+my PDFTiny $pdf1 .= new;
+my PDFTiny $pdf2 .= new;
+
+my $tr1 = $pdf1.core-font('times-roman');
+my $tr2 = $pdf2.core-font('times-roman');
+is $tr1.font-name, 'Times-Roman';
+ok $tr1 === $pdf1.core-font('times-roman'), 'PDF font caching';
+ok $tr1 !=== $tr2, 'font uniqueness 1';
+ok $tr1 !=== $pdf2.core-font('times-roman'), 'font uniqueness 2';
 
 done-testing;

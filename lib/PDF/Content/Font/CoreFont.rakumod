@@ -11,7 +11,20 @@ class PDF::Content::Font::CoreFont
     has Font::AFM $.metrics handles <kern>;
     has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode enc>;
     has PDF::Content::Font $!dict;
-    my Lock $lock .= new; 
+    class Cache {
+        has Lock $!lock .= new;
+        has %!fonts;
+        method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, |c) {
+            $!lock.protect: {
+                %!fonts{$font-name.lc~'-*-'~$enc} //= do {
+                    my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
+                    my $metrics = Font::AFM.core-font( $font-name );
+                    $class.new( :$encoder, :$metrics, |c);
+                }
+            }
+        }
+    }
+    my Cache $global-cache .= new;
 
     constant coreFonts = set <
         courier courier-oblique courier-bold courier-boldoblique
@@ -164,7 +177,7 @@ class PDF::Content::Font::CoreFont
     }
 
     method to-dict {
-        $lock.protect: {
+        $!encoder.lock.protect: {
             $!dict //= PDF::Content::Font.make-font(
                 PDF::COS::Dict.COERCE(self!make-dict),
                 self);
@@ -175,15 +188,8 @@ class PDF::Content::Font::CoreFont
     method underline-position  { $!metrics.UnderlinePosition }
     method underline-thickness { $!metrics.UnderlineThickness }
 
-    method !load-core-font(Str:D $font-name, :$enc!, |c) {
-        state %core-font-cache;
-        $lock.protect: {
-            %core-font-cache{$font-name.lc~'-*-'~$enc} //= do {
-                my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
-                my $metrics = Font::AFM.core-font( $font-name );
-                self.new( :$encoder, :$metrics, |c);
-            }
-        }
+    method !load-core-font(Str:D $font-name, Cache:D :$cache = $global-cache, |c) is hidden-from-backtrace {
+        $cache.core-font: $font-name, self, |c;
     }
 
     multi method load-font(Str:D $font-name! where /:i ^[ZapfDingbats|WebDings]/, :$enc='zapf', |c) {
@@ -194,9 +200,10 @@ class PDF::Content::Font::CoreFont
         self!load-core-font('symbol', :$enc, |c );
     }
 
-    multi method load-font(Str:D $font-name!, :$enc = 'win', |c) {
-        self!load-core-font($_, :$enc )
-            with $.core-font-name($font-name, |c);
+    multi method load-font(Str:D $font-name!, :$enc = 'win',  Cache:D :$cache = $global-cache, |c) {
+        do with $.core-font-name($font-name, |c) {
+            self!load-core-font($_, :$enc, :$cache );
+        } // self.WHAT;
     }
 
     method is-embedded  { False }

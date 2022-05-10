@@ -14,6 +14,7 @@ class PDFTiny is PDF does PDF::Content::Interface {
     use PDF::Content::PageTree;
     use PDF::Content::ResourceDict;
     use PDF::Content::Canvas;
+    use PDF::Content::Font::CoreFont;
     my role ResourceDict
 	does PDF::COS::Tie::Hash
 	does PDF::Content::ResourceDict { }
@@ -59,6 +60,11 @@ class PDFTiny is PDF does PDF::Content::Interface {
 
     has Catalog $.Root is entry(:required, :indirect);
 
+    has PDF::Content::Font::CoreFont::Cache $.cache .= new;
+    method core-font(|c) {
+        PDF::Content::Font::CoreFont.load-font(:$.cache, |c);
+    }
+
     my class Loader is PDF::COS::Loader {
         method owner { PDFTiny }
         constant %Classes = %( :Form(XObject-Form), :Image(XObject-Image), :Page(Page), :Pages(Pages) );
@@ -82,7 +88,7 @@ class PDFTiny is PDF does PDF::Content::Interface {
         );
     }
 
-    method Pages handles <page add-page delete-page insert-page page-count media-box crop-box bleed-box trim-box art-box core-font use-font rotate iterate-pages> {
+    method Pages handles <page add-page delete-page insert-page page-count media-box crop-box bleed-box trim-box art-box use-font rotate iterate-pages> {
         self.Root.Pages;
     }
 

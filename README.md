@@ -19,9 +19,10 @@ use lib 't';
 use PDF::Content;
 use PDF::Content::Canvas;
 use PDFTiny;
-my PDF::Content::Canvas $canvas = PDFTiny.new.add-page;
+my PDFTiny $pdf .= new;
+my PDF::Content::Canvas $canvas = $pdf.add-page;
 my PDF::Content $gfx .= new: :$canvas;
-$gfx.use-font: $gfx.core-font('Courier'); # define /F1 font
+$gfx.use-font: $pdf.core-font('Courier'); # define /F1 font
 $gfx.BeginText;
 $gfx.Font = 'F1', 16;
 $gfx.TextMove(10, 20);
@@ -118,8 +119,8 @@ use PDF::Content::Tag :ParagraphTags, :IllustrationTags;
 my PDFTiny $pdf .= new;
 
 my $page = $pdf.add-page;
-my $header-font = $page.core-font: :family<Helvetica>, :weight<bold>;
-my $body-font = $page.core-font: :family<Helvetica>;
+my $header-font = $pdf.core-font: :family<Helvetica>, :weight<bold>;
+my $body-font = $pdf.core-font: :family<Helvetica>;
 
 $page.graphics: -> $gfx {
     my PDF::Content::Tag $tag;

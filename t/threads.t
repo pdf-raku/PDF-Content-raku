@@ -8,12 +8,15 @@ use PDF::Content::PageTree;
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
+my $font = $pdf.core-font('Courier');
+my $font2 = $pdf.core-font('Times-Roman');
 my PDF::Content::Page @pages;
 lives-ok {
     @pages = (1..20).race(:batch(1)).map: -> $page-num {
         my PDF::Content::Page:D $page = PDF::Content::PageTree.page-fragment;
         $page.text: {
             .text-position = 50, 400;
+            .font = $font;
             .say: "Page $page-num";
             .say: '';
             .say: q:to"TEXT", :width(300);
@@ -32,7 +35,9 @@ lives-ok {
     my @ = (1..$pdf.page-count).race(:batch(1)).map: -> $page-num {
         $pdf.page($page-num).text: {
             .text-position = 50, 200;
-            .say: "Finish Page $page-num";
+            .print: "Finish ";
+            .font = $font2;
+            .say: "Page $page-num";
         }
     }
 }, 'page update race';

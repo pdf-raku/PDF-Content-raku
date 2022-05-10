@@ -14,8 +14,8 @@ my PDF::Content $gfx = $page.gfx;
 my $width = 50;
 my $font-size = 18;
 
-my PDF::Content::FontObj $bold-font = $page.core-font( :family<Helvetica>, :weight<bold> );
-my PDF::Content::FontObj $font = $page.core-font( :family<Helvetica> );
+my PDF::Content::FontObj $bold-font = $pdf.core-font( :family<Helvetica>, :weight<bold> );
+my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
 
 $gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font), :$font-size);
 

@@ -14,7 +14,7 @@ my PDF::Content $gfx = $page.gfx;
 my $width = 50;
 my $font-size = 18;
 
-my PDF::Content::FontObj $font = $page.core-font( :family<Helvetica> );
+my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
 
 $width = 100;
 my $height = 100;
