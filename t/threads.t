@@ -8,22 +8,26 @@ use PDF::Content::PageTree;
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
-my $font = $pdf.core-font('Courier');
-my $font2 = $pdf.core-font('Times-Roman');
+my $cfont = $pdf.core-font('Courier');
+my @fonts = <Courier Times-Roman Helvetica Times-Italic>.map: { $pdf.core-font($_) }
 my PDF::Content::Page @pages;
 lives-ok {
-    @pages = (1..20).race(:batch(1)).map: -> $page-num {
+    @pages = (1..20).hyper(:batch(1)).map: -> $page-num {
         my PDF::Content::Page:D $page = PDF::Content::PageTree.page-fragment;
-        $page.text: {
-            .text-position = 50, 400;
-            .font = $font;
-            .say: "Page $page-num";
-            .say: '';
-            .say: q:to"TEXT", :width(300);
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            sed do eiusmod tempor incididunt ut labore et dolore
-            magna aliqua.
-            TEXT
+        $page.graphics: {
+            .font = $cfont;
+            .say: "Page $page-num", :position[50, 700];
+            my $y = 650;
+            @fonts.map: -> $font {
+                .font = $font;
+                .say: '';
+                .say: q:to"TEXT", :width(300), :position[50, $y];
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                sed do eiusmod tempor incididunt ut labore et dolore
+                magna aliqua.
+                TEXT
+                $y -= 80;
+            }
         }
         $page;
     }
@@ -35,8 +39,9 @@ lives-ok {
     my @ = (1..$pdf.page-count).race(:batch(1)).map: -> $page-num {
         $pdf.page($page-num).text: {
             .text-position = 50, 200;
+            .font = $cfont;
             .print: "Finish ";
-            .font = $font2;
+            .font = @fonts[1];
             .say: "Page $page-num";
         }
     }

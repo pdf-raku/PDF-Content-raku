@@ -1,3 +1,4 @@
+#| base role for non-cid glyph name lookup
 role PDF::Content::Font::Enc::Glyphic {
     use Font::AFM;
     has Hash $.glyphs is rw = %Font::AFM::Glyphs;

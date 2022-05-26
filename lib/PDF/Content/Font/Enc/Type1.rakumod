@@ -94,6 +94,14 @@ class PDF::Content::Font::Enc::Type1
         $cid;
     }
 
+    # transcoding interface (encode/decode) has:
+    # - two stage encoding, :cids, --> Str
+    # - three stage decoding :cids, :ords, --> Str.
+    #
+    # This is because not all layers are present in all PDF's and not all
+    # layers need to decoded. For example PDF::To::Cairo only needs to decode
+    # to cids to render PDFs. ords mapping may or may not be present.
+
     multi method encode(Str $text, :cids($)! --> buf8) {
         self.protect: {buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) || Empty });}
     }

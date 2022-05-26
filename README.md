@@ -173,7 +173,7 @@ use PDFTiny;
 my PDFTiny $pdf .= new;
 my PDF::Content::Page @pages;
 
-@pages = (1..20).race(:batch(1)).map: -> $page-num {
+@pages = (1..20).hyper(:batch(1)).map: -> $page-num {
     my PDF::Content::Page:D $page = PDF::Content::PageTree.page-fragment;
     $page.text: {
         .text-position = 50, 400;

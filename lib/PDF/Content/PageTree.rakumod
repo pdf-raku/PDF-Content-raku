@@ -3,6 +3,7 @@ use PDF::Content::Resourced;
 role PDF::Content::PageTree
     does PDF::Content::Resourced {
 
+    use PDF::Content::Page;
     use PDF::Content::PageNode;
     use PDF::COS::Dict;
     use PDF::COS::Name;
@@ -13,7 +14,7 @@ role PDF::Content::PageTree
     method pages-fragment { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
 
     #| add new last page
-    method add-page(::?ROLE:D: PDF::Content::PageNode:D $page = $.page-fragment) {
+    method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment) {
 
         self.Kids.push: $page;
 	$page<Parent> = self.link;
@@ -30,8 +31,10 @@ role PDF::Content::PageTree
     }
 
     #| append page subtree
-    method add-pages(::?ROLE:D: PDF::Content::PageNode:D $pages = $.new-pages) {
+    method add-pages(::?ROLE:D: ::?ROLE:D $pages = $.pages-fragment) {
+        self.Kids.push: $pages;
 	$pages<Parent> = self.link;
+
         if $pages<Count> -> $count {
             my $node = self;
             my $n = 0;
@@ -46,7 +49,7 @@ role PDF::Content::PageTree
     }
 
     #| $.page(0?) - adds a new page
-    multi method page(::?ROLE:D: Int $page-num where 0 = 0 --> PDF::Content::PageNode) {
+    multi method page(::?ROLE:D: Int $page-num where 0 = 0 --> PDF::Content::Page) {
         self.add-page;
     }
 
@@ -91,7 +94,7 @@ role PDF::Content::PageTree
             for ^+$kids {
                 given $kids[$_] {
                     when PDF::Content::PageTree { @index.append: .page-index }
-                    when PDF::Content::PageNode { @index.push: .ind-ref }
+                    when PDF::Content::Page     { @index.push: .ind-ref }
                     default { die "unexpected object in page tree: {.raku}"; }
                 }
             }
@@ -105,7 +108,7 @@ role PDF::Content::PageTree
         for ^+$kids {
             given $kids[$_] {
                 when PDF::Content::PageTree { @pages.append: .pages }
-                when PDF::Content::PageNode { @pages.push: $_ }
+                when PDF::Content::Page     { @pages.push: $_ }
                 default { die "unexpected object in page tree: {.raku}"; }
             }
         }
@@ -113,8 +116,7 @@ role PDF::Content::PageTree
     }
 
     #| delete page from page tree
-    multi method delete-page(UInt $page-num,
-	--> PDF::Content::PageNode) {
+    multi method delete-page(UInt $page-num --> PDF::Content::Page) {
         my $page-count = 0;
 
         for self.Kids.keys -> $i {
@@ -154,7 +156,7 @@ role PDF::Content::PageTree
             also does Iterator;
             also does Iterable;
             has PDF::Content::PageTree:D $.node is required;
-            has PDF::Content::PageNode $!page;
+            has PDF::Content::Page $!page;
             has Int $!i = -1;
             has UInt $!n;
             has PageIterator $.kid;
@@ -185,7 +187,7 @@ role PDF::Content::PageTree
                 else {
                     with $!kid {
                         $rv = .pull-one;
-                        unless $rv.does(PDF::Content::PageNode) {
+                        unless $rv.does(PDF::Content::Page) {
                             self!get-next;
                             $rv = self.pull-one;
                         }

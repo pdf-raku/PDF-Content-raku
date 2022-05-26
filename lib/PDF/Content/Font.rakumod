@@ -4,7 +4,7 @@ role PDF::Content::Font {
     use PDF::Content::FontObj;
     has PDF::Content::FontObj $.font-obj is rw handles <encode decode protect filter font-name height kern stringwidth underline-position underline-thickness>;
 
-    method make-font(PDF::COS::Dict:D $font-dict, $font-obj) {
+    method make-font(PDF::COS::Dict:D $font-dict, PDF::Content::FontObj $font-obj) {
         $font-dict.^mixin: PDF::Content::Font
             unless $font-dict.does(PDF::Content::Font);
         $font-dict.set-font-obj($font-obj);
