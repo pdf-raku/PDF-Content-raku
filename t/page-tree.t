@@ -8,8 +8,6 @@ use PDF::Content::PageTree;
 my PDFTiny $pdf .= new;
 # check support for reading of PDF files with multi-level
 # page nodes; including fetching by page number, update and iteration.
-# writing of multi-level page nodes is not yet supported, so we need to
-# artifically create a multi-level page tree
 my $page-number;
 sub add-page($node) {
     my $page = $node.add-page;
@@ -20,15 +18,15 @@ sub add-page($node) {
     $page;
 }
 
-my PDFTiny::Page $first-page = $pdf.add-page;
+my PDFTiny::Page $first-page = $pdf.&add-page;
 
 my PDF::Content::PageTree:D $child .= pages-fragment;
-my PDFTiny::Page:D @middle-pages = (^3).map: {$child.add-page};
+my PDFTiny::Page:D @middle-pages = (^3).map: {$child.&add-page};
 $pdf.Pages.add-pages: $child;
 
 my PDF::Content::PageTree:D $grand-child = $child.add-pages;
-my PDFTiny::Page:D @bottom-pages = (^3).map: {$grand-child.add-page};
-my PDFTiny::Page:D @top-pages    = (^3).map: {$pdf.add-page};
+my PDFTiny::Page:D @bottom-pages = (^3).map: {$grand-child.&add-page};
+my PDFTiny::Page:D @top-pages    = (^3).map: {$pdf.&add-page};
 
 subtest 'tree structure', {
     my $root := $pdf.Pages;
