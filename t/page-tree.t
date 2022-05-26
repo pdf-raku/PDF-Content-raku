@@ -1,11 +1,10 @@
 use v6;
 use Test;
-plan 4;
+plan 5;
 
 use lib 't';
 use PDFTiny;
-use PDF::COS::Name;
-use PDF::COS::Dict;
+use PDF::Content::PageTree;
 my PDFTiny $pdf .= new;
 # check support for reading of PDF files with multi-level
 # page nodes; including fetching by page number, update and iteration.
@@ -20,35 +19,33 @@ sub add-page($node) {
     }
     $page;
 }
-my $Type = PDF::COS::Name.COERCE: 'Pages';
 
-my PDFTiny::Page $first-page = $pdf.&add-page;
+my PDFTiny::Page $first-page = $pdf.add-page;
 
-role SimpleAddPage {
-    method add-page {
-        my PDFTiny::Page $page = PDF::COS::Dict.COERCE: { :Type( :name<Page> ) };
-        self.Kids.push: $page;
-	$page = self.Kids.tail;
-	$page<Parent> = self.link;
-        my $node = self;
-        while $node.defined {
-            $node<Count>++;
-            $node = $node<Parent>;
-        }
-        $page;
-    }
+my PDF::Content::PageTree:D $child .= pages-fragment;
+my PDFTiny::Page:D @middle-pages = (^3).map: {$child.add-page};
+$pdf.Pages.add-pages: $child;
+
+my PDF::Content::PageTree:D $grand-child = $child.add-pages;
+my PDFTiny::Page:D @bottom-pages = (^3).map: {$grand-child.add-page};
+my PDFTiny::Page:D @top-pages    = (^3).map: {$pdf.add-page};
+
+subtest 'tree structure', {
+    my $root := $pdf.Pages;
+    # up
+    is-deeply @bottom-pages.head.Parent, $grand-child;
+    is-deeply $grand-child.Parent, $child;
+    is-deeply $child.Parent, $root;
+    # counts
+    is-deeply $grand-child.Count, 3;
+    is-deeply $child.Count, 6;
+    is-deeply $root.Count, 10;
+    # down
+    is-deeply $root.Kids[0], $first-page;
+    is-deeply $root.Kids[1], $child;
+    is-deeply $root.Kids[1].Kids[3], $grand-child;
+    is-deeply $root.Kids[1].Kids[3].Kids[0], @bottom-pages.head;
 }
-
-my $Parent = $pdf.Pages does SimpleAddPage;
-
-my $child = PDF::COS::Dict.COERCE: { :$Type, :$Parent, :Count(0), :Kids[] }; 
-$Parent.Kids.push: $child;
-my @middle-pages = (^3).map: {$child.&add-page};
-
-my $grand-child = PDF::COS::Dict.COERCE: { :$Type, :Parent($child), :Count(0), :Kids[] };
-$child.Kids.push: $grand-child;
-my @bottom-pages = (^3).map: {$grand-child.&add-page};
-my @top-pages    = (^3).map: {$pdf.&add-page};
 
 sub expected-page(UInt $_) {
     when 1 { $first-page }
