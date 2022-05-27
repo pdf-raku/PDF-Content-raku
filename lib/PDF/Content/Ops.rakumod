@@ -85,7 +85,7 @@ class PDF::Content::Ops {
     use PDF::IO::Writer;
     use PDF::COS;
     use PDF::COS::Dict;
-    use PDF::COS::Util :from-ast, :to-ast;
+    use PDF::COS::Util :&from-ast, :&to-ast;
     use PDF::Content::Matrix :inverse, :multiply, :is-identity, :TransformMatrix;
     use PDF::Content::Tag;
     use JSON::Fast;
@@ -837,7 +837,7 @@ class PDF::Content::Ops {
 	my \coerced-vals = opn.value;
 
 	my @ast-values = @raw-vals.pairs.map: {
-	    .value ~~ Pair
+	    .value.isa(Pair)
 		?? .value
 		!! coerced-vals[.key]
 	};

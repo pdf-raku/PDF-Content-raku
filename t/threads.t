@@ -37,13 +37,15 @@ $pdf.add-page($_) for @pages;
 
 lives-ok {
     my @ = (1..$pdf.page-count).race(:batch(1)).map: -> $page-num {
-        $pdf.page($page-num).text: {
+        my $page = $pdf.page($page-num);
+        $page.text: {
             .text-position = 50, 200;
             .font = $cfont;
             .print: "Finish ";
             .font = @fonts[1];
             .say: "Page $page-num";
         }
+        $page.finish;
     }
 }, 'page update race';
 
