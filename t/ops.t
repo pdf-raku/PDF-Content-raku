@@ -241,8 +241,6 @@ is-json-equiv $g.ops, [
     :comment["That's all♥!"],
 ], 'parse and comment';
 
-todo "needs PDF >= v0.3.8 for comment unicode fixes"
-   unless PDF.^ver >= v0.3.8;
 is-deeply $g.content-dump, $(
     '175 720 m % MoveTo',
     '175 700 l % LineTo',
@@ -320,7 +318,7 @@ $g.paint: :close, :fill, {
 
 is-json-equiv $g.ops, @painted, 'drawing/painting, block form';
 
-todo "failing on rakudo bleed";
+todo "failing on rakudo blead";
 lives-ok { $g.?Junk }, 'unknown method/operator: .? invocation';
 dies-ok { $g.Junk }, 'unknown method/operator: . invocation';
 

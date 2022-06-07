@@ -1,4 +1,6 @@
 {{$NEXT}}
+   - Adjust tests for PDF 0.5.8. Use PDF::COS::Util from-ast()
+     sub in PDF::Content::Ops for proper encapsulation
 
 0.6.2  2022-05-26T15:12:29+12:00
    - Fix PDF::Content::PageTree add-pages() method

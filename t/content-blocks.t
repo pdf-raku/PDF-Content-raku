@@ -47,7 +47,7 @@ $g.tag: 'Foo', :Bar{ :Baz }, {
    .EndText;
 };
 is-json-equiv [$g.ops], [
-    :BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(:bool)}),}],
+    :BDC[:name<Foo>, :dict{:Bar(:dict{:Baz(True)}),}],
     "BT" => [],
     :Tj[:literal<Hi>],
     "ET" => [],

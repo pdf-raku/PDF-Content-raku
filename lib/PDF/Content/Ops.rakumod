@@ -929,8 +929,8 @@ class PDF::Content::Ops {
             if $op ~~ 'BDC'|'DP'|'TJ'|'d' {
                 # operation may have array or dict operands
                 @args .= map: {
-                    when List { [ .map: *.value ] }
-                    when Hash { %( .map: {.key => .value.value} ) }
+                    when List { [ .map: { from-ast($_) } ] }
+                    when Hash { %( .map: {.key => from-ast(.value)} ) }
                     default { $_ }
                 }
             }
@@ -1100,7 +1100,7 @@ class PDF::Content::Ops {
 	    my \pad = op eq 'EI'
                 ?? ''
                 !! $writer.indent;
-            pad ~ $writer.write: :content($_);
+            pad ~ $writer.write-content: $_;
 	}).join: "\n";
     }
 
