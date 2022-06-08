@@ -10,10 +10,10 @@ my PDFTiny $pdf .= new;
 given $pdf.add-page.gfx {
     .current-point = 10, 10; # equivalent to move-to
     is-deeply .current-point, (10, 10);
-    is-json-equiv .ops, (:m[:real(10), :real(10)], );
+    is-json-equiv .ops, (:m[10, 10], );
 
     .current-point = 10, 10; # should be ignored
-    is-json-equiv .ops, (:m[:real(10), :real(10)], );
+    is-json-equiv .ops, (:m[10, 10], );
 
     .Rectangle(40,42,10,10);
     is-deeply .current-point, (40, 42);

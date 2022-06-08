@@ -25,13 +25,13 @@ is-json-equiv $g.CTM, [115, 12, 180, 19, 93, 15], '$g.GraphicMatrix - updated ag
 
 is-json-equiv $g.BeginText, (:BT[]), 'BeginText';
 
-is-json-equiv $g.op('Tf', 'F1', 16), (:Tf[ :name<F1>, :real(16) ]), 'Tf';
+is-json-equiv $g.op('Tf', 'F1', 16), (:Tf[ :name<F1>, 16 ]), 'Tf';
 is $g.font-size, 16, '$g.font-size';
 
 is $g.StrokeColorSpace, 'DeviceGray', '$g.StrokeColorSpace - initial';
 dies-ok { $g.op('SCN', .2, .3, .4) }, 'SCN (/DeviceGray)';
 
-is-json-equiv $g.op('RG', .1, .2, .3), (:RG[ :real(.1), :real(.2), :real(.3) ] ), 'CS';
+is-json-equiv $g.op('RG', .1, .2, .3), (:RG[ .1, .2, .3 ] ), 'CS';
 is-deeply $g.StrokeColor, (:DeviceRGB[.1, .2, .3]), '$g.StrokeColor - updated';
 is $g.StrokeColorSpace, 'DeviceRGB', '$g.StrokeColorSpace - updated';
 my $ops1 = +$g.ops;
@@ -56,7 +56,7 @@ lives-ok { $g.EndMarkedContent }, '$g.EndMarkedContent';
 is $g.tags[0].gist, '<P MCID="42"/>', 'tags';
 
 $g.StrokeColor = :DeviceN[.7, .8];
-is-deeply $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';
+is-json-equiv $g.StrokeColor, (:DeviceN[.7, .8]), '$g.StrokeColor - deviceN';
 
 is $g.FillColorSpace, 'DeviceGray', '$g.FillColorSpace - initial';
 is-json-equiv $g.op('cs', 'DeviceRGB'), (:cs[ :name<DeviceRGB> ] ), 'CS';
@@ -117,7 +117,7 @@ is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated';
 $g.TextMatrix = ( 10, 1, 15, 2, 3, 4);
 is-json-equiv $g.TextMatrix, [10, 1, 15, 2, 3, 4], '$g.TextMatrix - updated again';
 
-is-deeply $g.MoveSetShowText(10.0, 20.0, "move-show-text"), ('"' => [ :real(10.0), :real(20.0), :literal<move-show-text> ] ), 'MoveSetShowText';
+is-deeply $g.MoveSetShowText(10.0, 20.0, "move-show-text"), ('"' => [ 10.0, 20.0, :literal<move-show-text> ] ), 'MoveSetShowText';
 
 is $g.WordSpacing, 10.0, '$g.WordSpacing - MoveSetShow';
 is $g.CharSpacing, 20.0, '$g.CharSpacing - MoveSetShow';
@@ -132,8 +132,8 @@ is-json-equiv $canvas<Resources><ExtGState><GS1>, { :Type<ExtGState>, :ca(0.4)},
 $g.FillAlpha = 1.0;
 is-json-equiv $canvas<Resources><ExtGState><GS2>, { :Type<ExtGState>, :ca(1.0)}, 'FillAlpha graphics resource';
 
-is-json-equiv $g.op('scn', 0.30, 'int' => 1, 0.21, 'P2'), (:scn[ :real(.30), :int(1), :real(.21), :name<P2> ]), 'scn';
-is-json-equiv $g.op('TJ', $[ 'hello', 42, 'world']), (:TJ[ :array[ :literal<hello>, :int(42), :literal<world> ] ]), 'TJ';
+is-json-equiv $g.op('scn', 0.30, 1, 0.21, 'P2'), (:scn[ .30, 1, .21, :name<P2> ]), 'scn';
+is-json-equiv $g.op('TJ', $[ 'hello', 42, 'world']), (:TJ[ :array[ :literal<hello>, 42, :literal<world> ] ]), 'TJ';
 is-json-equiv $g.SetStrokeColorSpace('DeviceGray'), (:CS[ :name<DeviceGray> ]), 'Named operator';
 dies-ok {$g.op('Tf', 42, 125)}, 'invalid argument dies';
 dies-ok {$g.op('Junk', 42)}, 'invalid operator dies';
@@ -160,7 +160,7 @@ lives-ok  { $g.RenderingIntent = 'Perceptual' };
 is $g.ops.tail, 'ri' => :name<Perceptual>, 'rendering intent - updated';
 is $g.Flatness, 0, 'Flatness, initial';
 lives-ok  { $g.Flatness = 50 };
-is $g.ops.tail, 'i' => :real(50), 'rendering intent - updated';
+is-deeply $g.ops.tail, 'i' => [50], 'rendering intent - updated';
 is $g.Flatness, 50, 'Flatness, updated';
 $g.Restore;
 
@@ -170,9 +170,9 @@ is $g.Flatness, 0, 'Flatness, restored';
 $g .= new: :$canvas;
 
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
-is-json-equiv $g.ops, [:m[:int(175), :int(720)],
-                       :l[:int(175), :int(700)],
-                       :v[:int(300), :int(800), :int(400), :int(720)],
+is-json-equiv $g.ops, [:m[175, 720],
+                       :l[175, 700],
+                       :v[300, 800, 400, 720],
                        :h[],
                        :S[],
     ], 'basic parse';
@@ -197,10 +197,10 @@ EI
 
 $g.ops($image-block);
 is-json-equiv $g.ops[*-3], {:BI[:dict{
-                                    :W(:int(17)),
-                                    :H(:int(17)),
+                                    :W(17),
+                                    :H(17),
                                     :CS(:name<RGB>),
-                                    :BPC(:int(8)),
+                                    :BPC(8),
                                     :F(:array[:name<A85>, :name<LZW>]),
                                      }]}, 'Image BI';
 
@@ -223,7 +223,7 @@ is-json-equiv $compile-time[*-1], (:ET[]), 'compile time ops parse';
 $g.ops( $compile-time);
 is-json-equiv [ $g.ops[*-4..*] ], [
     :BT[],
-    :Tf[:name<F1>, :int(16)],
+    :Tf[:name<F1>, 16],
     :Tj[:literal<Hi>],
     :ET[],
 ], 'Text block parse';
@@ -233,9 +233,9 @@ $g .= new( :comment, :$canvas);
 $g.ops("175 720 m 175 700 l 300 800 400 720 v h S");
 $g.add-comment("That's all♥!");
 is-json-equiv $g.ops, [
-    :m[:int(175), :int(720), :comment<MoveTo>, ],
-    :l[:int(175), :int(700), :comment<LineTo>, ],
-    :v[:int(300), :int(800), :int(400), :int(720), :comment<CurveToInitial>, ],
+    :m[175, 720, :comment<MoveTo>, ],
+    :l[175, 700, :comment<LineTo>, ],
+    :v[300, 800, 400, 720, :comment<CurveToInitial>, ],
     :h[ :comment<ClosePath>, ],
     :S[ :comment<Stroke>, ],
     :comment["That's all♥!"],
@@ -252,7 +252,7 @@ is-deeply $g.content-dump, $(
 
 my PDF::Content $g1 .= new: :$canvas;
 lives-ok {$g1.ops: $g.ops;}, "comments import - lives";
-is-json-equiv $g1.ops.head, (:m[ :int(175), :int(720), ]), 'comments import - head';
+is-json-equiv $g1.ops.head, (:m[ 175, 720, ]), 'comments import - head';
 is-json-equiv $g1.ops.tail(2).List, (:S[ ], :comment["That's all♥!"]), 'comments import - tail';
 
 $g.Save;
@@ -303,7 +303,7 @@ $g.Restore;
 
 my @painted = [
     :q[],
-        :re[:real(10), :real(10), :real(150), :real(100)],
+        :re[10, 10, 150, 100],
         :h[],
         :f[],
     :Q[]

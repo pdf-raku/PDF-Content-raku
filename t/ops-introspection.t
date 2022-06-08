@@ -52,7 +52,7 @@ is-json-equiv $g.graphics-state(:delta), %(), 'graphics-state :delta';
 $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
 is-json-equiv $g.ops, [
     :q[],
-    :cm[:real(10), :real(1), :real(15), :real(2), :real(3), :real(4)],
+    :cm[10, 1, 15, 2, 3, 4],
 ], '.ops)_';
 is PDF::IO::Writer.write-content($g.ops).lines, ('q', '10 1 15 2 3 4 cm'), 'PDF write content';
 is-deeply $g.content-dump, ('q', '10 1 15 2 3 4 cm'), 'content-dump';

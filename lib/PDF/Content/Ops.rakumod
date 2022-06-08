@@ -694,7 +694,7 @@ class PDF::Content::Ops {
         'TJ' => sub (Str $op, Array $args!) {
             my @array = $args.map({
                 when Str     { :literal($_) }
-                when Numeric { :int(.Int) }
+                when Numeric { .Int }
                 when Pair    { $_ }
                 default {die X::PDF::Content::OP::BadArrayArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_);}
             });
@@ -702,27 +702,24 @@ class PDF::Content::Ops {
         },
 
         # name num                Tf
-        'Tf' => sub (Str, Str $name!, Numeric $real!) {
-            [ :$name, :$real ]
+        'Tf' => sub (Str, Str $name!, Numeric $size!) {
+            [ :$name, $size ]
         },
 
         # tag [dict|name]         BDC | DP
         'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str|Pair) {
             my Pair $prop = do given $p {
-                when Hash { PDF::COS::Dict.new(:dict($p)).content }
+                when Hash { PDF::COS::Dict.COERCE($p).content }
                 when Str  { :name($p) }
             }
             [ :$name, $prop ]
         },
 
         # dashArray dashPhase    d
-        'd' => sub (Str $op, List $args!, Numeric $real!) {
-            my @array = $args.map({
-                when Numeric { :real($_) }
-                when Pair    { $_ }
-                default {die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_) }
-            });
-            [ :@array, :$real ];
+        'd' => sub (Str $op, @array!, Numeric $phase!) {
+            die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_)
+                                                                                             with @array.first: {$_ !~~ Numeric|Pair};
+            [ :@array, $phase ];
         },
 
         # flatness               i
@@ -734,33 +731,33 @@ class PDF::Content::Ops {
         # wordSpace              Tw
         # scale                  Tz
         # lineWidth              w
-        'i'|'g'|'G'|'M'|'Tc'|'TL'|'Ts'|'Tw'|'Tz'|'w' => sub (Str, Numeric $real!) {
-            [ :$real ]
+        'i'|'g'|'G'|'M'|'Tc'|'TL'|'Ts'|'Tw'|'Tz'|'w' => sub (Str, Numeric $val!) {
+            [ $val ]
         },
 
         # lineCap                J
         # lineJoin               j
         # render                 Tr
-        'j'|'J'|'Tr' => sub (Str, UInt $int!) {
-            [ :$int ]
+        'j'|'J'|'Tr' => sub (Str, UInt $val!) {
+            [ $val ]
         },
 
         # x y                    m l
         # wx wy                  d0
         # tx ty                  Td TD
         'd0'|'l'|'m'|'Td'|'TD' => sub (Str, Numeric $n1!, Numeric $n2!) {
-            [ :real($n1), :real($n2) ]
+            [ $n1, $n2 ]
         },
 
         # aw ac string           "
         '"' => sub (Str, Numeric $n1!, Numeric $n2!, Str $literal! ) {
-            [ :real($n1), :real($n2), :$literal ]
+            [ $n1, $n2, :$literal ]
         },
 
         # r g b                  rg | RG
         'rg'|'RG' => sub (Str, Numeric $n1!,
                           Numeric $n2!, Numeric $n3!) {
-            [ :real($n1), :real($n2), :real($n3) ]
+            [ $n1, $n2, $n3 ]
         },
 
         # c m y k                k | K
@@ -768,7 +765,7 @@ class PDF::Content::Ops {
         # x2 y2 x3 y3            v y
         'k'|'K'|'re'|'v'|'y' => sub (Str, Numeric $n1!, Numeric $n2!,
                                           Numeric $n3!, Numeric $n4!) {
-            [ :real($n1), :real($n2), :real($n3), :real($n4) ]
+            [ $n1, $n2, $n3, $n4 ]
         },
 
         # x1 y1 x2 y2 x3 y3      c | cm
@@ -776,7 +773,7 @@ class PDF::Content::Ops {
         # a b c d e f            Tm
         'c'|'cm'|'d1'|'Tm' => sub (Str,
             Numeric $n1!, Numeric $n2!, Numeric $n3!, Numeric $n4!, Numeric $n5!, Numeric $n6!) {
-            [ :real($n1), :real($n2), :real($n3), :real($n4), :real($n5), :real($n6) ]
+            [ $n1, $n2, $n3, $n4, $n5, $n6 ]
         },
 
         # c1, ..., cn             sc | SC
@@ -785,13 +782,8 @@ class PDF::Content::Ops {
             die X::PDF::Content::OP::TooFewArgs.new: :$op, :mnemonic(%OpName{$op})
                 unless @args;
 
-            @args .= map: {
-                when Pair    {$_}
-                when Numeric { :real($_) }
-                default {
-                    die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_);
-                }
-            };
+            die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_)
+                with @args.first: {$_ !~~ Numeric|Pair};
 
             @args
         },
@@ -807,13 +799,8 @@ class PDF::Content::Ops {
             my Str $name = @args.pop
                 if @args.tail ~~ Str;
 
-            @args .= map: {
-                when Pair    {$_}
-                when Numeric { :real($_) }
-                default {
-                    die X::PDF::Content::OP::BadArrayArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_);
-                }
-            };
+            die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_)
+                with @args.first: {$_ !~~ Numeric|Pair};
 
             @args.push: (:$name) if $name.defined;
 
@@ -885,7 +872,7 @@ class PDF::Content::Ops {
             my $op = .key;
             if %OpName{$op}:exists {
                 # known opereator with incorrect arguments
-                my @args = .value».value;
+                my @args = .value.map(&from-ast);
                 die X::PDF::Content::OP::BadArgs.new: :$op, :@args, :mnemonic(%OpName{$op}) ;
             }
             else {
@@ -907,7 +894,7 @@ class PDF::Content::Ops {
 	my Str $op = do given opn {
             when Comment { .key }
             when Pair {
-                @args = .value».value;
+                @args = .value.map(&from-ast);
                 .key.Str
             }
             default {
@@ -1034,7 +1021,7 @@ class PDF::Content::Ops {
     method parse(Str $content) {
 	use PDF::Grammar::Content::Fast;
 	use PDF::Grammar::Content::Actions;
-	my PDF::Grammar::Content::Actions:D $actions .= new;
+	my PDF::Grammar::Content::Actions:D $actions .= new: :lite;
 	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
 	    // die X::PDF::Content::ParseError.new :$content;
 	p.ast
