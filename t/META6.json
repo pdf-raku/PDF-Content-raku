@@ -6,6 +6,6 @@
   "provides": {
       "PDFTiny": "lib/PDFTiny.rakumod"
   },
-  "source-url": "git://github.com/p6-pdf/PDF-Content-p6.git",
+  "source-url": "git://github.com/pdf-raku/PDF-Content-raku.git",
   "version": "0.0.1"
 }
