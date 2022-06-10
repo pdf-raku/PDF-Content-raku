@@ -220,8 +220,9 @@ class PDF::Content::Font::CoreFont
                );
             $Encoding<BaseEncoding> = $_
                 with self!encoding-name;
-
-            $dict<Encoding> = $Encoding;
+            $!encoder.protect: {
+                $dict<Encoding> = $Encoding;
+            }
         }
 
         $dict;
