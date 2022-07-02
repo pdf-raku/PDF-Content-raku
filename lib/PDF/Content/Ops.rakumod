@@ -709,8 +709,11 @@ class PDF::Content::Ops {
         # tag [dict|name]         BDC | DP
         'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str|Pair) {
             my Pair $prop = do given $p {
-                when Hash { PDF::COS::Dict.COERCE($p).content }
-                when Str  { :name($p) }
+                when Hash {
+                    # bypass type coercements; create a plan dictionary object
+                    PDF::COS::Dict.new(:dict($_)).content
+                }
+                when Str  { :name($_) }
             }
             [ :$name, $prop ]
         },
