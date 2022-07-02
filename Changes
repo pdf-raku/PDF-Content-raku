@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.6.5  2022-07-03T07:54:38+12:00
+   - Protect a potential race in setting font encoding
+   - Revert loading of tag dictionaries from 0.6.4 release
+
 0.6.4  2022-06-09T09:35:37+12:00
    - Convert ops to PDF 0.5.8+ :lite AST
 
