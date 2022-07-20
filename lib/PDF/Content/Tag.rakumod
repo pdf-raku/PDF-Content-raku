@@ -49,7 +49,6 @@ my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Annotation<Annot>, :Ruby<Ruby>,  :RubyPunctuation<RP>,
     :RubyBaseText<RB>,  :RubyText<RT>,
     :Warichu<Warichu>,  :WarichuPunctuation<RP>, :WarichuText<RT>,
-    :Artifact<Artifact>,
 );
 
 my enum IllustrationTags is export(:IllustrationTags,:Tags) (
@@ -58,6 +57,7 @@ my enum IllustrationTags is export(:IllustrationTags,:Tags) (
 
 #| These tags are meaningful within content streams, as opposed to the structure-tree
 my enum ContentTags is export(:ContentTags,:Tags) (
+    :Artifact<Artifact>,
     :OptionalContent<OC>,  # [PDF 32000 8.11.3.2 Optional Content in Content Streams]
     :TagSuspect<TagSuspect>, :ReversedChars<ReversedChars>, # [PDF 32000 14.8.2 Tagged PDF and Page Content]
     :Clipped<Clip>, # [PDF 32000 14.6.3 Marked Content and Clipping
