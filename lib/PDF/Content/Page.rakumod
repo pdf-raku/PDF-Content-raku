@@ -43,9 +43,12 @@ role PDF::Content::Page
 
     #| produce an XObject form for this page
     method to-xobject($page = self, Array :$BBox = $page.trim-box.clone) {
-        my $Resources = ($page.Resources // {}).clone,
+        my %Resources;
+        with $page.Resources -> $r {
+            %Resources{$_} = $r{$_} for $r.keys;
+        }
 	# copy unflushed graphics
-        my $xobject = self.xobject-form( :$BBox, :$Resources);
+        my $xobject = self.xobject-form( :$BBox, :%Resources);
         $xobject.pre-gfx.ops($page.pre-gfx.ops);
         $xobject.gfx.ops($page.gfx.ops);
 

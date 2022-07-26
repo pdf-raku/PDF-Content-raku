@@ -1,4 +1,5 @@
 {{$NEXT}}
+   - Fix page to-object() form construction
 
 0.6.5  2022-07-03T07:54:38+12:00
    - Protect a potential race in setting font encoding

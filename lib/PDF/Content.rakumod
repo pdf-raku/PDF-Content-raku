@@ -398,7 +398,7 @@ class PDF::Content:ver<0.6.5>
     use PDF::Content::Matrix :&dot;
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
-            @coords.map: -> $x is copy, $y is copy {
+            my @ = @coords.map: -> $x is copy, $y is copy {
                 ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
                 slip($user ?? $.CTM.&dot($x, $y) !! ($x, $y));
             }
