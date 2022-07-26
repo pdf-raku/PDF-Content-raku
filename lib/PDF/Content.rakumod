@@ -1,6 +1,6 @@
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState, :Vector;
 
-class PDF::Content:ver<0.6.5>
+class PDF::Content:ver<0.6.6>
     is PDF::Content::Ops {
 
     use PDF::COS;
