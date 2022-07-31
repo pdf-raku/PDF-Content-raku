@@ -13,6 +13,7 @@ use PDFTiny;
 my $dummy-font = %() does role { method cb-finish {} }
 
 my %gs-initial = %(
+    :BlendMode<Normal>,
     :CTM[1, 0, 0, 1, 0, 0],
     :CharSpacing(0),
     :DashPattern[[], 0],
