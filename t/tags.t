@@ -41,14 +41,18 @@ $page.graphics: -> $gfx {
             .do: $img, :position[50,70];
         }
 
+        .tag: Span, :Lang<es-MX>, {
+            .say('Hasta la vista', :position[50, 80]);
+        }
+
     }
 
     is $tag.name, 'P', 'outer tag name';
     is $tag.kids[0].name, 'Figure', 'inner tag name';
-    is-deeply $gfx.actual-text.lines, ('Header text', 'Paragraph that contains a figure'), '$.actual-text';
+    is-deeply $gfx.actual-text.lines, ('Header text', 'Paragraph that contains a figure', 'Hasta la vista'), '$.actual-text';
 }
 
-is $page.gfx.tags.gist, '<H1 MCID="0"><Artifact/></H1><P MCID="1"><Figure/></P>';
+is $page.gfx.tags.gist, '<H1 MCID="0"><Artifact/></H1><P MCID="1"><Figure/><Span Lang="es-MX"/></P>';
 
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
@@ -59,6 +63,6 @@ lives-ok { $pdf.save-as: "t/tags.pdf" }
 
 $pdf .= open: "t/tags.pdf";
 
-is $pdf.page(1).render.tags.gist, '<H1 MCID="0"><Artifact/></H1><P MCID="1"><Figure/></P>';
+is $pdf.page(1).render.tags.gist, '<H1 MCID="0"><Artifact/></H1><P MCID="1"><Figure/><Span Lang="es-MX"/></P>';
 
 done-testing;
