@@ -185,17 +185,17 @@ class PDF::Content::Ops {
     »;
     constant %ExtGState = ExtGState.enums.Hash;
 
-    my Int enum TextMode is export(:TextMode) «
+    our Int enum TextMode is export(:TextMode) «
 	:FillText(0) :OutlineText(1) :FillOutlineText(2)
         :InvisableText(3) :FillClipText(4) :OutlineClipText(5)
         :FillOutlineClipText(6) :ClipText(7)
     »;
 
-    my Int enum LineCaps is export(:LineCaps) «
+    our Int enum LineCaps is export(:LineCaps) «
 	:ButtCaps(0) :RoundCaps(1) :SquareCaps(2)
     »;
 
-    my Int enum LineJoin is export(:LineJoin) «
+    our Int enum LineJoin is export(:LineJoin) «
 	:MiterJoin(0) :RoundJoin(1) :BevelJoin(2)
     »;
 
