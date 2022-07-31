@@ -335,6 +335,7 @@ class PDF::Content::Ops {
                     with .<LJ>   { $!LineJoin = $_ }
                     with .<LW>   { $!LineWidth = $_ }
                     with .<RI>   { $!RenderingIntent = $_ }
+                    with .<BM>   { $!BlendMode = $_ }
                 }
                 else {
                     die X::PDF::Content::UnknownResource.new: :type<ExtGState>, :$key;
@@ -535,8 +536,9 @@ class PDF::Content::Ops {
     has FlatnessTolerance $.Flatness is graphics is stored(method ($!Flatness)  {}) is rw = 0;
 
     # *** Extended Graphics STATE ***
-    has $.StrokeAlpha is ext-graphics is rw = 1.0;
-    has $.FillAlpha   is ext-graphics is rw = 1.0;
+    has Numeric $.StrokeAlpha is ext-graphics is rw = 1.0;
+    has Numeric $.FillAlpha   is ext-graphics is rw = 1.0;
+    has Str $.BlendMode is ext-graphics is rw = 'Normal';
 
     method tags handles<open-tag close-tag add-tag open-tags closed-tag artifact descendants> {
         $!canvas.tags;

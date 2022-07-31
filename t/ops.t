@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 113;
+plan 117;
 
 use lib 't';
 use PDF;
@@ -166,6 +166,13 @@ $g.Restore;
 
 is $g.RenderingIntent, 'RelativeColorimetric', 'RenderingIntent, restored';
 is $g.Flatness, 0, 'Flatness, restored';
+
+$g.Save;
+is $g.BlendMode, 'Normal', 'initial BlendMode';
+lives-ok {$g.BlendMode = 'Multiply'}, 'set BlendMode';
+is $g.BlendMode,'Multiply', 'get BlendMode';
+$g.Restore;
+is $g.BlendMode, 'Normal', 'restored BlendMode';
 
 $g .= new: :$canvas;
 
