@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.6.7  2022-08-03T08:36:45+12:00
    - Added MiterLimit and BlendMode graphics variables
 
 0.6.6  2022-07-26T16:44:19+12:00
