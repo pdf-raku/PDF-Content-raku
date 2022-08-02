@@ -336,6 +336,7 @@ class PDF::Content::Ops {
                     with .<LW>   { $!LineWidth = $_ }
                     with .<RI>   { $!RenderingIntent = $_ }
                     with .<BM>   { $!BlendMode = $_ }
+                    with .<ML>   { $!MiterLimit = $_ }
                 }
                 else {
                     die X::PDF::Content::UnknownResource.new: :type<ExtGState>, :$key;
@@ -539,6 +540,7 @@ class PDF::Content::Ops {
     has Numeric $.StrokeAlpha is ext-graphics is rw = 1.0;
     has Numeric $.FillAlpha   is ext-graphics is rw = 1.0;
     has Str $.BlendMode is ext-graphics is rw = 'Normal';
+    has Numeric $.MiterLimit is graphics is stored(method ($!MiterLimit) {}) is rw = 10.0;
 
     method tags handles<open-tag close-tag add-tag open-tags closed-tag artifact descendants> {
         $!canvas.tags;

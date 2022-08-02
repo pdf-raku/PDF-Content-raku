@@ -1,4 +1,5 @@
 {{$NEXT}}
+   - Added MiterLimit and BlendMode graphics variables
 
 0.6.6  2022-07-26T16:44:19+12:00
    - Fix page to-object() form construction
