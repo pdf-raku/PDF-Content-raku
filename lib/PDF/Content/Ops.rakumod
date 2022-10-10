@@ -878,7 +878,7 @@ class PDF::Content::Ops {
         given .value {
             my $op = .key;
             if %OpName{$op}:exists {
-                # known opereator with incorrect arguments
+                # known operator with incorrect arguments
                 my @args = .value.map(&from-ast);
                 die X::PDF::Content::OP::BadArgs.new: :$op, :@args, :mnemonic(%OpName{$op}) ;
             }
@@ -1115,13 +1115,14 @@ class PDF::Content::Ops {
         self.op(OpCode::SetDashPattern, $args, $phase);
     }
     #-- avoid flattening issues on lists
-    method FALLBACK(\name, |c) {
-        with %OpCode{name} -> \op {
+    method FALLBACK($method, |c) {
+        with %OpCode{$method} -> \op-code {
             # e.g. $.Restore :== $.op('Q', [])
-            self.op(op, |c);
+            self.op(op-code, |c);
         }
         else {
-            die X::Method::NotFound.new( :method(name), :typename(self.^name) );
+            my $typename := self.^name;
+            die X::Method::NotFound.new: :$method, :$typename;
         }
     }
 }
