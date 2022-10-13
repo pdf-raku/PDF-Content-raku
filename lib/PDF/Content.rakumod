@@ -380,10 +380,6 @@ class PDF::Content:ver<0.6.7>
         nextwith( $text, :$font, |c);
     }
 
-    multi method canvas(&mark-up!, |c ) is DEPRECATED<html-canvas> {
-        self.html-canvas(&mark-up, |c );
-    }
-
     method html-canvas(&mark-up!, |c ) {
         my $html-canvas := PDF::COS.required('HTML::Canvas').new;
         $html-canvas.context(&mark-up);

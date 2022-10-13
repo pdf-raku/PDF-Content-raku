@@ -99,7 +99,6 @@ class PDF::Content::Ops {
     has Bool  $.trace   is rw = False;
     has Bool  $.strict  is rw = True;
     has $.canvas handles <resource-key resource-entry core-font use-font resources xobject-form tiling-pattern use-pattern width height> is required;
-    multi method canvas { $!canvas }
     method parent is DEPRECATED<canvas> { $!canvas }
     method owner  is DEPRECATED<canvas> { $!canvas }
     has UInt $.extended-ops = 0;
