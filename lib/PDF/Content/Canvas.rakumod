@@ -27,7 +27,6 @@ method use-mcid(UInt:D $_) {
 method next-mcid { $!mcid++ }
 
 method canvas(&code) is DEPRECATED<html-canvas> { self.html-canvas(&code) }
-method html-canvas(&code) { self.gfx.html-canvas( &code ) }
 
 #| Fix nesting issues that aren't illegal, but could cause problems:
 #| - append any missing 'Q' (Restore) operators at end of stream
@@ -59,11 +58,9 @@ method !tidy(@ops) {
     @ops;
 }
 
-method gfx(|c) {
+method gfx(|c) handles<html-canvas graphics text> {
     $!gfx //= self.new-gfx(|c);
 }
-method graphics(&code) { self.gfx.graphics( &code ) }
-method text(&code)     { self.gfx.text( &code ) }
 
 method contents-parse {
     PDF::Content.parse($.contents);
