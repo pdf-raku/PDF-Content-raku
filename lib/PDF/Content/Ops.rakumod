@@ -541,7 +541,7 @@ class PDF::Content::Ops {
     has Str $.BlendMode is ext-graphics is rw = 'Normal';
     has Numeric $.MiterLimit is graphics is stored(method ($!MiterLimit) {}) is rw = 10.0;
 
-    method tags handles<open-tag close-tag add-tag open-tags closed-tag artifact descendants> {
+    method tags handles<open-tag close-tag add-tag open-tags closed-tag artifact reversed-chars descendants> {
         $!canvas.tags;
     }
 

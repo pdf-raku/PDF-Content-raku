@@ -154,9 +154,11 @@ my class TagSetBuilder is PDF::Content::Tag::Set {
     has PDF::Content::Tag @.open-tags;            # currently open descendant tags
     has PDF::Content::Tag $.closed-tag;
     has UInt $.artifact is built;
+    has UInt $.reversed-chars is built;
 
     method open-tag(PDF::Content::Tag $tag) {     # open a new descendant
         $!artifact++ if $tag.name eq 'Artifact';
+        $!reversed-chars++ if $tag.name eq 'ReversedChars';
         with @!open-tags.tail {
             .add-kid: $tag;
         }
@@ -166,6 +168,7 @@ my class TagSetBuilder is PDF::Content::Tag::Set {
     method close-tag {                            # close innermost descendant
         $!closed-tag = @!open-tags.pop;
         $!artifact-- if $!closed-tag.name eq 'Artifact';
+        $!reversed-chars-- if $!closed-tag.name eq 'ReversedChars';
         @.tags.push: $!closed-tag
             without $!closed-tag.parent;
         $!closed-tag;
