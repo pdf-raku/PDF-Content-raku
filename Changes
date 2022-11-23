@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.6.8  2022-11-24T09:55:04+13:00
    - Handle /ReversedChars tags in content stream.
    - Fix setting text-position, when only X is specified.
 
