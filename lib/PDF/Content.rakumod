@@ -1,4 +1,4 @@
-use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState, :Vector;
+use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 
 class PDF::Content:ver<0.6.7>
     is PDF::Content::Ops {
@@ -10,6 +10,7 @@ class PDF::Content:ver<0.6.7>
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
     use PDF::Content::FontObj;
+    use are;
 
     has Str $.actual-text is rw;
 
@@ -18,6 +19,7 @@ class PDF::Content:ver<0.6.7>
     my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
     my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
     my subset Position of List where { .elems <= 2 }
+    my subset Vector of Position  where {.&are ~~ Numeric }
 
     method graphics( &meth! ) {
         $.op(Save);
@@ -266,10 +268,11 @@ class PDF::Content:ver<0.6.7>
         );
     }
 
-    method !set-position($text-block, $position,
-                         Bool :$left! is rw,
-                         Bool :$top! is rw) {
-        my $x;
+    method !set-position(
+        $text-block, $position,
+        Bool :$left! is rw,
+        Bool :$top! is rw) {
+        my Numeric $x;
         with $position[0] {
             when Numeric {$x = $_}
             when XPos-Pair {
@@ -278,7 +281,7 @@ class PDF::Content:ver<0.6.7>
                 $left = True; # position from left
             }
         }
-        my $y;
+        my Numeric $y;
         with $position[1] {
             when Numeric {$y = $_}
             when YPos-Pair {
