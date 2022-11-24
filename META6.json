@@ -6,7 +6,6 @@
   "build-depends": [
   ],
   "depends": [
-    "are",
     "Base64::Native",
     "Color",
     "Compress::Zlib::Raw",
