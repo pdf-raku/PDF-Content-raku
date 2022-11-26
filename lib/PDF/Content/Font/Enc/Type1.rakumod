@@ -8,7 +8,7 @@ use PDF::Content::Font::Enc::Glyphic;
 #| that have not been used.
 class PDF::Content::Font::Enc::Type1
     does PDF::Content::Font::Enc::Glyphic {
-    use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :zapf-glyphs, :mac-extra-encoding;
+    use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :mac-extra-encoding;
     has UInt %!from-unicode{UInt};  #| all encoding mappings
     has UInt %.charset{UInt}; #| used characters (useful for subsetting)
     has uint16 @.to-unicode[256];
@@ -25,9 +25,6 @@ class PDF::Content::Font::Enc::Type1
 
     submethod TWEAK {
         my array $encoding = %Encoding{$!enc};
-
-	self.glyphs = $zapf-glyphs
-            if $!enc eq 'zapf';
 
         @!to-unicode = $encoding.list;
         my uint16 @allocated-cids;

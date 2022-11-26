@@ -236,6 +236,7 @@ class PDF::Content:ver<0.6.8>
         &meth(self);
         my \rv = self.paint: |%o;
         self.Restore;
+        rv;
     }
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}

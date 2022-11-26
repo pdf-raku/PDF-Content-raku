@@ -1,7 +1,6 @@
 #| base role for non-cid glyph name lookup
 role PDF::Content::Font::Enc::Glyphic {
-    use Font::AFM;
-    has Hash $.glyphs is rw = %Font::AFM::Glyphs;
+    has Hash $.glyphs is required;
     use PDF::COS;
     use PDF::COS::Name;
     my subset NameOrUInt where PDF::COS::Name|UInt;
@@ -9,7 +8,7 @@ role PDF::Content::Font::Enc::Glyphic {
 
     # Get the standard glyph name
     method lookup-glyph(UInt $ord --> Str) {
-        $!glyphs{$ord.chr} // Str
+        $!glyphs{$ord.chr} // Str;
     }
 
     method local-glyph-name(UInt $cid) {

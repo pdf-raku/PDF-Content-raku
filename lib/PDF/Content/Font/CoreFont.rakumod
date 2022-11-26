@@ -2,7 +2,7 @@ use PDF::Content::FontObj;
 
 class PDF::Content::Font::CoreFont
     does PDF::Content::FontObj {
-    use Font::AFM:ver(v1.23.5+);
+    use Font::AFM;
     use PDF::Content::Font;
     use PDF::Content::Font::Enc::Type1;
     use PDF::COS::Dict;
@@ -12,13 +12,19 @@ class PDF::Content::Font::CoreFont
     has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode enc>;
     has PDF::Content::Font $!dict;
     class Cache {
+        use PDF::Content::Font::Encodings :zapf-glyphs;
+        constant %CharSet = %Font::AFM::Glyphs.invert.Hash;
+
         has Lock $!lock .= new;
         has %!fonts;
         method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, |c) {
             $!lock.protect: {
                 %!fonts{$font-name.lc~'-*-'~$enc} //= do {
-                    my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc;
                     my $metrics = Font::AFM.core-font( $font-name );
+                    my Str %glyphs = $font-name eq 'zapfdingbats'
+                        ?? %$zapf-glyphs
+                        !! $metrics.Wx.keys.map: {%CharSet{$_} => $_ };
+                    my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc, :%glyphs;
                     $class.new( :$encoder, :$metrics, |c);
                 }
             }
