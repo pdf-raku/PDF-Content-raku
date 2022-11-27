@@ -1,5 +1,9 @@
 {{$NEXT}}
-   - Fix over-zealous font encoding
+
+0.6.9  2022-11-28T07:27:39+13:00
+   - Fix font over-encoding of glyphs not actually present in
+     particular core fonts,
+   - Restore backwards compatibility to Rakudo 2011.12
 
 0.6.8  2022-11-24T09:55:04+13:00
    - Handle /ReversedChars tags in content stream.
