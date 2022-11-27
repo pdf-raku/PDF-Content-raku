@@ -1,6 +1,7 @@
 #| base role for non-cid glyph name lookup
 role PDF::Content::Font::Enc::Glyphic {
-    has Hash $.glyphs is required;
+    use Font::AFM;
+    has Hash $.glyphs = %Font::AFM::Glyphs;
     use PDF::COS;
     use PDF::COS::Name;
     my subset NameOrUInt where PDF::COS::Name|UInt;
