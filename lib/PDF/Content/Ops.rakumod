@@ -89,7 +89,6 @@ class PDF::Content::Ops {
     use PDF::Content::Matrix :inverse, :multiply, :is-identity, :TransformMatrix;
     use PDF::Content::Tag;
     use JSON::Fast;
-    use are;
 
     has Block @.callback is rw;
     has Pair  @.ops;
@@ -857,7 +856,7 @@ class PDF::Content::Ops {
         $op-name ∈ GraphicsOps;
     }
 
-    my subset Vector of List is export(:Vector) where {.elems == 2 && .&are ~~ Numeric}
+    my subset Vector of List is export(:Vector) where {.elems == 2 && .are ~~ Numeric}
     method current-point is rw returns Vector {
         Proxy.new(
             FETCH => {
