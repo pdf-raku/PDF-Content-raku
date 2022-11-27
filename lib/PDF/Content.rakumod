@@ -10,6 +10,7 @@ class PDF::Content:ver<0.6.8>
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
     use PDF::Content::FontObj;
+    use are;
 
     has Str $.actual-text is rw;
 
@@ -18,7 +19,7 @@ class PDF::Content:ver<0.6.8>
     my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
     my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
     my subset Position of List where { .elems <= 2 }
-    my subset Vector of Position  where {.are ~~ Numeric }
+    my subset Vector of Position  where { .&are ~~ Numeric }
 
     method graphics( &meth! ) {
         $.op(Save);
