@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 54;
+plan 59;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -19,6 +19,11 @@ is $tr-bold.font-name, 'Times-Bold', 'font-name';
 my PDF::Content::Font::CoreFont $tsym .= load-font( :family<Symbol>, :weight<bold>);
 is $tsym.font-name, 'Symbol', 'font-name';
 is $tsym.enc, 'sym', 'enc';
+isa-ok $tsym.metrics, 'Font::AFM';
+is $tsym.font-name, 'Symbol', 'font-name';
+is $tsym.encode("A♥♣✔B"), "\x[A9]\x[A7]", '.encode(...) sanity';
+is $tsym.decode("\x[A9]\x[A7]"), "♥♣", '.decode(...) sanity';
+is-deeply $tsym.encoder.charset, (my UInt %{UInt} = '♥'.ord => 0xA9, '♣'.ord => 0xA7), 'charset';
 
 my PDF::Content::Font::CoreFont $hb-afm .= load-font( 'Helvetica-Bold' );
 isa-ok $hb-afm.metrics, 'Font::AFM';
@@ -37,7 +42,7 @@ is-deeply $hb-afm.encoder.charset, (my UInt %{UInt} = 'A'.ord => 'A'.ord, 'B'.or
 is-json-equiv $hb-afm.encoder.differences, (), 'differences';
 
 my PDF::Content::Font::CoreFont $ab-afm .= load-font( 'Arial-Bold' );
-isa-ok $ab-afm.metrics, 'Font::AFM'; 
+isa-ok $ab-afm.metrics, 'Font::AFM';
 is $ab-afm.font-name, 'Helvetica-Bold', 'font-name';
 is $ab-afm.encode("A♥♣✔B"), "AB", '.encode(...) sanity';
 
