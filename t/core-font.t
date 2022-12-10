@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 59;
+plan 58;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -20,7 +20,6 @@ my PDF::Content::Font::CoreFont $tsym .= load-font( :family<Symbol>, :weight<bol
 is $tsym.font-name, 'Symbol', 'font-name';
 is $tsym.enc, 'sym', 'enc';
 isa-ok $tsym.metrics, 'Font::AFM';
-is $tsym.font-name, 'Symbol', 'font-name';
 is $tsym.encode("A♥♣✔B"), "\x[A9]\x[A7]", '.encode(...) sanity';
 is $tsym.decode("\x[A9]\x[A7]"), "♥♣", '.decode(...) sanity';
 is-deeply $tsym.encoder.charset, (my UInt %{UInt} = '♥'.ord => 0xA9, '♣'.ord => 0xA7), 'charset';

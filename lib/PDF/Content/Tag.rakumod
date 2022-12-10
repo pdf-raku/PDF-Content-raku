@@ -11,7 +11,7 @@ has Str $.name is rw;
 has Str $.op;
 has %.attributes;
 has $.canvas is required;
-method owner  is DEPRECATED<canvas> { $!canvas }
+method owner is DEPRECATED<canvas> { $!canvas }
 has UInt $.start is rw;
 has UInt $.end is rw;
 has UInt $.mcid is rw; # marked content identifer
