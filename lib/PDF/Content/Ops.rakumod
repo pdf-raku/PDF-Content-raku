@@ -973,6 +973,7 @@ class PDF::Content::Ops {
             when 'd0'          { %(:$!char-width, :$!char-height) }
             when 'd1'          { %(:$!char-width, :$!char-height, :@!char-bbox) }
             when 'Q'|'gs'      { $.graphics-state(:delta); }
+            when 'cm'          { %( :@!CTM ) }
             default {
                 my $value = Nil;
                 my $op-name := %OpName{$op};
