@@ -7,6 +7,8 @@ role PDF::Content::PageTree
     use PDF::Content::PageNode;
     use PDF::COS::Dict;
     use PDF::COS::Name;
+    use Method::Also;
+
     my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids && .[0] ~~ PDF::Content::PageNode;
     sub name(PDF::COS::Name() $_) { $_ }
 
@@ -148,7 +150,7 @@ role PDF::Content::PageTree
         die "unable to locate page: $page-num";
     }
 
-    method page-count returns UInt { self.Count }
+    method page-count is also<Int> returns UInt { self.Count }
 
     # iterates all child page nodes
     method iterate-pages(PDF::Content::PageTree:D $node:) {
