@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.6.10  2023-03-15T07:04:53+13:00
    - Add PDF::Content::API role. A set of base methods for
      content APIs (PDF::Class, PDF::Lite).
    - Make to-landscape() available as an exportable sub

@@ -7,7 +7,6 @@ role PDF::Content::Page
     use PDF::COS::Tie;
     use PDF::COS::Stream;
     use PDF::Content::XObject;
-    use PDF::Content::Font::CoreFont;
 
     my Array enum PageSizes is export(:PageSizes) «
 	    :Letter[0,0,612,792]
