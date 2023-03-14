@@ -1,4 +1,7 @@
 {{$NEXT}}
+   - Add PDF::Content::API role. A set of base methods for
+     content APIs (PDF::Class, PDF::Lite).
+   - Make to-landscape() available as an exportable sub
 
 0.6.9  2022-11-28T07:27:39+13:00
    - Fix font over-encoding of glyphs not actually present in

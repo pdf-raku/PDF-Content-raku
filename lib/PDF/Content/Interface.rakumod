@@ -1,13 +1,18 @@
-# top-level content-related PDF actions as performed by PDF::Class,
-# PDF::Lite (and PDF::API6)
+#| deprecated - use PDF::Content::API;
 unit role PDF::Content::Interface;
 
 # I/O
 method open { ... }
 method update { ... }
 method save-as { ... }
+method encrypt { ... }
+## method is-encrypted { ... }
 method Root {...}
-# pages
+method Str { ... }
+method Blob { ... }
+method ast { ... }
+
+# page tree
 method Pages {...}
 method page {...}
 method add-page {...}
@@ -15,12 +20,15 @@ method delete-page {...}
 method insert-page {...}
 method page-count {...}
 method rotate { ... }
+method iterate-pages { ... }
+
 # media boxes
 method media-box { ... }
 method crop-box { ... }
 method bleed-box { ... }
 method trim-box { ... }
 method art-box { ... }
+method bleed { ... }
+
 # fonts
-method core-font { ... }
 method use-font { ... }

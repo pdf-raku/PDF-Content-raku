@@ -7,6 +7,7 @@ role PDF::Content::Page
     use PDF::COS::Tie;
     use PDF::COS::Stream;
     use PDF::Content::XObject;
+    use PDF::Content::Font::CoreFont;
 
     my Array enum PageSizes is export(:PageSizes) «
 	    :Letter[0,0,612,792]
@@ -26,6 +27,13 @@ role PDF::Content::Page
 	    :Folio[0,0,612,936]
 	    :Quarto[0,0,610,780]
 	»;
+
+    my subset Box of List is export(:Box) where {.elems == 4}
+
+    #| e.g. $.to-landscape(PagesSizes::A4)
+    sub to-landscape(Box $p --> Box) is export(:to-landscape) {
+	[ $p[1], $p[0], $p[3], $p[2] ]
+    }
 
     method contents returns Str {
         with self<Contents> {

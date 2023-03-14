@@ -1,15 +1,13 @@
 role PDF::Content::PageNode {
     use PDF::COS::Tie::Hash;
-    use PDF::Content::Page :PageSizes;
+    use PDF::Content::Page :PageSizes, :Box, :&to-landscape;
     use PDF::Content::XObject :&from-origin;
 
     #| source: http://www.gnu.org/software/gv/
-    my subset Box of List where {.elems == 4}
     my subset BoxOrStr where Box|Str;
 
-    #| e.g. $.to-landscape(PagesSizes::A4)
-    method to-landscape(Box $p --> Box) {
-	[ $p[1], $p[0], $p[3], $p[2] ]
+    method to-landscape(Box $p = self.bbox --> Box) {
+        to-landscape($p);
     }
 
     my constant %BBoxEntry = %(
