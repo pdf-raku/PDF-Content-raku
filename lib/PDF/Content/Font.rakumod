@@ -4,14 +4,14 @@ role PDF::Content::Font {
     use PDF::Content::FontObj;
     has PDF::Content::FontObj $.font-obj is rw handles <encode decode protect filter font-name height kern stringwidth underline-position underline-thickness>;
 
-    multi method make-font(::?ROLE:D $font-dict, PDF::Content::FontObj $font-obj) {
+    multi method make-font(::?ROLE:D $font-dict, PDF::Content::FontObj:D $font-obj) {
         $font-dict.make-font($font-obj);
     }
-    multi method make-font(::?ROLE:U: PDF::COS::Dict:D $font-dict, PDF::Content::FontObj $font-obj) {
+    multi method make-font(::?ROLE:U: PDF::COS::Dict:D $font-dict, PDF::Content::FontObj:D $font-obj) {
         $font-dict.^mixin: PDF::Content::Font;
         $font-dict.make-font($font-obj);
     }
-    multi method make-font(::?ROLE:D: PDF::Content::FontObj $!font-obj) {
+    multi method make-font(::?ROLE:D: PDF::Content::FontObj:D $!font-obj) {
         self;
     }
     # formally needed by PDF::Class (PDF::Font::Type1)
