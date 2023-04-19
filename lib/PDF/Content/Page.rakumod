@@ -29,9 +29,14 @@ role PDF::Content::Page
 
     my subset Box of List is export(:Box) where {.elems == 4}
 
+    proto to-landscape($) is export(:to-landscape) {*}
     #| e.g. $.to-landscape(PagesSizes::A4)
-    sub to-landscape(Box $p --> Box) is export(:to-landscape) {
+    multi sub to-landscape(Box $p --> Box) {
 	[ $p[1], $p[0], $p[3], $p[2] ]
+    }
+    multi sub to-landscape(Str $size) is hidden-from-backtrace {
+        my Array $rect = PageSizes::{$size} // die "Unknown named page size '$size' (expected: {PageSizes::.keys.sort.join: ', '})";
+        to-landscape($rect);
     }
 
     method contents returns Str {
