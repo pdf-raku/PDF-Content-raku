@@ -5,7 +5,7 @@ use PDF::COS::Array;
 use PDF::COS::Dict;
 use PDF::COS::Stream;
 
-our class Set {...}
+our class NodeSet {...}
 
 has Str $.name is rw;
 has Str $.op;
@@ -17,7 +17,7 @@ has UInt $.end is rw;
 has UInt $.mcid is rw; # marked content identifer
 has PDF::COS::Stream $.content;
 has PDF::Content::Tag $.parent is rw; # hierarchical parent
-has Set $.kids handles<AT-POS list grep map tags children elems> .= new;
+has NodeSet $.kids handles<AT-POS list grep map tags children elems> .= new;
 
 #| See [PDF 32000 Tables 333 - Standard structure types for grouping elements]
 my enum StructureTags is export(:StructureTags,:Tags) (
@@ -99,7 +99,7 @@ method take-descendants {
 
 method descendants { gather self.take-descendants }
 
-our class Set {
+our class NodeSet {
     my subset Node where PDF::Content::Tag | Str;
     has Node @.tags handles<grep map AT-POS Bool shift push elems>;
 

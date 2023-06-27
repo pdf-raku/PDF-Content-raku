@@ -150,7 +150,7 @@ method save-as-image(ImageFile $outfile, |c) {
     ::('PDF::To::Cairo').save-as-image(self, $outfile, |c);
 }
 # *** Marked Content Tags ***
-my class TagSetBuilder is PDF::Content::Tag::Set {
+my class TagSetBuilder is PDF::Content::Tag::NodeSet {
     has PDF::Content::Tag @.open-tags;            # currently open descendant tags
     has PDF::Content::Tag $.closed-tag;
     has UInt $.artifact is built;
