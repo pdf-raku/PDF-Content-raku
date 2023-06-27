@@ -6,12 +6,14 @@ class PDF::Content::Text::Box {
     use PDF::Content::Ops :OpCode, :TextMode;
     use PDF::Content::XObject;
 
+    my subset Alignment of Str is export(:Alignment) where 'left'|'center'|'right'|'justify';
+    my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
+
     has Numeric $.width;
     has Numeric $.height;
     has Numeric $.indent = 0;
-    my subset Alignment of Str is export(:Alignment) where 'left'|'center'|'right'|'justify';
+
     has Alignment $.align = 'left';
-    my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'center'|'bottom';
     has VerticalAlignment $.valign = 'top';
     has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness>;
     has PDF::Content::Text::Line @.lines is built;
@@ -278,9 +280,9 @@ class PDF::Content::Text::Box {
     method place-images($gfx) {
         for self.images {
             $gfx.Save;
-            $gfx.ConcatMatrix(|.<Tm>);
+            $gfx.ConcatMatrix: |.<Tm>;
             .<xobject>.finish;
-            $gfx.XObject($gfx.resource-key(.<xobject>));
+            $gfx.XObject: $gfx.resource-key(.<xobject>);
             $gfx.Restore;
         }
     }
