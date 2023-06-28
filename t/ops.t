@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 123;
+plan 126;
 
 use lib 't';
 use PDF;
@@ -289,12 +289,18 @@ $g.ConcatMatrix(1,0,0,1,75,-25,);
 is-deeply [ $g.CTM.list ], [2, 0, 0, 2, 150, 742], "chained matrix transforms";
 $g.text: {
     .text-position = 5, 10;
+
     ($x, $y) = $g.base-coords(80, -100);
     is-deeply ($x, $y), (310, 542), 'graphics to base user coordinates';
+    is-deeply $g.user-coords($x, $y).List, (80.0, -100.0);
+
     ($x, $y) = $g.base-coords(80, -100, :text);
     is-deeply ($x, $y), (320, 562), 'graphics+text to base user coordinates, :text';
+    is-deeply $g.user-coords($x, $y, :text).List, (80.0, -100.0);
+
     ($x, $y) = $g.base-coords(80, -100, :!user);
     is-deeply ($x, $y), (85, -90), 'text to graphics coordinates';
+    is-deeply $g.user-coords($x, $y, :!user).List, (80.0, -100.0);
 }
 $g.Restore;
 

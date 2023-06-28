@@ -5,7 +5,7 @@
 endobj
 
 2 0 obj
-<< /Type /Pages /Count 1 /Kids [ 3 0 R ] >>
+<< /Type /Pages /Count 2 /Kids [ 3 0 R 6 0 R ] >>
 endobj
 
 3 0 obj
@@ -59,16 +59,52 @@ endobj
 >>
 endobj
 
+6 0 obj
+<<
+  /Type /Page
+  /Contents 7 0 R
+  /MediaBox [ 0 0 612 792 ]
+  /Parent 2 0 R
+  /Resources << /Font << /F1 8 0 R >> /Procset [ /PDF /Text ] >>
+>>
+endobj
+
+7 0 obj
+<< /Length 88 >> stream
+q
+  BT
+    /F1 24 Tf
+    1 0 0 1 15 25 Tm
+    (Bye for now) Tj
+    26.4 TL
+    T*
+  ET
+Q
+endstream
+endobj
+
+8 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+  /Encoding /MacRomanEncoding
+>>
+endobj
+
 xref
-0 6
+0 9
 0000000000 65535 f 
 0000000015 00000 n 
 0000000065 00000 n 
-0000000125 00000 n 
-0000000264 00000 n 
-0000000751 00000 n 
+0000000131 00000 n 
+0000000270 00000 n 
+0000000757 00000 n 
+0000000868 00000 n 
+0000001031 00000 n 
+0000001170 00000 n 
 trailer
-<< /ID [ (t/text-box.t    ) (t/text-box.t    ) ] /Root 1 0 R /Size 6 >>
+<< /ID [ (t/text-box.t    ) (t/text-box.t    ) ] /Root 1 0 R /Size 9 >>
 startxref
-862
+1277
 %%EOF

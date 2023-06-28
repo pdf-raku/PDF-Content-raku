@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 25;
+plan 26;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -94,6 +94,36 @@ subtest 'overflow', {
         .say: $text-box;
         is $text-box.overflow.join, ' et dolore magna aliqua.';
         .say: '...' ~ $text-box.overflow.join;
+    }
+}
+
+
+subtest 'font loading from content stream', {
+    if (try require PDF::Font::Loader) === Nil {
+        skip 'PDF::Font::Loader is needed for this test';
+    }
+    else {
+        sub prefix:</>($s) { PDF::COS::Name.COERCE($s) };
+        my $page = $pdf.add-page;
+        my %Resources =
+            :Procset[ /'PDF', /'Text'],
+            :Font{
+            :F1{
+                :Type(/'Font'),
+                :Subtype(/'Type1'),
+                :BaseFont(/'Helvetica'),
+                :Encoding(/'MacRomanEncoding'),
+            },
+        };
+        $page.Resources = %Resources;
+        lives-ok: {
+            $page.graphics: {
+                .ops("BT /F1 24 Tf");
+                .text-position = 15, 25;
+                .say("Bye for now");
+                .EndText;
+            }
+        }
     }
 }
 

@@ -9,6 +9,8 @@ class PDF::Content:ver<0.6.10>
     use PDF::Content::Text::Block; # deprecated
     use PDF::Content::XObject;
     use PDF::Content::Tag :ParagraphTags;
+    use PDF::Content::Font;
+    use PDF::Content::Font::CoreFont;
     use PDF::Content::FontObj;
     use are;
 
@@ -241,9 +243,26 @@ class PDF::Content:ver<0.6.10>
     }
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
+    multi sub make-font(PDF::Content::FontObj:D) { $_ }
+    multi sub make-font(PDF::COS::Dict:D() $dict where .<Type> ~~ 'Font') {
+        $dict.^mixin: PDF::Content::Font
+            unless $dict.does(PDF::Content::Font);
+        unless $dict.font-obj.defined {
+            my $font-loader = try PDF::COS.required("PDF::Font::Loader");
+            die "Content font loading is only supported if PDF::Font::Loader is installed"
+                if $font-loader === Any;
+
+            my Bool $core-font = $dict<Subtype> ~~ 'Type1'
+                             && ! $dict<FontDescriptor>.defined
+                             &&  PDF::Content::Font::CoreFont.core-font-name($dict<BaseFont>).defined;
+            $dict.make-font: $font-loader.load-font(:$dict, :$core-font);
+        }
+        $dict;
+    }
+    
     method text-box(
         ::?CLASS:D $gfx:
-        MadeFont:D :$font = self!current-font[0],
+        MadeFont:D :$font = make-font(self!current-font[0]),
         Numeric:D  :$font-size = $.font-size // self!current-font[1],
         *%opt,
     ) is hidden-from-backtrace {
@@ -399,12 +418,21 @@ class PDF::Content:ver<0.6.10>
     }
 
     # map transformed user coordinates to untransformed (default) coordinates
-    use PDF::Content::Matrix :&dot;
+    use PDF::Content::Matrix :&dot, :&inverse-dot;
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
         (
             my @ = @coords.map: -> $x is copy, $y is copy {
                 ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
                 slip($user ?? $.CTM.&dot($x, $y) !! ($x, $y));
+            }
+        )
+    }
+    # inverse of base-coords
+    method user-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
+        (
+            my @ = @coords.map: -> $x is copy, $y is copy {
+                ($x, $y) = $.CTM.&inverse-dot($x, $y) if $user;
+                slip($text ?? $.TextMatrix.&inverse-dot($x, $y) !! ($x, $y));
             }
         )
     }
