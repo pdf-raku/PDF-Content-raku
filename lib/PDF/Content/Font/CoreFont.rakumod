@@ -166,17 +166,23 @@ class PDF::Content::Font::CoreFont
         $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
     }
 
+    method encoding {
+        my Str %enc-name = :win<WinAnsi>, :mac<MacRoman>, :mac-extra<MacExpert>;
+        %enc-name{self.enc};
+    }
+
+    sub name(PDF::COS::Name() $name) {
+        $name;
+    }
     method !encoding-name {
-        my %enc-name = :win<WinAnsiEncoding>, :mac<MacRomanEncoding>, :mac-extra<MacExpertEncoding>;
-        with %enc-name{self.enc} -> $name {
-            :$name;
-        }
+        name($_ ~ 'Encoding')
+            with self.encoding;
     }
 
     method !make-dict {
         my $dict = {
-            :Type( :name<Font> ), :Subtype( :name<Type1> ),
-            :BaseFont( :name( $!metrics.FontName ) ),
+            :Type( name 'Font' ), :Subtype( name 'Type1' ),
+            :BaseFont( name( $!metrics.FontName ) ),
         };
         $dict<Encoding> = $_ with self!encoding-name;
         $dict;
@@ -212,6 +218,7 @@ class PDF::Content::Font::CoreFont
         } // self.WHAT;
     }
 
+    method type         { 'Type1' }
     method is-embedded  { False }
     method is-subset    { False }
     method is-core-font { True }
@@ -221,7 +228,7 @@ class PDF::Content::Font::CoreFont
 
         if $!encoder.differences -> $Differences {
             my $Encoding = %(
-                :Type( :name<Encoding> ),
+                :Type( name 'Encoding' ),
                 :$Differences,
                );
             $Encoding<BaseEncoding> = $_

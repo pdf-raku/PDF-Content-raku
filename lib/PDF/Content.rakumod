@@ -243,7 +243,7 @@ class PDF::Content:ver<0.6.10>
     }
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
-    multi sub make-font(PDF::Content::FontObj:D) { $_ }
+    multi sub make-font(PDF::Content::FontObj:D $_) { $_ }
     multi sub make-font(PDF::COS::Dict:D() $dict where .<Type> ~~ 'Font') {
         $dict.^mixin: PDF::Content::Font
             unless $dict.does(PDF::Content::Font);
