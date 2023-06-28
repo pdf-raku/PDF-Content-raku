@@ -1,5 +1,13 @@
 {{$NEXT}}
 
+0.6.11  2023-06-29T08:23:35+12:00
+   - Add PDF::Content user-coords() method. This is the inverse of
+     the existing base-coords() method.
+   - Added automatic font object loading from the content stream. See
+     tests in t/text-box.t. Also requires PDF::Font::Loader.
+   - Added type() and encoding() methods to core fonts for improved
+     compatibility with PDF::Font::Loader::FontObj objects.
+
 0.6.10  2023-03-15T07:04:53+13:00
    - Add PDF::Content::API role. A set of base methods for
      content APIs (PDF::Class, PDF::Lite).
