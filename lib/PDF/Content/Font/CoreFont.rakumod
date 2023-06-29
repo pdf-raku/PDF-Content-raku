@@ -17,15 +17,15 @@ class PDF::Content::Font::CoreFont
 
         has Lock $!lock .= new;
         has %!fonts;
-        method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, |c) {
+        method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, PDF::Content::Font :$dict, :encoder($), |c) {
             $!lock.protect: {
-                %!fonts{$font-name.lc~'-*-'~$enc} //= do {
-                    my $metrics = Font::AFM.core-font( $font-name );
-                    my Str %glyphs = $font-name eq 'zapfdingbats'
-                        ?? %$zapf-glyphs
-                        !! $metrics.Wx.keys.map: {%CharSet{$_} => $_ };
-                    my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc, :%glyphs;
-                    $class.new( :$encoder, :$metrics, |c);
+                ($dict.defined ?? $dict.font-obj !! %!fonts{$font-name.lc~'-*-'~$enc}) //= do {
+                        my $metrics = Font::AFM.core-font( $font-name );
+                        my Str %glyphs = $font-name eq 'zapfdingbats'
+                                          ?? %$zapf-glyphs
+                                          !! $metrics.Wx.keys.map: {%CharSet{$_} => $_ };
+                        my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc, :%glyphs;
+                        $class.new( :$encoder, :$metrics, :$dict, |c);
                 }
             }
         }
@@ -212,9 +212,9 @@ class PDF::Content::Font::CoreFont
         self!load-core-font('symbol', :$enc, |c );
     }
 
-    multi method load-font(Str:D $font-name!, :$enc = 'win',  Cache:D :$cache = $global-cache, |c) {
+    multi method load-font(Str:D $font-name!, :$enc = 'win', Cache:D :$cache = $global-cache, |c) {
         do with $.core-font-name($font-name, |c) {
-            self!load-core-font($_, :$enc, :$cache );
+            self!load-core-font($_, :$enc, :$cache, |c );
         } // self.WHAT;
     }
 
