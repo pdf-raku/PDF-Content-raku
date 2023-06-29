@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.6.12  2023-06-30T07:17:24+12:00
+   - Export PDF::Content::Font::Enc::Type1 :Type1EncodingScheme
+   - Fix over-caching of fonts
+
 0.6.11  2023-06-29T08:23:35+12:00
    - Add PDF::Content user-coords() method. This is the inverse of
      the existing base-coords() method.
