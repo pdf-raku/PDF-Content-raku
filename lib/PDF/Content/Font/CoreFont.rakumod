@@ -17,7 +17,7 @@ class PDF::Content::Font::CoreFont
 
         has Lock $!lock .= new;
         has %!fonts;
-        method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, PDF::Content::Font :$dict, :encoder($), |c) {
+        method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, PDF::Content::Font :$dict, |c) {
             $!lock.protect: {
                 ($dict.defined ?? $dict.font-obj !! %!fonts{$font-name.lc~'-*-'~$enc}) //= do {
                         my $metrics = Font::AFM.core-font( $font-name );

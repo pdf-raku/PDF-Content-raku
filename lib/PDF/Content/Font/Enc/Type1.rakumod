@@ -13,9 +13,9 @@ class PDF::Content::Font::Enc::Type1
     has UInt %.charset{UInt}; #| used characters (useful for subsetting)
     has uint16 @.to-unicode[256];
     has uint8 @!spare-cids;   #| unmapped codes in the encoding scheme
-    my subset EncodingScheme of Str where 'mac'|'win'|'sym'|'zapf'|'std'|'mac-extra';
+    my subset Type1EncodingScheme of Str  is export(:Type1EncodingScheme)where 'mac'|'win'|'sym'|'zapf'|'std'|'mac-extra';
     has Lock $.lock handles<protect> .= new;
-    has EncodingScheme $.enc = 'win';
+    has Type1EncodingScheme $.enc = 'win';
     my constant %Encoding = %(
         :mac($mac-encoding),   :win($win-encoding),
         :sym($sym-encoding),   :std($std-encoding),
