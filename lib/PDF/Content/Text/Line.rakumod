@@ -8,7 +8,7 @@ class PDF::Content::Text::Line {
     has Numeric $.word-width is rw = 0; #| sum of word widths
     has Numeric $.word-gap = 0;
     has Numeric $.indent is rw = 0;
-    has Numeric $.align is rw = 0;
+    has Numeric $.align = 0;
     has UInt @.spaces;
 
     method content-width returns Numeric {
@@ -37,6 +37,8 @@ class PDF::Content::Text::Line {
     multi method align('center') {
         $!align = - $.content-width  /  2;
     }
+
+    multi method align { $!align }
 
     method content(:$font!, Numeric :$font-size!, Numeric :$x-shift = 0, :$space-pad = 0) {
         my Numeric \scale = -1000 / $font-size;

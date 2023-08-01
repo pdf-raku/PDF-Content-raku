@@ -238,8 +238,8 @@ class PDF::Content::Text::Box {
         # compute text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
-            @Tm[4] += $x-shift + .<Tx> + $.TextRise;
-            @Tm[5] += $y-shift + .<Ty>;
+            @Tm[4] += $x-shift + .<Tx>;
+            @Tm[5] += $y-shift + .<Ty> + $.TextRise;
             .<Tm> = @Tm;
         }
 
@@ -270,7 +270,7 @@ class PDF::Content::Text::Box {
         else {
             with  @!lines.tail {
                 # compute text flow position
-                $gfx.tf-x += ($x-shift + .content-width) * $gfx.HorizScaling / 100;
+                $gfx.tf-x += ($x-shift + .align + .content-width) * $gfx.HorizScaling / 100;
             }
         }
 
