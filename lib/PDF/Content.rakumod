@@ -321,7 +321,7 @@ class PDF::Content:ver<0.6.12>
 	Proxy.new(
 	    FETCH => {
                 my @tm = @.TextMatrix;
-	        @tm[4] / @tm[0], @tm[5] / @tm[3];
+	        (@tm[4] + self.tf-x) / @tm[0], @tm[5] / @tm[3];
 	    },
 	    STORE => -> $, Vector \v {
                 my @tm = @.TextMatrix;
@@ -365,7 +365,7 @@ class PDF::Content:ver<0.6.12>
         }
 
         my \x0 = $x + $dx;
-        my \y0 = $y + $dy;
+        my \y0 = $y + $dy + $text-box.TextRise;
         my \x1 = x0 + $text-box.width;
         my \y1 = y0 + $text-box.height;
 

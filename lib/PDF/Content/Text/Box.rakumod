@@ -267,6 +267,12 @@ class PDF::Content::Text::Box {
                 unless $leading =~= lead;
 	    @content.push: OpCode::TextNextLine;
 	}
+        else {
+            with  @!lines.tail {
+                # compute text flow position
+                $gfx.tf-x += ($x-shift + .content-width) * $gfx.HorizScaling / 100;
+            }
+        }
 
         $gfx.ops: @content;
         # restore original graphics values

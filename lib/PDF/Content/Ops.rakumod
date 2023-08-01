@@ -104,8 +104,8 @@ class PDF::Content::Ops {
     method owner  is DEPRECATED<canvas> { $!canvas }
     has UInt $.extended-ops = 0;
     has Numeric ($!cur-x, $!cur-y); # current point
+    has Numeric ($.tf-x = 0.0, $.tf-y = 0.0) is rw; # text flow
     has Numeric ($!close-x, $!close-y); # closepath end-point
-
     # some convenient mnemomic names
     my Str enum OpCode is export(:OpCode) «
         :BeginImage<BI> :ImageData<ID> :EndImage<EI>
@@ -243,6 +243,7 @@ class PDF::Content::Ops {
     BEGIN %Store = (
         OpCode::BeginText|OpCode::EndText => method {
             @!TextMatrix = [ 1, 0, 0, 1, 0, 0, ];
+            $!tf-x = 0; $!tf-y = 0;
         },
         OpCode::Save => method {
             my %gstate := $.graphics-state;
@@ -447,7 +448,7 @@ class PDF::Content::Ops {
     has Numeric $.TextLeading   is graphics is stored(method ($!TextLeading)  {}) is rw = 0;
     has Numeric $.TextRender    is graphics is stored(method ($!TextRender)   {}) is rw = 0;
     has Numeric $.TextRise      is graphics is stored(method ($!TextRise)     {}) is rw = 0;
-    has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+    has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {$!tf-x = 0; $!tf-y = 0;}) is rw = [ 1, 0, 0, 1, 0, 0, ];
     has Array   $.Font          is graphics is stored(
         method (Str $key, Numeric $size!) {
             with $!canvas.resource-entry('Font', $key) -> \font-face {
@@ -1056,6 +1057,7 @@ class PDF::Content::Ops {
     }
 
     method !text-move(Numeric $tx, Numeric $ty) {
+        $!tf-x = 0.0; $!tf-y = 0.0;
         @!TextMatrix = [1, 0, 0, 1, $tx, $ty].&multiply: @!TextMatrix;
     }
 
