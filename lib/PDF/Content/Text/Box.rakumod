@@ -15,7 +15,7 @@ class PDF::Content::Text::Box {
 
     has Alignment $.align = 'left';
     has VerticalAlignment $.valign = 'top';
-    has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness>;
+    has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness font-height>;
     has PDF::Content::Text::Line @.lines is built;
     has @.overflow is rw is built;
     has @.images is built;

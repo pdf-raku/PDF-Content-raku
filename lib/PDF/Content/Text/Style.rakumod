@@ -47,8 +47,8 @@ class PDF::Content::Text::Style is rw {
         my \h = $!font.height($!font-size, :hanging, :from-baseline);
 	when 'alphabetic'  { 0 }
 	when 'top'         { - h }
-	when 'bottom'      {   $!font.height($!font-size, :hanging)   - h }
-	when 'middle'      {   $!font.height($!font-size, :hanging)/2 - h }
+	when 'bottom'      {   $.font-height(:hanging)   - h }
+	when 'middle'      {   $.font-height(:hanging)/2 - h }
 	when 'ideographic' {   $!font-size - h }
 	when 'hanging'     { - h }
 	default            { 0 }
@@ -64,5 +64,9 @@ class PDF::Content::Text::Style is rw {
 
     method underline-thickness {
         ($!font.underline-thickness // 50) * $!font-size / 1000;
+    }
+
+    method font-height(|c) {
+        $!font.height: $!font-size, |c;
     }
 }

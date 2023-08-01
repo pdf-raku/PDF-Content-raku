@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 26;
+plan 27;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -35,6 +35,7 @@ is-deeply $text-box.font, $font, '$.font cloned';
 is $text-box.height, $height, '$.height cloned';
 is $text-box.underline-position, -1.6;
 is $text-box.underline-thickness, 0.8;
+is $text-box.font-height, 19.04;
 
 my $gfx = $pdf.add-page.gfx;
 $gfx.Save;
