@@ -260,6 +260,7 @@ class PDF::Content::Text::Box {
             @content.push: line.content(:$.font, :$.font-size, :$x-shift, :$space-pad);
         }
 
+        my $tf-dx = 0;
 	if $nl || @!overflow {
 	    my $height = @!lines ?? @!lines.tail.height !! $.font-size;
             my \lead = $height * $.leading;
@@ -268,13 +269,14 @@ class PDF::Content::Text::Box {
 	    @content.push: OpCode::TextNextLine;
 	}
         else {
-            with  @!lines.tail {
-                # compute text flow position
-                $gfx.tf-x += $x-shift + .align + .content-width;
+            with @!lines.tail {
+                # compute text flow increment
+                $tf-dx = $x-shift + .align + .content-width;
             }
         }
 
         $gfx.ops: @content;
+        $gfx.tf-x += $tf-dx; # add to text-flow
         # restore original graphics values
         $gfx."{.key}"() = .value for %saved.pairs;
 

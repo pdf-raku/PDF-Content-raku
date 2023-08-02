@@ -1,11 +1,11 @@
 {{$NEXT}}
 
 0.6.13  2023-08-02T13:02:41+12:00
-   - Fixes to return positional values of Graphics .print and .say methods
-     -- Track and take account of current text flow in computing
-        $x0 of: my ($x0, $y0) = $gfx.print("text");
+   - Fixes to return positional values of Graphics .print and .say methods:
+     my ($x0, $y0, $x1, $y1) = $gfx.print("text");
+     -- Track and take account of current text flow in computing $x0, $x1:
         This is only an issue if the text is continuing the current line
-     -- Add any :$baseline offset to $y0.
+     -- Add any :$baseline offset to $y0, $y1.
 
 0.6.12  2023-06-30T07:17:24+12:00
    - Export PDF::Content::Font::Enc::Type1 :Type1EncodingScheme
