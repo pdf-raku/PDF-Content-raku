@@ -270,7 +270,7 @@ class PDF::Content::Text::Box {
         else {
             with  @!lines.tail {
                 # compute text flow position
-                $gfx.tf-x += ($x-shift + .align + .content-width) * $gfx.HorizScaling / 100;
+                $gfx.tf-x += $x-shift + .align + .content-width;
             }
         }
 
