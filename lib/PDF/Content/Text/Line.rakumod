@@ -40,14 +40,14 @@ class PDF::Content::Text::Line {
 
     multi method align { $!align }
 
-    method content(:$font!, Numeric :$font-size!, Numeric :$x-shift = 0, :$space-pad = 0) {
+    method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
         my Numeric \scale = -1000 / $font-size;
         my subset Str-or-Pos where Str|Numeric;
         my Str-or-Pos @line;
         constant Space = ' ';
         my int $wc = 0;
 
-        if $!align + $!indent + $x-shift -> $indent {
+        if $!align + $!indent -> $indent {
             @line.push: ($indent * scale).round.Int;
         }
 

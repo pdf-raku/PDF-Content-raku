@@ -228,13 +228,13 @@ class PDF::Content::Text::Box {
             if $gfx.comment;
 
         my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
-        @content.push( OpCode::TextMove => [0, $y-shift ] )
-            unless $y-shift =~= 0.0;
 
         my $dx = %( :center(0.5), :right(1.0) ){$!align}
            // 0.0;
 
         my $x-shift = $left ?? $dx * $.width !! 0.0;
+        @content.push( OpCode::TextMove => [$x-shift, $y-shift] )
+            unless $x-shift =~= 0 && $y-shift =~= 0.0;
         # compute text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
@@ -257,7 +257,7 @@ class PDF::Content::Text::Box {
 	    }
 
             my $space-pad = scale * (line.word-gap - self.space-width);
-            @content.push: line.content(:$.font, :$.font-size, :$x-shift, :$space-pad);
+            @content.push: line.content(:$.font, :$.font-size, :$space-pad);
         }
 
         my $tf-dx = 0;
@@ -271,7 +271,7 @@ class PDF::Content::Text::Box {
         else {
             with @!lines.tail {
                 # compute text flow increment
-                $tf-dx = $x-shift + .align + .content-width;
+                $tf-dx += .align + .content-width;
             }
         }
 
