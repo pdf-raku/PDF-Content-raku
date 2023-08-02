@@ -276,7 +276,8 @@ class PDF::Content::Text::Box {
         }
 
         $gfx.ops: @content;
-        $gfx.tf-x += $tf-dx; # add to text-flow
+        $gfx.tf-x += $tf-dx # add to text-flow
+            unless $gfx.TextRender == InvisableText;
         # restore original graphics values
         $gfx."{.key}"() = .value for %saved.pairs;
 
