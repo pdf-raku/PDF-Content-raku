@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.6.14  2023-08-02T15:25:37+12:00
+   - Exclude invisible text from text-flow calculations
+
 0.6.13  2023-08-02T13:02:41+12:00
    - Fixes to return positional values of Graphics .print and .say methods:
      my ($x0, $y0, $x1, $y1) = $gfx.print("text");
