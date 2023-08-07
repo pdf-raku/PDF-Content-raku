@@ -1,4 +1,28 @@
+#| Simple color construction functions
 module PDF::Content::Color {
+
+=head2 Synopsis
+
+=begin code :lang<raku>
+use lib 't';
+use PDFTiny;
+my $page = PDFTiny.new.add-page;
+use PDF::Content;
+use PDF::Content::Color :color, :ColorName;
+my PDF::Content $gfx = $page.gfx;
+$gfx.Save;
+$gfx.FillColor = color Blue; # named color
+$gfx.StrokeColor = color '#fa9'; # RGB mask, 3 digit
+$gfx.StrokeColor = color '#ffaa99'; # RGB mask, 6 digit
+$gfx.StrokeColor = color [1, .8, .1, .2]; # CMYK color values (0..1)
+$gfx.StrokeColor = color [1, .5, .1];     # RGB color values (0..1)
+$gfx.StrokeColor = color [255, 127, 25];  # RGB color values (0..255)
+$gfx.StrokeColor = color .7; # Shade of gray
+use Color;
+my Color $red .= new(0xff, 0x0a, 0x0a);
+$gfx.StrokeColor = color $red; # Color objects
+$gfx.Restore;
+=end code
 
     use Color;
 

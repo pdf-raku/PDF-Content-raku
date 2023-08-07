@@ -46,17 +46,13 @@ my class PageNode
 
    has ResourceDict $.Resources is entry(:inherit);
    has $.Parent is entry;
+   has Numeric (@.MediaBox, @.CropBox) is entry(:inherit,:len(4));
 }
 our class Page is PageNode does PDF::Content::Page {
-    has Numeric @.MediaBox is entry(:inherit,:len(4));
-    has Numeric @.CropBox  is entry(:len(4));
-    has Numeric @.TrimBox  is entry(:len(4));
-    has Numeric @.BleedBox is entry(:len(4));
+    has Numeric (@.TrimBox, @.BleedBox, @.ArtBox) is entry(:len(4));
 }
 our class Pages is PageNode does PDF::Content::PageTree {
     has ResourceDict $.Resources is entry(:inherit);
-    has Numeric @.MediaBox is entry(:inherit,:len(4));
-    has Numeric @.CropBox  is entry(:inherit,:len(4));
     has PageNode @.Kids    is entry(:required, :indirect);
     has UInt $.Count       is entry(:required);
 }

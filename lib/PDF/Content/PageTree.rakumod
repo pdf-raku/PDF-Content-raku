@@ -1,7 +1,47 @@
-use PDF::Content::Resourced;
+#| methods related to page tree nodes
+role PDF::Content::PageTree {
 
-role PDF::Content::PageTree
-    does PDF::Content::Resourced {
+=begin pod
+
+=head2 Description
+
+This role contains methods for querying and manipulating page tree
+notes in a PDF
+
+=head3 Page Fragments
+
+This class includes the methods:
+
+=item `page-fragment` - create a detached page
+`pages-fragment` - create a detached page sub-treee
+
+These stand-alone fragments aim to be thread-safe to allow parallel construction of pages. The final PDF assembly needs to be synchronous.
+
+=begin code :lang<raku>
+use PDF::Content::Page;
+use PDF::Content::PageTree;
+use lib 't';
+use PDFTiny;
+
+my PDFTiny $pdf .= new;
+my PDF::Content::Page @pages;
+
+@pages = (1..20).hyper(:batch(1)).map: -> $page-num {
+    my PDF::Content::Page:D $page = PDF::Content::PageTree.page-fragment;
+    $page.text: {
+        .text-position = 50, 400;
+        .say: "Page $page-num";
+    }
+    $page;
+}
+
+$pdf.add-page($_) for @pages;
+=end code
+
+=end pod
+
+    use PDF::Content::Resourced;
+    also does PDF::Content::Resourced;
 
     use PDF::Content::Page;
     use PDF::Content::PageNode;
@@ -12,8 +52,11 @@ role PDF::Content::PageTree
     my subset LeafNode of PDF::Content::PageTree where .Count == + .Kids && .[0] ~~ PDF::Content::PageNode;
     sub name(PDF::COS::Name() $_) { $_ }
 
-    method page-fragment  { PDF::COS::Dict.COERCE: %( :Type( name 'Page'), ) }
-    method pages-fragment { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
+    #| produce a single page fragment, not attached to any PDF
+    method page-fragment returns PDF::Content::Page { PDF::COS::Dict.COERCE: %( :Type( name 'Page'), ) }
+
+    #| produce a page-tree fragment, not attached to any PDF
+    method pages-fragment returns PDF::Content::PageNode { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
 
     #| add new last page
     method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment) {

@@ -1,6 +1,25 @@
 #| simple plain-text blocks
 class PDF::Content::Text::Box {
 
+=head2 Synopsis
+
+=begin code :lang<raku>
+use lib 't';
+use PDFTiny;
+my $page = PDFTiny.new.add-page;
+use PDF::Content;
+use PDF::Content::Font::CoreFont;
+use PDF::Content::Text::Block;
+my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
+my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
+my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :font-size(16) );
+my PDF::Content $gfx = $page.gfx;
+$gfx.BeginText;
+$text-box.render($gfx);
+$gfx.EndText;
+say $gfx.Str;
+=end code
+
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;

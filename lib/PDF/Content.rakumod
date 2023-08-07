@@ -1,7 +1,40 @@
-use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
+#| PDF Content construction and manipulation
+class PDF::Content:ver<0.6.14> {
 
-class PDF::Content:ver<0.6.14>
-    is PDF::Content::Ops {
+    use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
+    also is PDF::Content::Ops;
+
+=begin pod
+
+=head2 Description
+
+implements a PDF graphics state machine for composition, or rendering:
+
+=head2 Synposis
+
+=begin code :lang<raku>
+use lib 't';
+use PDF::Content;
+use PDF::Content::Canvas;
+use PDFTiny;
+my PDFTiny $pdf .= new;
+my PDF::Content::Canvas $canvas = $pdf.add-page;
+my PDF::Content $gfx .= new: :$canvas;
+$gfx.use-font: $pdf.core-font('Courier'); # define /F1 font
+$gfx.BeginText;
+$gfx.Font = 'F1', 16;
+$gfx.TextMove(10, 20);
+$gfx.ShowText('Hello World');
+$gfx.EndText;
+say $gfx.Str;
+# BT
+#  /F1 16 Tf
+#  10 20 Td
+#  (Hello World) Tj
+# ET
+=end code
+
+=end pod
 
     use PDF::COS;
     use PDF::COS::Stream;
@@ -109,30 +142,30 @@ class PDF::Content:ver<0.6.14>
 
     #| extract any inline images from the content stream. returns an array of XObject Images
     method inline-images returns Array {
-	my PDF::Content::XObject @images;
-	for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
-	    my $bi = $.ops[$i];
-	    my $id = $.ops[$i+1];
-	    die "'BI' op not followed by 'ID' in content stream"
-		unless $id ~~ Pair && $id.key eq 'ID';
+        my PDF::Content::XObject @images;
+        for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
+            my $bi = $.ops[$i];
+            my $id = $.ops[$i+1];
+            die "'BI' op not followed by 'ID' in content stream"
+                unless $id ~~ Pair && $id.key eq 'ID';
 
-	    my %dict = PDF::Content::XObject['Image'].inline-to-xobject($bi.value[0]<dict>);
-	    my $encoded = $id.value[0]<encoded>;
+            my %dict = PDF::Content::XObject['Image'].inline-to-xobject($bi.value[0]<dict>);
+            my $encoded = $id.value[0]<encoded>;
 
-	    @images.push: PDF::COS::Stream.COERCE: { :%dict, :$encoded };
-	}
-	@images;
+            @images.push: PDF::COS::Stream.COERCE: { :%dict, :$encoded };
+        }
+        @images;
     }
 
     use PDF::Content::Matrix :transform;
     method transform( |c ) {
-	my Numeric @matrix = transform( |c );
-	$.ConcatMatrix( @matrix );
+        my Numeric @matrix = transform( |c );
+        $.ConcatMatrix( @matrix );
     }
 
     method text-transform( |c ) {
-	my Numeric @matrix = transform( |c );
-	$.SetTextMatrix( @matrix );
+        my Numeric @matrix = transform( |c );
+        $.SetTextMatrix( @matrix );
     }
 
     #| place an image, or form object
@@ -259,7 +292,7 @@ class PDF::Content:ver<0.6.14>
         }
         $dict;
     }
-    
+
     method text-box(
         ::?CLASS:D $gfx:
         MadeFont:D :$font = make-font(self!current-font[0]),
@@ -318,18 +351,18 @@ class PDF::Content:ver<0.6.14>
         warn '$.text-position accessor used outside of a text-block'
             unless $.context == GraphicsContext::Text;
 
-	Proxy.new(
-	    FETCH => {
+        Proxy.new(
+            FETCH => {
                 my @tm = @.TextMatrix;
-	        (@tm[4] + self.tf-x) / @tm[0], @tm[5] / @tm[3];
-	    },
-	    STORE => -> $, Vector \v {
+                (@tm[4] + self.tf-x) / @tm[0], @tm[5] / @tm[3];
+            },
+            STORE => -> $, Vector \v {
                 my @tm = @.TextMatrix;
                 @tm[4] = $_ * @tm[0] with v[0];
                 @tm[5] = $_ * @tm[3] with v[1];
-		self.op(SetTextMatrix, @tm);
-	    },
-	);
+                self.op(SetTextMatrix, @tm);
+            },
+        );
     }
 
     multi method print(PDF::Content::Text::Box $text-box,

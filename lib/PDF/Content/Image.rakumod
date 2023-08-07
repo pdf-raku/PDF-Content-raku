@@ -22,10 +22,29 @@ class X::PDF::Image::UnknownMimeType is Exception {
     }
 }
 
+#| loading and manipulation of PDF images
 class PDF::Content::Image {
     use PDF::COS;
     use PDF::COS::Stream;
     use PDF::IO;
+
+=begin pod
+
+=head2 Synopsis
+
+=begin code :lang<raku>
+use PDF::Content::Image;
+my PDF::Content::Image $image .= open: "t/images/lightbulb.gif";
+say "image has size {$image.width} X {$image.height}";
+say $image.data-uri;
+# data:image/gif;base64,R0lGODlhEwATAMQA...
+=end code
+
+=head2 Description
+
+This class currently currently supports image formats: PNG, GIF and JPEG.
+
+=end pod
 
     has Str $.data-uri;
     subset IOish where PDF::IO|IO::Handle;

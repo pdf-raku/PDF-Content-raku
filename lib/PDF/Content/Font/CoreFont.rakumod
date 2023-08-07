@@ -1,7 +1,23 @@
-use PDF::Content::FontObj;
+#| Basic PDF core font support
+class PDF::Content::Font::CoreFont {
 
-class PDF::Content::Font::CoreFont
-    does PDF::Content::FontObj {
+=begin pod
+
+=head2 Synopsis
+
+=begin code :lang<raku>
+use PDF::Content::Font::CoreFont;
+my PDF::Content::Font::CoreFont $font .= load-font( :family<Times-Roman>, :weight<bold> );
+say $font.encode("¶Hi");
+say $font.stringwidth("RVX"); # 2166
+say $font.stringwidth("RVX", :kern); # 2111
+=end code
+
+=end pod
+
+    use PDF::Content::FontObj;
+    also does PDF::Content::FontObj;
+
     use Font::AFM;
     use PDF::Content::Font;
     use PDF::Content::Font::Enc::Type1;

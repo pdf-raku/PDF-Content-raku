@@ -3,6 +3,7 @@ use Test;
 plan 7;
 use lib 't';
 use PDFTiny;
+use PDF::Content;
 use PDF::Content::Ops;
 use PDF::Grammar;
 my PDF::Content $g = PDFTiny.new.add-page.gfx;
