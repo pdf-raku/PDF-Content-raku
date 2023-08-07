@@ -26,7 +26,7 @@ docs/%.md : lib/%.rakumod
 Pod-To-Markdown-installed :
 	@raku -M Pod::To::Markdown -c
 
-doc : $(DocLinker) Pod-To-Markdown-installed docs/index.md docs/PDF/Content.md docs/PDF/Content/Image.md docs/PDF/Content/Font/CoreFont.md docs/PDF/Content/Text/Box.md docs/PDF/Content/Color.md docs/PDF/Content/Tag.md docs/PDF/Content/PageTree.md
+doc : $(DocLinker) Pod-To-Markdown-installed docs/index.md docs/PDF/Content.md docs/PDF/Content/Canvas.md docs/PDF/Content/Image.md docs/PDF/Content/Font/CoreFont.md docs/PDF/Content/Text/Box.md docs/PDF/Content/Color.md docs/PDF/Content/Tag.md docs/PDF/Content/PageTree.md
 
 docs/index.md : README.md
 	cp $< $@

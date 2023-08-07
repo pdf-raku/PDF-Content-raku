@@ -12,22 +12,29 @@ use PDF::Content::Ops :OpCode;
 use PDF::Content::Tag;
 use PDF::COS::Stream;
 use PDF::COS::Name;
+use Method::Also;
 sub name($_) { PDF::COS::Name.COERCE: $_ }
+
+has PDF::Content $!gfx;     #| appended graphics
+#| return appended PDF content stream
+method gfx(::?ROLE:D $canvas: |c --> PDF::Content) handles<html-canvas graphics text> {
+    $!gfx //= PDF::Content.new: :$canvas, |c
+}
 
 has PDF::Content $!pre-gfx; #| prepended graphics
 method has-pre-gfx { ? .ops with $!pre-gfx }
-method pre-gfx { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
+#| return prepended graphics
+method pre-gfx returns PDF::Content { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
 method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
-has PDF::Content $!gfx;     #| appended graphics
 has Bool $!rendered = False;
 has UInt $.mcid = 0;
 method use-mcid(UInt:D $_) {
     $!mcid = $_ unless $!mcid >= $_;
 }
-method next-mcid { $!mcid++ }
+#| Allocate the next MCID (Marked Content Identifier)
+method next-mcid returns UInt:D { $!mcid++ }
 
 method canvas(&code) is DEPRECATED<html-canvas> { self.html-canvas(&code) }
-method html-canvas(&code) { self.gfx.html-canvas( &code ) }
 
 #| Fix nesting issues that aren't illegal, but could cause problems:
 #| - append any missing 'Q' (Restore) operators at end of stream
@@ -59,16 +66,7 @@ method !tidy(@ops) {
     @ops;
 }
 
-method gfx(|c) {
-    $!gfx //= self.new-gfx(|c);
-}
-method graphics(&code) { self.gfx.graphics( &code ) }
-method text(&code)     { self.gfx.text( &code ) }
-
-method contents-parse {
-    PDF::Content.parse($.contents);
-}
-
+#| return contents
 method contents returns Str {
     with $.decoded {
        .isa(Str) ?? $_ !! .Str;
@@ -78,10 +76,16 @@ method contents returns Str {
     }
 }
 
-method new-gfx(::?ROLE:D $canvas: |c) {
+#| reparse contents
+method contents-parse {
+    PDF::Content.parse($.contents);
+}
+
+method new-gfx(::?ROLE:D $canvas: |c) is DEPRECATED {
     PDF::Content.new: :$canvas, |c;
 }
 
+#| render graphics
 method render(Bool :$tidy = True, |c) {
     my $gfx := $.gfx(|c);
     $!rendered ||= do {
@@ -94,7 +98,8 @@ method render(Bool :$tidy = True, |c) {
     $gfx;
 }
 
-method finish is hidden-from-backtrace {
+#| finish for serialization purposes
+method finish is hidden-from-backtrace is also<cb-finish> {
     if $!gfx.defined || $!pre-gfx.defined {
         # rebuild graphics, if they've been accessed
         my $decoded = do with $!pre-gfx { .Str } else { '' };
@@ -113,8 +118,6 @@ method finish is hidden-from-backtrace {
         self.decoded = $decoded;
     }
 }
-
-method cb-finish is hidden-from-backtrace { $.finish }
 
 #| create a child XObject Form
 method xobject-form(:$group = True, *%dict) {
@@ -143,12 +146,15 @@ method tiling-pattern(List    :$BBox!,
     PDF::COS::Stream.COERCE: { :%dict };
 }
 my subset ImageFile of Str where /:i '.'('png'|'svg'|'pdf') $/;
+
+#| draft rendering via Cairo (experimental)
 method save-as-image(ImageFile $outfile, |c) {
-    # experimental draft rendering via Cairo
     (try require PDF::To::Cairo) !=== Nil
          or die "save-as-image method is only supported if PDF::To::Cairo is installed";
     ::('PDF::To::Cairo').save-as-image(self, $outfile, |c);
 }
+=para The L<PDF::To::Cairo> module must be installed to use this method
+
 # *** Marked Content Tags ***
 my class TagSetBuilder is PDF::Content::Tag::NodeSet {
     has PDF::Content::Tag @.open-tags;            # currently open descendant tags

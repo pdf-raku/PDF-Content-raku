@@ -12,7 +12,9 @@ as listed in the [PDF::API6 Graphics Documentation](https://pdf-raku.github.io/P
 
 ## Key classes and modules:
 
-- [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content) manages content graphics and related resources
+- [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content) manages content stream graphics and related resources
+
+- [PDF::Content::Canvas](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Canvas) manages a canvas that contains a content stream
 
 - [PDF::Content::Image](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Image) loading and manipulation of PDF images
 
