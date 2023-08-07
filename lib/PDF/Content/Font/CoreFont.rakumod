@@ -13,6 +13,8 @@ say $font.stringwidth("RVX"); # 2166
 say $font.stringwidth("RVX", :kern); # 2111
 =end code
 
+=head2 Methods
+
 =end pod
 
     use PDF::Content::FontObj;
@@ -136,7 +138,8 @@ say $font.stringwidth("RVX", :kern); # 2111
             with $!dict;
     }
 
-    method core-font-name(Str:D $family!, Str :$weight?, Str :$style?, ) is export(:core-font-name) {
+    #| get a core font name for the given family, weight and style
+    method core-font-name(Str:D $family!, Str :$weight?, Str :$style?, --> Str) is export(:core-font-name) {
         my Str $face = $family.lc;
         my Str $bold = $weight && $weight ~~ m:i/bold|[6..9]\d\d/
             ?? 'bold' !! '';
@@ -157,12 +160,13 @@ say $font.stringwidth("RVX", :kern); # 2111
         $face ∈ coreFonts ?? $face !! Nil;
     }
 
-    our proto method load-font(|c) {*};
+    our proto method load-font(|c --> ::?CLASS:D) {*};
 
     multi method load-font( Str :$family!, |c) {
         $.load-font( $family, |c );
     }
 
+    #| get the height of 'X' for the font
     multi method height(Numeric $pointsize?, Bool :$ex where .so) {
         my Numeric $height = $!metrics.XHeight;
 	$pointsize ?? $height * $pointsize / 1000 !! $height;
@@ -177,6 +181,7 @@ say $font.stringwidth("RVX", :kern); # 2111
 	$pointsize ?? $height * $pointsize / 1000 !! $height;
     }
 
+    #| compute the width of a string
     method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False) {
         my $glyphs = $!encoder.glyphs;
         $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
@@ -204,6 +209,7 @@ say $font.stringwidth("RVX", :kern); # 2111
         $dict;
     }
 
+    #| produce a PDF Font dictionary for this core font
     method to-dict {
         $!encoder.lock.protect: {
             $!dict //= PDF::Content::Font.make-font(
@@ -212,9 +218,12 @@ say $font.stringwidth("RVX", :kern); # 2111
         }
     }
 
-    method font-name { $!metrics.FontName }
-    method underline-position  { $!metrics.UnderlinePosition }
-    method underline-thickness { $!metrics.UnderlineThickness }
+    #| return the font name
+    method font-name returns Str { $!metrics.FontName }
+    #| return the underline position for the font
+    method underline-position returns Numeric { $!metrics.UnderlinePosition }
+    #| return the underline thickness for the font
+    method underline-thickness returns Numeric { $!metrics.UnderlineThickness }
 
     method !load-core-font(Str:D $font-name, Cache:D :$cache = $global-cache, |c) is hidden-from-backtrace {
         $cache.core-font: $font-name, self, |c;
@@ -234,11 +243,16 @@ say $font.stringwidth("RVX", :kern); # 2111
         } // self.WHAT;
     }
 
+    #| PDF Font type (always 'Type1' for core fonts)
     method type         { 'Type1' }
+    #| whether font is embedded (always False for core fonts)
     method is-embedded  { False }
+    #| whether font is subset (always False for core fonts)
     method is-subset    { False }
+    #| whether font is a core font (always True for core fonts)
     method is-core-font { True }
 
+    #| finish a PDF rendered font
     method cb-finish {
         my $dict := self.to-dict;
 

@@ -38,6 +38,8 @@ my PDF::Content::Page @pages;
 $pdf.add-page($_) for @pages;
 =end code
 
+=head2 Methods
+
 =end pod
 
     use PDF::Content::Resourced;
@@ -128,8 +130,8 @@ $pdf.add-page($_) for @pages;
 	die "no such page: $page-num";
     }
 
-    # build an flattened index of indirect references to pages
-    method page-index {
+    #| build flattened index of indirect references to pages
+    method page-index returns Array {
         my @index;
         if self ~~ LeafNode {
             @index = self.Kids.values
@@ -147,7 +149,8 @@ $pdf.add-page($_) for @pages;
         @index;
     }
 
-    method pages {
+    #| return all leaf pages for this page tree. or sub-tree
+    method pages returns Array {
         my @pages;
         my $kids := self.Kids;
         for ^+$kids {
@@ -193,6 +196,7 @@ $pdf.add-page($_) for @pages;
         die "unable to locate page: $page-num";
     }
 
+    #| return the number of pages
     method page-count is also<Int> returns UInt { self.Count }
 
     # iterates all child page nodes
@@ -245,7 +249,7 @@ $pdf.add-page($_) for @pages;
         PageIterator.new: :$node;
     }
 
-    # allow array indexing of pages $pages[9] :== $.pages.page(10);
+    # return zero offset page, i.e. $pages[0] === $pages.page(1);
     method AT-POS(UInt $pos) is rw {
 	# vivify next page
 	self.add-page
@@ -253,6 +257,7 @@ $pdf.add-page($_) for @pages;
         self.page($pos + 1)
     }
 
+    # finish a page tree for serialization purposes
     method cb-finish {
         my Array $kids = self.Kids;
         $kids[$_].cb-finish

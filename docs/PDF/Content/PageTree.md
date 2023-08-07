@@ -41,6 +41,9 @@ my PDF::Content::Page @pages;
 $pdf.add-page($_) for @pages;
 ```
 
+Methods
+-------
+
 ### method page-fragment
 
 ```raku
@@ -97,6 +100,22 @@ method page(
 
 traverse page tree
 
+### method page-index
+
+```raku
+method page-index() returns Array
+```
+
+build flattened index of indirect references to pages
+
+### method pages
+
+```raku
+method pages() returns Array
+```
+
+return all leaf pages for this page tree. or sub-tree
+
 ### method delete-page
 
 ```raku
@@ -106,4 +125,12 @@ method delete-page(
 ```
 
 delete page from page tree
+
+### method page-count
+
+```raku
+method page-count() returns UInt
+```
+
+return the number of pages
 

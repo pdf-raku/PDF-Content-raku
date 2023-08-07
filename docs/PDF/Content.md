@@ -37,6 +37,76 @@ say $gfx.Str;
 # ET
 ```
 
+Methods
+-------
+
+### method graphics
+
+```raku
+method graphics(
+    &meth
+) returns Mu
+```
+
+Add a graphics block
+
+### method text
+
+```raku
+method text(
+    &meth
+) returns Mu
+```
+
+Add a text block
+
+### method mark
+
+```raku
+method mark(
+    Str $t,
+    &meth,
+    |c
+) returns Mu
+```
+
+Add a marked content block
+
+### multi method tag
+
+```raku
+multi method tag(
+    Str $tag,
+    Bool :$mark,
+    *%props
+) returns Mu
+```
+
+Add an empty content tag, optionally marked
+
+### multi method tag
+
+```raku
+multi method tag(
+    Str $tag,
+    &meth,
+    Bool :$mark,
+    *%props
+) returns Mu
+```
+
+Add tagged content, optionally marked
+
+### method load-image
+
+```raku
+method load-image(
+    $spec
+) returns PDF::Content::XObject
+```
+
+Open an image from a file-spec or data-uri
+
 ### method inline-images
 
 ```raku
@@ -44,6 +114,26 @@ method inline-images() returns Array
 ```
 
 extract any inline images from the content stream. returns an array of XObject Images
+
+### method transform
+
+```raku
+method transform(
+    |c
+) returns Mu
+```
+
+perform a series of graphics transforms
+
+### method text-transform
+
+```raku
+method text-transform(
+    |c
+) returns Mu
+```
+
+perform a series of text transforms
 
 ### multi method do
 
@@ -61,6 +151,62 @@ multi method do(
 
 place an image, or form object
 
+### method use-pattern
+
+```raku
+method use-pattern(
+    Hash $pat where { ... }
+) returns Mu
+```
+
+ensure pattern is declared as a resource
+
+### multi method paint
+
+```raku
+multi method paint(
+    Bool :$fill,
+    Bool :$even-odd,
+    Bool :$close,
+    Bool :$stroke
+) returns Mu
+```
+
+fill and stroke the current path
+
+### multi method paint
+
+```raku
+multi method paint(
+    &meth,
+    *%o
+) returns Mu
+```
+
+build a path, then fill and stroke it
+
+### multi sub make-font
+
+```raku
+multi sub make-font(
+    PDF::COS::Dict:D(Any):D $dict where { ... }
+) returns Mu
+```
+
+associate a font dictionaery with a font object
+
+### method text-box
+
+```raku
+method text-box(
+    Any:D :$font where { ... } = Code.new,
+    Numeric:D :$font-size = Code.new,
+    *%opt
+) returns Mu
+```
+
+create a text box object for use in graphics .print() or .say() methods
+
 ### multi method print
 
 ```raku
@@ -72,16 +218,26 @@ multi method print(
 
 output text leave the text position at the end of the current line
 
-### method text-block
+### method text-position
 
 ```raku
-method text-block(
-    $font = Code.new,
-    *%opt
+method text-position() returns PDF::Content::Vector
+```
+
+get or set the current text position
+
+### multi method print
+
+```raku
+multi method print(
+    PDF::Content::Text::Box $text-box,
+    List :$position where { ... },
+    Bool :$nl = Bool::False,
+    Bool :$preserve = Bool::True
 ) returns Mu
 ```
 
-deprecated in favour of text-box()
+print a text block object
 
 ### method say
 
@@ -104,4 +260,73 @@ multi method set-font(
 ```
 
 thin wrapper to $.op(SetFont, ...)
+
+### method font
+
+```raku
+method font() returns Array
+```
+
+Get or set the current font as ($font, $font-size)
+
+### multi method print
+
+```raku
+multi method print(
+    Str $text,
+    :$font = Code.new,
+    |c
+) returns Mu
+```
+
+print text to the content stream
+
+### method html-canvas
+
+```raku
+method html-canvas(
+    &mark-up,
+    |c
+) returns Mu
+```
+
+add graphics using HTML Canvas 2D API
+
+The HTML::Canvas::To::PDF Raku module must be installed to use this method
+
+### method draw
+
+```raku
+method draw(
+    $html-canvas,
+    :$renderer,
+    |c
+) returns Mu
+```
+
+render an HTML canvas
+
+### method base-coords
+
+```raku
+method base-coords(
+    *@coords where { ... },
+    :$user = Bool::True,
+    :$text = Code.new
+) returns Array
+```
+
+map transformed user coordinates to untransformed (default) coordinates
+
+### method user-coords
+
+```raku
+method user-coords(
+    *@coords where { ... },
+    :$user = Bool::True,
+    :$text = Code.new
+) returns Array
+```
+
+inverse of base-coords
 

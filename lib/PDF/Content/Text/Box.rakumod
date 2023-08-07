@@ -20,6 +20,8 @@ $gfx.EndText;
 say $gfx.Str;
 =end code
 
+=head2 Methods
+
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
     use PDF::Content::Ops :OpCode, :TextMode;
@@ -51,10 +53,12 @@ say $gfx.Str;
         token word  { [ <![ - ]> <!before <space>> . ]+ '-'? | '-' }
     }
 
+    #| break a text string into word and whitespace fragments
     method comb(Str $_) {
         .comb(/<Text::word> | <Text::space>/);
     }
 
+    #| clone a text box
     method clone(::?CLASS:D: :$text = $!text ~ @!overflow.join, |c) {
         given callwith(|c) {
             .TWEAK: :$text;
@@ -203,7 +207,9 @@ say $gfx.Str;
         $word-gap * $.HorizScaling / 100;
     }
 
+    #| return displacement width of a text box
     method width  { $!width  || self.content-width }
+    #| return displacement height of a text box
     method height { $!height || self.content-height }
     method !dy {
         %( :center(0.5), :bottom(1.0) ){$!valign}
@@ -213,6 +219,7 @@ say $gfx.Str;
         self!dy * ($.height - $.content-height);
     }
 
+    #| render a text box to a content stream at current or given text position
     method render(
 	PDF::Content::Ops:D $gfx,
 	Bool :$nl,   # add trailing line
@@ -303,8 +310,8 @@ say $gfx.Str;
 	($x-shift, $y-shift);
     }
 
-    # flow any xobject images. This needs to be done
-    # after rendering and exiting text block
+    #| flow any xobject images. This needs to be done
+    #| after rendering and exiting text block
     method place-images($gfx) {
         for self.images {
             $gfx.Save;
@@ -315,6 +322,7 @@ say $gfx.Str;
         }
     }
 
+    #| return text split into lines
     method Str {
         @!lines>>.text.join: "\n";
     }

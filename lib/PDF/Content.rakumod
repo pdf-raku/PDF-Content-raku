@@ -34,6 +34,8 @@ say $gfx.Str;
 # ET
 =end code
 
+=head2 Methods
+
 =end pod
 
     use PDF::COS;
@@ -56,6 +58,7 @@ say $gfx.Str;
     my subset Position of List where { .elems <= 2 }
     my subset Vector of Position  where { .&are ~~ Numeric }
 
+    #| Add a graphics block
     method graphics( &meth! ) {
         $.op(Save);
         my \rv = meth(self);
@@ -63,6 +66,7 @@ say $gfx.Str;
         rv;
     }
 
+    #| Add a text block
     method text( &meth! ) {
         $.op(BeginText);
         my \rv = meth(self);
@@ -85,6 +89,7 @@ say $gfx.Str;
         }
     }
 
+    #| Add a marked content block
     method mark(Str $t, &meth, |c) { self.tag($t, &meth, :mark, |c) }
 
     multi method tag(PDF::Content::Tag $_, &meth) {
@@ -95,6 +100,7 @@ say $gfx.Str;
         samewith( .tag, |.attributes);
     }
 
+    #| Add an empty content tag, optionally marked
     multi method tag(Str $tag, Bool :$mark, *%props) {
         self!setup-mcid: :$mark, :%props;
         %props
@@ -103,6 +109,7 @@ say $gfx.Str;
         $.closed-tag;
     }
 
+    #| Add tagged content, optionally marked
     multi method tag(Str $tag, &meth!, Bool :$mark, *%props) {
         self!setup-mcid: :$mark, :%props;
         %props
@@ -136,7 +143,8 @@ say $gfx.Str;
         $!tagger //= Tagger.new: :gfx(self);
     }
 
-    method load-image($spec) {
+    #| Open an image from a file-spec or data-uri
+    method load-image($spec --> PDF::Content::XObject) {
         PDF::Content::XObject.open($spec);
     }
 
@@ -158,11 +166,13 @@ say $gfx.Str;
     }
 
     use PDF::Content::Matrix :transform;
+    #| perform a series of graphics transforms
     method transform( |c ) {
         my Numeric @matrix = transform( |c );
         $.ConcatMatrix( @matrix );
     }
 
+    #| perform a series of text transforms
     method text-transform( |c ) {
         my Numeric @matrix = transform( |c );
         $.SetTextMatrix( @matrix );
@@ -236,12 +246,14 @@ say $gfx.Str;
 
     my subset Pattern of Hash where .<PatternType> ~~ 1|2;
     my subset TilingPattern of Pattern where .<PatternType> ~~ 1;
+    #| ensure pattern is declared as a resource
     method use-pattern(Pattern $pat!) {
         $pat.finish
             if $pat ~~ TilingPattern;
         :Pattern(self.resource-key($pat));
     }
 
+    #| fill and stroke the current path
     multi method paint(
         Bool :$fill,  Bool :$even-odd,
         Bool :$close, Bool :$stroke,
@@ -267,6 +279,7 @@ say $gfx.Str;
             for @paint-ops;
     }
 
+    #| build a path, then fill and stroke it
     multi method paint(&meth, *%o) {
         self.Save;
         &meth(self);
@@ -277,6 +290,7 @@ say $gfx.Str;
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
     multi sub make-font(PDF::Content::FontObj:D $_) { $_ }
+    #| associate a font dictionaery with a font object
     multi sub make-font(PDF::COS::Dict:D() $dict where .<Type> ~~ 'Font') {
         $dict.^mixin: PDF::Content::Font
             unless $dict.does(PDF::Content::Font);
@@ -293,6 +307,7 @@ say $gfx.Str;
         $dict;
     }
 
+    #| create a text box object for use in graphics .print() or .say() methods
     method text-box(
         ::?CLASS:D $gfx:
         MadeFont:D :$font = make-font(self!current-font[0]),
@@ -313,7 +328,7 @@ say $gfx.Str;
         @.print( $text-box, |%opt);
     }
 
-    #| deprecated in favour of text-box()
+    # deprecated in favour of text-box()
     method text-block(::?CLASS:D $gfx: $font = self!current-font[0], *%opt) is DEPRECATED('text-box') {
         my Numeric $font-size = $.font-size // self!current-font[1];
         PDF::Content::Text::Block.new(
@@ -347,6 +362,7 @@ say $gfx.Str;
         self.text-position = [$x, $y];
     }
 
+    #| get or set the current text position
     method text-position is rw returns Vector {
         warn '$.text-position accessor used outside of a text-block'
             unless $.context == GraphicsContext::Text;
@@ -365,6 +381,7 @@ say $gfx.Str;
         );
     }
 
+    #| print a text block object
     multi method print(PDF::Content::Text::Box $text-box,
                        Position :$position,
                        Bool :$nl = False,
@@ -423,6 +440,7 @@ say $gfx.Str;
         $.Font // [$.core-font('Courier'), 16]
     }
 
+    #| Get or set the current font as ($font, $font-size)
     method font is rw returns Array {
         Proxy.new(
             FETCH => {
@@ -436,23 +454,27 @@ say $gfx.Str;
         );
     }
 
+    #| print text to the content stream
     multi method print(Str $text, :$font = self!current-font[0], |c) {
         nextwith( $text, :$font, |c);
     }
 
+    #| add graphics using HTML Canvas 2D API
     method html-canvas(&mark-up!, |c ) {
         my $html-canvas := PDF::COS.required('HTML::Canvas').new;
         $html-canvas.context(&mark-up);
         self.draw($html-canvas, |c);
     }
+    =para The HTML::Canvas::To::PDF Raku module must be installed to use this method
 
+    #| render an HTML canvas
     method draw(PDF::Content:D $gfx: $html-canvas, :$renderer, |c) {
         $html-canvas.render($renderer // PDF::COS.required('HTML::Canvas::To::PDF').new: :$gfx, |c);
     }
 
-    # map transformed user coordinates to untransformed (default) coordinates
+    #| map transformed user coordinates to untransformed (default) coordinates
     use PDF::Content::Matrix :&dot, :&inverse-dot;
-    method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
+    method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user --> Array) {
         (
             my @ = @coords.map: -> $x is copy, $y is copy {
                 ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
@@ -460,8 +482,8 @@ say $gfx.Str;
             }
         )
     }
-    # inverse of base-coords
-    method user-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user) {
+    #| inverse of base-coords
+    method user-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user --> Array) {
         (
             my @ = @coords.map: -> $x is copy, $y is copy {
                 ($x, $y) = $.CTM.&inverse-dot($x, $y) if $user;

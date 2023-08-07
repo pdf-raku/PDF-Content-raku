@@ -60,6 +60,11 @@ $page.graphics: -> $gfx {
 say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 ```
 
+heading2
+========
+
+Methods
+
 
 
 See [PDF 32000 Tables 333 - Standard structure types for grouping elements]
@@ -75,4 +80,30 @@ See [PDF 32000 Table 338 - Standard structure types for inline-level structure e
 
 
 These tags are meaningful within content streams, as opposed to the structure-tree
+
+### multi method add-kid
+
+```raku
+multi method add-kid(
+    PDF::Content::Tag $kid
+) returns Mu
+```
+
+Add a child tag
+
+### method take-descendants
+
+```raku
+method take-descendants() returns Mu
+```
+
+take self and all descendants
+
+### method descendants
+
+```raku
+method descendants() returns Mu
+```
+
+gather all descendants
 

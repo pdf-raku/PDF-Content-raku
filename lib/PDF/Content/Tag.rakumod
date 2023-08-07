@@ -52,8 +52,9 @@ $page.graphics: -> $gfx {
 }
 
 say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
-
 =end code
+
+=heading2 Methods
 
 =end pod
 
@@ -123,6 +124,7 @@ my enum ContentTags is export(:ContentTags,:Tags) (
 constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums, ContentTags.enums );
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
+#| Add a child tag
 multi method add-kid(PDF::Content::Tag $kid) {
     die 'tag already parented by {.gist}' with $kid.parent;
     die "can't add tag to itself"
@@ -149,11 +151,13 @@ method gist {
         !! "<{$.name}$attributes/>";
 }
 
+#| take self and all descendants
 method take-descendants {
     take self;
     $!kids.take-descendants;
 }
 
+#| gather all descendants
 method descendants { gather self.take-descendants }
 
 our class NodeSet {

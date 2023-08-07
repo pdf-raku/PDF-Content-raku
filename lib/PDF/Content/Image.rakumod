@@ -44,15 +44,18 @@ say $image.data-uri;
 
 This class currently currently supports image formats: PNG, GIF and JPEG.
 
+=head2Methods
+
 =end pod
 
     has Str $.data-uri;
     subset IOish where PDF::IO|IO::Handle;
     has IOish $.source;
-    subset ImageType of Str where 'JPEG'|'GIF'|'PNG'|'PDF';
+    subset ImageType of Str:D where 'JPEG'|'GIF'|'PNG'|'PDF';
+    subset DataURI   of Str:D where m/^('data:' [<ident> '/' <ident>]? ";base64"? ",")/;
     has ImageType $.image-type;
 
-    method !image-type($_, :$path!) {
+    method !image-type($_, :$path! --> ImageType) {
         when m:i/^ jpe?g $/    { 'JPEG' }
         when m:i/^ gif $/      { 'GIF' }
         when m:i/^ png $/      { 'PNG' }
@@ -62,7 +65,8 @@ This class currently currently supports image formats: PNG, GIF and JPEG.
         }
     }
 
-    multi method load(Str $data-uri where m/^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") /) {
+    #| load an image from a data URI string
+    multi method load(DataURI $data-uri where m/^('data:' [<t=.ident> '/' <s=.ident>]? $<b64>=";base64"? $<start>=",") / --> ::?CLASS:D) {
         my $path = ~ $0;
         my Str $mime-type = ( $0<t> // '(missing)').lc;
         my Str $mime-subtype = ( $0<s> // '').lc;
@@ -82,11 +86,8 @@ This class currently currently supports image formats: PNG, GIF and JPEG.
         self!image-handler(:$image-type).new: :$source, :$data-uri, :$image-type;
     }
 
-    multi method load(Str $path! ) {
-        self.load( $path.IO );
-    }
-
-    multi method load(IO::Path $io-path) {
+    #| load an image from a path
+    multi method load(IO::Path() $io-path --> ::?CLASS:D) {
         self.load( $io-path.open( :r, :bin) );
     }
 
@@ -94,7 +95,8 @@ This class currently currently supports image formats: PNG, GIF and JPEG.
         PDF::COS.required("PDF::Content::Image::$image-type");
     }
 
-    multi method load(IO::Handle $source!) {
+    #| load an image from an IO handle
+    multi method load(IO::Handle $source! --> ::?CLASS:D) {
         my $path = $source.path;
         my Str $image-type = self!image-type($path.extension, :$path);
         self!image-handler(:$image-type).new: :$source, :$image-type;
@@ -115,7 +117,8 @@ This class currently currently supports image formats: PNG, GIF and JPEG.
         }
     }
 
-    method data-uri is rw {
+    #| Get or set the data URI from an image
+    method data-uri returns DataURI is rw {
         Proxy.new(
             FETCH => {
                 $!data-uri //= $.make-data-uri( :$.image-type, :$!source );

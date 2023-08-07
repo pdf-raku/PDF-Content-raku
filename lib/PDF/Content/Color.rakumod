@@ -24,6 +24,8 @@ $gfx.StrokeColor = color $red; # Color objects
 $gfx.Restore;
 =end code
 
+=head2 Subroutines
+
     use Color;
 
     my Array enum ColorName is export(:ColorName) «
@@ -39,16 +41,20 @@ $gfx.Restore;
         :Magenta[1, 0, 1]   :Registration[1, 1, 1, 1]
        »;
 
+    #| build RGB Op
     our sub rgb(\r, \g, \b) is export(:rgb) {
         :DeviceRGB[r, g, b]
     }
+    #| build CMYK Op
     our sub cmyk(\c, \m, \y, \k) is export(:cmyk) {
         :DeviceCMYK[c, m, y, k];
     }
+    #| build Gray Op
     our sub gray(\g) is export(:gray) {
         :DeviceGray[g];
     }
 
+    #| Coerce a color to an Op
     our proto sub color(|) is export(:color) {*};
     multi sub color(Color $_) { color([.rgb]) }
     multi sub color(Numeric $a, *@c) { @c.prepend($a); color(@c); }

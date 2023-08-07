@@ -32,3 +32,51 @@ $gfx.StrokeColor = color $red; # Color objects
 $gfx.Restore;
 ```
 
+Subroutines
+-----------
+
+### sub rgb
+
+```raku
+sub rgb(
+    \r,
+    \g,
+    \b
+) returns Mu
+```
+
+build RGB Op
+
+### sub cmyk
+
+```raku
+sub cmyk(
+    \c,
+    \m,
+    \y,
+    \k
+) returns Mu
+```
+
+build CMYK Op
+
+### sub gray
+
+```raku
+sub gray(
+    \g
+) returns Mu
+```
+
+build Gray Op
+
+### sub color
+
+```raku
+sub color(
+    |
+) returns Mu
+```
+
+Coerce a color to an Op
+
