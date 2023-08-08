@@ -16,6 +16,8 @@ as listed in the [PDF::API6 Graphics Documentation](https://pdf-raku.github.io/P
 
 - [PDF::Content::Canvas](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Canvas) manages a canvas that contains a content stream
 
+- [PDF::Content::Ops](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Ops) implements a content stream as a graphics state machine
+
 - [PDF::Content::Image](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Image) loading and manipulation of PDF images
 
 - [PDF::Content::Font::CoreFont](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Font/CoreFont) provides simple support for core fonts
