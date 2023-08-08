@@ -54,15 +54,15 @@ role PDF::Content::ResourceDict {
         Str :$type = self!resource-type($object),
     ) {
         without $.find-resource($object, :$type) {
-            my constant %Prefix = %(
-                :ColorSpace<CS>, :Font<F>, :ExtGState<GS>, :Pattern<Pt>,
-                :Shading<Sh>, :XObject{  :Form<Fm>, :Image<Im>, :PS<PS> },
-                :Other<Obj>,
+            my constant %ResourcePrefix = %(
+                :ColorSpace<CS>, :Font<F>, :ExtGState<GS>,
+                :Pattern<Pt>, :Shading<Sh>, :Other<Obj>,
             );
+            my constant %XObjectPrefix = %( :Form<Fm>, :Image<Im>, :PS<PS> );
 
             my $prefix = $type eq 'XObject'
-                ?? %Prefix{$type}{ $object<Subtype> }
-                !! %Prefix{$type};
+                ?? %XObjectPrefix{ $object<Subtype> }
+                !! %ResourcePrefix{ $type };
 
             my Str $key;
             # make a unique resource key
