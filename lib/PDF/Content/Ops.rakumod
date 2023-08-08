@@ -540,8 +540,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {$!tf-x = 0; $!tf-y = 0;}) is rw = [ 1, 0, 0, 1, 0, 0, ];
     has Array   $.Font          is graphics is stored(
         method (Str $key, Numeric $size!) {
-            with $!canvas.resource-entry('Font', $key) -> \font-face {
-                $!Font = [font-face, $size];
+            with $!canvas.resource-entry('Font', $key) -> \font-dict {
+                $!Font = [font-dict, $size];
             }
             else {
                 die X::PDF::Content::UnknownResource.new: :type<Font>, :$key;

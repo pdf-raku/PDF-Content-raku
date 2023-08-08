@@ -39,21 +39,22 @@ role PDF::Content::Font::Enc::Glyphic {
                 my %glyph-map := self.glyph-map;
                 my uint32 $cid = 0;
 
-                for @diffs {
-                    when UInt { $cid  = $_ }
-                    when Str {
-                        my $name = $_;
-                        with %glyph-map{$name} {
-                           self.set-encoding(.ord, $cid);
-                        }
-                        else {
-                            self.use-cid($cid);
-                            self.cid-map-glyph($name, $cid);
-                        }
-                        %!diffs{$cid++} = PDF::COS::Name.COERCE($_);
+                multi sub add-diff(UInt:D $_) { $cid = $_}
+                multi sub add-diff(Str:D $name) {
+                    with %glyph-map{$name} {
+                       self.set-encoding(.ord, $cid);
                     }
-                    default { die "bad difference entry: .raku" }
+                    else {
+                        self.use-cid($cid);
+                        self.cid-map-glyph($name, $cid);
+                    }
+                    %!diffs{$cid++} = PDF::COS::Name.COERCE($name);
                 }
+                multi sub add-diff($_) is hidden-from-backtrace {
+                    die "bad difference entry: .raku";
+                }
+
+                add-diff($_) for @diffs;
             },
             FETCH => {
                 my $cid := -2;
