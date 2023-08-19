@@ -12,7 +12,6 @@ use PDF::Content::Ops :OpCode;
 use PDF::Content::Tag;
 use PDF::COS::Stream;
 use PDF::COS::Name;
-use Method::Also;
 sub name($_) { PDF::COS::Name.COERCE: $_ }
 
 has PDF::Content $!gfx;     #| appended graphics
@@ -99,7 +98,7 @@ method render(Bool :$tidy = True, |c) {
 }
 
 #| finish for serialization purposes
-method finish is hidden-from-backtrace is also<cb-finish> {
+method finish is hidden-from-backtrace {
     if $!gfx.defined || $!pre-gfx.defined {
         # rebuild graphics, if they've been accessed
         my $decoded = do with $!pre-gfx { .Str } else { '' };
@@ -118,6 +117,8 @@ method finish is hidden-from-backtrace is also<cb-finish> {
         self.decoded = $decoded;
     }
 }
+
+method cb-finish is hidden-from-backtrace { $.finish }
 
 #| create a child XObject Form
 method xobject-form(:$group = True, *%dict) {
