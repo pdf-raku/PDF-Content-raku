@@ -173,12 +173,12 @@ say $font.stringwidth("RVX", :kern); # 2111
     }
 
     #| compute the overall font-height
-    multi method height(Numeric $pointsize?, Bool :$from-baseline, Bool :$hanging) {
+    multi method height(Numeric $pointsize = 1000, Bool :$from-baseline, Bool :$hanging) {
         my List $bbox = $!metrics.FontBBox;
 	my Numeric $height = $hanging ?? $!metrics.Ascender !! $bbox[3];
 	$height -= $hanging ?? $!metrics.Descender !! $bbox[1]
             unless $from-baseline;
-	$pointsize ?? $height * $pointsize / 1000 !! $height;
+	$height * $pointsize / 1000;
     }
 
     #| compute the width of a string

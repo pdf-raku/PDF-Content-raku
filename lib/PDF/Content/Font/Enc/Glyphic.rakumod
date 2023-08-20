@@ -42,7 +42,7 @@ role PDF::Content::Font::Enc::Glyphic {
                 multi sub add-diff(UInt:D $_) { $cid = $_}
                 multi sub add-diff(Str:D $name) {
                     with %glyph-map{$name} {
-                       self.set-encoding(.ord, $cid);
+                        self.set-encoding(.ord, $cid);
                     }
                     else {
                         self.use-cid($cid);
