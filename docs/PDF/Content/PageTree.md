@@ -10,7 +10,7 @@ methods related to page tree nodes
 Description
 -----------
 
-This role contains methods for querying and manipulating page tree notes in a PDF
+This role contains methods for querying and manipulating page tree nodes in a PDF.
 
 ### Page Fragments
 
@@ -18,7 +18,7 @@ This class includes the methods:
 
   * `page-fragment` - create a detached page `pages-fragment` - create a detached page sub-treee
 
-These stand-alone fragments aim to be thread-safe to allow parallel construction of pages. The final PDF assembly needs to be synchronous.
+These stand-alone fragments aim to be thread-safe to support parallel construction of pages. The final PDF assembly needs to be synchronous.
 
 ```raku
 use PDF::Content::Page;
@@ -35,6 +35,7 @@ my PDF::Content::Page @pages;
         .text-position = 50, 400;
         .say: "Page $page-num";
     }
+    $.page.finish;
     $page;
 }
 
@@ -65,7 +66,7 @@ produce a page-tree fragment, not attached to any PDF
 ```raku
 method add-page(
     PDF::Content::Page:D $page = Code.new
-) returns Mu
+) returns PDF::Content::Page
 ```
 
 add new last page

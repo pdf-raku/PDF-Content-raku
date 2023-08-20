@@ -6,7 +6,7 @@ role PDF::Content::PageTree {
 =head2 Description
 
 This role contains methods for querying and manipulating page tree
-notes in a PDF
+nodes in a PDF.
 
 =head3 Page Fragments
 
@@ -15,7 +15,7 @@ This class includes the methods:
 =item `page-fragment` - create a detached page
 `pages-fragment` - create a detached page sub-treee
 
-These stand-alone fragments aim to be thread-safe to allow parallel construction of pages. The final PDF assembly needs to be synchronous.
+These stand-alone fragments aim to be thread-safe to support parallel construction of pages. The final PDF assembly needs to be synchronous.
 
 =begin code :lang<raku>
 use PDF::Content::Page;
@@ -32,6 +32,7 @@ my PDF::Content::Page @pages;
         .text-position = 50, 400;
         .say: "Page $page-num";
     }
+    $.page.finish;
     $page;
 }
 
@@ -61,7 +62,7 @@ $pdf.add-page($_) for @pages;
     method pages-fragment returns PDF::Content::PageNode { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
 
     #| add new last page
-    method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment) {
+    method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment --> PDF::Content::Page) {
 
         self.Kids.push: $page;
 	$page<Parent> = self.link;
