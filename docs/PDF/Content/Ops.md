@@ -53,7 +53,7 @@ returns the current tags status
 ```raku
 multi method gsaves(
     :$delta! where { ... }
-) returns Mu
+) returns Array
 ```
 
 return graphics gsave stack, including changed variables only
@@ -61,7 +61,7 @@ return graphics gsave stack, including changed variables only
 ### multi method gsaves
 
 ```raku
-multi method gsaves() returns Mu
+multi method gsaves() returns Array
 ```
 
 return graphics gsave stack, including all graphics variables
@@ -71,7 +71,7 @@ return graphics gsave stack, including all graphics variables
 ```raku
 multi method graphics-state(
     :$delta!
-) returns Mu
+) returns Hash
 ```
 
 return locally updated graphics state variables
@@ -119,7 +119,7 @@ Process a parsed graphics operation
 ```raku
 multi method ops(
     Str $ops
-) returns Mu
+) returns Array
 ```
 
 Parse and process graphics operations
@@ -129,7 +129,7 @@ Parse and process graphics operations
 ```raku
 multi method ops(
     List $ops?
-) returns Mu
+) returns Array
 ```
 
 Parse and process a list of graphics operations
@@ -169,7 +169,7 @@ serialize content into a string. indent blocks for readability
 ### method content-dump
 
 ```raku
-method content-dump() returns Mu
+method content-dump() returns Seq
 ```
 
 serialized current content as a sequence of strings - for debugging/testing

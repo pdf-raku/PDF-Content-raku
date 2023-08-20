@@ -37,7 +37,7 @@ Methods
 ```raku
 method comb(
     Str $_
-) returns Mu
+) returns Seq
 ```
 
 break a text string into word and whitespace fragments
@@ -48,7 +48,7 @@ break a text string into word and whitespace fragments
 method clone(
     :$text = Code.new,
     |c
-) returns Mu
+) returns PDF::Content::Text::Box
 ```
 
 clone a text box
@@ -64,7 +64,7 @@ calculates actual spacing between words
 ### method width
 
 ```raku
-method width() returns Mu
+method width() returns Numeric
 ```
 
 return displacement width of a text box
@@ -72,7 +72,7 @@ return displacement width of a text box
 ### method height
 
 ```raku
-method height() returns Mu
+method height() returns Numeric
 ```
 
 return displacement height of a text box
@@ -86,7 +86,7 @@ method render(
     Bool :$top,
     Bool :$left,
     Bool :$preserve = Bool::True
-) returns Mu
+) returns List
 ```
 
 render a text box to a content stream at current or given text position
@@ -104,7 +104,7 @@ flow any xobject images. This needs to be done after rendering and exiting text 
 ### method Str
 
 ```raku
-method Str() returns Mu
+method Str() returns Str
 ```
 
 return text split into lines

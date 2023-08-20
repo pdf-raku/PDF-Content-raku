@@ -167,13 +167,12 @@ say $font.stringwidth("RVX", :kern); # 2111
     }
 
     #| get the height of 'X' for the font
-    multi method height(Numeric $pointsize?, Bool :$ex where .so) {
-        my Numeric $height = $!metrics.XHeight;
-	$pointsize ?? $height * $pointsize / 1000 !! $height;
+    multi method height(Numeric $pointsize = 1000, Bool :$ex where .so --> Numeric) {
+	$!metrics.XHeight * $pointsize / 1000;
     }
 
     #| compute the overall font-height
-    multi method height(Numeric $pointsize = 1000, Bool :$from-baseline, Bool :$hanging) {
+    multi method height(Numeric $pointsize = 1000, Bool :$from-baseline, Bool :$hanging --> Numeric) {
         my List $bbox = $!metrics.FontBBox;
 	my Numeric $height = $hanging ?? $!metrics.Ascender !! $bbox[3];
 	$height -= $hanging ?? $!metrics.Descender !! $bbox[1]
@@ -182,12 +181,13 @@ say $font.stringwidth("RVX", :kern); # 2111
     }
 
     #| compute the width of a string
-    method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False) {
+    method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False --> Numeric) {
         my $glyphs = $!encoder.glyphs;
         $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
     }
 
-    method encoding {
+    #| Core font base encoding: WinAsni, MacRoman or MacExpert
+    method encoding returns Str {
         my Str %enc-name = :win<WinAnsi>, :mac<MacRoman>, :mac-extra<MacExpert>;
         %enc-name{self.enc};
     }
@@ -210,7 +210,7 @@ say $font.stringwidth("RVX", :kern); # 2111
     }
 
     #| produce a PDF Font dictionary for this core font
-    method to-dict {
+    method to-dict returns PDF::COS::Dict {
         $!encoder.lock.protect: {
             $!dict //= PDF::Content::Font.make-font(
                 PDF::COS::Dict.COERCE(self!make-dict),
@@ -244,16 +244,16 @@ say $font.stringwidth("RVX", :kern); # 2111
     }
 
     #| PDF Font type (always 'Type1' for core fonts)
-    method type         { 'Type1' }
+    method type returns Str  { 'Type1' }
     #| whether font is embedded (always False for core fonts)
-    method is-embedded  { False }
+    method is-embedded  returns Bool { False }
     #| whether font is subset (always False for core fonts)
-    method is-subset    { False }
+    method is-subset    returns Bool { False }
     #| whether font is a core font (always True for core fonts)
-    method is-core-font { True }
+    method is-core-font returns Bool { True }
 
     #| finish a PDF rendered font
-    method cb-finish {
+    method cb-finish returns PDF::COS::Dict {
         my $dict := self.to-dict;
 
         if $!encoder.differences -> $Differences {

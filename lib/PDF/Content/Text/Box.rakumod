@@ -54,12 +54,12 @@ say $gfx.Str;
     }
 
     #| break a text string into word and whitespace fragments
-    method comb(Str $_) {
+    method comb(Str $_ --> Seq) {
         .comb(/<Text::word> | <Text::space>/);
     }
 
     #| clone a text box
-    method clone(::?CLASS:D: :$text = $!text ~ @!overflow.join, |c) {
+    method clone(::?CLASS:D: :$text = $!text ~ @!overflow.join, |c --> ::?CLASS:D) {
         given callwith(|c) {
             .TWEAK: :$text;
             $_;
@@ -208,9 +208,9 @@ say $gfx.Str;
     }
 
     #| return displacement width of a text box
-    method width  { $!width  || self.content-width }
+    method width returns Numeric { $!width  || self.content-width }
     #| return displacement height of a text box
-    method height { $!height || self.content-height }
+    method height returns Numeric { $!height || self.content-height }
     method !dy {
         %( :center(0.5), :bottom(1.0) ){$!valign}
             // 0;
@@ -226,6 +226,7 @@ say $gfx.Str;
 	Bool :$top,  # position from top
 	Bool :$left, # position from left
 	Bool :$preserve = True, # restore text state
+        --> List
 	) {
 	my %saved;
         my Bool $gsave;
@@ -323,7 +324,7 @@ say $gfx.Str;
     }
 
     #| return text split into lines
-    method Str {
+    method Str returns Str {
         @!lines>>.text.join: "\n";
     }
 }

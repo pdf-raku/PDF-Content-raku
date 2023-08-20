@@ -75,7 +75,7 @@ add new last page
 ```raku
 method add-pages(
     PDF::Content::PageTree:D $pages = Code.new
-) returns Mu
+) returns PDF::Content::PageTree
 ```
 
 append page subtree
@@ -95,7 +95,7 @@ $.page(0?) - adds a new page
 ```raku
 method page(
     Int $page-num where { ... }
-) returns Mu
+) returns PDF::Content::Page
 ```
 
 traverse page tree

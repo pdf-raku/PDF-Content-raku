@@ -12,6 +12,7 @@ use PDF::Content::Ops :OpCode;
 use PDF::Content::Tag;
 use PDF::COS::Stream;
 use PDF::COS::Name;
+use PDF::Content::XObject;
 sub name($_) { PDF::COS::Name.COERCE: $_ }
 
 has PDF::Content $!gfx;     #| appended graphics
@@ -21,7 +22,7 @@ method gfx(::?ROLE:D $canvas: |c --> PDF::Content) handles<html-canvas graphics 
 }
 
 has PDF::Content $!pre-gfx; #| prepended graphics
-method has-pre-gfx { ? .ops with $!pre-gfx }
+method has-pre-gfx returns Bool { ? .ops with $!pre-gfx }
 #| return prepended graphics
 method pre-gfx returns PDF::Content { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
 method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
@@ -39,7 +40,7 @@ method canvas(&code) is DEPRECATED<html-canvas> { self.html-canvas(&code) }
 #| - append any missing 'Q' (Restore) operators at end of stream
 #| - wrap with 'q' (Save) and 'Q' (Restore) operators, if there
 #|   are any top-level graphics, which may affect the state.
-method !tidy(@ops) {
+method !tidy(@ops --> Array) {
     my int $nesting = 0;
     my $wrap = False;
 
@@ -85,7 +86,7 @@ method new-gfx(::?ROLE:D $canvas: |c) is DEPRECATED {
 }
 
 #| render graphics
-method render(Bool :$tidy = True, |c) {
+method render(Bool :$tidy = True, |c --> PDF::Content) {
     my $gfx := $.gfx(|c);
     $!rendered ||= do {
         my Pair @ops = self.contents-parse;
@@ -121,7 +122,7 @@ method finish is hidden-from-backtrace {
 method cb-finish is hidden-from-backtrace { $.finish }
 
 #| create a child XObject Form
-method xobject-form(:$group = True, *%dict) {
+method xobject-form(:$group = True, *%dict --> PDF::Content::XObject) {
     %dict<Type> = name 'XObject';
     %dict<Subtype> = name 'Form';
     %dict<Resources> //= {};
@@ -139,6 +140,7 @@ method tiling-pattern(List    :$BBox!,
                       Int :$TilingType = 1,
                       Hash :$Resources = {},
                       *%dict
+                      --> PDF::Content::XObject
                      ) {
     %dict.push: $_
                  for (:Type(name 'Pattern'), :PatternType(1),
@@ -172,7 +174,7 @@ my class TagSetBuilder is PDF::Content::Tag::NodeSet {
         @!open-tags.push: $tag;
     }
 
-    method close-tag {                            # close innermost descendant
+    method close-tag returns PDF::Content::Tag {                            # close innermost descendant
         $!closed-tag = @!open-tags.pop;
         $!artifact-- if $!closed-tag.name eq 'Artifact';
         $!reversed-chars-- if $!closed-tag.name eq 'ReversedChars';

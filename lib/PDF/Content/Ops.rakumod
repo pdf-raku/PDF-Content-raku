@@ -654,19 +654,19 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has @.gsaves;
     #| return graphics gsave stack, including changed variables only
-    multi method gsaves(:$delta! where .so) {
+    multi method gsaves(:$delta! where .so --> Array) {
         my @gs = @!gsaves;
         @gs.push: $.graphics-state;
         delta(@gs);
     }
     #| return graphics gsave stack, including all graphics variables
-    multi method gsaves { @!gsaves }
+    multi method gsaves returns Array { @!gsaves }
 
     # looks too much like a verb
     method gsave is DEPRECATED('gsaves') { @!gsaves }
 
     #| return locally updated graphics state variables
-    multi method graphics-state(:$delta!) {
+    multi method graphics-state(:$delta! --> Hash) {
         with @!gsaves.tail {
             delta([$_, $.graphics-state]).tail;
         }
@@ -1112,12 +1112,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     #| Parse and process graphics operations
-    multi method ops(Str $ops!) {
+    multi method ops(Str $ops! --> Array) {
 	$.ops(self.parse($ops));
     }
 
     #| Parse and process a list of graphics operations
-    multi method ops(List $ops?) {
+    multi method ops(List $ops? --> Array) {
 	with $ops {
 	    self.op($_)
 		for .list
@@ -1207,7 +1207,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     #| serialized current content as a sequence of strings - for debugging/testing
-    method content-dump {
+    method content-dump returns Seq {
         my PDF::IO::Writer $writer .= new;
         @!ops.map: { $writer.write-content($_) };
     }

@@ -54,7 +54,7 @@ $page.graphics: -> $gfx {
 say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 =end code
 
-=heading2 Methods
+=head2 Methods
 
 =end pod
 
@@ -125,7 +125,7 @@ constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphT
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
 #| Add a child tag
-multi method add-kid(PDF::Content::Tag $kid) {
+multi method add-kid(PDF::Content::Tag $kid --> PDF::Content::Tag) {
     die 'tag already parented by {.gist}' with $kid.parent;
     die "can't add tag to itself"
         if $kid === self;
@@ -158,7 +158,7 @@ method take-descendants {
 }
 
 #| gather all descendants
-method descendants { gather self.take-descendants }
+method descendants returns Seq { gather self.take-descendants }
 
 our class NodeSet {
     my subset Node where PDF::Content::Tag | Str;

@@ -42,7 +42,7 @@ sub rgb(
     \r,
     \g,
     \b
-) returns Mu
+) returns Pair
 ```
 
 build RGB Op
@@ -55,7 +55,7 @@ sub cmyk(
     \m,
     \y,
     \k
-) returns Mu
+) returns Pair
 ```
 
 build CMYK Op
@@ -65,7 +65,7 @@ build CMYK Op
 ```raku
 sub gray(
     \g
-) returns Mu
+) returns Pair
 ```
 
 build Gray Op
@@ -75,7 +75,7 @@ build Gray Op
 ```raku
 sub color(
     |
-) returns Mu
+) returns Pair
 ```
 
 Coerce a color to an Op

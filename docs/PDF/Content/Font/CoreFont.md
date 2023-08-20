@@ -39,9 +39,9 @@ get a core font name for the given family, weight and style
 
 ```raku
 multi method height(
-    Numeric $pointsize?,
+    Numeric $pointsize = 1000,
     Bool :$ex where { ... }
-) returns Mu
+) returns Numeric
 ```
 
 get the height of 'X' for the font
@@ -50,10 +50,10 @@ get the height of 'X' for the font
 
 ```raku
 multi method height(
-    Numeric $pointsize?,
+    Numeric $pointsize = 1000,
     Bool :$from-baseline,
     Bool :$hanging
-) returns Mu
+) returns Numeric
 ```
 
 compute the overall font-height
@@ -65,15 +65,23 @@ method stringwidth(
     Str $str,
     $pointsize = 0,
     Bool :$kern = Bool::False
-) returns Mu
+) returns Numeric
 ```
 
 compute the width of a string
 
+### method encoding
+
+```raku
+method encoding() returns Str
+```
+
+Core font base encoding: WinAsni, MacRoman or MacExpert
+
 ### method to-dict
 
 ```raku
-method to-dict() returns Mu
+method to-dict() returns PDF::COS::Dict
 ```
 
 produce a PDF Font dictionary for this core font
@@ -105,7 +113,7 @@ return the underline thickness for the font
 ### method type
 
 ```raku
-method type() returns Mu
+method type() returns Str
 ```
 
 PDF Font type (always 'Type1' for core fonts)
@@ -113,7 +121,7 @@ PDF Font type (always 'Type1' for core fonts)
 ### method is-embedded
 
 ```raku
-method is-embedded() returns Mu
+method is-embedded() returns Bool
 ```
 
 whether font is embedded (always False for core fonts)
@@ -121,7 +129,7 @@ whether font is embedded (always False for core fonts)
 ### method is-subset
 
 ```raku
-method is-subset() returns Mu
+method is-subset() returns Bool
 ```
 
 whether font is subset (always False for core fonts)
@@ -129,7 +137,7 @@ whether font is subset (always False for core fonts)
 ### method is-core-font
 
 ```raku
-method is-core-font() returns Mu
+method is-core-font() returns Bool
 ```
 
 whether font is a core font (always True for core fonts)
@@ -137,7 +145,7 @@ whether font is a core font (always True for core fonts)
 ### method cb-finish
 
 ```raku
-method cb-finish() returns Mu
+method cb-finish() returns PDF::COS::Dict
 ```
 
 finish a PDF rendered font

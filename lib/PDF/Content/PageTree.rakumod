@@ -78,7 +78,7 @@ $pdf.add-page($_) for @pages;
     }
 
     #| append page subtree
-    method add-pages(::?ROLE:D: ::?ROLE:D $pages = $.pages-fragment) {
+    method add-pages(::?ROLE:D: ::?ROLE:D $pages = $.pages-fragment --> ::?ROLE:D) {
         self.Kids.push: $pages;
 	$pages<Parent> = self.link;
 
@@ -101,7 +101,7 @@ $pdf.add-page($_) for @pages;
     }
 
     #| traverse page tree
-    multi method page(::?ROLE:D: UInt $page-num) {
+    multi method page(::?ROLE:D: UInt $page-num --> PDF::Content::Page) {
         my Int $page-count = 0;
 
         for self.Kids.keys {

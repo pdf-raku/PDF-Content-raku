@@ -61,7 +61,7 @@ say $gfx.Str;
     #| Add a graphics block
     method graphics( &meth! ) {
         $.op(Save);
-        my \rv = meth(self);
+        my \rv = self.&meth();
         $.op(Restore);
         rv;
     }
@@ -69,7 +69,7 @@ say $gfx.Str;
     #| Add a text block
     method text( &meth! ) {
         $.op(BeginText);
-        my \rv = meth(self);
+        my \rv = self.&meth();
         $.op(EndText);
         return rv;
     }
@@ -90,7 +90,7 @@ say $gfx.Str;
     }
 
     #| Add a marked content block
-    method mark(Str $t, &meth, |c) { self.tag($t, &meth, :mark, |c) }
+    method mark(Str $t, &meth, |c --> PDF::Content::Tag) { self.tag($t, &meth, :mark, |c) }
 
     multi method tag(PDF::Content::Tag $_, &meth) {
         samewith( .tag, &meth, |.attributes, );
@@ -101,7 +101,7 @@ say $gfx.Str;
     }
 
     #| Add an empty content tag, optionally marked
-    multi method tag(Str $tag, Bool :$mark, *%props) {
+    multi method tag(Str $tag, Bool :$mark, *%props --> PDF::Content::Tag) {
         self!setup-mcid: :$mark, :%props;
         %props
             ?? $.MarkPointDict($tag, $%props)
@@ -110,12 +110,12 @@ say $gfx.Str;
     }
 
     #| Add tagged content, optionally marked
-    multi method tag(Str $tag, &meth!, Bool :$mark, *%props) {
+    multi method tag(Str $tag, &meth!, Bool :$mark, *%props --> PDF::Content::Tag) {
         self!setup-mcid: :$mark, :%props;
         %props
             ?? $.BeginMarkedContentDict($tag, $%props)
             !! $.BeginMarkedContent($tag);
-        meth(self);
+        self.&meth();
         $.EndMarkedContent;
         $.closed-tag;
     }
@@ -149,7 +149,7 @@ say $gfx.Str;
     }
 
     #| extract any inline images from the content stream. returns an array of XObject Images
-    method inline-images returns Array {
+    method inline-images returns Array[PDF::Content::XObject] {
         my PDF::Content::XObject @images;
         for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
             my $bi = $.ops[$i];
@@ -186,6 +186,7 @@ say $gfx.Str;
               Numeric  :$width is copy,
               Numeric  :$height is copy,
               Bool     :$inline = False,
+              --> List
         )  {
 
         my Numeric ($x, $y);
@@ -282,7 +283,7 @@ say $gfx.Str;
     #| build a path, then fill and stroke it
     multi method paint(&meth, *%o) {
         self.Save;
-        &meth(self);
+        self.&meth();
         my \rv = self.paint: |%o;
         self.Restore;
         rv;
@@ -290,8 +291,11 @@ say $gfx.Str;
 
     my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
     multi sub make-font(PDF::Content::FontObj:D $_) { $_ }
-    #| associate a font dictionaery with a font object
-    multi sub make-font(PDF::COS::Dict:D() $dict where .<Type> ~~ 'Font') {
+    #| associate a font dictionary with a font object
+    multi sub make-font(
+        PDF::COS::Dict:D() $dict where .<Type> ~~ 'Font'
+        --> PDF::COS::Dict
+    ) {
         $dict.^mixin: PDF::Content::Font
             unless $dict.does(PDF::Content::Font);
         unless $dict.font-obj.defined {
@@ -313,6 +317,7 @@ say $gfx.Str;
         MadeFont:D :$font = make-font(self!current-font[0]),
         Numeric:D  :$font-size = $.font-size // self!current-font[1],
         *%opt,
+        --> PDF::Content::Text::Box
     ) is hidden-from-backtrace {
         PDF::Content::Text::Box.new(
             :$gfx, :$font, :$font-size, |%opt,
@@ -323,6 +328,7 @@ say $gfx.Str;
     multi method print(
         Str $text,
         *%opt,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
+        --> List
     ) {
         my $text-box = self.text-box( :$text, |%opt);
         @.print( $text-box, |%opt);
@@ -386,6 +392,7 @@ say $gfx.Str;
                        Position :$position,
                        Bool :$nl = False,
                        Bool :$preserve = True,
+                       --> List
         ) {
 
         my Bool $left = False;
@@ -455,7 +462,7 @@ say $gfx.Str;
     }
 
     #| print text to the content stream
-    multi method print(Str $text, :$font = self!current-font[0], |c) {
+    multi method print(Str $text, :$font = self!current-font[0], |c --> List) {
         nextwith( $text, :$font, |c);
     }
 

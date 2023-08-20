@@ -21,7 +21,7 @@ appended graphics return appended PDF content stream
 ### method has-pre-gfx
 
 ```raku
-method has-pre-gfx() returns Mu
+method has-pre-gfx() returns Bool
 ```
 
 prepended graphics
@@ -47,7 +47,7 @@ Allocate the next MCID (Marked Content Identifier)
 ```raku
 method tidy(
     @ops
-) returns Mu
+) returns Array
 ```
 
 Fix nesting issues that aren't illegal, but could cause problems: - append any missing 'Q' (Restore) operators at end of stream - wrap with 'q' (Save) and 'Q' (Restore) operators, if there are any top-level graphics, which may affect the state.
@@ -74,7 +74,7 @@ reparse contents
 method render(
     Bool :$tidy = Bool::True,
     |c
-) returns Mu
+) returns PDF::Content
 ```
 
 render graphics
@@ -93,7 +93,7 @@ finish for serialization purposes
 method xobject-form(
     :$group = Bool::True,
     *%dict
-) returns Mu
+) returns PDF::Content::XObject
 ```
 
 create a child XObject Form
@@ -109,7 +109,7 @@ method tiling-pattern(
     Int :$TilingType = 1,
     Hash :$Resources = Code.new,
     *%dict
-) returns Mu
+) returns PDF::Content::XObject
 ```
 
 create a new Type 1 (Tiling) Pattern

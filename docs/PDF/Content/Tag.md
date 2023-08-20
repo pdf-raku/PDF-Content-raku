@@ -60,10 +60,8 @@ $page.graphics: -> $gfx {
 say $page.gfx.tags.gist; # '<H1 MCID="0"/><P MCID="1"><Figure/></P>';
 ```
 
-heading2
-========
-
 Methods
+-------
 
 
 
@@ -86,7 +84,7 @@ These tags are meaningful within content streams, as opposed to the structure-tr
 ```raku
 multi method add-kid(
     PDF::Content::Tag $kid
-) returns Mu
+) returns PDF::Content::Tag
 ```
 
 Add a child tag
@@ -102,7 +100,7 @@ take self and all descendants
 ### method descendants
 
 ```raku
-method descendants() returns Mu
+method descendants() returns Seq
 ```
 
 gather all descendants

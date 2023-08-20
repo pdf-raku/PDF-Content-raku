@@ -67,7 +67,7 @@ method mark(
     Str $t,
     &meth,
     |c
-) returns Mu
+) returns PDF::Content::Tag
 ```
 
 Add a marked content block
@@ -79,7 +79,7 @@ multi method tag(
     Str $tag,
     Bool :$mark,
     *%props
-) returns Mu
+) returns PDF::Content::Tag
 ```
 
 Add an empty content tag, optionally marked
@@ -92,7 +92,7 @@ multi method tag(
     &meth,
     Bool :$mark,
     *%props
-) returns Mu
+) returns PDF::Content::Tag
 ```
 
 Add tagged content, optionally marked
@@ -110,7 +110,7 @@ Open an image from a file-spec or data-uri
 ### method inline-images
 
 ```raku
-method inline-images() returns Array
+method inline-images() returns Array[PDF::Content::XObject]
 ```
 
 extract any inline images from the content stream. returns an array of XObject Images
@@ -146,7 +146,7 @@ multi method do(
     Numeric :$width is copy,
     Numeric :$height is copy,
     Bool :$inline = Bool::False
-) returns Mu
+) returns List
 ```
 
 place an image, or form object
@@ -190,10 +190,10 @@ build a path, then fill and stroke it
 ```raku
 multi sub make-font(
     PDF::COS::Dict:D(Any):D $dict where { ... }
-) returns Mu
+) returns PDF::COS::Dict
 ```
 
-associate a font dictionaery with a font object
+associate a font dictionary with a font object
 
 ### method text-box
 
@@ -202,7 +202,7 @@ method text-box(
     Any:D :$font where { ... } = Code.new,
     Numeric:D :$font-size = Code.new,
     *%opt
-) returns Mu
+) returns PDF::Content::Text::Box
 ```
 
 create a text box object for use in graphics .print() or .say() methods
@@ -213,7 +213,7 @@ create a text box object for use in graphics .print() or .say() methods
 multi method print(
     Str $text,
     *%opt
-) returns Mu
+) returns List
 ```
 
 output text leave the text position at the end of the current line
@@ -234,7 +234,7 @@ multi method print(
     List :$position where { ... },
     Bool :$nl = Bool::False,
     Bool :$preserve = Bool::True
-) returns Mu
+) returns List
 ```
 
 print a text block object
@@ -276,7 +276,7 @@ multi method print(
     Str $text,
     :$font = Code.new,
     |c
-) returns Mu
+) returns List
 ```
 
 print text to the content stream
