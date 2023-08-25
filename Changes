@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+0.6.15  2023-08-26T07:00:47+12:00
+   - Breakup README.md add source-level POD. Add Makefile with 'doc'
+     target to build markdown under 'docs/' directory
+   - Add return constraints to methods/subs (mostly to improve POD)
+
 0.6.14  2023-08-02T15:25:37+12:00
    - Exclude invisible text from text-flow calculations
 
