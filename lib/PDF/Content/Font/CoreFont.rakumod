@@ -118,6 +118,7 @@ say $font.stringwidth("RVX", :kern); # 2111
 
         :sans-serif<helvetica>,
         :serif<times-roman>,
+        :mono<courier>,
 
         :symbol-bold<symbol>,
         :symbol-italic<symbol>,
