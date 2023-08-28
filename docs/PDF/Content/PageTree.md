@@ -35,7 +35,7 @@ my PDF::Content::Page @pages;
         .text-position = 50, 400;
         .say: "Page $page-num";
     }
-    $.page.finish;
+    $page.finish;
     $page;
 }
 

@@ -1,3 +1,4 @@
+#| style setting for a text box
 class PDF::Content::Text::Style is rw {
 
     use PDF::Content::Color :&color;
@@ -43,7 +44,10 @@ class PDF::Content::Text::Style is rw {
         self!build(|%o);
     }
 
-    method baseline-shift(Baseline $_) {
+    =head2 Methods
+
+    #| compute a vertical offset for a named font alignment mode
+    multi method baseline-shift(Baseline $_ --> Numeric) {
         my \h = $!font.height($!font-size, :hanging, :from-baseline);
 	when 'alphabetic'  { 0 }
 	when 'top'         { - h }
@@ -53,19 +57,27 @@ class PDF::Content::Text::Style is rw {
 	when 'hanging'     { - h }
 	default            { 0 }
     }
+    =para This returns a positive or negative y-offset in units of points.  The default is C<alphabetic>, which is a zero offset. 
 
+    #| get/set a numeric font vertical alignment offset
+    multi method baseline-shift is rw { $!TextRise }
+
+    #| return the scaled width of spaces
     method space-width {
         $!space-width * $!font-size / 1000;
     }
 
+    #| return the scaled underline position
     method underline-position {
         ($!font.underline-position // -100) * $!font-size / 1000;
     }
 
+    #| return the scaled underline thickness
     method underline-thickness {
         ($!font.underline-thickness // 50) * $!font-size / 1000;
     }
 
+    #| return the scaled font height
     method font-height(|c) {
         $!font.height: $!font-size, |c;
     }

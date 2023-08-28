@@ -32,6 +32,40 @@ say $gfx.Str;
 Methods
 -------
 
+style
+-----
+
+```raku
+        method style() returns PDF::Content::Text::Style
+```
+
+Styling delegate for this text box. See[PDF::Content::Text::Style](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Style)
+
+font, font-size, leading, kern, WordSpacing, CharSpacing, HorizScaling, TextRender, TextRise, baseline-shift, space-width, underline-position, underline-thickness, font-height
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+These methods are all handled by the `style` delegate. For example `$tb.font-height` is equivalent to `$tb.style.font-height`.
+
+### method content-width
+
+```raku
+method content-width() returns Numeric
+```
+
+return the actual width of content in the text box
+
+Calculated from the longest line in the text box.
+
+### method content-height
+
+```raku
+method content-height() returns Numeric
+```
+
+return the actual height of content in the text box
+
+Calculated from the number of lines in the text box.
+
 ### method comb
 
 ```raku
@@ -52,14 +86,6 @@ method clone(
 ```
 
 clone a text box
-
-### method word-gap
-
-```raku
-method word-gap() returns Numeric
-```
-
-calculates actual spacing between words
 
 ### method width
 

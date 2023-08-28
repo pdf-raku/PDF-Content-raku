@@ -44,8 +44,23 @@ say $gfx.Str;
     has Bool $.squish = False;
     has Bool $.verbatim;
 
-    method content-width  { @!lines».content-width.max; }
-    method content-height { @!lines».height.sum * $.leading; }
+    =head2 style
+    =for code :lang<raku>
+        method style() returns PDF::Content::Text::Style
+
+    =para Styling delegate for this text box. SeeL<PDF::Content::Text::Style>
+
+    =head2 font, font-size, leading, kern, WordSpacing, CharSpacing, HorizScaling, TextRender, TextRise, baseline-shift, space-width, underline-position, underline-thickness, font-height
+
+    =para These methods are all handled by the C<style> delegate. For example C<$tb.font-height> is equivalent to C<$tb.style.font-height>.
+
+    #| return the actual width of content in the text box
+    method content-width returns Numeric  { @!lines».content-width.max; }
+    =para Calculated from the longest line in the text box.
+
+    #| return the actual height of content in the text box
+    method content-height returns Numeric { @!lines».height.sum * $.leading; }
+    =para Calculated from the number of lines in the text box.
 
     my grammar Text {
         token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
@@ -201,7 +216,7 @@ say $gfx.Str;
         $n;
     }
 
-    #| calculates actual spacing between words
+    # calculates actual spacing between words
     method !word-gap returns Numeric {
         my $word-gap = $.space-width + $.WordSpacing + $.CharSpacing;
         $word-gap * $.HorizScaling / 100;

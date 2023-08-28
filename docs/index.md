@@ -24,6 +24,8 @@ as listed in the [PDF::API6 Graphics Documentation](https://pdf-raku.github.io/P
 
 - [PDF::Content::Text::Box](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Box) a utility class for creating boxed text content for output by `print()` or `say()`
 
+- [PDF::Content::Text::Style](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Style) text styling class for text boxes.
+
 - [PDF::Content::Color](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Color) A module of color construction functions
 
 - [PDF::Content::Tag](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Tag) Tagged content detection and construction
