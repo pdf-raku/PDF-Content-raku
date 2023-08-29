@@ -20,6 +20,41 @@ $gfx.EndText;
 say $gfx.Str;
 =end code
 
+=head2 Description
+
+=para Text boxes are used to implement the <PDF::Content> C<print> and C<say> methods. They usually work "behind the scenes". But can be created as objects and then passed to C<print> and C<say>:
+
+=begin code :lang<raku>
+use PDF::Lite;
+use PDF::Content;
+use PDF::Content::Text::Box;
+
+my PDF::Lite $pdf .= new;
+
+my $font-size = 16;
+my $height = 20;
+my $text = "Hello.  Ting, ting-ting.";
+
+my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
+my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :$font-size, :$height );
+
+say "width:" ~ $text-box.width;
+say "height:" ~ $text-box.height;
+say "underline-thickness:" ~ $text-box.underline-thickness;
+say "underline-position:" ~ $text-box.underline-position;
+
+my $page = $pdf.add-page;
+
+$page.text: {
+    .text-position = 10, 20;
+    .say: $text-box;
+    .text-position = 10, 50;
+    .print: $text-box;
+}
+
+$pdf.save-as: "test.pdf";
+=end code
+
 =head2 Methods
 
     use PDF::Content::Text::Style;
@@ -46,13 +81,11 @@ say $gfx.Str;
 
     =head2 style
     =for code :lang<raku>
-        method style() returns PDF::Content::Text::Style
+    method style() returns PDF::Content::Text::Style
 
     =para Styling delegate for this text box. SeeL<PDF::Content::Text::Style>
 
-    =head2 font, font-size, leading, kern, WordSpacing, CharSpacing, HorizScaling, TextRender, TextRise, baseline-shift, space-width, underline-position, underline-thickness, font-height
-
-    =para These methods are all handled by the C<style> delegate. For example C<$tb.font-height> is equivalent to C<$tb.style.font-height>.
+    =para This method also handles method C<font>, C<font-size>, C<leading>, C<kern>, C<WordSpacing>, C<CharSpacing>, C<HorizScaling>, C<TextRender>, C<TextRise>, C<baseline-shift>, C<space-width>, C<underline-position>, C<underline-thickness>, C<font-height>. For example C<$tb.font-height> is equivalent to C<$tb.style.font-height>.
 
     #| return the actual width of content in the text box
     method content-width returns Numeric  { @!lines».content-width.max; }

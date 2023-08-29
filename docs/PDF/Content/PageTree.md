@@ -16,7 +16,7 @@ This role contains methods for querying and manipulating page tree nodes in a PD
 
 This class includes the methods:
 
-  * `page-fragment` - create a detached page `pages-fragment` - create a detached page sub-treee
+  * `page-fragment` - create a detached page `pages-fragment` - create a detached page sub-tree
 
 These stand-alone fragments aim to be thread-safe to support parallel construction of pages. The final PDF assembly needs to be synchronous.
 

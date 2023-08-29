@@ -13,7 +13,7 @@ nodes in a PDF.
 This class includes the methods:
 
 =item `page-fragment` - create a detached page
-`pages-fragment` - create a detached page sub-treee
+`pages-fragment` - create a detached page sub-tree
 
 These stand-alone fragments aim to be thread-safe to support parallel construction of pages. The final PDF assembly needs to be synchronous.
 
