@@ -1,4 +1,5 @@
 {{$NEXT}}
+   - Make text-box text() method a rw accessor
 
 0.6.15  2023-08-26T07:00:47+12:00
    - Breakup README.md add source-level POD. Add Makefile with 'doc'

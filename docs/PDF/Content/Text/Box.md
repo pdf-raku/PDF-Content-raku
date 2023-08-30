@@ -32,7 +32,7 @@ say $gfx.Str;
 Description
 -----------
 
-Text boxes are used to implement the <PDF::Content> `print` and `say` methods. They usually work "behind the scenes". But can be created as objects and then passed to `print` and `say`:
+Text boxes are used to implement the [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content) `print` and `say` methods. They usually work "behind the scenes". But can be created as objects and then passed to `print` and `say`:
 
 ```raku
 use PDF::Lite;
@@ -67,6 +67,30 @@ $pdf.save-as: "test.pdf";
 
 Methods
 -------
+
+### text
+
+The text contained in the text box. This is a `rw` accessor. It can also be used to replace the text contained in a text box.
+
+### width
+
+The constraining width for the text box.
+
+### height
+
+The constraining height for the text box.
+
+### indent
+
+The indentation of the first line (points).
+
+### align
+
+Horizontal alignment `left`, `center`, or `right`.
+
+### valign
+
+Vertical alignment `top`, `center`, or `bottom`.
 
 style
 -----

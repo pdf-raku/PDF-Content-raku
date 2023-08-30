@@ -1,5 +1,5 @@
-# top-level content-related PDF actions as performed by PDF::Class,
-# PDF::Lite (and PDF::API6)
+#| top-level content-related PDF actions as performed by PDF::Class,
+#| PDF::Lite (and PDF::API6)
 unit role PDF::Content::API;
 
 use PDF::Content::Interface;

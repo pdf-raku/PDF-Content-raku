@@ -22,7 +22,7 @@ say $gfx.Str;
 
 =head2 Description
 
-=para Text boxes are used to implement the <PDF::Content> C<print> and C<say> methods. They usually work "behind the scenes". But can be created as objects and then passed to C<print> and C<say>:
+=para Text boxes are used to implement the L<PDF::Content> C<print> and C<say> methods. They usually work "behind the scenes". But can be created as objects and then passed to C<print> and C<say>:
 
 =begin code :lang<raku>
 use PDF::Lite;
@@ -56,6 +56,31 @@ $pdf.save-as: "test.pdf";
 =end code
 
 =head2 Methods
+
+=head3 text
+
+=para The text contained in the text box. This is a C<rw> accessor. It can also
+be used to replace the text contained in a text box.
+
+=head3 width
+
+=para The constraining width for the text box.
+
+=head3 height
+
+=para The constraining height for the text box.
+
+=head3 indent
+
+=para The indentation of the first line (points).
+
+=head3 align
+
+=para Horizontal alignment C<left>, C<center>, or C<right>.
+
+=head3 valign
+
+=para Vertical alignment C<top>, C<center>, or C<bottom>.
 
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
@@ -114,6 +139,16 @@ $pdf.save-as: "test.pdf";
         }
     }
 
+    method text(::?CLASS:D $obj:) is rw {
+        Proxy.new(
+            FETCH => { $!text },
+            STORE => -> $, $!text {
+                my @chunks = $obj.comb($!text);
+                $obj!layup: @chunks;
+            },
+        );
+    }
+
     multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
         $_ .= new(|c) without $!style;
 	self!layup: @chunks;
@@ -133,7 +168,7 @@ $pdf.save-as: "test.pdf";
 	my $height = $!style.font-size;
 
         my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
-	@!lines = [ $line ];
+	@!lines = $line;
 
         LAYUP: while $i < $n {
             my subset StrOrImage where Str | PDF::Content::XObject;
