@@ -42,7 +42,7 @@ say $image.data-uri;
 
 =head2 Description
 
-This class currently currently supports image formats: PNG, GIF and JPEG.
+This class currently supports image formats: PNG, GIF and JPEG.
 
 =head2Methods
 
@@ -102,7 +102,8 @@ This class currently currently supports image formats: PNG, GIF and JPEG.
         self!image-handler(:$image-type).new: :$source, :$image-type;
     }
 
-    method make-data-uri(Str :$image-type!, :$source!) {
+    # build a data uri from a binary source with a given image-type
+    sub make-data-uri(Str :$image-type!, :$source! --> Str) is export(:make-data-uri) {
         with $source {
             use Base64::Native;
             my Blob $bytes = .isa(Str)
@@ -121,7 +122,7 @@ This class currently currently supports image formats: PNG, GIF and JPEG.
     method data-uri returns DataURI is rw {
         Proxy.new(
             FETCH => {
-                $!data-uri //= $.make-data-uri( :$.image-type, :$!source );
+                $!data-uri //= make-data-uri( :$.image-type, :$!source );
             },
             STORE => -> $, $!data-uri {},
         )

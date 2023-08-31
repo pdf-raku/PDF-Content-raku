@@ -22,7 +22,7 @@ say $image.data-uri;
 Description
 -----------
 
-This class currently currently supports image formats: PNG, GIF and JPEG.
+This class currently supports image formats: PNG, GIF and JPEG.
 
 head2Methods
 ============

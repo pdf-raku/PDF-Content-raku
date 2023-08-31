@@ -1,319 +1,317 @@
 # adapted from Perl's PDF::API2::Resource::XObject::Image::PNG
+unit class PDF::Content::Image::PNG;
+
 use PDF::Content::Image;
+also is PDF::Content::Image;
 
-class PDF::Content::Image::PNG
-    is PDF::Content::Image {
+use PDF::COS;
+use PDF::COS::Name;
+use PDF::COS::Stream;
+use PDF::IO::Filter;
+use PDF::IO::Util :pack;
+use Native::Packing :Endian;
 
-    use PDF::COS;
-    use PDF::COS::Name;
-    use PDF::COS::Stream;
-    use PDF::IO::Filter;
-    use PDF::IO::Util :pack;
-    use Native::Packing :Endian;
+enum PNG-CS is export(:PNG-CS) « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
 
-    enum PNG-CS is export(:PNG-CS) « :Gray(0) :RGB(2) :RGB-Palette(3) :Gray-Alpha(4) :RGB-Alpha(6) »;
+use NativeCall;
+need Compress::Zlib::Raw;
 
-    use NativeCall;
-    need Compress::Zlib::Raw;
+class Magic is repr('CStruct') does Native::Packing[Host] {
+    constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
+    has uint64 $.buf;
+    method Str(Magic:D:) { self.pack.decode('latin-1') }
+    method is-png { self.Str eq PNG-Header }
+}
+class Header is repr('CStruct') does Native::Packing[Network] {
+    has uint32 $.width;
+    has uint32 $.height;
+    has uint8  $.bit-depth;
+    has uint8  $.color-type is rw;
+    has uint8  $.compression-type;
+    has uint8  $.filter-type;
+    has uint8  $.interlace-type;
+}
+class Quad is repr('CStruct') does Native::Packing[Network] {
+    has uint32 $.Numeric;
+}
+has Header $.hdr;
+has Blob $.palette is rw;
+has Blob $.trns is rw;
+has Blob $.stream;
+constant NullPointer = nativecast(CArray,Pointer.new(0));
 
-    class Magic is repr('CStruct') does Native::Packing[Host] {
-        constant PNG-Header = [~] 0x89.chr, "PNG", 0xD.chr, 0xA.chr, 0x1A.chr, 0xA.chr;
-        has uint64 $.buf;
-        method Str(Magic:D:) { self.pack.decode('latin-1') }
-        method is-png { self.Str eq PNG-Header }
-    }
-    class Header is repr('CStruct') does Native::Packing[Network] {
-        has uint32 $.width;
-        has uint32 $.height;
-        has uint8  $.bit-depth;
-        has uint8  $.color-type is rw;
-        has uint8  $.compression-type;
-        has uint8  $.filter-type;
-        has uint8  $.interlace-type;
-    }
-    class Quad is repr('CStruct') does Native::Packing[Network] {
-        has uint32 $.Numeric;
-    }
-    has Header $.hdr;
-    has Blob $.palette is rw;
-    has Blob $.trns is rw;
-    has Blob $.stream;
-    constant NullPointer = nativecast(CArray,Pointer.new(0));
+method !crc($hdr, $buf) {
+    my uint32 $crc = Compress::Zlib::Raw::crc32(0, NullPointer, 0);
+    $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $hdr), 4);
+    $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $buf), $buf.elems)
+        if $buf.elems;
+    $crc;
+}
 
-    method !crc($hdr, $buf) {
-        my uint32 $crc = Compress::Zlib::Raw::crc32(0, NullPointer, 0);
-        $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $hdr), 4);
-        $crc = Compress::Zlib::Raw::crc32($crc, nativecast(CArray, $buf), $buf.elems)
-            if $buf.elems;
-        $crc;
-    }
+method read($fh = $.source) {
+    my Magic $magic .= read($fh);
+    die X::PDF::Image::WrongHeader.new( :type<PNG>, :header($magic.Str), :path($fh.path) )
+        unless $magic.is-png;
 
-    method read($fh = $.source) {
-        my Magic $magic .= read($fh);
-        die X::PDF::Image::WrongHeader.new( :type<PNG>, :header($magic.Str), :path($fh.path) )
-            unless $magic.is-png;
+    $!stream  = Nil;
+    $!palette = Nil;
+    $!trns    = Nil;
 
-        $!stream  = Nil;
-        $!palette = Nil;
-        $!trns    = Nil;
+    while !$fh.eof {
+        my Quad $len .= read($fh);
+        my buf8 $hdr = $fh.read(4);
+        my buf8 $buf = $_ ?? $fh.read($_) !! buf8.new
+            given +$len;
+        my Quad $crc .= read($fh);
+        if +$len {
+            my uint32 $crc-got = +$crc;
+            my uint32 $crc-calc = self!crc($hdr,$buf);
+            die "crc check failed: expected $crc-calc, got $crc-got"
+                unless $crc-calc == $crc-got;
+        }
 
-        while !$fh.eof {
-            my Quad $len .= read($fh);
-            my buf8 $hdr = $fh.read(4);
-            my buf8 $buf = $_ ?? $fh.read($_) !! buf8.new
-                given +$len;
-            my Quad $crc .= read($fh);
-            if +$len {
-                my uint32 $crc-got = +$crc;
-                my uint32 $crc-calc = self!crc($hdr,$buf);
-                die "crc check failed: expected $crc-calc, got $crc-got"
-                    unless $crc-calc == $crc-got;
+        given $hdr.decode('latin-1') {
+
+            when 'IHDR' {
+                $!hdr = Header.unpack: $buf;
+                die "Unsupported Compression($!hdr.cm) Method" if $!hdr.compression-type;
+                die "Unsupported Filter($!hdr.fm) Method" if $!hdr.filter-type;
+                die "Unsupported Interlace($!hdr.im) Method" if $!hdr.interlace-type;
             }
-
-            given $hdr.decode('latin-1') {
-
-                when 'IHDR' {
-                    $!hdr = Header.unpack: $buf;
-                    die "Unsupported Compression($!hdr.cm) Method" if $!hdr.compression-type;
-                    die "Unsupported Filter($!hdr.fm) Method" if $!hdr.filter-type;
-                    die "Unsupported Interlace($!hdr.im) Method" if $!hdr.interlace-type;
-                }
-                when 'PLTE' {
-                    $!palette = $buf;
-                }
-                when 'IDAT' {
-                    $!stream //= buf8.new;
-                    $!stream.append: $buf.list;
-                }
-                when 'tRNS' {
-                    $!trns = $buf;
-                }
-                when 'IEND' {
-                    last;
-                }
+            when 'PLTE' {
+                $!palette = $buf;
+            }
+            when 'IDAT' {
+                $!stream //= buf8.new;
+                $!stream.append: $buf.list;
+            }
+            when 'tRNS' {
+                $!trns = $buf;
+            }
+            when 'IEND' {
+                last;
             }
         }
-        $fh.close;
-        self;
+    }
+    $fh.close;
+    self;
+}
+
+method !add-chunk(buf8 $buf, Str $hdr, Blob:D $data) {
+    my Quad $len .= new: :Numeric($data.bytes);
+    $len.pack($buf);
+    $buf.append: $hdr.encode.list;
+    $buf.append: $data.list;
+    my Quad $crc .= new: :Numeric(self!crc($hdr.encode, $data));
+    $crc.pack($buf);
+}
+
+method Buf {
+    my $buf = buf8.new: Magic::PNG-Header.encode: "latin-1";
+    self!add-chunk($buf, 'IHDR', $!hdr.pack);
+    self!add-chunk($buf, 'PLTE', $_) with $!palette;
+    self!add-chunk($buf, 'tRNS', $_) with $!trns;
+    self!add-chunk($buf, 'IDAT', $!stream);
+    self!add-chunk($buf, 'IEND', buf8.new);
+    $buf;
+}
+
+sub network-words(Buf $buf) {
+    pack($buf, 16);
+}
+
+method to-dict(Bool :$alpha = True) {
+    my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
+    %dict<Width>  = $!hdr.width;
+    %dict<Height> = $!hdr.height;
+
+    my %opts = :w($!hdr.width), :h($!hdr.height), :%dict, :$!stream, :$alpha;
+    %opts<trns> = $_ with $!trns;
+    %opts<palette> = $_ with $!palette;
+    png-to-stream(PNG-CS($!hdr.color-type), $!hdr.bit-depth, |%opts);
+}
+
+proto sub png-to-stream(uint $cs, uint $bpc, *%o --> PDF::COS::Stream) {*}
+
+multi sub png-to-stream(PNG-CS::Gray,
+                        $bpc where 1|2|4|8|16,
+                        UInt :$w!,
+                        UInt :$h!,
+                        :%dict!,
+                        Buf :$stream!,
+                        Buf :$trns,
+                        Bool :$alpha,
+    ) {
+    %dict<Filter> = :name<FlateDecode>;
+    %dict<ColorSpace> = :name<DeviceGray>;
+    %dict<BitsPerComponent> = $bpc;
+    %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
+
+    if $alpha && $trns && +$trns {
+        my $vals = network-words($trns);
+        %dict<Mask> = $vals.minmax.minmax;
+    }
+    my $encoded = $stream.decode: 'latin-1';
+    PDF::COS::Stream.COERCE: { :%dict, :$encoded };
+}
+
+multi sub png-to-stream(PNG-CS::RGB,
+                        $bpc where 8|16,
+                        UInt :$w!,
+                        UInt :$h!,
+                        :%dict!,
+                        Buf :$stream!,
+                        Buf :$trns,
+                        Bool :$alpha,
+    ) {
+    %dict<Filter> = :name<FlateDecode>;
+    %dict<ColorSpace> = :name<DeviceRGB>;
+    %dict<BitsPerComponent> = $bpc;
+    %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
+
+    if $alpha && $trns && +$trns {
+        my $vals = network-words($trns);
+        %dict<Mask> = $vals.minmax.minmax;
+    }
+    my $encoded = $stream.decode: 'latin-1';
+    PDF::COS::Stream.COERCE: { :%dict, :$encoded };
+}
+
+multi sub png-to-stream(PNG-CS::RGB-Palette,
+                        $bpc where 1|2|4|8,
+                        UInt :$w!,
+                        UInt :$h!,
+                        :%dict!,
+                        Buf :$stream!,
+                        Buf :$trns,
+                        Buf :$palette!,
+                        Bool :$alpha,
+    ) {
+    %dict<Filter> = :name<FlateDecode>;
+    %dict<BitsPerComponent> = $bpc;
+    %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
+
+    my $encoded = $palette.decode('latin-1');
+    my $color-stream = PDF::COS::Stream.COERCE: { :$encoded };
+    my $hival = +$palette div 3  -  1;
+    %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, $hival, $color-stream, ];
+
+    if defined $trns && $alpha {
+        my $decoded = $trns;
+        my uint $padding = $w * $h  -  +$decoded;
+        $decoded.append( 0xFF xx $padding)
+            if $padding;
+
+        %dict<SMask> = PDF::COS::Stream.COERCE: {
+            :dict{:Type( :name<XObject> ),
+                  :Subtype( :name<Image> ),
+                  :Width($w),
+                  :Height($h),
+                  :ColorSpace( :name<DeviceGray> ),
+                  :Filter( :name<FlateDecode> ),
+                  :BitsPerComponent(8),
+            },
+            :$decoded,
+        };
+    }
+    $encoded = $stream.decode: 'latin-1';
+    PDF::COS::Stream.COERCE: { :%dict, :$encoded };
+}
+
+multi sub png-to-stream(PNG-CS::Gray-Alpha,
+                        $bpc where 8|16,
+                        UInt :$w!,
+                        UInt :$h!,
+                        :%dict!,
+                        :$stream! is copy,
+                        Bool :$alpha,
+    ) {
+
+    %dict<Filter> = PDF::COS::Name.COERCE: 'FlateDecode';
+    %dict<ColorSpace> = :name<DeviceGray>;
+    %dict<DecodeParms> = { :Predictor(15), :Colors(2), :Columns($w), :BitsPerComponent($bpc) };
+    %dict<BitsPerComponent> = $bpc;
+
+    $stream = PDF::IO::Filter.decode( $stream, :%dict );
+
+    # Extract alpha (transparency channel)
+    %dict<DecodeParms><Colors>--;
+
+    my uint $n = $bpc div 8;
+    my uint $i = 0;
+
+    my buf8 $gray-channel  .= new;
+    my buf8 $alpha-channel .= new;
+    while $i < +$stream {
+        $gray-channel.push( $stream[$i++] )  xx $n;
+        $alpha-channel.push( $stream[$i++] ) xx $n;
     }
 
-    method !add-chunk(buf8 $buf, Str $hdr, Blob:D $data) {
-        my Quad $len .= new: :Numeric($data.bytes);
-        $len.pack($buf);
-        $buf.append: $hdr.encode.list;
-        $buf.append: $data.list;
-        my Quad $crc .= new: :Numeric(self!crc($hdr.encode, $data));
-        $crc.pack($buf);
+    if $alpha {
+        my $decoded = $alpha-channel.decode: 'latin-1';
+        %dict<SMask> = PDF::COS::Stream.COERCE: {
+            :dict{:Type( :name<XObject> ),
+                  :Subtype( :name<Image> ),
+                  :Width($w),
+                  :Height($h),
+                  :ColorSpace( :name<DeviceGray> ),
+                  :Filter( :name<FlateDecode> ),
+                  :BitsPerComponent( $bpc ),
+            },
+            :$decoded,
+        };
     }
 
-    method Buf {
-        my $buf = buf8.new: Magic::PNG-Header.encode: "latin-1";
-        self!add-chunk($buf, 'IHDR', $!hdr.pack);
-        self!add-chunk($buf, 'PLTE', $_) with $!palette;
-        self!add-chunk($buf, 'tRNS', $_) with $!trns;
-        self!add-chunk($buf, 'IDAT', $!stream);
-        self!add-chunk($buf, 'IEND', buf8.new);
-        $buf;
+    my $decoded = $gray-channel.decode: 'latin-1';
+    PDF::COS::Stream.COERCE: { :%dict, :$decoded };
+}
+
+multi sub png-to-stream(PNG-CS::RGB-Alpha,
+                        $bpc where 8|16,
+                        UInt :$w!,
+                        UInt :$h!,
+                        :%dict!,
+                        :$stream! is copy,
+                        Buf :$trns,
+                        Bool :$alpha,
+    ) {
+    %dict<Filter> = PDF::COS::Name.COERCE: 'FlateDecode';
+    %dict<ColorSpace> = :name<DeviceRGB>;
+    %dict<BitsPerComponent> = $bpc;
+    %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(4), :Columns($w) };
+    $stream = PDF::IO::Filter.decode( $stream, :%dict );
+    # Strip alpha (transparency channel)
+    %dict<DecodeParms><Colors>--;
+
+    my uint $n = $bpc div 8;
+    my uint $nc = $n * 3;
+    my uint $i = 0;
+    my uint $stream-len = +$stream;
+
+    my buf8 $rgb-channels  .= new;
+    my buf8 $alpha-channel .= new;
+    while $i < $stream-len {
+        $rgb-channels.push( $stream[$i++] )  xx $nc;
+        $alpha-channel.push( $stream[$i++] ) xx $n;
     }
 
-    sub network-words(Buf $buf) {
-        pack($buf, 16);
+    if $alpha {
+        my $decoded = $alpha-channel.decode: 'latin-1';
+        %dict<SMask> = PDF::COS::Stream.COERCE: {
+            :dict{:Type( :name<XObject> ),
+                  :Subtype( :name<Image> ),
+                  :Width($w),
+                  :Height($h),
+                  :ColorSpace( :name<DeviceGray> ),
+                  :Filter( :name<FlateDecode> ),
+                  :BitsPerComponent( $bpc ),
+            },
+            :$decoded
+        };
     }
 
-    method to-dict(Bool :$alpha = True) {
-        my %dict = :Type( :name<XObject> ), :Subtype( :name<Image> );
-        %dict<Width>  = $!hdr.width;
-        %dict<Height> = $!hdr.height;
-
-        my %opts = :w($!hdr.width), :h($!hdr.height), :%dict, :$!stream, :$alpha;
-        %opts<trns> = $_ with $!trns;
-        %opts<palette> = $_ with $!palette;
-        png-to-stream(PNG-CS($!hdr.color-type), $!hdr.bit-depth, |%opts);
-    }
-
-    proto sub png-to-stream(uint $cs, uint $bpc, *%o --> PDF::COS::Stream) {*}
-
-    multi sub png-to-stream(PNG-CS::Gray,
-                            $bpc where 1|2|4|8|16,
-                            UInt :$w!,
-                            UInt :$h!,
-                            :%dict!,
-                            Buf :$stream!,
-                            Buf :$trns,
-                            Bool :$alpha,
-        ) {
-        %dict<Filter> = :name<FlateDecode>;
-        %dict<ColorSpace> = :name<DeviceGray>;
-        %dict<BitsPerComponent> = $bpc;
-        %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
-
-        if $alpha && $trns && +$trns {
-            my $vals = network-words($trns);
-            %dict<Mask> = $vals.minmax.minmax;
-        }
-        my $encoded = $stream.decode: 'latin-1';
-        PDF::COS::Stream.COERCE: { :%dict, :$encoded };
-    }
-
-    multi sub png-to-stream(PNG-CS::RGB,
-                            $bpc where 8|16,
-                            UInt :$w!,
-                            UInt :$h!,
-                            :%dict!,
-                            Buf :$stream!,
-                            Buf :$trns,
-                            Bool :$alpha,
-        ) {
-        %dict<Filter> = :name<FlateDecode>;
-        %dict<ColorSpace> = :name<DeviceRGB>;
-        %dict<BitsPerComponent> = $bpc;
-        %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(3), :Columns($w) };
-
-        if $alpha && $trns && +$trns {
-            my $vals = network-words($trns);
-            %dict<Mask> = $vals.minmax.minmax;
-        }
-        my $encoded = $stream.decode: 'latin-1';
-        PDF::COS::Stream.COERCE: { :%dict, :$encoded };
-    }
-
-    multi sub png-to-stream(PNG-CS::RGB-Palette,
-                            $bpc where 1|2|4|8,
-                            UInt :$w!,
-                            UInt :$h!,
-                            :%dict!,
-                            Buf :$stream!,
-                            Buf :$trns,
-                            Buf :$palette!,
-                            Bool :$alpha,
-        ) {
-        %dict<Filter> = :name<FlateDecode>;
-        %dict<BitsPerComponent> = $bpc;
-        %dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(1), :Columns($w) };
-
-        my $encoded = $palette.decode('latin-1');
-        my $color-stream = PDF::COS::Stream.COERCE: { :$encoded };
-        my $hival = +$palette div 3  -  1;
-        %dict<ColorSpace> = [ :name<Indexed>, :name<DeviceRGB>, $hival, $color-stream, ];
-
-        if defined $trns && $alpha {
-            my $decoded = $trns;
-            my uint $padding = $w * $h  -  +$decoded;
-            $decoded.append( 0xFF xx $padding)
-                if $padding;
-
-            %dict<SMask> = PDF::COS::Stream.COERCE: {
-                :dict{:Type( :name<XObject> ),
-		      :Subtype( :name<Image> ),
-		      :Width($w),
-		      :Height($h),
-		      :ColorSpace( :name<DeviceGray> ),
-		      :Filter( :name<FlateDecode> ),
-		      :BitsPerComponent(8),
-		},
-		:$decoded,
-	    };
-	}
-	$encoded = $stream.decode: 'latin-1';
-	PDF::COS::Stream.COERCE: { :%dict, :$encoded };
-    }
-
-    multi sub png-to-stream(PNG-CS::Gray-Alpha,
-			    $bpc where 8|16,
-			    UInt :$w!,
-			    UInt :$h!,
-			    :%dict!,
-			    :$stream! is copy,
-			    Bool :$alpha,
-	) {
-
-	%dict<Filter> = PDF::COS::Name.COERCE: 'FlateDecode';
-	%dict<ColorSpace> = :name<DeviceGray>;
-	%dict<DecodeParms> = { :Predictor(15), :Colors(2), :Columns($w), :BitsPerComponent($bpc) };
-	%dict<BitsPerComponent> = $bpc;
-
-	$stream = PDF::IO::Filter.decode( $stream, :%dict );
-
-	# Extract alpha (transparency channel)
-	%dict<DecodeParms><Colors>--;
-
-	my uint $n = $bpc div 8;
-	my uint $i = 0;
-
-	my buf8 $gray-channel  .= new;
-	my buf8 $alpha-channel .= new;
-	while $i < +$stream {
-	    $gray-channel.push( $stream[$i++] )  xx $n;
-	    $alpha-channel.push( $stream[$i++] ) xx $n;
-	}
-
-	if $alpha {
-	    my $decoded = $alpha-channel.decode: 'latin-1';
-	    %dict<SMask> = PDF::COS::Stream.COERCE: {
-		:dict{:Type( :name<XObject> ),
-		      :Subtype( :name<Image> ),
-		      :Width($w),
-		      :Height($h),
-		      :ColorSpace( :name<DeviceGray> ),
-		      :Filter( :name<FlateDecode> ),
-		      :BitsPerComponent( $bpc ),
-		},
-		:$decoded,
-	    };
-	}
-
-	my $decoded = $gray-channel.decode: 'latin-1';
-	PDF::COS::Stream.COERCE: { :%dict, :$decoded };
-    }
-
-    multi sub png-to-stream(PNG-CS::RGB-Alpha,
-			    $bpc where 8|16,
-			    UInt :$w!,
-			    UInt :$h!,
-			    :%dict!,
-			    :$stream! is copy,
-			    Buf :$trns,
-			    Bool :$alpha,
-	) {
-	%dict<Filter> = PDF::COS::Name.COERCE: 'FlateDecode';
-	%dict<ColorSpace> = :name<DeviceRGB>;
-	%dict<BitsPerComponent> = $bpc;
-	%dict<DecodeParms> = { :Predictor(15), :BitsPerComponent($bpc), :Colors(4), :Columns($w) };
-	$stream = PDF::IO::Filter.decode( $stream, :%dict );
-	# Strip alpha (transparency channel)
-	%dict<DecodeParms><Colors>--;
-
-	my uint $n = $bpc div 8;
-        my uint $nc = $n * 3;
-	my uint $i = 0;
-        my uint $stream-len = +$stream;
-
-	my buf8 $rgb-channels  .= new;
-	my buf8 $alpha-channel .= new;
-	while $i < $stream-len {
-	    $rgb-channels.push( $stream[$i++] )  xx $nc;
-	    $alpha-channel.push( $stream[$i++] ) xx $n;
-	}
-
-	if $alpha {
-	    my $decoded = $alpha-channel.decode: 'latin-1';
-	    %dict<SMask> = PDF::COS::Stream.COERCE: {
-		:dict{:Type( :name<XObject> ),
-		      :Subtype( :name<Image> ),
-		      :Width($w),
-		      :Height($h),
-		      :ColorSpace( :name<DeviceGray> ),
-		      :Filter( :name<FlateDecode> ),
-		      :BitsPerComponent( $bpc ),
-		},
-		:$decoded
-	    };
-	}
-
-	my $decoded = $rgb-channels.decode: 'latin-1';
-	PDF::COS::Stream.COERCE: { :%dict, :$decoded };
-    }
-
+    my $decoded = $rgb-channels.decode: 'latin-1';
+    PDF::COS::Stream.COERCE: { :%dict, :$decoded };
 }
 
 =begin rfc

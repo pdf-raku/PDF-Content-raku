@@ -1,7 +1,7 @@
 
 #| A graphical content container such as a page, xobject form, or pattern
 unit role PDF::Content::Canvas;
-#= this role is applied to PDF::Content::Type::Page, PDF::Content::Type::Pattern and PDF::Content::Type::XObject::Form
+=para this role is applied to L<PDF::Content::Page> and L<PDF::Content::XObject>C<['Form']>.
 
 use PDF::Content::Resourced;
 also does PDF::Content::Resourced;
@@ -21,7 +21,7 @@ method gfx(::?ROLE:D $canvas: |c --> PDF::Content) handles<html-canvas graphics 
     $!gfx //= PDF::Content.new: :$canvas, |c
 }
 
-has PDF::Content $!pre-gfx; #| prepended graphics
+has PDF::Content $!pre-gfx;
 method has-pre-gfx returns Bool { ? .ops with $!pre-gfx }
 #| return prepended graphics
 method pre-gfx returns PDF::Content { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
@@ -36,10 +36,10 @@ method next-mcid returns UInt:D { $!mcid++ }
 
 method canvas(&code) is DEPRECATED<html-canvas> { self.html-canvas(&code) }
 
-#| Fix nesting issues that aren't illegal, but could cause problems:
-#| - append any missing 'Q' (Restore) operators at end of stream
-#| - wrap with 'q' (Save) and 'Q' (Restore) operators, if there
-#|   are any top-level graphics, which may affect the state.
+# Fix nesting issues that aren't illegal, but could cause problems:
+# - append any missing 'Q' (Restore) operators at end of stream
+# - wrap with 'q' (Save) and 'Q' (Restore) operators, if there
+#   are any top-level graphics, which may affect the state.
 method !tidy(@ops --> Array) {
     my int $nesting = 0;
     my $wrap = False;
@@ -192,4 +192,5 @@ my class TagSetBuilder is PDF::Content::Tag::NodeSet {
         }
     }
 }
+#| snapshot of previous, and currently open tags
 has TagSetBuilder $.tags .= new();

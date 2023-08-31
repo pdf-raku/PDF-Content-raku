@@ -57,28 +57,28 @@ $pdf.save-as: "test.pdf";
 
 =head2 Methods
 
-=head3 text
+=head3 method text
 
 =para The text contained in the text box. This is a C<rw> accessor. It can also
 be used to replace the text contained in a text box.
 
-=head3 width
+=head3 method width
 
 =para The constraining width for the text box.
 
-=head3 height
+=head3 method height
 
 =para The constraining height for the text box.
 
-=head3 indent
+=head3 method indent
 
 =para The indentation of the first line (points).
 
-=head3 align
+=head3 method align
 
 =para Horizontal alignment C<left>, C<center>, or C<right>.
 
-=head3 valign
+=head3 method valign
 
 =para Vertical alignment C<top>, C<center>, or C<bottom>.
 

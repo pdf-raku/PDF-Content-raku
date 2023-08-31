@@ -68,27 +68,27 @@ $pdf.save-as: "test.pdf";
 Methods
 -------
 
-### text
+### method text
 
 The text contained in the text box. This is a `rw` accessor. It can also be used to replace the text contained in a text box.
 
-### width
+### method width
 
 The constraining width for the text box.
 
-### height
+### method height
 
 The constraining height for the text box.
 
-### indent
+### method indent
 
 The indentation of the first line (points).
 
-### align
+### method align
 
 Horizontal alignment `left`, `center`, or `right`.
 
-### valign
+### method valign
 
 Vertical alignment `top`, `center`, or `bottom`.
 

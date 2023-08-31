@@ -1,5 +1,6 @@
+#| base role for XObjects
 role PDF::Content::XObject {
-    use PDF::Content::Image;
+    use PDF::Content::Image :&make-data-uri;
     use PDF::COS::Stream;
 
     my subset XObjectType of Str where 'Form'|'Image'|'PS';
@@ -9,7 +10,7 @@ role PDF::Content::XObject {
         PDF::Content::Image::IOish :$source!,
         Str :$image-type!,
        ) {
-        self.open: PDF::Content::Image.make-data-uri( :$source, :$image-type);
+        self.open: make-data-uri( :$source, :$image-type);
     }
 
     #| load from a file or data-uri
@@ -26,6 +27,7 @@ role PDF::Content::XObject {
 
 }
 
+#| XObject form specific role
 role PDF::Content::XObject['Form']
     does PDF::Content::XObject {
     has Numeric $.width;
@@ -57,6 +59,7 @@ role PDF::Content::XObject['Form']
     }
 }
 
+#| XObject image specific role
 role PDF::Content::XObject['Image']
     does PDF::Content::XObject {
     has Numeric $.width;

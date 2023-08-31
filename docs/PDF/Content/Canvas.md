@@ -6,7 +6,8 @@
 
 
 A graphical content container such as a page, xobject form, or pattern
-this role is applied to PDF::Content::Type::Page, PDF::Content::Type::Pattern and PDF::Content::Type::XObject::Form
+
+this role is applied to [PDF::Content::Page](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Page) and [PDF::Content::XObject](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/XObject)`['Form']`.
 
 ### method gfx
 
@@ -17,14 +18,6 @@ method gfx(
 ```
 
 appended graphics return appended PDF content stream
-
-### method has-pre-gfx
-
-```raku
-method has-pre-gfx() returns Bool
-```
-
-prepended graphics
 
 ### method pre-gfx
 
@@ -41,16 +34,6 @@ method next-mcid() returns UInt:D
 ```
 
 Allocate the next MCID (Marked Content Identifier)
-
-### method tidy
-
-```raku
-method tidy(
-    @ops
-) returns Array
-```
-
-Fix nesting issues that aren't illegal, but could cause problems: - append any missing 'Q' (Restore) operators at end of stream - wrap with 'q' (Save) and 'Q' (Restore) operators, if there are any top-level graphics, which may affect the state.
 
 ### method contents
 
@@ -126,4 +109,8 @@ method save-as-image(
 draft rendering via Cairo (experimental)
 
 The [PDF::To::Cairo](https://pdf-raku.github.io/PDF-Class-raku) module must be installed to use this method
+
+### has PDF::Content::Canvas::TagSetBuilder $.tags
+
+snapshot of previous, and currently open tags
 
