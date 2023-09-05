@@ -295,7 +295,7 @@ be used to replace the text contained in a text box.
     #| return displacement height of a text box
     method height returns Numeric { $!height || self.content-height }
     method !dy {
-        %( :center(0.5), :bottom(1.0) ){$!valign}
+        %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign}
             // 0;
     }
     method !top-offset {
@@ -337,12 +337,11 @@ be used to replace the text contained in a text box.
         @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join: ' '
             if $gfx.comment;
 
-        my $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
+        my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
 
-        my $dx = %( :center(0.5), :right(1.0) ){$!align}
-           // 0.0;
+        my Numeric:D $dx = %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} * $.width;
 
-        my $x-shift = $left ?? $dx * $.width !! 0.0;
+        my $x-shift = $left ?? $dx !! 0.0;
         @content.push( OpCode::TextMove => [$x-shift, $y-shift] )
             unless $x-shift =~= 0 && $y-shift =~= 0.0;
         # compute text positions of images content
@@ -391,7 +390,7 @@ be used to replace the text contained in a text box.
         # restore original graphics values
         $gfx."{.key}"() = .value for %saved.pairs;
 
-	($x-shift, $y-shift);
+	($x-shift - $dx, $y-shift);
     }
 
     #| flow any xobject images. This needs to be done

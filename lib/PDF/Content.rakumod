@@ -350,7 +350,7 @@ say $gfx.Str;
         with $position[0] {
             when Numeric {$x = $_}
             when XPos-Pair {
-                my constant Dx = %( :left(0.0), :center(0.5), :right(1.0) );
+                my constant Dx = %( :left(0.0), :justify(0.0), :center(0.5), :right(1.0) );
                 $x = .value  +  Dx{.key} * $text-block.width;
                 $left = True; # position from left
             }
