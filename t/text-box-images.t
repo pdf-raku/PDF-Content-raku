@@ -7,9 +7,20 @@ use PDF::Content::Text::Box;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::Page;
 use PDF::Content::XObject;
+use PDF::Content::Color :&color;
 use PDFTiny;
 
 # experimental feature to flow text and images
+my $n = 0;
+sub draw-rect($gfx, @rect) {
+    $gfx.tag: 'Artifact', {
+        @rect[2] -= @rect[0];
+        @rect[3] -= @rect[1];
+        $gfx.StrokeAlpha = .5;
+        $gfx.StrokeColor = color .5, .01, .01;
+        $gfx.paint: :stroke, { .Rectangle(|@rect); }
+    }
+}
 
 my PDFTiny $pdf .= new;
 my PDF::Content::Page $page = $pdf.add-page;
@@ -30,17 +41,18 @@ is-deeply @rect, [1, 0, 1 + $image.width, $image.height], '$gfx.do returned rect
 
 my $text-box;
 
+my (@rect2, @rect3);
+
 $page.text: -> $gfx {
     $gfx.TextMove(100, 500);
     $text-box = $gfx.text-box( :@chunks, :$font, :$font-size, :width(220) );
-    $gfx.say($text-box);
+    @rect2 = $gfx.say($text-box);
     for @chunks.grep('the'|'aga') -> $source is rw {
         $source = $image-padded;
     }
     $text-box = $gfx.text-box( :@chunks, :$font, :$font-size, :width(220) );
-    @rect = $gfx.say($text-box).list;
-    is-deeply [@rect.map(*.round)], [100, 465, 100+220, 465+50], '$gfx.say returned rectangle';
-
+    @rect3 = $gfx.say($text-box).list;
+    is-deeply [@rect3.map(*.round)], [100, 437, 320, 488], '$gfx.say returned rectangle';
     is-json-equiv [$text-box.images.map({[ .<Tx>, .<Ty> ]})], [
         [141.344, 0],
         [0.0, -25.3]
@@ -48,6 +60,11 @@ $page.text: -> $gfx {
 }
 
 $text-box.place-images($page.gfx);
+
+$page.graphics: -> $gfx {
+    draw-rect($gfx,@rect2);
+    draw-rect($gfx,@rect3);
+}
 
 $page.graphics: -> $gfx {
     $gfx.HorizScaling = 120;
@@ -71,8 +88,9 @@ $page.graphics: -> $gfx {
     }
     $text-box = $gfx.text-box( :@chunks, :$font, :$font-size, :width(250) );
     $page.text: {
-        $gfx.print($text-box, :position[100, 400]);
+        @rect = $gfx.print($text-box, :position[100, 400]);
     }
+   draw-rect($gfx,@rect);
 }
 
 $text-box.place-images($page.gfx);

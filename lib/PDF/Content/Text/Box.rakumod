@@ -338,17 +338,17 @@ be used to replace the text contained in a text box.
             if $gfx.comment;
 
         my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
-
+        my $tf-y = $gfx.tf-y;
         my Numeric:D $dx = %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} * $.width;
 
         my $x-shift = $left ?? $dx !! 0.0;
-        @content.push( OpCode::TextMove => [$x-shift, $y-shift] )
-            unless $x-shift =~= 0 && $y-shift =~= 0.0;
+        @content.push( OpCode::TextMove => [$x-shift + $gfx.tf-x, $y-shift + $tf-y] )
+            unless $x-shift + $gfx.tf-x =~= 0 && $y-shift + $tf-y =~= 0.0;
         # compute text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
-            @Tm[4] += $x-shift + .<Tx>;
-            @Tm[5] += $y-shift + .<Ty> + $.TextRise;
+            @Tm[4] += $x-shift + .<Tx> + $gfx.tf-x;
+            @Tm[5] += $y-shift + .<Ty> + $.TextRise + $tf-y;
             .<Tm> = @Tm;
         }
 
@@ -385,12 +385,15 @@ be used to replace the text contained in a text box.
         }
 
         $gfx.ops: @content;
-        $gfx.tf-x += $tf-dx # add to text-flow
-            unless $gfx.TextRender == InvisableText;
+        unless $gfx.TextRender == InvisableText {
+            $gfx.tf-x += $tf-dx; # add to text-flow;
+            $gfx.tf-y = - $y-shift;
+        }
         # restore original graphics values
         $gfx."{.key}"() = .value for %saved.pairs;
 
-	($x-shift - $dx, $y-shift);
+        my $h = @!lines ?? @!lines.head.height !! 0;
+	($x-shift - $dx, $y-shift - $.height + $h + $tf-y);
     }
 
     #| flow any xobject images. This needs to be done
