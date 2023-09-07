@@ -361,7 +361,7 @@ endobj
 endobj
 
 8 0 obj
-<< /Length 1272 >> stream
+<< /Length 1192 >> stream
 BT
   1 0 0 1 10 750 Tm
   /F1 16 Tf
@@ -371,33 +371,26 @@ BT
   [ ] TJ
   T*
   (Baseline: ) Tj
-  96 0 Td
   (alphabetic) Tj
   -10.064 Ts
-  96 0 Td
   (top) Tj
   0 Ts
   2.512 Ts
-  28.8 0 Td
   (bottom) Tj
   0 Ts
   -3.776 Ts
-  57.6 0 Td
   (middle) Tj
   0 Ts
   5.936 Ts
-  57.6 0 Td
   (ideographic) Tj
   0 Ts
   -10.064 Ts
-  105.6 0 Td
   (hanging) Tj
   0 Ts
   1 0 0 1 10 650 Tm
   (Valign: ) Tj
-  76.8 0 Td
   (top) Tj
-  28.8 8.8 Td
+  105.6 8.8 Td
   (center) Tj
   57.6 8.8 Td
   (bottom) Tj
@@ -495,10 +488,10 @@ xref
 0000005926 00000 n 
 0000006032 00000 n 
 0000006200 00000 n 
-0000007525 00000 n 
-0000007572 00000 n 
+0000007445 00000 n 
+0000007492 00000 n 
 trailer
 << /ID [ (t/pdf-text-align) (t/pdf-text-align) ] /Root 1 0 R /Size 11 >>
 startxref
-7677
+7597
 %%EOF

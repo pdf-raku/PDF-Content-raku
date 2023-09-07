@@ -343,7 +343,7 @@ be used to replace the text contained in a text box.
 
         my $x-shift = $left ?? $dx !! 0.0;
         @content.push( OpCode::TextMove => [$x-shift + $gfx.tf-x, $y-shift + $tf-y] )
-            unless $x-shift + $gfx.tf-x =~= 0 && $y-shift + $tf-y =~= 0.0;
+            unless $x-shift  =~= 0 && $y-shift + $tf-y =~= 0.0;
         # compute text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
