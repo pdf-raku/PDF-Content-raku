@@ -73,10 +73,50 @@ $gfx.text: {
     for <alphabetic top bottom middle ideographic hanging> -> $baseline {
         @rects.push: .print: $baseline, :$baseline;
     }
-    .text-position = 10, 650;
+    .text-position = 10, 620;
     .print: 'Valign: ';
     for <top center bottom top> -> $valign {
         @rects.push: .print: $valign, :$valign;
+    }
+
+    my $x = 150;
+    my $y = 510;
+    .text-position = 10, $y;
+    .print: 'Valign wrapping: ';
+    for <top center bottom top> -> $valign {
+        $x += 65;
+        .text-position = $x, $y;
+        @rects.push: .print: "multi $valign lines", :$valign, :width(60);
+    }
+
+    $x = 150;
+    $y = 350;
+    .text-position = 10, $y;
+    .print: 'Valign fixed height: ';
+    for <top center bottom top> -> $valign {
+        $x += 65;
+        .text-position = $x, $y;
+        @rects.push: .print: "$valign lines", :$valign, :width(60), :height(80);
+    }
+
+    $x = 180;
+    $y = 250;
+    .text-position = 10, $y;
+    .print: 'align: ';
+    for <right center left justify> -> $align {
+        $x += 80;
+        .text-position = $x, $y;
+        @rects.push: .print: $align, :$align;
+    }
+
+    $x = 180;
+    $y = 210;
+    .text-position = 10, $y;
+    .print: 'align fixed width: ';
+    for <right center left justify> -> $align {
+        $x += 80;
+        .text-position = $x, $y;
+        @rects.push: .print: $align, :$align, :width(70);
     }
 }
 

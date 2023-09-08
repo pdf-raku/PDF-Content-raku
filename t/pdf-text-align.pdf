@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 5528 >> stream
+<< /Length 5536 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -128,7 +128,7 @@ q
   BT
     1 0 0 1 235 700 Tm
     -7.18 Ts
-    0 40 Td
+    0 34.5 Td
     (*** center left***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
@@ -147,14 +147,14 @@ q
   ET
   /Artifact BMC
     q
-      235 662.82 100 80 re
+      235 657.32 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 235 530 Tm
     -7.18 Ts
-    0 40 Td
+    0 34.5 Td
     [ 4224 (*** center center***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -173,14 +173,14 @@ q
   ET
   /Artifact BMC
     q
-      185 492.82 100 80 re
+      185 487.32 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 235 360 Tm
     -7.18 Ts
-    0 40 Td
+    0 34.5 Td
     [ 7614 (*** center right***) ] TJ
     T*
     [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -199,14 +199,14 @@ q
   ET
   /Artifact BMC
     q
-      135 322.82 100 80 re
+      135 317.32 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 235 190 Tm
     -7.18 Ts
-    0 40 Td
+    0 34.5 Td
     [ (*** ) -887 (center ) -887 (justify***) ] TJ
     T*
     [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
@@ -225,14 +225,14 @@ q
   ET
   /Artifact BMC
     q
-      235 152.82 100 80 re
+      235 147.32 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 360 700 Tm
     -7.18 Ts
-    0 80 Td
+    0 69 Td
     (*** bottom left***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
@@ -251,14 +251,14 @@ q
   ET
   /Artifact BMC
     q
-      360 702.82 100 80 re
+      360 691.82 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 360 530 Tm
     -7.18 Ts
-    0 80 Td
+    0 69 Td
     [ 4363 (*** bottom center***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -277,14 +277,14 @@ q
   ET
   /Artifact BMC
     q
-      310 532.82 100 80 re
+      310 521.82 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 360 360 Tm
     -7.18 Ts
-    0 80 Td
+    0 69 Td
     [ 7892 (*** bottom right***) ] TJ
     T*
     [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -303,14 +303,14 @@ q
   ET
   /Artifact BMC
     q
-      260 362.82 100 80 re
+      260 351.82 100 80 re
       S
     Q
   EMC
   BT
     1 0 0 1 360 190 Tm
     -7.18 Ts
-    0 80 Td
+    0 69 Td
     [ (*** ) -748 (bottom ) -748 (justify***) ] TJ
     T*
     [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
@@ -329,7 +329,7 @@ q
   ET
   /Artifact BMC
     q
-      360 192.82 100 80 re
+      360 181.82 100 80 re
       S
     Q
   EMC
@@ -361,7 +361,7 @@ endobj
 endobj
 
 8 0 obj
-<< /Length 1192 >> stream
+<< /Length 3269 >> stream
 BT
   1 0 0 1 10 750 Tm
   /F1 16 Tf
@@ -387,15 +387,80 @@ BT
   -10.064 Ts
   (hanging) Tj
   0 Ts
-  1 0 0 1 10 650 Tm
+  1 0 0 1 10 620 Tm
   (Valign: ) Tj
   (top) Tj
-  105.6 8.8 Td
   (center) Tj
-  57.6 8.8 Td
   (bottom) Tj
-  57.6 -17.6 Td
   (top) Tj
+  1 0 0 1 10 510 Tm
+  (Valign wrapping: ) Tj
+  1 0 0 1 215 510 Tm
+  (multi) Tj
+  T*
+  (top) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 280 510 Tm
+  0 17.6 Td
+  (multi) Tj
+  T*
+  (center) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 345 510 Tm
+  0 35.2 Td
+  (multi) Tj
+  T*
+  (bottom) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 410 510 Tm
+  (multi) Tj
+  T*
+  (top) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 10 350 Tm
+  (Valign fixed height: ) Tj
+  1 0 0 1 215 350 Tm
+  (top) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 280 350 Tm
+  0 31.2 Td
+  (center) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 345 350 Tm
+  0 62.4 Td
+  (bottom) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 410 350 Tm
+  (top) Tj
+  T*
+  (lines) Tj
+  1 0 0 1 10 250 Tm
+  (align: ) Tj
+  1 0 0 1 260 250 Tm
+  [ 3000 (right) ] TJ
+  1 0 0 1 340 250 Tm
+  [ 1800 (center) ] TJ
+  1 0 0 1 420 250 Tm
+  (left) Tj
+  1 0 0 1 500 250 Tm
+  (justify) Tj
+  1 0 0 1 10 210 Tm
+  (align fixed width: ) Tj
+  1 0 0 1 260 210 Tm
+  [ 3000 (right) ] TJ
+  1 0 0 1 340 210 Tm
+  [ 1800 (center) ] TJ
+  1 0 0 1 420 210 Tm
+  (left) Tj
+  1 0 0 1 500 210 Tm
+  (justify) Tj
 ET
 q
   /Artifact BMC
@@ -438,25 +503,121 @@ q
   EMC
   /Artifact BMC
     q
-      86.8 648.4 28.8 17.6 re
+      86.8 618.4 28.8 17.6 re
       S
     Q
   EMC
   /Artifact BMC
     q
-      115.6 657.2 57.6 17.6 re
+      115.6 618.4 57.6 17.6 re
       S
     Q
   EMC
   /Artifact BMC
     q
-      173.2 666 57.6 17.6 re
+      173.2 618.4 57.6 17.6 re
       S
     Q
   EMC
   /Artifact BMC
     q
-      230.8 648.4 28.8 17.6 re
+      230.8 618.4 28.8 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      215 473.2 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      280 490.8 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      345 508.4 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      410 473.2 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      215 286 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      280 317.2 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      345 348.4 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      410 286 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      212 248.4 48 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      311.2 248.4 57.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      420 248.4 38.4 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      500 248.4 67.2 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      190 208.4 70 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      305 208.4 70 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      420 208.4 70 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      500 208.4 70 17.6 re
       S
     Q
   EMC
@@ -484,14 +645,14 @@ xref
 0000000065 00000 n 
 0000000131 00000 n 
 0000000298 00000 n 
-0000005879 00000 n 
-0000005926 00000 n 
-0000006032 00000 n 
-0000006200 00000 n 
-0000007445 00000 n 
-0000007492 00000 n 
+0000005887 00000 n 
+0000005934 00000 n 
+0000006040 00000 n 
+0000006208 00000 n 
+0000009530 00000 n 
+0000009577 00000 n 
 trailer
 << /ID [ (t/pdf-text-align) (t/pdf-text-align) ] /Root 1 0 R /Size 11 >>
 startxref
-7597
+9682
 %%EOF

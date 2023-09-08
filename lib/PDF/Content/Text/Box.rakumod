@@ -337,7 +337,8 @@ be used to replace the text contained in a text box.
         @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join: ' '
             if $gfx.comment;
 
-        my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * $.height;
+        my $h = @!lines ?? @!lines.head.height !! 0;
+        my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * ($.height - $h * $.leading);
         my $tf-y = $gfx.tf-y;
         my Numeric:D $dx = %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} * $.width;
 
@@ -392,7 +393,6 @@ be used to replace the text contained in a text box.
         # restore original graphics values
         $gfx."{.key}"() = .value for %saved.pairs;
 
-        my $h = @!lines ?? @!lines.head.height !! 0;
 	($x-shift - $dx, $y-shift - $.height + $h + $tf-y);
     }
 
