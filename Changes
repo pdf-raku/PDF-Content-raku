@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.7.0  2023-09-11T08:09:51+12:00
+   - Tone down text-box :valign to only affect the text flow of multi-
+     line text boxes. This removes the overlap with :baseline-shift.
+     They no longer combine to allow shifting of Text boxes by up to
+     two lines #16
+
 0.6.16  2023-09-08T08:29:55+12:00
    - Make text-box text() method a rw accessor
    - Fix text box rendering x, y returned position
