@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 5536 >> stream
+<< /Length 5528 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -128,7 +128,7 @@ q
   BT
     1 0 0 1 235 700 Tm
     -7.18 Ts
-    0 34.5 Td
+    0 33 Td
     (*** center left***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
@@ -154,7 +154,7 @@ q
   BT
     1 0 0 1 235 530 Tm
     -7.18 Ts
-    0 34.5 Td
+    0 33 Td
     [ 4224 (*** center center***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -180,7 +180,7 @@ q
   BT
     1 0 0 1 235 360 Tm
     -7.18 Ts
-    0 34.5 Td
+    0 33 Td
     [ 7614 (*** center right***) ] TJ
     T*
     [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -206,7 +206,7 @@ q
   BT
     1 0 0 1 235 190 Tm
     -7.18 Ts
-    0 34.5 Td
+    0 33 Td
     [ (*** ) -887 (center ) -887 (justify***) ] TJ
     T*
     [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
@@ -232,7 +232,7 @@ q
   BT
     1 0 0 1 360 700 Tm
     -7.18 Ts
-    0 69 Td
+    0 66 Td
     (*** bottom left***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
@@ -258,7 +258,7 @@ q
   BT
     1 0 0 1 360 530 Tm
     -7.18 Ts
-    0 69 Td
+    0 66 Td
     [ 4363 (*** bottom center***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
@@ -284,7 +284,7 @@ q
   BT
     1 0 0 1 360 360 Tm
     -7.18 Ts
-    0 69 Td
+    0 66 Td
     [ 7892 (*** bottom right***) ] TJ
     T*
     [ 9558 (Lorem ipsum dolor sit) ] TJ
@@ -310,7 +310,7 @@ q
   BT
     1 0 0 1 360 190 Tm
     -7.18 Ts
-    0 69 Td
+    0 66 Td
     [ (*** ) -748 (bottom ) -748 (justify***) ] TJ
     T*
     [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
@@ -361,7 +361,7 @@ endobj
 endobj
 
 8 0 obj
-<< /Length 3269 >> stream
+<< /Length 3268 >> stream
 BT
   1 0 0 1 10 750 Tm
   /F1 16 Tf
@@ -428,12 +428,12 @@ BT
   T*
   (lines) Tj
   1 0 0 1 280 350 Tm
-  0 31.2 Td
+  0 8.8 Td
   (center) Tj
   T*
   (lines) Tj
   1 0 0 1 345 350 Tm
-  0 62.4 Td
+  0 17.6 Td
   (bottom) Tj
   T*
   (lines) Tj
@@ -645,14 +645,14 @@ xref
 0000000065 00000 n 
 0000000131 00000 n 
 0000000298 00000 n 
-0000005887 00000 n 
-0000005934 00000 n 
-0000006040 00000 n 
-0000006208 00000 n 
-0000009530 00000 n 
-0000009577 00000 n 
+0000005879 00000 n 
+0000005926 00000 n 
+0000006032 00000 n 
+0000006200 00000 n 
+0000009521 00000 n 
+0000009568 00000 n 
 trailer
 << /ID [ (t/pdf-text-align) (t/pdf-text-align) ] /Root 1 0 R /Size 11 >>
 startxref
-9682
+9673
 %%EOF

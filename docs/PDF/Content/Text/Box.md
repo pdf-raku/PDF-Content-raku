@@ -90,7 +90,9 @@ Horizontal alignment `left`, `center`, or `right`.
 
 ### method valign
 
-Vertical alignment `top`, `center`, or `bottom`.
+Vertical alignment of mutiple-line text boxes: `top`, `center`, or `bottom`.
+
+See also the :baseline` option for vertical displacememnt of the first line of text.
 
 style
 -----

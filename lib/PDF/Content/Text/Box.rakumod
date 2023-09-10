@@ -80,7 +80,9 @@ be used to replace the text contained in a text box.
 
 =head3 method valign
 
-=para Vertical alignment C<top>, C<center>, or C<bottom>.
+=para Vertical alignment of mutiple-line text boxes: C<top>, C<center>, or C<bottom>.
+
+=para See also the :baseline` option for vertical displacememnt of the first line of text.
 
     use PDF::Content::Text::Style;
     use PDF::Content::Text::Line;
@@ -340,11 +342,12 @@ be used to replace the text contained in a text box.
         my $h = @!lines ?? @!lines.head.height !! 0;
         my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * ($.height - $h * $.leading);
         my $tf-y = $gfx.tf-y;
+        my $y-pad = self!dy * ($.height - $.content-height);
         my Numeric:D $dx = %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} * $.width;
 
         my $x-shift = $left ?? $dx !! 0.0;
-        @content.push( OpCode::TextMove => [$x-shift + $gfx.tf-x, $y-shift + $tf-y] )
-            unless $x-shift  =~= 0 && $y-shift + $tf-y =~= 0.0;
+        @content.push( OpCode::TextMove => [$x-shift + $gfx.tf-x, $y-shift + $tf-y - $y-pad] )
+            unless $x-shift  =~= 0 && $y-shift + $tf-y - $y-pad =~= 0.0;
         # compute text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
