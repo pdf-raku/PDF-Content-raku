@@ -342,22 +342,26 @@ be used to replace the text contained in a text box.
         my $h = @!lines ?? @!lines.head.height !! 0;
         my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * ($.height - $h * $.leading);
         my $tf-y = $gfx.tf-y;
-        my $y-pad = self!dy * ($.height - $.content-height);
         my Numeric:D $dx = %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} * $.width;
-
         my $x-shift = $left ?? $dx !! 0.0;
-        @content.push( OpCode::TextMove => [$x-shift + $gfx.tf-x, $y-shift + $tf-y - $y-pad] )
-            unless $x-shift  =~= 0 && $y-shift + $tf-y - $y-pad =~= 0.0;
-        # compute text positions of images content
-        for @!images {
-            my Numeric @Tm[6] = $gfx.TextMatrix.list;
-            @Tm[4] += $x-shift + .<Tx> + $gfx.tf-x;
-            @Tm[5] += $y-shift + .<Ty> + $.TextRise + $tf-y;
-            .<Tm> = @Tm;
-        }
-
         my $leading = $gfx.TextLeading;
         my Numeric \scale = -1000 / $.font-size;
+
+        {
+            # work out and move to the text starting position
+            my $y-pad = self!dy * ($.height - $.content-height);
+            my $tx := $x-shift + $gfx.tf-x;
+            my $ty := $y-shift + $tf-y - $y-pad;
+            @content.push( OpCode::TextMove => [$tx, $ty] )
+                unless $x-shift =~= 0 && $ty =~= 0.0;
+            # offset text positions of images content
+            for @!images {
+                my Numeric @Tm[6] = $gfx.TextMatrix.list;
+                @Tm[4] += .<Tx> + $tx;
+                @Tm[5] += .<Ty> + $.TextRise + $ty;
+                .<Tm> = @Tm;
+            }
+        }
 
         for @!lines.pairs {
 	    my \line = .value;
