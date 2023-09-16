@@ -1,6 +1,9 @@
 {{$NEXT}}
-   - Fix Canvas `has-pre-gfx()` return value. Was causing a regression
+
+0.7.1  2023-09-17T08:37:57+12:00
+   - Fix Canvas `has-pre-gfx()` return value. Was causing regressions
      in PDF::Font::Loader.
+   - Refactor text-box text positioning calculations
 
 0.7.0  2023-09-11T08:09:51+12:00
    - Tone down text-box :valign to only affect the text flow of multi-
