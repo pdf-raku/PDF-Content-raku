@@ -22,7 +22,7 @@ method gfx(::?ROLE:D $canvas: |c --> PDF::Content) handles<html-canvas graphics 
 }
 
 has PDF::Content $!pre-gfx;
-method has-pre-gfx returns Bool { ? .ops with $!pre-gfx }
+method has-pre-gfx returns Bool { ? (.ops with $!pre-gfx) }
 #| return prepended graphics
 method pre-gfx returns PDF::Content { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
 method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
