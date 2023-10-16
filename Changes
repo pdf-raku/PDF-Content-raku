@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.7.2  2023-10-17T06:40:11+13:00
+   - Fix local-glyph-name return value. Was causing regressions
+     in PDF::To::Cairo
+
 0.7.1  2023-09-17T08:37:57+12:00
    - Fix Canvas `has-pre-gfx()` return value. Was causing regressions
      in PDF::Font::Loader.
