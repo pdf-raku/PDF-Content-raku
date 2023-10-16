@@ -15,7 +15,7 @@ method lookup-glyph(UInt $ord --> Str) {
 
 #| Get the locally definition for a glyph
 method local-glyph-name(UInt $cid --> Str) {
-    %!diffs{$cid};
+    %!diffs{$cid} // Str;
 }
 
 #| return a mapping of glyph names to CIDS
