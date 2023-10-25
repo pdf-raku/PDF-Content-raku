@@ -83,6 +83,8 @@ my enum StructureTags is export(:StructureTags,:Tags) (
     :Division<Div>, :BlockQuotation<BlockQuote>, :Caption<Caption>,
     :TableOfContents<TOC>, :TableOfContentsItem<TOCI>, :Index<Index>,
     :NonStructural<NonStruct>, :Private<Private>,
+    # + [PDF 32000-2 Table 365 — Grouping level structure types]
+    :DocumentFragment<DocumentFragment>, :Aside<Aside>, :Subdivision<Sub>,
 );
 
 #| See [PDF 32000 Tables 334-337 - Block-level structure elements]
@@ -90,6 +92,8 @@ my enum ParagraphTags is export(:ParagraphTags,:Tags) (
     :Paragraph<P>, :Header<H>,
     :Header1<H1>,  :Header2<H2>,  :Header3<H3>,
     :Header4<H4>,  :Header5<H5>,  :Header6<H6>,
+    # + [PDF 32000-2 Table 366 — Block level structure types]
+    :Title<Title>, :FENote<FENote>,
 );
 my enum ListElemTags is export(:ListElemTags,:Tags) (
     :List<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
@@ -107,6 +111,8 @@ my enum InlineElemTags is export(:InlineElemTags,:Tags) (
     :Annotation<Annot>, :Ruby<Ruby>,  :RubyPunctuation<RP>,
     :RubyBaseText<RB>,  :RubyText<RT>,
     :Warichu<Warichu>,  :WarichuPunctuation<RP>, :WarichuText<RT>,
+    # + [PDF 32000-2 Table 368 — General inline level structure types]
+    :Emphasis<Em>, :Strong<Strong>
 );
 
 my enum IllustrationTags is export(:IllustrationTags,:Tags) (

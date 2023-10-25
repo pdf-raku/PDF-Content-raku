@@ -98,7 +98,7 @@ style
 -----
 
 ```raku
-    method style() returns PDF::Content::Text::Style
+method style() returns PDF::Content::Text::Style
 ```
 
 Styling delegate for this text box. See[PDF::Content::Text::Style](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Style)
