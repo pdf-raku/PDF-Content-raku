@@ -698,7 +698,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has GraphicsContext $.context = Page;
 
-    method !track-context(Str $op) {
+    method !track-context(Str $op) is hidden-from-backtrace {
 
         my constant %Transition = %(
             'BT'     => ( (Page) => Text ),
