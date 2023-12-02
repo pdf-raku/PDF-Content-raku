@@ -698,6 +698,34 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has GraphicsContext $.context = Page;
 
+    method !unexpected-op($op) is hidden-from-backtrace {
+        # Found an op we didn't expect. Raise a warning.
+        my $type;
+        my $where;
+        if $!context == Text && $op ∈ SpecialGraphicOps {
+            $type = 'special graphics';
+            $where = 'in a BT ... ET text block';
+        }
+        elsif $op ∈ TextOps {
+            $type = 'text operation';
+            $where = 'outside of a BT ... ET text block';
+        }
+        else {
+            $type = 'unexpected';
+            $where = '(first operation)';
+
+            loop (my int $n = +@!ops-2; $n >= 0; $n--) {
+                with @!ops[$n].key {
+                    unless $_ ~~ 'comment' {
+                        $where = "in $!context context, following '$_' (%OpName{$_})";
+                        last;
+                    }
+                }
+            }
+        }
+        warn X::PDF::Content::OP::Unexpected.new: :$type, :$op, :mnemonic(%OpName{$op}), :$where;
+    }
+
     method !track-context(Str $op) is hidden-from-backtrace {
 
         my constant %Transition = %(
@@ -719,8 +747,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
            (Image) => <ID>.Set,
         );
 
-        my Bool $ok-here = False;
         my $rv = $!context;
+        my Bool $ok-here = False;
         $ok-here = $op ∈ $_
             with %InSitu{$!context};
 
@@ -729,33 +757,9 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             $rv = .value;
         }
 
-        if !$ok-here && $!strict {
-            # Found an op we didn't expect. Raise a warning.
-            my $type;
-            my $where;
-            if $rv == Text && $op ∈ SpecialGraphicOps {
-                $type = 'special graphics';
-                $where = 'in a BT ... ET text block';
-            }
-            elsif $op ∈ TextOps {
-                $type = 'text operation';
-                $where = 'outside of a BT ... ET text block';
-            }
-            else {
-                $type = 'unexpected';
-                $where = '(first operation)';
+        self!unexpected-op($op)
+            if !$ok-here && $!strict;
 
-                loop (my int $n = +@!ops-2; $n >= 0; $n--) {
-                    with @!ops[$n].key {
-                        unless $_ ~~ 'comment' {
-                            $where = "in $!context context, following '$_' (%OpName{$_})";
-                            last;
-                        }
-                    }
-                }
-            }
-            warn X::PDF::Content::OP::Unexpected.new: :$type, :$op, :mnemonic(%OpName{$op}), :$where;
-        }
         $rv;
     }
 
