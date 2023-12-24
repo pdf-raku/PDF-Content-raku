@@ -166,8 +166,11 @@ method !layup(@atoms is copy) {
     my int $line-start = 0;
     my int $n = +@atoms;
     my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
-    my $word-gap = self!word-gap;
-    my $height = $!style.font-size;
+    my $word-gap := self!word-gap;
+    my $height := $!style.font-size;
+    my $font := $!style.font;
+    my Bool $kern := $!style.kern;
+    my Bool $shape := $!style.shape;
 
     my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
     @!lines = $line;
@@ -176,10 +179,10 @@ method !layup(@atoms is copy) {
         my subset StrOrImage where Str | PDF::Content::XObject;
         my StrOrImage $atom = @atoms[$i++];
         my Bool $xobject = False;
-        my $line-breaks = 0;
+        my Int $line-breaks = 0;
         my List $word;
-        my $word-width = 0;
-        my $word-pad = $preceding-spaces * $word-gap;
+        my Numeric $word-width = 0;
+        my Numeric $word-pad = $preceding-spaces * $word-gap;
 
         given $atom {
             when Str {
@@ -190,17 +193,23 @@ method !layup(@atoms is copy) {
                     $word-pad = 0;
                 }
 
-                if $!style.kern {
+                if $shape {
+                    given $font.shape($atom) {
+                        $word = .[0];
+                        $word-width = .[1];
+                    }
+                }
+                elsif $kern {
                     given $!style.font.kern($atom) {
                         $word = .List given .[0].list.map: {
-                            .does(Numeric) ?? -$_ !! $_;
+                            .does(Numeric) ?? -$_ !! $font.encode($_);
                         }
                         $word-width = .[1];
                     }
                 }
                 else {
-                    $word = [ $atom, ];
-                    $word-width = $!style.font.stringwidth($atom);
+                    $word = [ $font.encode($atom), ];
+                    $word-width = $font.stringwidth($atom);
                 }
                 $word-width *= $!style.font-size * $.HorizScaling / 100000;
                 $word-width += ($atom.chars - 1) * $.CharSpacing
@@ -216,7 +225,7 @@ method !layup(@atoms is copy) {
         $line-breaks ||= ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
             if $!width;
 
-        while $line-breaks--  {
+        while $line-breaks-- {
             $line-start = $i;
             $line .= new: :$word-gap, :$height;
             @!lines.push: $line;

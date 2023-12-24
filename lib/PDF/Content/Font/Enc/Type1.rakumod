@@ -8,6 +8,9 @@ class PDF::Content::Font::Enc::Type1 {
     use PDF::Content::Font::Enc::Glyphic;
     also does PDF::Content::Font::Enc::Glyphic;
 
+    use PDF::Content::Font::Encoder;
+    also does PDF::Content::Font::Encoder;
+
     use PDF::Content::Font::Encodings :mac-encoding, :win-encoding, :sym-encoding, :std-encoding, :zapf-encoding, :mac-extra-encoding;
     has UInt %!from-unicode{UInt};  #| all encoding mappings
     has UInt %.charset{UInt}; #| used characters (useful for subsetting)
@@ -47,6 +50,12 @@ class PDF::Content::Font::Enc::Type1 {
         %!from-unicode{"\c[NO-BREAK SPACE]".ord} //= %!from-unicode{' '.ord};
     }
 
+    multi method charset($k) {
+        self.protect: -> { %!charset{$k} }
+    }
+    multi method charset {
+        %!charset
+    }
     method use-cid($cid) {
         with @!spare-cids.first({$_ == $cid}, :k) {
             @!spare-cids[$_] = 0;
@@ -99,12 +108,16 @@ class PDF::Content::Font::Enc::Type1 {
     # layers need to decoded. For example PDF::To::Cairo only needs to decode
     # to cids to render PDFs. ords mapping may or may not be present.
 
-    multi method encode(Str $text, :cids($)! --> buf8) {
-        self.protect: {buf8.new: $text.ords.map({%!charset{$_} || self.add-encoding($_) || Empty });}
+    multi method encode(Str $text, :cids($)! --> Seq) {
+        $text.ords.map({self.protect: {%!charset{$_} || self.add-encoding($_) || Empty }});
     }
 
     multi method encode(Str $text --> Str) {
-        self.encode($text, :cids).decode: 'latin-1';
+        self.encode-cids: self.encode($text, :cids);
+    }
+
+    method encode-cids(@cids is raw) {
+        buf8.new(@cids).decode: 'latin-1';
     }
 
     multi method decode(Str $encoded, :cids($)!) {

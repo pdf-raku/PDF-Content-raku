@@ -41,10 +41,25 @@ multi method align('center') {
 
 multi method align { $!align }
 
+sub coalesce(@line is raw) {
+    my @l;
+    my $prev;
+    for @line {
+        if $_ ~~ Str && $prev ~~ Str {
+            @l.tail ~= $_;
+        }
+        else {
+            @l.push: $_;
+            $prev := $_;
+        }
+    }
+    @l;
+}
+
 method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
     my Numeric \scale = -1000 / $font-size;
-    my subset Str-or-Pos where Str|Numeric;
-    my Str-or-Pos @line;
+    my subset Atom where Str|Numeric;
+    my Atom @line;
     constant Space = ' ';
     my int $wc = 0;
 
@@ -63,24 +78,11 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
         }
         @line.append: @!words[$i].list;
     }
+    @line .= &coalesce;
 
-    my @out;
-    my $prev := Int;
-    for @line {
-        my $tk := $_ ~~ Str ?? $font.encode($_) !! $_;
-        if $tk ~~ Str && $prev ~~ Str {
-            # coalesce adjacent strings
-            @out.tail ~= $tk;
-        }
-        else {
-            @out.push: $tk;
-        }
-        $prev := $tk;
-    }
-
-    @out == 1 && @out.head.isa(Str)
-        ?? ((OpCode::ShowText) => [@out.head,])
-        !! ((OpCode::ShowSpaceText) => [@out,]);
+    @line == 1 && @line.head.isa(Str)
+        ?? ((OpCode::ShowText) => [@line.head,])
+        !! ((OpCode::ShowSpaceText) => [@line,]);
 
 }
 

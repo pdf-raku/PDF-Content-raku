@@ -20,4 +20,4 @@ method decode {...}      # decode buffer to text
 method kern {...}        # kern text
 method to-dict {...}     # create a PDF Font dictionary
 method cb-finish {...}   # finish the font. e.g. embed and create CMaps and Widths
-# todo: is-subset is-core-font is-embedded underline-position underline-thickness lock type encoding
+# todo: is-subset is-core-font is-embedded underline-position underline-thickness lock type encoding encode-cids units-per-EM

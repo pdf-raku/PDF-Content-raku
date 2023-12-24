@@ -7,7 +7,9 @@ has $.font is required;
 has Numeric $.font-size = 16;
 has Numeric $.leading = 1.1;
 has Bool    $.kern;
+has Bool    $.shape;
 has Numeric $!space-width = 300;
+has $!units-per-EM = 1000;
 
 # directly mapped to graphics state
 has Numeric $.WordSpacing  is built;
@@ -26,6 +28,7 @@ method !build(
     :$!TextRise = 0,
 ) {
     with $!font {
+        try { $!units-per-EM = .units-per-EM || 1000 }
         if .stringwidth(' ') -> $sw {
             $!space-width = $sw;
         }
@@ -41,7 +44,7 @@ submethod TWEAK(*%o) {
         %o<TextRender>   //= .TextRender;
         %o<TextRise>     //= .TextRise;
     }
-    self!build(|%o);
+    self!build: |%o;
 }
 
 =head2 Methods
@@ -57,24 +60,33 @@ multi method baseline-shift(Baseline $_ --> Numeric) {
     when 'hanging'     { - h }
     default            { 0 }
 }
-=para This returns a positive or negative y-offset in units of points.  The default is C<alphabetic>, which is a zero offset. 
+=para This returns a positive or negative y-offset in units of points.  The default is C<alphabetic>, which is a zero offset.
+
+method shape returns Bool {
+    $!shape && $!font.^can('shape').so;
+}
+
+#|
+method kern returns Bool {
+    $!kern || ($!shape && ! $!font.^can('shape').so);
+}
 
 #| get/set a numeric font vertical alignment offset
 multi method baseline-shift is rw { $!TextRise }
 
 #| return the scaled width of spaces
 method space-width {
-    $!space-width * $!font-size / 1000;
+    $!space-width * $!font-size / $!units-per-EM;
 }
 
 #| return the scaled underline position
 method underline-position {
-    ($!font.underline-position // -100) * $!font-size / 1000;
+    ($!font.underline-position // -100) * $!font-size / $!units-per-EM;
 }
 
 #| return the scaled underline thickness
 method underline-thickness {
-    ($!font.underline-thickness // 50) * $!font-size / 1000;
+    ($!font.underline-thickness // 50) * $!font-size / $!units-per-EM;
 }
 
 #| return the scaled font height

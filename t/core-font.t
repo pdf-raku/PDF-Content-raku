@@ -104,7 +104,7 @@ my %glyphs = %Font::AFM::Glyphs.invert;
 my PDF::Content::Font::Enc::Type1 $encoder .= new: :enc<win>, :%glyphs;
 $encoder.differences = @differences;
 my PDF::Content::Font::CoreFont $tr .= new: :$metrics, :$encoder;
-is-deeply $tr.encode('abcxyz', :cids), buf8.new(10,11,99,1,2,122), 'win differences encoding';
+is-deeply $tr.encode('abcxyz', :cids).list, (10,11,99,1,2,122), 'win differences encoding';
 $tr.cb-finish;
 is-json-equiv $tr.to-dict<Encoding><Differences>, [1, "x", "y", 10, "a", "b"], 'dfferences to-dict';
 
@@ -113,7 +113,7 @@ $encoder.differences = @differences;
 $tr .= new: :$metrics, :$encoder;
 my $dec = 'abcxyz½';
 $enc = buf8.new(10,11,3,1,2,4,72);
-is-deeply $tr.encode($dec, :cids), $enc, 'mac-extra differences encoding';
+is-deeply $tr.encode($dec, :cids), $enc.list, 'mac-extra differences encoding';
 is-deeply $tr.decode($enc.decode), $dec, 'mac-extra differences decoding';
 $tr.cb-finish;
 is-json-equiv $tr.to-dict<Encoding><Differences>, [1, "x", "y", "c", "z", 10, "a", "b"], 'dfferences to-dict';

@@ -1019,7 +1019,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             # block. makes it harder to later edit/reuse this content stream
             # and may upset downstream utilities
             warn X::PDF::Content::OP::Unexpected.new: :$op, :mnemonic(%OpName{$op}), :type('graphics operator'), :where("outside of a 'q' ... 'Q' (Save .. Restore) graphics block");
-	}
+        }
 
         if $op ~~ 'comment' {
             note '% ' ~ opn if $!trace && ! $!comment;

@@ -20,14 +20,16 @@ say $font.stringwidth("RVX", :kern); # 2111
 use PDF::Content::FontObj;
 also does PDF::Content::FontObj;
 
-use Font::AFM;
+use Font::AFM :UnitsPerEM;
 use PDF::Content::Font;
 use PDF::Content::Font::Enc::Type1;
 use PDF::COS::Dict;
 use PDF::COS::Name;
 
+method units-per-EM { UnitsPerEM }
+
 has Font::AFM $.metrics handles <kern>;
-has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode enc>;
+has PDF::Content::Font::Enc::Type1 $.encoder handles <encode decode encode-cids enc>;
 has PDF::Content::Font $!dict;
 class Cache {
     use PDF::Content::Font::Encodings :zapf-glyphs;
@@ -168,17 +170,17 @@ multi method load-font( Str :$family!, |c) {
 }
 
 #| get the height of 'X' for the font
-multi method height(Numeric $pointsize = 1000, Bool :$ex where .so --> Numeric) {
-    $!metrics.XHeight * $pointsize / 1000;
+multi method height(Numeric $pointsize = UnitsPerEM, Bool :$ex where .so --> Numeric) {
+    $!metrics.XHeight * $pointsize / UnitsPerEM;
 }
 
 #| compute the overall font-height
-multi method height(Numeric $pointsize = 1000, Bool :$from-baseline, Bool :$hanging --> Numeric) {
+multi method height(Numeric $pointsize = UnitsPerEM, Bool :$from-baseline, Bool :$hanging --> Numeric) {
     my List $bbox = $!metrics.FontBBox;
     my Numeric $height = $hanging ?? $!metrics.Ascender !! $bbox[3];
     $height -= $hanging ?? $!metrics.Descender !! $bbox[1]
         unless $from-baseline;
-    $height * $pointsize / 1000;
+    $height * $pointsize / UnitsPerEM;
 }
 
 #| compute the width of a string
