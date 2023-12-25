@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 58;
+plan 59;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -69,6 +69,7 @@ my PDF::Content::Font::CoreFont $tr-afm .= load-font( 'Times-Roman' );
 is $tr-afm.stringwidth("RVX", :!kern), 2111, 'stringwidth :!kern';
 is $tr-afm.stringwidth("RVX", :kern), 2111 - 80, 'stringwidth :kern';
 is-deeply $tr-afm.kern("RVX" ), (['R', -80, 'VX'], 2031), '.kern(...)';
+is-deeply $tr-afm.shape("RVX" ), (['R', 80+0i, 'VX'], 2031), '.kern(...)';
 
 for (win => "Á®ÆØ",
      mac => "ç¨®¯") {

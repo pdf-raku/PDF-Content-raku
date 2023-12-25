@@ -195,6 +195,39 @@ method encoding returns Str {
     %enc-name{self.enc};
 }
 
+method shape(Str $text) {
+    my @shaped;
+    my uint8 @cids;
+    my $prev-glyph;
+    my Hash $wx   = $!metrics.Wx;
+    my Hash $kern = $!metrics.KernData;
+    my $width;
+    my $encoder := $.encoder;
+
+    for $text.ords -> $ord {
+        my $glyph-name = $encoder.lookup-glyph($ord);
+        next unless $glyph-name && $glyph-name ne '.notdef';
+        my uint8 $cid = $encoder.protect: { $encoder.charset{$ord} // $encoder.add-encoding($ord) };
+
+        if $cid {
+            $width += $wx{$glyph-name};
+            if $prev-glyph && (my $kp := $kern{$prev-glyph}) {
+                my $kx := $kp{$glyph-name};
+                if $kx {
+                    $width += $kx;
+                    @shaped.push: $.encode-cids: @cids;
+                    @shaped.push: Complex.new(-$kx, 0) ;
+                    @cids = ();
+                }
+            }
+            @cids.push: $cid;
+        }
+        $prev-glyph := $glyph-name;
+    }
+    @shaped.push($.encode-cids: @cids) if @cids;
+    @shaped, $width;
+}
+
 sub name(PDF::COS::Name() $name) {
     $name;
 }
