@@ -30,8 +30,8 @@
     "PDF::Content::Font::CoreFont": "lib/PDF/Content/Font/CoreFont.rakumod",
     "PDF::Content::Font::Enc::Glyphic": "lib/PDF/Content/Font/Enc/Glyphic.rakumod",
     "PDF::Content::Font::Enc::Type1": "lib/PDF/Content/Font/Enc/Type1.rakumod",
-    "PDF::Content::Font::Encodings": "lib/PDF/Content/Font/Encodings.rakumod",
     "PDF::Content::Font::Encoder": "lib/PDF/Content/Font/Encoder.rakumod",
+    "PDF::Content::Font::Encodings": "lib/PDF/Content/Font/Encodings.rakumod",
     "PDF::Content::FontObj": "lib/PDF/Content/FontObj.rakumod",
     "PDF::Content::Image": "lib/PDF/Content/Image.rakumod",
     "PDF::Content::Image::GIF": "lib/PDF/Content/Image/GIF.rakumod",
@@ -61,5 +61,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.7.2"
+  "version": "0.7.3"
 }

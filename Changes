@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.7.3  2024-01-02T07:45:29+13:00
+   - Add core-font shape method with ligatures and kerning.
+   - Add PDF::Content::Font::Encoder interface role
+
 0.7.2  2023-10-17T06:40:11+13:00
    - Fix local-glyph-name return value. Was causing regressions
      in PDF::To::Cairo
