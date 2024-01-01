@@ -72,7 +72,7 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
     for ^+@!words -> $i {
         my $spaces := @!spaces[$i];
         if $spaces {
-            @line.push: Space x $spaces;
+            @line.push: $font.encode(Space x $spaces);
             @line.push: $space-pad * $spaces
                 unless $space-pad =~= 0;
         }

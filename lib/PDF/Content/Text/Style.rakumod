@@ -62,14 +62,6 @@ multi method baseline-shift(Baseline $_ --> Numeric) {
 }
 =para This returns a positive or negative y-offset in units of points.  The default is C<alphabetic>, which is a zero offset.
 
-method shape returns Bool {
-    $!shape && $!font.^can('shape').so;
-}
-
-#|
-method kern returns Bool {
-    $!kern || ($!shape && ! $!font.^can('shape').so);
-}
 
 #| get/set a numeric font vertical alignment offset
 multi method baseline-shift is rw { $!TextRise }

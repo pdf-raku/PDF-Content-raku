@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 2;
+plan 3;
 use lib 't';
 use PDFTiny;
 use PDF::Content;
@@ -21,7 +21,7 @@ $gfx.say('Hello, World!', :$width, :kern, :position[50, 100], :font($bold-font),
 
 is-deeply $gfx.content-dump, $(
     "BT",
-    "1 0 0 1 50 100 Tm", 
+    "1 0 0 1 50 100 Tm",
     "/F1 18 Tf",
     "(Hello,) Tj",
     "19.8 TL",
@@ -31,12 +31,20 @@ is-deeply $gfx.content-dump, $(
     "ET",
      ), "hello world (with kerning)";
 
+$gfx.say('RVX', :$width, :shape, :position[150, 100], :font($bold-font), :$font-size);
+
+is-deeply $gfx.content-dump.tail(5), $(
+    "BT",
+    "1 0 0 1 150 100 Tm",
+    "[ (R) 50 (VX) ] TJ",
+    "T*",
+    "ET",
+     ), "shaping";
+
 $width = 100;
 my $height = 150;
 my $x = 20;
 my $y = 700;
-
-$gfx = $page.gfx;
 
 my $sample = q:to"--ENOUGH!!--";
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

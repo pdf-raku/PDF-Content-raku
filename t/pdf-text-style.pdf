@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 7446 >> stream
+<< /Length 7499 >> stream
 BT
   1 0 0 1 50 100 Tm
   /F1 18 Tf
@@ -27,6 +27,11 @@ BT
   19.8 TL
   T*
   [ (W) 60 (orld!) ] TJ
+  T*
+ET
+BT
+  1 0 0 1 150 100 Tm
+  [ (R) 50 (VX) ] TJ
   T*
 ET
 BT
@@ -435,10 +440,10 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000274 00000 n 
-0000007773 00000 n 
-0000007884 00000 n 
+0000007826 00000 n 
+0000007937 00000 n 
 trailer
 << /ID [ (t/pdf-text-style) (t/pdf-text-style) ] /Root 1 0 R /Size 7 >>
 startxref
-7990
+8043
 %%EOF

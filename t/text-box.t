@@ -135,9 +135,9 @@ subtest 'font loading from content stream', {
         $page.Resources = %Resources;
         lives-ok: {
             $page.graphics: {
-                .ops("BT /F1 24 Tf");
+                .ops: "BT /F1 24 Tf";
                 .text-position = 15, 25;
-                .say("Bye for now");
+                .say: "Bye for now";
                 .EndText;
             }
         }

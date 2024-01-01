@@ -4,7 +4,7 @@ method charset {...}
 method to-unicode {...}
 method encode {...}
 method encode-cids {...}
-method set-encoding($,$) {...}
+method add-encoding($) {...}
 method decode {...}
 method lock {...}
-method use-cid {...}
+

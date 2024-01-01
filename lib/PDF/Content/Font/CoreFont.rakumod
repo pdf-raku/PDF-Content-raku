@@ -201,19 +201,18 @@ method shape(Str $text) {
     my $prev-glyph;
     my Hash $wx   = $!metrics.Wx;
     my Hash $kern = $!metrics.KernData;
-    my $width;
+    my $width = 0;
     my $encoder := $.encoder;
 
-    for $text.ords -> $ord {
-        my $glyph-name = $encoder.lookup-glyph($ord);
+    for $!metrics.ligature-subs($text).ords -> $ord {
+        my $glyph-name := $encoder.lookup-glyph($ord);
         next unless $glyph-name && $glyph-name ne '.notdef';
         my uint8 $cid = $encoder.protect: { $encoder.charset{$ord} // $encoder.add-encoding($ord) };
 
         if $cid {
             $width += $wx{$glyph-name};
-            if $prev-glyph && (my $kp := $kern{$prev-glyph}) {
-                my $kx := $kp{$glyph-name};
-                if $kx {
+            if $prev-glyph {
+                if (my $kp := $kern{$prev-glyph}) && (my $kx := $kp{$glyph-name}) {
                     $width += $kx;
                     @shaped.push: $.encode-cids: @cids;
                     @shaped.push: Complex.new(-$kx, 0) ;
