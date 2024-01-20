@@ -24,12 +24,14 @@ method glyph-map returns Hash {
 }
 
 #| register this glyph in the differences table
-method add-glyph-diff(UInt $cid) {
+multi method add-glyph-diff(UInt $cid) {
     if @.to-unicode[$cid] -> $ord {
-        my $glyph-name = self.lookup-glyph( $ord ) // '.notdef';
-        %!diffs{$cid} = PDF::COS::Name.COERCE: $glyph-name
-            unless $glyph-name eq '.notdef';
+        $.add-glyph-diff: $cid, self.lookup-glyph( $ord ) // '.notdef';
     }
+}
+multi method add-glyph-diff(UInt $cid, PDF::COS::Name() $glyph-name) {
+    %!diffs{$cid} = PDF::COS::Name.COERCE: $glyph-name
+        unless $glyph-name eq '.notdef';
 }
 
 method cid-map-glyph($glyph-name, $cid) {

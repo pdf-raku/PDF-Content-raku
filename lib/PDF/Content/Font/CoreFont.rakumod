@@ -40,10 +40,11 @@ class Cache {
     method core-font(Str:D $font-name, PDF::Content::Font::CoreFont $class?, :$enc!, PDF::Content::Font :$dict, |c) {
         $!lock.protect: {
             ($dict.defined ?? $dict.font-obj !! %!fonts{$font-name.lc~'-*-'~$enc}) //= do {
-                    my $metrics = Font::AFM.core-font( $font-name );
+                    my Font::AFM $metrics .= core-font( $font-name );
                     my Str %glyphs = $font-name eq 'zapfdingbats'
                                       ?? %$zapf-glyphs
                                       !! $metrics.Wx.keys.map: {%CharSet{$_} => $_ };
+                    $metrics.glyphs = %glyphs;
                     my $encoder = PDF::Content::Font::Enc::Type1.new: :$enc, :%glyphs;
                     $class.new( :$encoder, :$metrics, :$dict, |c);
             }
@@ -185,8 +186,7 @@ multi method height(Numeric $pointsize = UnitsPerEM, Bool :$from-baseline, Bool 
 
 #| compute the width of a string
 method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False --> Numeric) {
-    my $glyphs = $!encoder.glyphs;
-    $!metrics.stringwidth( $str, $pointsize, :$kern, :$glyphs);
+    $!metrics.stringwidth( $str, $pointsize, :$kern);
 }
 
 #| Core font base encoding: WinAsni, MacRoman or MacExpert

@@ -73,9 +73,20 @@ class PDF::Content::Font::Enc::Type1 {
         }
         $cid;
     }
+    method allocate-cid {
+        my $cid = 0;
+        while @!spare-cids && !$cid {
+            $cid = @!spare-cids.shift;
+            my $old-ord = @!to-unicode[$cid];
+            if $old-ord && %!charset{$old-ord} {
+                # already inuse
+                $cid = 0;
+            }
+        }
+        $cid;
+    }
     method add-encoding($ord) {
         my $cid = %!from-unicode{$ord} // 0;
-
         if $cid {
             %!charset{$ord} = $cid;
         }
@@ -83,18 +94,10 @@ class PDF::Content::Font::Enc::Type1 {
             my $glyph-name = self.lookup-glyph($ord);
             if $glyph-name && $glyph-name ne '.notdef' {
                 # try to remap the glyph to a spare encoding or other unused glyph
-                while @!spare-cids && !$cid {
-                    $cid = @!spare-cids.shift;
-                    my $old-ord = @!to-unicode[$cid];
-                    if $old-ord && %!charset{$old-ord} {
-                        # already inuse
-                        $cid = 0;
-                    }
-                    else {
-                        # add it to the encoding scheme
-                        self.set-encoding($ord, $cid);
-                    }
-                }
+                $cid = self.allocate-cid;
+                # add it to the encoding scheme
+                self.set-encoding($ord, $cid)
+                    if $cid;
             }
         }
         $cid;
