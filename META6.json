@@ -14,7 +14,7 @@
     "Native::Packing",
     "Method::Also",
     "JSON::Fast",
-    "PDF:ver<0.5.9+>",
+    "PDF:ver<0.6.2+>",
     "PDF::Grammar:ver<0.3.0+>"
   ],
   "description": "PDF content related classes; including text, images, fonts and graphics",
@@ -61,5 +61,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.7.3"
+  "version": "0.7.4"
 }

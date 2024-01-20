@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.7.4  2024-01-21T10:47:12+13:00
+   - Add encoding allocate-cid() method - for PDF::Font::Loader
+     v0.8.0+ shaping.
+
 0.7.3  2024-01-02T07:45:29+13:00
    - Add core-font shape method with ligatures and kerning.
    - Add PDF::Content::Font::Encoder interface role
