@@ -18,7 +18,6 @@ my $font-size = 18;
 my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
 
 $width = 100;
-my $height = 80;
 my $x = 110;
 
 $gfx.Save;
@@ -34,21 +33,29 @@ sub draw-rect($gfx, @rect) {
     }
 }
 
+sub draw-cross($gfx, $x, $y) {
+    $gfx.tag: 'Artifact', {
+        $gfx.StrokeAlpha = .75;
+        $gfx.StrokeColor = color .01, .7, 0.1;
+        $gfx.paint: :stroke, { .MoveTo($x-5, $y);  .LineTo($x+5, $y); }
+        $gfx.paint: :stroke, { .MoveTo($x, $y-5);  .LineTo($x, $y+5); }
+    }
+}
+
 my $sample = q:to"--ENOUGH!!--".chomp;
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
 ut labore et dolore magna aliqua.
 --ENOUGH!!--
-
-my $baseline = 'top';
 
 for <top center bottom> -> $valign {
 
     my $y = 700;
     for <left center right justify> -> $align {
         my @rect[4];
+        $gfx.&draw-cross($x, $y);
         $gfx.text: {
             .text-position = ($x, $y);
-            @rect= $gfx.say( "*** $valign $align*** " ~ $sample, :$width, :$height, :$valign, :$align, :$baseline );
+            @rect= $gfx.print: "*** $valign $align*** " ~ $sample, :$width, :$valign, :$align;
         }
         draw-rect $gfx, @rect;
 

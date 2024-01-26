@@ -5,7 +5,7 @@
 endobj
 
 2 0 obj
-<< /Type /Pages /Count 2 /Kids [ 3 0 R 7 0 R ] >>
+<< /Type /Pages /Count 2 /Kids [ 3 0 R 8 0 R ] >>
 endobj
 
 3 0 obj
@@ -14,16 +14,30 @@ endobj
   /Contents 4 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /ExtGState << /GS1 5 0 R >> /Font << /F1 6 0 R >> >>
+  /Resources << /ExtGState << /GS1 5 0 R /GS2 6 0 R >> /Font << /F1 7 0 R >> >>
 >>
 endobj
 
 4 0 obj
-<< /Length 5528 >> stream
+<< /Length 7740 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
   /F1 10 Tf
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 700 m
+      115 700 l
+      S
+    Q
+    q
+      110 695 m
+      110 705 l
+      S
+    Q
+  EMC
   BT
     1 0 0 1 110 700 Tm
     -7.18 Ts
@@ -41,12 +55,27 @@ q
     (labore et dolore) Tj
     T*
     (magna aliqua.) Tj
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      110 622.82 100 80 re
+      110 625.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 530 m
+      115 530 l
+      S
+    Q
+    q
+      110 525 m
+      110 535 l
       S
     Q
   EMC
@@ -66,12 +95,27 @@ q
     [ 4753 (incididunt ut labore et) ] TJ
     T*
     [ 4669 (dolore magna aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      60 452.82 100 80 re
+      60 455.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 360 m
+      115 360 l
+      S
+    Q
+    q
+      110 355 m
+      110 365 l
       S
     Q
   EMC
@@ -91,12 +135,27 @@ q
     [ 6948 (labore et dolore) ] TJ
     T*
     [ 6281 (magna aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      10 282.82 100 80 re
+      10 285.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 190 m
+      115 190 l
+      S
+    Q
+    q
+      110 185 m
+      110 195 l
       S
     Q
   EMC
@@ -116,18 +175,33 @@ q
     [ (labore ) -1526 (et ) -1526 (dolore) ] TJ
     T*
     [ (magna ) -3719 (aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      110 112.82 100 80 re
+      110 115.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 700 m
+      240 700 l
+      S
+    Q
+    q
+      235 695 m
+      235 705 l
       S
     Q
   EMC
   BT
     1 0 0 1 235 700 Tm
-    -7.18 Ts
+    -2.555 Ts
     0 33 Td
     (*** center left***) Tj
     T*
@@ -142,18 +216,33 @@ q
     (incididunt ut labore et) Tj
     T*
     (dolore magna aliqua.) Tj
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      235 657.32 100 80 re
+      235 663.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 530 m
+      240 530 l
+      S
+    Q
+    q
+      235 525 m
+      235 535 l
       S
     Q
   EMC
   BT
     1 0 0 1 235 530 Tm
-    -7.18 Ts
+    -2.555 Ts
     0 33 Td
     [ 4224 (*** center center***) ] TJ
     T*
@@ -168,18 +257,33 @@ q
     [ 4753 (incididunt ut labore et) ] TJ
     T*
     [ 4669 (dolore magna aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      185 487.32 100 80 re
+      185 493.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 360 m
+      240 360 l
+      S
+    Q
+    q
+      235 355 m
+      235 365 l
       S
     Q
   EMC
   BT
     1 0 0 1 235 360 Tm
-    -7.18 Ts
+    -2.555 Ts
     0 33 Td
     [ 7614 (*** center right***) ] TJ
     T*
@@ -194,18 +298,33 @@ q
     [ 9505 (incididunt ut labore et) ] TJ
     T*
     [ 9338 (dolore magna aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      135 317.32 100 80 re
+      135 323.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 190 m
+      240 190 l
+      S
+    Q
+    q
+      235 185 m
+      235 195 l
       S
     Q
   EMC
   BT
     1 0 0 1 235 190 Tm
-    -7.18 Ts
+    -2.555 Ts
     0 33 Td
     [ (*** ) -887 (center ) -887 (justify***) ] TJ
     T*
@@ -220,18 +339,33 @@ q
     [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
     T*
     [ (dolore ) -331 (magna ) -331 (aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      235 147.32 100 80 re
+      235 153.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 700 m
+      365 700 l
+      S
+    Q
+    q
+      360 695 m
+      360 705 l
       S
     Q
   EMC
   BT
     1 0 0 1 360 700 Tm
-    -7.18 Ts
+    2.07 Ts
     0 66 Td
     (*** bottom left***) Tj
     T*
@@ -246,18 +380,33 @@ q
     (incididunt ut labore et) Tj
     T*
     (dolore magna aliqua.) Tj
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      360 691.82 100 80 re
+      360 701.07 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 530 m
+      365 530 l
+      S
+    Q
+    q
+      360 525 m
+      360 535 l
       S
     Q
   EMC
   BT
     1 0 0 1 360 530 Tm
-    -7.18 Ts
+    2.07 Ts
     0 66 Td
     [ 4363 (*** bottom center***) ] TJ
     T*
@@ -272,18 +421,33 @@ q
     [ 4753 (incididunt ut labore et) ] TJ
     T*
     [ 4669 (dolore magna aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      310 521.82 100 80 re
+      310 531.07 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 360 m
+      365 360 l
+      S
+    Q
+    q
+      360 355 m
+      360 365 l
       S
     Q
   EMC
   BT
     1 0 0 1 360 360 Tm
-    -7.18 Ts
+    2.07 Ts
     0 66 Td
     [ 7892 (*** bottom right***) ] TJ
     T*
@@ -298,18 +462,33 @@ q
     [ 9505 (incididunt ut labore et) ] TJ
     T*
     [ 9338 (dolore magna aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      260 351.82 100 80 re
+      260 361.07 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 190 m
+      365 190 l
+      S
+    Q
+    q
+      360 185 m
+      360 195 l
       S
     Q
   EMC
   BT
     1 0 0 1 360 190 Tm
-    -7.18 Ts
+    2.07 Ts
     0 66 Td
     [ (*** ) -748 (bottom ) -748 (justify***) ] TJ
     T*
@@ -324,12 +503,13 @@ q
     [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
     T*
     [ (dolore ) -331 (magna ) -331 (aliqua.) ] TJ
-    T*
     0 Ts
   ET
   /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
     q
-      360 181.82 100 80 re
+      360 191.07 100 77 re
       S
     Q
   EMC
@@ -342,6 +522,10 @@ endobj
 endobj
 
 6 0 obj
+<< /Type /ExtGState /CA 0.75 >>
+endobj
+
+7 0 obj
 <<
   /Type /Font
   /Subtype /Type1
@@ -350,17 +534,17 @@ endobj
 >>
 endobj
 
-7 0 obj
+8 0 obj
 <<
   /Type /Page
-  /Contents 8 0 R
+  /Contents 9 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /ExtGState << /GS1 9 0 R >> /Font << /F1 10 0 R >> >>
+  /Resources << /ExtGState << /GS1 10 0 R >> /Font << /F1 11 0 R >> >>
 >>
 endobj
 
-8 0 obj
+9 0 obj
 << /Length 3527 >> stream
 BT
   1 0 0 1 10 750 Tm
@@ -649,11 +833,11 @@ Q
 endstream
 endobj
 
-9 0 obj
+10 0 obj
 << /Type /ExtGState /CA 0.5 >>
 endobj
 
-10 0 obj
+11 0 obj
 <<
   /Type /Font
   /Subtype /Type1
@@ -663,20 +847,21 @@ endobj
 endobj
 
 xref
-0 11
+0 12
 0000000000 65535 f 
 0000000015 00000 n 
 0000000065 00000 n 
 0000000131 00000 n 
-0000000298 00000 n 
-0000005879 00000 n 
-0000005926 00000 n 
-0000006032 00000 n 
-0000006200 00000 n 
-0000009780 00000 n 
-0000009827 00000 n 
+0000000309 00000 n 
+0000008102 00000 n 
+0000008149 00000 n 
+0000008197 00000 n 
+0000008303 00000 n 
+0000008472 00000 n 
+0000012052 00000 n 
+0000012100 00000 n 
 trailer
-<< /ID [ (t/pdf-text-align) (t/pdf-text-align) ] /Root 1 0 R /Size 11 >>
+<< /ID [ (t/pdf-text-align) (t/pdf-text-align) ] /Root 1 0 R /Size 12 >>
 startxref
-9932
+12205
 %%EOF
