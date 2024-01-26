@@ -18,7 +18,7 @@ has Numeric $.HorizScaling is built;
 has UInt    $.TextRender   is built;
 has Numeric $.TextRise     is built;
 
-my subset Baseline of Str is export(:BaseLine) where 'alphabetic'|'top'|'bottom'|'middle'|'ideographic'|'hanging'|Any:U;
+my subset Baseline of Str is export(:BaseLine) where 'alphabetic'|'top'|'bottom'|'middle'|'center'|'ideographic'|'hanging'|Any:U;
 
 method !build(
     :$!CharSpacing = 0,
@@ -52,13 +52,13 @@ submethod TWEAK(*%o) {
 #| compute a vertical offset for a named font alignment mode
 multi method baseline-shift(Baseline $_ --> Numeric) {
     my \h = $!font.height($!font-size, :hanging, :from-baseline);
-    when 'alphabetic'  { 0 }
-    when 'top'         { - h }
-    when 'bottom'      {   $.font-height(:hanging)   - h }
-    when 'middle'      {   $.font-height(:hanging)/2 - h }
-    when 'ideographic' {   $!font-size - h }
-    when 'hanging'     { - h }
-    default            { 0 }
+    when 'alphabetic'      { 0 }
+    when 'top'             { - h }
+    when 'bottom'          {   $.font-height(:hanging)   - h }
+    when 'middle'|'center' {   $.font-height(:hanging)/2 - h }
+    when 'ideographic'     {   $!font-size - h }
+    when 'hanging'         { - h }
+    default                { 0 }
 }
 =para This returns a positive or negative y-offset in units of points.  The default is C<alphabetic>, which is a zero offset.
 

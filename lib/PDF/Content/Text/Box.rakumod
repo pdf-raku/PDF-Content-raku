@@ -97,7 +97,7 @@ has Numeric $.height;
 has Numeric $.indent = 0;
 
 has Alignment $.align = 'left';
-has VerticalAlignment $.valign = 'top';
+has VerticalAlignment $.valign;
 has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness font-height shape>;
 has PDF::Content::Text::Line @.lines is built;
 has @.overflow is rw is built;
@@ -151,13 +151,18 @@ method text(::?CLASS:D $obj:) is rw {
     );
 }
 
+method !build-style(:$baseline = $!valign // 'alphabetic', |c) {
+    $_ .= new(:$baseline, |c) without $!style;
+    $!valign //= 'top';
+}
+
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
-    $_ .= new(|c) without $!style;
+    self!build-style: |c;
     self!layup: @chunks;
 }
 
 multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
-    $_ .= new(|c) without $!style;
+    self!build-style: |c;
     self!layup: @chunks;
 }
 
