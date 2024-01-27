@@ -171,7 +171,7 @@ multi method load-font( Str :$family!, |c) {
 }
 
 #| get the height of 'X' for the font
-multi method height(Numeric $pointsize = UnitsPerEM, Bool :$ex where .so --> Numeric) {
+multi method height(Numeric $pointsize = UnitsPerEM, Bool :$ex! where .so --> Numeric) {
     $!metrics.XHeight * $pointsize / UnitsPerEM;
 }
 

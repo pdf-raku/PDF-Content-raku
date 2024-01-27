@@ -1,6 +1,9 @@
 {{$NEXT}}
-   - Implicitly set baseline when setting valign, so that the entire
-     text box is aligned - see https://github.com/pdf-raku/PDF-API6/issues/17
+
+0.7.5  2024-01-28T12:02:11+13:00
+   - Implicitly set baseline to match valign so that the entire
+     text box and, in particular, a single line of text is aligned
+     as expected - see https://github.com/pdf-raku/PDF-API6/issues/17
 
 0.7.4  2024-01-21T10:47:12+13:00
    - Add encoding allocate-cid() method - for PDF::Font::Loader

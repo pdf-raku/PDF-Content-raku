@@ -9,22 +9,6 @@ use PDF::Content::FontObj;
 use PDF::Content::Page;
 use PDFTiny;
 
-my PDFTiny $pdf .= new;
-my PDF::Content::Page $page = $pdf.add-page;
-my PDF::Content $gfx = $page.gfx;
-my $width = 50;
-my $font-size = 18;
-
-my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
-
-$width = 100;
-my $x = 110;
-
-$gfx.Save;
-$gfx.StrokeAlpha = .5;
-$gfx.StrokeColor = color .5, .01, .01;
-$gfx.set-font( $font, 10);
-
 sub draw-rect($gfx, @rect) {
     $gfx.tag: 'Artifact', {
         $gfx.StrokeAlpha = .5;
@@ -42,6 +26,22 @@ sub draw-cross($gfx, $x, $y) {
     }
 }
 
+my PDFTiny $pdf .= new;
+my PDF::Content::Page $page = $pdf.add-page;
+my PDF::Content $gfx = $page.gfx;
+my $width = 50;
+my $font-size = 18;
+
+my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
+
+$width = 100;
+my $x = 110;
+
+$gfx.Save;
+$gfx.StrokeAlpha = .5;
+$gfx.StrokeColor = color .5, .01, .01;
+$gfx.set-font( $font, 10);
+
 my $sample = q:to"--ENOUGH!!--".chomp;
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
 ut labore et dolore magna aliqua.
@@ -55,7 +55,7 @@ for <top center bottom> -> $valign {
         $gfx.&draw-cross($x, $y);
         $gfx.text: {
             .text-position = ($x, $y);
-            @rect= $gfx.print: "*** $valign $align*** " ~ $sample, :$width, :$valign, :$align;
+            @rect = .print: "*** $valign $align*** " ~ $sample, :$width, :$valign, :$align;
         }
         draw-rect $gfx, @rect;
 

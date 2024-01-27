@@ -1,5 +1,5 @@
 #| PDF Content construction and manipulation
-class PDF::Content:ver<0.7.4> {
+class PDF::Content:ver<0.7.5> {
 
     use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
     also is PDF::Content::Ops;
