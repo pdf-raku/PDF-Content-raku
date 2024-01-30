@@ -50,9 +50,9 @@ submethod TWEAK(*%o) {
 =head2 Methods
 
 #| compute a vertical offset for a named font alignment mode
+multi method baseline-shift('alphabetic') { 0 }
 multi method baseline-shift(Baseline $_ --> Numeric) {
     my \h = $!font.height($!font-size, :hanging, :from-baseline);
-    when 'alphabetic'      { 0 }
     when 'top'             { - h }
     when 'bottom'          {   $.font-height(:hanging)   - h }
     when 'middle'|'center' {   $.font-height(:hanging)/2 - h }

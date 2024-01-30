@@ -178,9 +178,15 @@ multi method height(Numeric $pointsize = UnitsPerEM, Bool :$ex! where .so --> Nu
 #| compute the overall font-height
 multi method height(Numeric $pointsize = UnitsPerEM, Bool :$from-baseline, Bool :$hanging --> Numeric) {
     my List $bbox = $!metrics.FontBBox;
-    my Numeric $height = $hanging ?? $!metrics.Ascender !! $bbox[3];
-    $height -= $hanging ?? $!metrics.Descender !! $bbox[1]
-        unless $from-baseline;
+    my Numeric $height = $!metrics.Ascender
+        if $hanging;
+    $height //= $bbox[3];
+    unless $from-baseline {
+        my Numeric $descent = $!metrics.Descender
+            if $hanging;
+        $descent //= $bbox[1];
+        $height -= $descent;
+    }
     $height * $pointsize / UnitsPerEM;
 }
 

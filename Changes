@@ -1,4 +1,6 @@
 {{$NEXT}}
+   - Handle missing Ascender, Descender metric values in height
+     calculations for ZapfDingbats & Symbol fonts.
 
 0.7.5  2024-01-28T12:02:11+13:00
    - Implicitly set baseline to match valign so that the entire
