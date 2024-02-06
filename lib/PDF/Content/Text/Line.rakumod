@@ -4,7 +4,8 @@ unit class PDF::Content::Text::Line;
 use PDF::Content::Ops :OpCode;
 use Method::Also;
 
-has List @.words;
+has Str @.decoded;
+has List @.encoded;
 has Numeric $.height is rw is required;
 has Numeric $.word-width is rw = 0; #| sum of word widths
 has Numeric $.word-gap = 0;
@@ -69,14 +70,14 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
 
     # flatten words. insert spaces and space adjustments.
     # Ensure we add spaces - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
-    for ^+@!words -> $i {
+    for ^+@!encoded -> $i {
         my $spaces := @!spaces[$i];
         if $spaces {
             @line.push: $font.encode(Space x $spaces);
             @line.push: $space-pad * $spaces
                 unless $space-pad =~= 0;
         }
-        @line.append: @!words[$i].list;
+        @line.append: @!encoded[$i].list;
     }
     @line .= &coalesce;
 
@@ -86,9 +87,15 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
 
 }
 
-method text is also<Str> {
-    join '', @!words.kv.map: -> $i, $w {
+method encode {
+    join '', @!encoded.kv.map: -> $i, $w {
         ((' ' x @!spaces[$i]).Slip, $w.grep(Str).Slip)
+    }
+}
+
+method decode is also<Str text> {
+    join '', @!decoded.kv.map: -> $i, $w {
+        ((' ' x @!spaces[$i]).Slip, $w)
     }
 }
 

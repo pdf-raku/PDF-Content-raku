@@ -141,10 +141,10 @@ subtest 'font loading from content stream', {
                 .EndText;
             }
         }
+        # ensure consistant document ID generation
+        $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
+
+        $pdf.save-as: "t/text-box.pdf";
     }
 }
 
-# ensure consistant document ID generation
-$pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
-
-$pdf.save-as: "t/text-box.pdf";

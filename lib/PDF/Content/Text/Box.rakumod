@@ -166,7 +166,7 @@ multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
     self!layup: @chunks;
 }
 
-method !layup(@atoms is copy) {
+method !layup(@atoms is copy, Bool :$bidi) {
     my int $i = 0;
     my int $line-start = 0;
     my int $n = +@atoms;
@@ -227,7 +227,7 @@ method !layup(@atoms is copy) {
             }
         }
 
-        $line-breaks ||= ($line.words || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
+        $line-breaks ||= ($line.encoded || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
             if $!width;
 
         while $line-breaks-- {
@@ -258,9 +258,12 @@ method !layup(@atoms is copy) {
             my $Ty = @!lines.head.height * $.leading  -  self.content-height;
             @!images.push( { :$Tx, :$Ty, :xobject($atom) } )
         }
+        else {
+        }
 
-        $line.spaces[+$line.words] = $preceding-spaces;
-        $line.words.push: $word;
+        $line.spaces[+$line.encoded] = $preceding-spaces;
+        $line.decoded.push: $xobject ?? '' !! $atom;
+        $line.encoded.push: $word;
         $line.word-width += $word-width;
         $line.height = $height
             if $height > $line.height;
@@ -271,7 +274,7 @@ method !layup(@atoms is copy) {
     if $preceding-spaces {
         # trailing space
         $line.spaces.push($preceding-spaces);
-        $line.words.push: [];
+        $line.encoded.push: [];
     }
 
     @!overflow = @atoms[$i..*];
@@ -350,7 +353,7 @@ method render(
         for @!lines;
 
     my @content;
-    @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join: ' '
+    @content.push: 'comment' => 'text: ' ~ @!lines>>.encode.join: ' '
         if $gfx.comment;
 
     my $h = @!lines ?? @!lines.head.height !! 0;
