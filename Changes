@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+0.7.7  2024-02-07T08:26:57+13:00
+    - Store original text atoms in text lines @!decoded attribute.
+      Fix text() method to return these rejoined, rather than
+      encoded byte-strings.
+
 0.7.6  2024-01-31T11:16:39+13:00
    - Handle missing Ascender, Descender metric values in height
      calculations for ZapfDingbats & Symbol core fonts.
