@@ -166,7 +166,7 @@ multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
     self!layup: @chunks;
 }
 
-method !layup(@atoms is copy, Bool :$bidi) {
+method !layup(@atoms is copy) {
     my int $i = 0;
     my int $line-start = 0;
     my int $n = +@atoms;

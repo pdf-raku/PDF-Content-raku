@@ -87,13 +87,7 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
 
 }
 
-method encode {
-    join '', @!encoded.kv.map: -> $i, $w {
-        ((' ' x @!spaces[$i]).Slip, $w.grep(Str).Slip)
-    }
-}
-
-method decode is also<Str text> {
+method text is also<Str> {
     join '', @!decoded.kv.map: -> $i, $w {
         ((' ' x @!spaces[$i]).Slip, $w)
     }
