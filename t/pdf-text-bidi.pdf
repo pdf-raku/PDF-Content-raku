@@ -19,12 +19,14 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 126 >> stream
+<< /Length 154 >> stream
 BT
   /F1 10 Tf
   1 0 0 1 110 500 Tm
-  (Left thgiR left) Tj
+  (Left Right left) Tj
   11 TL
+  T*
+  (Left thgiR left) Tj
   T*
   (Left) Tj
   T*
@@ -52,9 +54,9 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000264 00000 n 
-0000000442 00000 n 
+0000000470 00000 n 
 trailer
 << /ID [ (t/pdf-text-bidi.) (t/pdf-text-bidi.) ] /Root 1 0 R /Size 6 >>
 startxref
-548
+576
 %%EOF
