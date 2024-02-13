@@ -17,6 +17,11 @@ constant $LRO = 0x202D.chr;
 constant $RLO = 0x202E.chr;
 constant $PDF = 0x202C.chr;
 
+if (try require ::('Text::FriBidi::Lines')) === Nil {
+    skip-rest "Text::FriBidi v0.0.4+ is required for :bidi tests";
+    exit 0;
+}
+
 my $text = "Left {$RLO}Right{$PDF} {$LRO}left{$PDF}";
 
 my PDF::Content::FontObj $font = $pdf.core-font( :family<Helvetica> );
