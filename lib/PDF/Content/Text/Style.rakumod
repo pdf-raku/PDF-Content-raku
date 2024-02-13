@@ -8,7 +8,6 @@ has Numeric $.font-size = 16;
 has Numeric $.leading = 1.1;
 has Bool    $.kern;
 has Bool    $.shape;
-has Bool    $.bidi;
 has Numeric $!space-width = 300;
 has $!units-per-EM = 1000;
 

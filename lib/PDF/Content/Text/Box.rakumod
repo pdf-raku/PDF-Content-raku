@@ -95,6 +95,7 @@ my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'ce
 has Numeric $.width;
 has Numeric $.height;
 has Numeric $.indent = 0;
+has Bool    $.bidi;
 
 has Alignment $.align = 'left';
 has VerticalAlignment $.valign;
@@ -278,6 +279,21 @@ method !layup(@atoms is copy) {
     }
 
     @!overflow = @atoms[$i..*];
+
+    if $!bidi {
+        if (try require ::('Text::FriBidi::Lines')) !=== Nil {
+            # apply bidi processing
+            my Str @lines = @!lines.map: *.text;
+            # todo: :lang, :direction
+            my $bidi-lines = ::('Text::FriBidi::Lines').new: :@lines;
+            my Str() $text = $bidi-lines;
+            my ::?CLASS:D $proxy = self.clone: :$text, :!bidi, :verbatum;
+            @!lines = $proxy.lines;
+        }
+        else {
+            warn "Text::FriBidi v0.0.4+ is required for :bidi processing";
+        }
+    }
 }
 
 method !height-exceeded {
