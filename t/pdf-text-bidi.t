@@ -31,8 +31,8 @@ $gfx.set-font( $font, 10);
 
 $gfx.text-position = 110, 500;
 $gfx.say: $text, :!bidi;
-$gfx.say: $text, :bidi;
-$gfx.say: $text, :bidi, :width(15);
+$gfx.say: $text;
+$gfx.say: $text, :width(15);
 
 $gfx.EndText;
 

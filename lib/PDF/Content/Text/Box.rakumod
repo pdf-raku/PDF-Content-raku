@@ -95,7 +95,6 @@ my subset VerticalAlignment of Str is export(:VerticalAlignment) where 'top'|'ce
 has Numeric $.width;
 has Numeric $.height;
 has Numeric $.indent = 0;
-has Bool    $.bidi;
 
 has Alignment $.align = 'left';
 has VerticalAlignment $.valign;
@@ -106,6 +105,13 @@ has @.images is built;
 has Str $.text is built;
 has Bool $.squish = False;
 has Bool $.verbatim;
+has Bool $.bidi;
+
+method bidi { $!bidi //= $!text.&has-bidi-controls(); }
+multi sub has-bidi-controls(Str:U) { False }
+multi sub has-bidi-controls(Str:D $_) {
+    .contains(m/<[ \x2066..\x2069 \x202A..\x202E ]>/)  
+}
 
 =head2 style
 =for code :lang<raku>
@@ -280,7 +286,7 @@ method !layup(@atoms is copy) {
 
     @!overflow = @atoms[$i..*];
 
-    if $!bidi {
+    if $.bidi {
         if (try require ::('Text::FriBidi::Lines')) !=== Nil {
             # apply bidi processing
             my Str @lines = @!lines.map: *.text;
@@ -326,7 +332,7 @@ method !word-gap returns Numeric {
 }
 
 #| return displacement width of a text box
-method width returns Numeric { $!width  || self.content-width }
+method width returns Numeric  { $!width  || self.content-width }
 #| return displacement height of a text box
 method height returns Numeric { $!height || self.content-height }
 method !dy {
