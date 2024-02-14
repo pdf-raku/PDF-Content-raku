@@ -110,7 +110,7 @@ has Bool $.bidi;
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
 multi sub has-bidi-controls(Str:D $_) {
-    .contains(m/<[ \x2066..\x2069 \x202A..\x202E ]>/)  
+    .contains(/<[ \x2066..\x2069 \x202A..\x202E ]>/)
 }
 
 =head2 style
@@ -375,7 +375,7 @@ method render(
         for @!lines;
 
     my @content;
-    @content.push: 'comment' => 'text: ' ~ @!lines>>.encode.join: ' '
+    @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join(' ').subst(/(<-[\0..\xFF]>)/, { '\u%04d'.sprintf($0.ord)}, :g)
         if $gfx.comment;
 
     my $h = @!lines ?? @!lines.head.height !! 0;
