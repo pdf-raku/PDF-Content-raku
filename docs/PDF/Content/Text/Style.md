@@ -16,13 +16,13 @@ Methods
 
 ```raku
 multi method baseline-shift(
-    Str $_ where { ... }
+    "alphabetic"
 ) returns Numeric
 ```
 
 compute a vertical offset for a named font alignment mode
 
-This returns a positive or negative y-offset in units of points. The default is `alphabetic`, which is a zero offset. 
+This returns a positive or negative y-offset in units of points. The default is `alphabetic`, which is a zero offset.
 
 ### multi method baseline-shift
 

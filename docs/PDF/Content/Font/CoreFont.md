@@ -40,7 +40,7 @@ get a core font name for the given family, weight and style
 ```raku
 multi method height(
     Numeric $pointsize = 1000,
-    Bool :$ex where { ... }
+    Bool :$ex! where { ... }
 ) returns Numeric
 ```
 

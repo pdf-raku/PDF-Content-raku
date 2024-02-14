@@ -1,4 +1,6 @@
 {{$NEXT}}
+    - Add text-box :$direction and :$bidi options. These require
+      installation of the optional Text::FriBidi Raku module.
 
 0.7.7  2024-02-07T08:26:57+13:00
     - Store original text atoms in text lines @!decoded attribute.
