@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.8.1  2024-02-27T08:11:19+13:00
+    - Support text box :shape, :!kern option combination. I.e. shaping,
+      but without horizontal kerning.
+
 0.8.0  2024-02-15T13:09:07+13:00
     - Add text-box :$direction and :$bidi options. These require
       installation of the optional Text::FriBidi Raku module.
