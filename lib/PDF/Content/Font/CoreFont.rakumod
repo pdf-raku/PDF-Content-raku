@@ -201,12 +201,12 @@ method encoding returns Str {
     %enc-name{self.enc};
 }
 
-method shape(Str $text) {
+method shape(Str $text, Bool :$kern = True) {
     my @shaped;
     my uint8 @cids;
     my $prev-glyph;
     my Hash $wx   = $!metrics.Wx;
-    my Hash $kern = $!metrics.KernData;
+    my Hash $kern-data = $!metrics.KernData if $kern;
     my $width = 0;
     my $encoder := $.encoder;
 
@@ -217,8 +217,8 @@ method shape(Str $text) {
 
         if $cid {
             $width += $wx{$glyph-name};
-            if $prev-glyph {
-                if (my $kp := $kern{$prev-glyph}) && (my $kx := $kp{$glyph-name}) {
+            if $kern && $prev-glyph {
+                if (my $kp := $kern-data{$prev-glyph}) && (my $kx := $kp{$glyph-name}) {
                     $width += $kx;
                     @shaped.push: $.encode-cids: @cids;
                     @shaped.push: Complex.new(-$kx, 0) ;

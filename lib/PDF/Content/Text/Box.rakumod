@@ -187,8 +187,9 @@ method !layup(@atoms is copy) {
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;
     my $font := $!style.font;
-    my Bool $kern := $!style.kern;
     my Bool $shape := $!style.shape;
+    my Bool $kern = $!style.kern;
+    $kern //= True if $shape;
 
     my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
     @!lines = $line;
@@ -212,7 +213,7 @@ method !layup(@atoms is copy) {
                 }
 
                 if $shape {
-                    given $font.shape($atom) {
+                    given $font.shape($atom, :$kern) {
                         $word = .[0];
                         $word-width = .[1];
                     }
@@ -346,10 +347,8 @@ method !word-gap returns Numeric {
 method width returns Numeric  { $!width  || self.content-width }
 #| return displacement height of a text box
 method height returns Numeric { $!height || self.content-height }
-method !dy {
-    %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign}
-        // 0;
-}
+method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
+method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
 method !top-offset {
     self!dy * ($.height - $.content-height);
 }
@@ -392,7 +391,7 @@ method render(
     my $h = @!lines ?? @!lines.head.height !! 0;
     my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * ($.height - $h * $.leading);
     my $tf-y = $gfx.tf-y;
-    my Numeric:D $dx = %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} * $.width;
+    my Numeric:D $dx = self!dx * $.width;
     my $x-shift = $left ?? $dx !! 0.0;
     my $leading = $gfx.TextLeading;
     my Numeric \scale = -1000 / $.font-size;

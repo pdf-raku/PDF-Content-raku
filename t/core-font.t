@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 60;
+plan 61;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -70,6 +70,7 @@ is $tr-afm.stringwidth("RVX", :!kern), 2111, 'stringwidth :!kern';
 is $tr-afm.stringwidth("RVX", :kern), 2111 - 80, 'stringwidth :kern';
 is-deeply $tr-afm.kern("RVX" ), (['R', -80, 'VX'], 2031), '.kern(...)';
 is-deeply $tr-afm.shape("RVX" ), (['R', 80+0i, 'VX'], 2031), '.shape(...) kerning';
+is-deeply $tr-afm.shape("RVX", :!kern ), (['RVX'], 2111), '.shape(...) !kerning';
 is-deeply $ab-afm.shape("first"), (["\x[1]r", 15+0i, 'st'], 1874), '.shape(...) ligatures';
 
 for (win => "Á®ÆØ",
