@@ -4,7 +4,7 @@ unit role PDF::Content::FontObj;
 =begin pod
 =head2 Description
 
-This role is consumed by font object implmentations, include:
+This role is consumed by font object implmentations, including:
 
 =item PDF::Content::CoreFont
 
@@ -20,4 +20,4 @@ method decode {...}      # decode buffer to text
 method kern {...}        # kern text
 method to-dict {...}     # create a PDF Font dictionary
 method cb-finish {...}   # finish the font. e.g. embed and create CMaps and Widths
-# todo: is-subset is-core-font is-embedded underline-position underline-thickness lock type encoding encode-cids units-per-EM
+# todo: is-subset is-core-font is-embedded underline-position underline-thickness lock type encoding encode-cids units-per-EM shape
