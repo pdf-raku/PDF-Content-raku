@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 180;
+plan 181;
 use PDF::Grammar::Test :is-json-equiv;
 use lib 't';
 use PDF::Content::XObject;
@@ -22,6 +22,7 @@ ok $jpeg<Length>, 'jpeg dict length';
 is $jpeg.encoded.codes, $jpeg<Length>, 'jpeg encoded length';
 is $jpeg.width, 24, 'jpeg width';
 is $jpeg.height, 24, 'jpeg height';
+is-json-equiv $jpeg.inline-content[0], 'BI' => [:dict{:BPC(8), :CS(:name("DeviceRGB")), :F(:name("DCTDecode")), :H(24), :L(18690), :W(24)}];
 
 my PDF::Content::XObject $gif;
 lives-ok {$gif .= open: "t/images/lightbulb.gif";}, "open gif - lives";

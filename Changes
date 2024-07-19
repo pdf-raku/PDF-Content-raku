@@ -1,4 +1,5 @@
 {{$NEXT}}
+    - Support PDF 2.0 mandated /L (length) entry in inline XObject Images
 
 0.8.1  2024-02-27T08:11:19+13:00
     - Support text box :shape, :!kern option combination. I.e. shaping,

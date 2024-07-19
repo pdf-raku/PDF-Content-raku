@@ -73,7 +73,7 @@ role PDF::Content::XObject['Image']
     method inline-to-xobject(Hash $inline-dict, Bool :$invert) {
 
         my constant %Abbreviations = %(
-            # [PDF 1.7 TABLE 4.43 Entries in an inline image object]
+            # [PDF 1.7 Table 4.43 Entries in an inline image object]
             :BPC<BitsPerComponent>,
             :CS<ColorSpace>,
             :D<Decode>,
@@ -83,10 +83,12 @@ role PDF::Content::XObject['Image']
             :IM<ImageMask>,
             :I<Interpolate>,
             :W<Width>,
-            # [PDF 1.7 TABLE 4.44 Additional abbreviations in an inline image object]
+            # [PDF 1.7 Table 4.44 Additional abbreviations in an inline image object]
             :G<DeviceGray>,
             :RGB<DeviceRGB>,
             :CMYK<DeviceCMYK>,
+            # [IS0-32000-2 PDF 2.0 Table 91 Entries in an inline image object]
+            :L<Length>,
             # Notes:
             # 1. ambiguous 'Indexed' entry seems to be a typo in the spec
             # 2. filter abbreviations are handled in PDF::IO::Filter
@@ -116,6 +118,8 @@ role PDF::Content::XObject['Image']
         use PDF::COS::Util :ast-coerce;
         # serialize to content ops
         my %dict = ast-coerce(self).value.list;
+        %dict<Length>:delete;
+        %dict<L> = $.encoded.codes; # Length is mandatory in PDF 2.0
         %dict = self.inline-to-xobject( %dict, :invert );
 
         [ (BeginImage) => [ :%dict ],
