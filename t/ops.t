@@ -204,26 +204,26 @@ my $image-block = 'BI                  % Begin inline image object
     /F [/A85 /LZW]  % Filters
 ID                  % Begin image data
 J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
-%…Omitted data…
+%...Omitted data...
 %R.s(4KE3&d&7hb*7[%Ct2HCqC~>
 EI';
 
-my @image-lines = q:to"EI".lines;;
+my @image-lines = q:to"EI".lines;
 J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
-%…Omitted data…
+%...Omitted data...
 %R.s(4KE3&d&7hb*7[%Ct2HCqC~>
 EI
 
 $g.ops($image-block);
-is-json-equiv $g.ops[*-3], {:BI[:dict{
-                                    :W(17),
-                                    :H(17),
-                                    :CS(:name<RGB>),
-                                    :BPC(8),
-                                    :F(:array[:name<A85>, :name<LZW>]),
-                                     }]}, 'Image BI';
+is-json-equiv $g.ops[*-2]<ID>[0]<dict>, %(
+    :W(17),
+    :H(17),
+    :CS(:name<RGB>),
+    :BPC(8),
+    :F(:array[:name<A85>, :name<LZW>]),
+), 'Image ID';
 
-is-json-equiv [$g.ops[*-2]<ID>[0]<encoded>.lines], @image-lines, 'Image ID';
+is-json-equiv [$g.ops[*-2]<ID>[1]<encoded>.lines], @image-lines, 'Image ID';
 is-json-equiv $g.ops[*-1], (:EI[]), 'Image EI';
 
 lives-ok {$g.content-dump}, 'can write image data';
@@ -232,7 +232,7 @@ my @inline-images = $g.inline-images;
 is-json-equiv @inline-images, [
     { :Subtype<Image>, :Type<XObject>,
       :BitsPerComponent(8), :ColorSpace<RGB>, :Filter<A85 LZW>,
-      :Height(17), :Width(17),  :Length(86), },
+      :Height(17), :Width(17),  :Length(90), },
 ], 'inline-images';
 
 is-deeply [@inline-images[0].encoded.lines], @image-lines, 'image lines';

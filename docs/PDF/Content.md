@@ -110,7 +110,7 @@ Open an image from a file-spec or data-uri
 ### method inline-images
 
 ```raku
-method inline-images() returns Array[PDF::Content::XObject]
+method inline-images() returns Seq
 ```
 
 extract any inline images from the content stream. returns an array of XObject Images

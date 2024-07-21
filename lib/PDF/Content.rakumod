@@ -149,20 +149,11 @@ say $gfx.Str;
     }
 
     #| extract any inline images from the content stream. returns an array of XObject Images
-    method inline-images returns Array[PDF::Content::XObject] {
-        my PDF::Content::XObject @images;
-        for $.ops.keys.grep: { $.ops[$_].key eq 'BI' } -> $i {
-            my $bi = $.ops[$i];
-            my $id = $.ops[$i+1];
-            die "'BI' op not followed by 'ID' in content stream"
-                unless $id ~~ Pair && $id.key eq 'ID';
-
-            my %dict = PDF::Content::XObject['Image'].inline-to-xobject($bi.value[0]<dict>);
-            my $encoded = $id.value[0]<encoded>;
-
-            @images.push: PDF::COS::Stream.COERCE: { :%dict, :$encoded };
+    method inline-images returns Seq {
+        $.ops.grep(*.key eq 'ID' ).map: -> $id {
+            my %dict = PDF::Content::XObject['Image'].inline-to-xobject($id.value[0]<dict>);
+            PDF::COS::Stream.COERCE: { :%dict, $id.value[1] };
         }
-        @images;
     }
 
     use PDF::Content::Matrix :transform;

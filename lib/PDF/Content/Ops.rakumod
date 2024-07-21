@@ -654,6 +654,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     has @.gsaves;
     #| return graphics gsave stack, including changed variables only
+
     multi method gsaves(:$delta! where .so --> Array) {
         my @gs = @!gsaves;
         @gs.push: $.graphics-state;
@@ -766,12 +767,12 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     my Routine %Ops = BEGIN %(
 
         # BI dict ID stream EI
-        'BI' => sub (Str, Hash $dict = {}) {
-            [ :$dict ];
+        'BI' => sub (Str) {
+            [ ];
         },
 
-        'ID' => sub (Str, Str $encoded = '') {
-            [ :$encoded ];
+        'ID' => sub (Str, Hash $dict = {}, Str $encoded = '') {
+            [ :$dict, :$encoded ];
         },
 
         'EI' => sub ($op) { $op => [] },
@@ -1117,7 +1118,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     #| Parse and process graphics operations
     multi method ops(Str $ops! --> Array) {
-	$.ops(self.parse($ops));
+	$.ops: self.parse($ops);
     }
 
     #| Parse and process a list of graphics operations
@@ -1141,7 +1142,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 	my PDF::Grammar::Content::Actions:D $actions .= new: :lite;
 	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
 	    // die X::PDF::Content::ParseError.new :$content;
-	p.ast
+        p.ast;
     }
 
     method !color-args-ok($op, @colors) {

@@ -180,9 +180,9 @@ multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
 }
 
 method !layup(@atoms is copy) {
-    my int $i = 0;
-    my int $line-start = 0;
-    my int $n = +@atoms;
+    my Int $i = 0;
+    my Int $line-start = 0;
+    my Int $n = +@atoms;
     my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;

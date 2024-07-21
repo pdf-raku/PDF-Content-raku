@@ -112,7 +112,7 @@ class PDF::Content::Font::Enc::Type1 {
     # to cids to render PDFs. ords mapping may or may not be present.
 
     multi method encode(Str $text, :cids($)! --> Seq) {
-        $text.ords.map({self.protect: {%!charset{$_} || self.add-encoding($_) || Empty }});
+        $text.ords.map: {self.protect: {%!charset{$_} || self.add-encoding($_) || Empty }};
     }
 
     multi method encode(Str $text --> Str) {
