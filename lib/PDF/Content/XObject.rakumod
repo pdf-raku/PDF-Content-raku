@@ -122,8 +122,8 @@ role PDF::Content::XObject['Image']
         %dict<L> = $.encoded.codes; # Length is mandatory in PDF 2.0
         %dict = self.inline-to-xobject( %dict, :invert );
 
-        [ (BeginImage) => [ :%dict ],
-          (ImageData)  => [ :$.encoded ],
+        [ (BeginImage) => [ ],
+          (ImageData)  => [ :%dict, :$.encoded ],
           (EndImage)   => [],
         ]
     }

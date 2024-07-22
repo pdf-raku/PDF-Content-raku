@@ -1,5 +1,5 @@
 #| PDF Content construction and manipulation
-class PDF::Content:ver<0.8.2> {
+class PDF::Content:ver<0.8.3> {
 
     use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
     also is PDF::Content::Ops;
@@ -220,7 +220,7 @@ say $gfx.Str;
         self.graphics: {
             $.op(ConcatMatrix, $width, 0, 0, $height, x0, y0);
             if $inline && $obj<Subtype> ~~ 'Image' {
-                # serialize the image to the content stream, aka: :BI[:$dict], :ID[:$encoded], :EI[]
+                # serialize the image to the content stream, aka: :BI[], :ID[:$dict, :$encoded], :EI[]
                 $.ops( $obj.inline-content );
             }
             else {

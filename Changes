@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.8.3  2024-07-23T05:41:11+12:00
+    - Fix inline-content() method, broken in 0.8.2
+
 0.8.2  2024-07-23T05:12:02+12:00
     - Support PDF 2.0 mandated /L (length) entry in inline XObject Images
     - Revised inline image handling for latest PDF and PDF::Grammar.
