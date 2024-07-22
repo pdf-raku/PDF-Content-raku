@@ -14,8 +14,8 @@
     "Native::Packing",
     "Method::Also",
     "JSON::Fast",
-    "PDF:ver<0.6.2+>",
-    "PDF::Grammar:ver<0.3.0+>"
+    "PDF:ver<0.6.6+>",
+    "PDF::Grammar:ver<0.3.2+>"
   ],
   "description": "PDF content related classes; including text, images, fonts and graphics",
   "license": "Artistic-2.0",
@@ -55,11 +55,11 @@
   },
   "resources": [
   ],
-  "source-url": "git://github.com/pdf-raku/PDF-Content-raku.git",
+  "source-url": "https://github.com/pdf-raku/PDF-Content-raku.git",
   "tags": [
     "pdf"
   ],
   "test-depends": [
   ],
-  "version": "0.8.1"
+  "version": "0.8.2"
 }
