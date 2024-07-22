@@ -2,7 +2,6 @@
 role PDF::Content::XObject {
     use PDF::Content::Image :&make-data-uri;
     use PDF::COS::Stream;
-
     my subset XObjectType of Str where 'Form'|'Image'|'PS';
 
     #| load from in-memory data
@@ -62,8 +61,14 @@ role PDF::Content::XObject['Form']
 #| XObject image specific role
 role PDF::Content::XObject['Image']
     does PDF::Content::XObject {
+
+    use PDF::COS::Name;
+
     has Numeric $.width;
     has Numeric $.height;
+
+    sub name( PDF::COS::Name() $_) { $_ }
+
     method width  { $!width //= self<Width> }
     method height { $!height //= self<Height> }
     method bbox   {[0, 0, $.width, $.height]}
@@ -104,8 +109,8 @@ role PDF::Content::XObject['Image']
             %xobject-dict<Type Subtype Length>:delete;
         }
         else {
-            %xobject-dict<Type> = :name<XObject>;
-            %xobject-dict<Subtype> = :name<Image>;
+            %xobject-dict<Type> = name('XObject');
+            %xobject-dict<Subtype> = name('Image');
         }
 
         %xobject-dict;

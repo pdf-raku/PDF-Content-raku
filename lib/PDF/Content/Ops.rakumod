@@ -1026,7 +1026,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
             note '% ' ~ opn if $!trace && ! $!comment;
         }
         else {
-            if $op ~~ 'BDC'|'DP'|'TJ'|'d' {
+            if $op ~~ 'BDC'|'DP'|'TJ'|'d'|'ID' {
                 # operation may have array or dict operands
                 @args .= map: {
                     when List { [ .map: { from-ast($_) } ] }
