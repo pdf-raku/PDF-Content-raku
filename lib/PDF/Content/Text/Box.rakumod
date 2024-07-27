@@ -423,7 +423,7 @@ method render(
         }
 
         my $space-pad = scale * (line.word-gap - self.space-width);
-        @content.push: line.content(:$.font, :$.font-size, :$space-pad);
+        @content.push: line.content(:$.font, :$.font-size, :$space-pad, :$.TextRise);
     }
 
     my $tf-dx = 0;

@@ -57,15 +57,55 @@ sub coalesce(@line is raw) {
     @l;
 }
 
-method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
-    my Numeric \scale = -1000 / $font-size;
+multi sub render2D(@atoms, :$scale, :$TextRise!) {
+    my @segs;
+    my Array $chunk = [];
+    my Int $y = 0;
+    my $cur-rise = $TextRise;
+
+    for @atoms {
+        if .isa(Complex) {
+            my $new-rise = $TextRise + .im.round / $scale;
+            if $new-rise !=~= $cur-rise {
+                @segs.push: render(@$chunk) if $chunk;
+                @segs.push: 'Ts' => [$new-rise];
+                $chunk = [];
+                $cur-rise = $new-rise;
+            }
+            $chunk.push: .re if .re;
+        }
+        else {
+            $chunk.push: $_;
+        }
+    }
+
+    @segs.push: render(@$chunk) if $chunk;
+
+    if ($cur-rise !=~= $TextRise) {
+        # restore
+        @segs.push: 'Ts' => [$TextRise];
+    }
+
+    @segs.Slip;
+}
+
+multi sub render(@atoms where .elems == 1 && .head.isa(Str)) {
+    (OpCode::ShowText) => [@atoms.head,];
+}
+
+multi sub render(@atoms) {
+    (OpCode::ShowSpaceText) => [@atoms,];
+}
+
+method content(:$font!, Numeric :$font-size!, :$space-pad = 0, :$TextRise = 0.0) {
+    my Numeric $scale = -1000 / $font-size;
     my subset Atom where Str|Numeric;
     my Atom @line;
     constant Space = ' ';
     my int $wc = 0;
 
     if $!align + $!indent -> $indent {
-        @line.push: ($indent * scale).round.Int;
+        @line.push: ($indent * $scale).round.Int;
     }
 
     # flatten words. insert spaces and space adjustments.
@@ -81,10 +121,9 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0) {
     }
     @line .= &coalesce;
 
-    @line == 1 && @line.head.isa(Str)
-        ?? ((OpCode::ShowText) => [@line.head,])
-        !! ((OpCode::ShowSpaceText) => [@line,]);
-
+    @line.first(Complex)
+    ?? render2D(@line, :$scale, :$TextRise)
+    !! render(@line);
 }
 
 method text is also<Str> {
