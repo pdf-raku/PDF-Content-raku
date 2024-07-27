@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.8.4  2024-07-28T09:42:57+12:00
+    - Handle potential 2-dimensional kerning from PDF::Font::Loader
+      shaping.
+
 0.8.3  2024-07-23T05:41:11+12:00
     - Fix inline-content() method, broken in 0.8.2
 
