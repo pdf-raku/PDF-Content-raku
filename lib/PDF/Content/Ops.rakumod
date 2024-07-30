@@ -1135,14 +1135,35 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         @!ops.push: (:comment[$_]);
     }
 
+    my Bool $have-native-parser;
+    my $native-parser;
+    try CHECK {
+        if (require ::('PDF::Native')).^ver >= v0.1.7 {
+            require ::('PDF::Native::COS');
+            $native-parser = ::('PDF::Native::COS::COSContent');
+            $have-native-parser = True;
+        }
+    }
+
     #| parse, but don't process PDF content operators
-    method parse(Str $content) {
-	use PDF::Grammar::Content::Fast;
-	use PDF::Grammar::Content::Actions;
+    multi sub parse-content(Str $content where $have-native-parser) {
+        .ast.value with $native-parser.parse($content);
+    }
+
+    multi sub parse-content(Str $content) {
+	need PDF::Grammar::Content::Fast;
+	need PDF::Grammar::Content::Actions;
 	my PDF::Grammar::Content::Actions:D $actions .= new: :lite;
-	my \p = PDF::Grammar::Content::Fast.parse($content, :$actions)
-	    // die X::PDF::Content::ParseError.new :$content;
-        p.ast;
+	.ast with PDF::Grammar::Content::Fast.parse($content, :$actions);
+    }
+
+    method parse($content) {
+        with parse-content($content) {
+            .List
+        }
+        else {
+            die X::PDF::Content::ParseError.new :$content;
+        }
     }
 
     method !color-args-ok($op, @colors) {
@@ -1192,23 +1213,28 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     method Str is hidden-from-backtrace { $!content-cache //= self!content }
 
     method !content returns Str is hidden-from-backtrace {
-        my PDF::IO::Writer $writer .= new;
-
 	$.finish;
-	my UInt $nesting = 0;
+        if $have-native-parser {
+            $native-parser.COERCE(@!ops).write;
+        }
+        else {
+            my PDF::IO::Writer $writer .= new;
 
-        @!ops.map({
-	    my \op = ~ .key;
+	    my UInt $nesting = 0;
 
-	    $nesting-- if $nesting && op ∈ Closers;
-	    $writer.indent = '  ' x $nesting;
-	    $nesting++ if op ∈ Openers;
+            @!ops.map({
+	        my \op = ~ .key;
 
-	    my \pad = op eq 'EI'
-                ?? ''
-                !! $writer.indent;
-            pad ~ $writer.write-content: $_;
-	}).join: "\n";
+	        $nesting-- if $nesting && op ∈ Closers;
+	        $writer.indent = '  ' x $nesting;
+	        $nesting++ if op ∈ Openers;
+
+	        my \pad = op eq 'EI'
+                             ?? ''
+                             !! $writer.indent;
+                pad ~ $writer.write-content: $_;
+           }).join: "\n";
+        }
     }
 
     #| serialized current content as a sequence of strings - for debugging/testing

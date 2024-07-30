@@ -202,7 +202,7 @@ my $image-block = 'BI                  % Begin inline image object
     /CS /RGB        % Colour space
     /BPC 8          % Bits per component
     /F [/A85 /LZW]  % Filters
-ID                  % Begin image data
+ID
 J1/gKA>.]AN&J?]-<HW]aRVcg*bb.\eKAdVV%/PcZ
 %...Omitted data...
 %R.s(4KE3&d&7hb*7[%Ct2HCqC~>
