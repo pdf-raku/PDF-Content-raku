@@ -221,11 +221,11 @@ say $gfx.Str;
             $.op(ConcatMatrix, $width, 0, 0, $height, x0, y0);
             if $inline && $obj<Subtype> ~~ 'Image' {
                 # serialize the image to the content stream, aka: :BI[], :ID[:$dict, :$encoded], :EI[]
-                $.ops( $obj.inline-content );
+                $.ops: $obj.inline-content ;
             }
             else {
                 my Str:D $key = $.resource-key($obj),
-                $.op(XObject, $key);
+                $.op: XObject, $key;
             }
         }
 

@@ -98,7 +98,7 @@ has Numeric $.indent = 0;
 
 has Alignment $.align = 'start';
 has VerticalAlignment $.valign;
-has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness font-height shape>;
+has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness font-height shape direction>;
 has PDF::Content::Text::Line @.lines is built;
 has @.overflow is rw is built;
 has @.images is built;
@@ -106,8 +106,6 @@ has Str $.text is built;
 has Bool $.squish = False;
 has Bool $.verbatim;
 has Bool $.bidi;
-my subset TextDirection of Str:D where 'ltr'|'rtl';
-has TextDirection $.direction = 'ltr'; 
 
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
@@ -163,8 +161,8 @@ method text(::?CLASS:D $obj:) is rw {
 method !build-style(:$baseline = $!valign // 'alphabetic', |c) {
     $_ .= new(:$baseline, |c) without $!style;
     given $!align {
-        when 'start' { $_ = $!direction eq 'ltr' ?? 'left' !! 'right' }
-        when 'end'   { $_ = $!direction eq 'rtl' ?? 'left' !! 'right' }
+        when 'start' { $_ = $.direction eq 'ltr' ?? 'left' !! 'right' }
+        when 'end'   { $_ = $.direction eq 'rtl' ?? 'left' !! 'right' }
     }
     $!valign //= 'top';
 }
@@ -293,14 +291,14 @@ method !layup(@atoms is copy) {
 
     @!overflow = @atoms[$i..*];
 
-    if !$!verbatim && ($.bidi || $!direction ne 'ltr') {
+    if !$!verbatim && ($.bidi || $.direction ne 'ltr') {
         if (try require ::('Text::FriBidi::Lines')) !=== Nil {
             my constant FRIBIDI_PAR_LTR = 272;
             my constant FRIBIDI_PAR_RTL = 273;
             # apply bidi processing
             my Str @lines = @!lines.map: *.text;
             # todo: :lang
-            my UInt $direction = $!direction eq 'rtl'
+            my UInt $direction = $.direction eq 'rtl'
                 ?? FRIBIDI_PAR_RTL
                 !! FRIBIDI_PAR_LTR;
             my $bidi-lines = ::('Text::FriBidi::Lines').new: :@lines, :$direction;

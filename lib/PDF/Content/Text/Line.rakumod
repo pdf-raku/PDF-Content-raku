@@ -61,16 +61,16 @@ multi sub render2D(@atoms, :$scale, :$TextRise!) {
     my @segs;
     my Array $chunk = [];
     my Int $y = 0;
-    my $cur-rise = $TextRise;
+    my $text-rise = $TextRise;
 
     for @atoms {
         if .isa(Complex) {
             my $new-rise = $TextRise + .im.round / $scale;
-            if $new-rise !=~= $cur-rise {
+            unless $new-rise =~= $text-rise {
+                $text-rise := $new-rise;
                 @segs.push: render(@$chunk) if $chunk;
-                @segs.push: 'Ts' => [$new-rise];
+                @segs.push: 'Ts' => [$text-rise];
                 $chunk = [];
-                $cur-rise = $new-rise;
             }
             $chunk.push: .re if .re;
         }
@@ -81,7 +81,7 @@ multi sub render2D(@atoms, :$scale, :$TextRise!) {
 
     @segs.push: render(@$chunk) if $chunk;
 
-    if ($cur-rise !=~= $TextRise) {
+    if ($text-rise !=~= $TextRise) {
         # restore
         @segs.push: 'Ts' => [$TextRise];
     }

@@ -2,6 +2,7 @@
 unit class PDF::Content::Text::Style is rw;
 
 use PDF::Content::Color :&color;
+my subset TextDirection of Str:D where 'ltr'|'rtl';
 
 has $.font is required;
 has Numeric $.font-size = 16;
@@ -10,6 +11,7 @@ has Bool    $.kern;
 has Bool    $.shape;
 has Numeric $!space-width = 300;
 has $!units-per-EM = 1000;
+has TextDirection $.direction = 'ltr';
 
 # directly mapped to graphics state
 has Numeric $.WordSpacing  is built;
