@@ -1,6 +1,6 @@
 {{$NEXT}}
-    - Detected and load graphics content parsing and serialization
-      optimisations available with PDF::Native v0.1.7+.
+    - Add a PDF::Native v0.1.8+ fast-path for parsing and serializing
+      graphics content.
 
 0.8.4  2024-07-28T09:42:57+12:00
     - Handle potential 2-dimensional kerning from PDF::Font::Loader

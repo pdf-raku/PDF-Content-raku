@@ -1137,8 +1137,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
 
     my Bool $have-native-parser;
     my $native-parser;
-    try CHECK {
-        if (require ::('PDF::Native')).^ver >= v0.1.7 {
+    try {
+        if (require ::('PDF::Native')).^ver >= v0.1.8 {
             require ::('PDF::Native::COS');
             $native-parser = ::('PDF::Native::COS::COSContent');
             $have-native-parser = True;
@@ -1158,12 +1158,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
 
     method parse($content) {
-        with parse-content($content) {
-            .List
-        }
-        else {
-            die X::PDF::Content::ParseError.new :$content;
-        }
+        .List given
+           parse-content($content) // die X::PDF::Content::ParseError.new :$content;
     }
 
     method !color-args-ok($op, @colors) {
