@@ -55,7 +55,7 @@ method differences is rw {
                     self.use-cid($cid);
                     self.cid-map-glyph($name, $cid);
                 }
-                %!diffs{$cid} = PDF::COS::Name.COERCE($name);
+                %!diffs{$cid++} = PDF::COS::Name.COERCE($name);
             }
             multi sub add-diff($_) is hidden-from-backtrace {
                 die "bad difference entry: .raku";
