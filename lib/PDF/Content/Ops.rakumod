@@ -977,8 +977,8 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     }
     =para This method is only valid in a path context
 
-    #| process operator quarantined by PDF::Grammar::Content as either an unknown operator
-    #| or having an incorrect argument list
+    #| process operator quarantined by PDF::Grammar::Content / PDF::Native::COS as either an
+    #| unknown operator or having an incorrect argument list
     multi method op(SuspectOp $_) {
         given .value {
             my $op = .key;

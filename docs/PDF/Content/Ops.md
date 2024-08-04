@@ -102,7 +102,7 @@ multi method op(
 ) returns Mu
 ```
 
-process operator quarantined by PDF::Grammar::Content as either an unknown operator or having an incorrect argument list
+process operator quarantined by PDF::Grammar::Content / PDF::Native::COS as either an unknown operator or having an incorrect argument list
 
 ### multi method op
 
@@ -144,11 +144,11 @@ method add-comment(
 
 Add a comment to the content stream
 
-### method parse
+### multi sub parse-content
 
 ```raku
-method parse(
-    Str $content
+multi sub parse-content(
+    Str $content where { ... }
 ) returns Mu
 ```
 

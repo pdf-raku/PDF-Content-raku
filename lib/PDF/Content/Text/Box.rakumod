@@ -186,6 +186,8 @@ method !layup(@atoms is copy) {
     my $height := $!style.font-size;
     my $font := $!style.font;
     my Bool $shape := $!style.shape;
+    my Str $script := $!style.script;
+    my Str $lang := $!style.lang;
     my Bool $kern = $!style.kern;
     $kern //= True if $shape;
 
@@ -210,8 +212,8 @@ method !layup(@atoms is copy) {
                     $word-pad = 0;
                 }
 
-                if $shape {
-                    given $font.shape($atom, :$kern) {
+                if $shape || $script || $lang {
+                    given $font.shape($atom, :$kern, :$script, :$lang) {
                         $word = .[0];
                         $word-width = .[1];
                     }

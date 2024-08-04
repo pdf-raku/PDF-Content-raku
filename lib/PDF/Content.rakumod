@@ -473,21 +473,17 @@ say $gfx.Str;
     #| map transformed user coordinates to untransformed (default) coordinates
     use PDF::Content::Matrix :&dot, :&inverse-dot;
     method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user --> Array) {
-        (
-            my @ = @coords.map: -> $x is copy, $y is copy {
-                ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
-                slip($user ?? $.CTM.&dot($x, $y) !! ($x, $y));
-            }
-        )
+        my @ = @coords.map: -> $x is copy, $y is copy {
+            ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
+            slip($user ?? $.CTM.&dot($x, $y) !! ($x, $y));
+        }
     }
     #| inverse of base-coords
     method user-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user --> Array) {
-        (
-            my @ = @coords.map: -> $x is copy, $y is copy {
-                ($x, $y) = $.CTM.&inverse-dot($x, $y) if $user;
-                slip($text ?? $.TextMatrix.&inverse-dot($x, $y) !! ($x, $y));
-            }
-        )
+        my @ = @coords.map: -> $x is copy, $y is copy {
+            ($x, $y) = $.CTM.&inverse-dot($x, $y) if $user;
+            slip($text ?? $.TextMatrix.&inverse-dot($x, $y) !! ($x, $y));
+        }
     }
     method user-default-coords(|c) is DEPRECATED('base-coords') {
         $.base-coords(|c);
