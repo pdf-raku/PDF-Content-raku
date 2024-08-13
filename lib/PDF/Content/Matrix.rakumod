@@ -59,38 +59,23 @@ our sub multiply(TransformMatrix \x, TransformMatrix \y --> TransformMatrix) is 
     ];
 }
 
-sub mdiv(\num, \denom, Bool $div-err is rw) {
-    if num =~= 0 {
-        0.0
-    }
-    elsif denom =~= 0 {
-        $div-err = True;
-        0.0
-    }
-    else {
-        num / denom;
-    }
-}
-
 #| calculate an inverse, if possible
 our sub inverse(TransformMatrix \m --> TransformMatrix) is export(:inverse) {
 
-    my Bool $div-err;
-    my \Ib = mdiv( m[b], m[c] * m[b] - m[d] * m[a], $div-err);
-    my \Ia = mdiv(1 - m[c] * Ib, m[a], $div-err);
-
-    my \Id = mdiv(m[a], m[a] * m[d] - m[b] * m[c], $div-err);
-    my \Ic = mdiv(1 - m[d] * Id, m[b], $div-err);
-
-    my \If = mdiv(m[f] * m[a] - m[b] * m[e], m[b] * m[c] - m[a] * m[d], $div-err);
-    my \Ie = mdiv(- m[e] - m[c] * If, m[a], $div-err);
-
-    if $div-err {
+    my $det := m[a] * m[d]  -  m[b] * m[c];
+    if $det =~= 0 {
         warn "unable to invert matrix: {m}";
         identity();
     }
     else {
-        [ Ia, Ib, Ic, Id, Ie, If, ];
+        [
+            m[d] / $det,
+            m[b] / $det,
+            m[c] / $det,
+            m[a] / $det,
+            (m[c] * m[f]  -  m[d] * m[e]) / $det,
+            (m[b] * m[e]  -  m[a] * m[f]) / $det,
+        ]
     }
 }
 
