@@ -92,15 +92,15 @@ our sub dot(TransformMatrix \m, Numeric \x, Numeric \y) is export(:dot) {
 our sub inverse-dot(TransformMatrix \m, Numeric \tx, Numeric \ty) is export(:inverse-dot) {
     # nb two different simultaneous equations for the above.
     my ($x, $y);
-    my \div1 = m[d] * m[a]  -  m[c] * m[b];
-    if div1|m[a] !=~= 0.0 {
-        $y = (ty * m[a]  - m[b] * tx + m[e] * m[b]  -  m[f] * m[a]) / div1;
+    my \det1 = m[d] * m[a]  -  m[c] * m[b];
+    if det1 !=~= 0 && m[a] !=~= 0 {
+        $y = (ty * m[a]  - m[b] * tx + m[e] * m[b]  -  m[f] * m[a]) / det1;
         $x = (tx  -  m[c] * $y  -  m[e]) / m[a];
     }
     else {
-        my \div2 = m[b] * m[c]  -  m[a] * m[d];
-        if div2|m[c] !=~= 0  {
-            $x = (ty * m[c]  +  m[d] * m[e]  - m[f] * m[c] - m[d] * tx) / div2;
+        my \det2 = m[b] * m[c]  -  m[a] * m[d];
+        if det2 !=~= 0 && m[c] !=~= 0 {
+            $x = (ty * m[c]  +  m[d] * m[e]  - m[f] * m[c] - m[d] * tx) / det2;
             $y = (tx  -  m[a] * $x  -  m[e]) / m[c];
         }
         else {
