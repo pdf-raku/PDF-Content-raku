@@ -704,18 +704,18 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
         my $type;
         my $where;
         if $!context == Text && $op ∈ SpecialGraphicOps {
-            $type = 'special graphics';
+            $type = 'Special graphics';
             $where = 'in a BT ... ET text block';
         }
         elsif $op ∈ TextOps {
-            $type = 'text operation';
+            $type = 'Text operation';
             $where = 'outside of a BT ... ET text block';
         }
         else {
-            $type = 'unexpected';
+            $type = 'Unexpected';
             $where = '(first operation)';
 
-            loop (my int $n = +@!ops-2; $n >= 0; $n--) {
+            loop (my int $n = +@!ops-1; $n >= 0; $n--) {
                 with @!ops[$n].key {
                     unless $_ ~~ 'comment' {
                         $where = "in $!context context, following '$_' (%OpName{$_})";
