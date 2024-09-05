@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.8.6  2024-09-06T07:49:22+12:00
+    - Fix off-by-one bug in 'Unexpected Operator' warnings
+    - Rework matrix inverse() function
+
 0.8.5  2024-07-31T06:33:26+12:00
     - Add a PDF::Native v0.1.8+ fast-path for parsing and serializing
       graphics content.
