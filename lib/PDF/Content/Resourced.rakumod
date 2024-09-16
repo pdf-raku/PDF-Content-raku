@@ -12,7 +12,7 @@ method use-font($obj, |c) {
 method use-resource($obj, |c) {
     self!resource-dict.resource($obj, |c);
 }
-method resource-key($obj, |c) {
+method resource-key($obj, |c) is rw {
     self!resource-dict.resource-key($obj, |c);
 }
 

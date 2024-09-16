@@ -76,7 +76,7 @@ compute the width of a string
 method encoding() returns Str
 ```
 
-Core font base encoding: WinAsni, MacRoman or MacExpert
+Core font base encoding: WinAnsi, MacRoman or MacExpert
 
 ### method to-dict
 

@@ -27,6 +27,7 @@ $page.graphics: {
         }
     }
     my PDF::Content::XObject $jpeg .= open: "t/images/jpeg.jpg";
+    $page.resource-key($jpeg) = 'JPeg';
     # sanity check of form vs image positioning
     my @p1 = .do($form, :position(10, 30), :width(80), :height(30), :valign<top>);
     is-deeply @p1, [10, 0, 90, 30], 'form position';
@@ -40,7 +41,7 @@ $page.graphics: {
     .do($form, :position(10, 70), :width(80), :height(30), :valign<bottom>);
     .do($jpeg, :position(100, 70), :width(80), :height(30), :valign<bottom>);
     is $page.resource-key($form), 'Fm1';
-    is $page.resource-key($jpeg), 'Im1';
+    is $page.resource-key($jpeg), 'JPeg';
 }
 
 # ensure consistant document ID generation
