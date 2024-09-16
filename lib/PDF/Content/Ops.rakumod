@@ -234,7 +234,7 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     my constant TextObjectOps = set <BT ET>;
     my constant TextStateOps = set <Tc Tw Tz TL Tf Tr Ts>;
     my constant TextOps = set <T* Td TD Tj TJ Tm ' ">;
-    my constant ColorOps = set <CS cs SC SCN sc scn G g RG rg K k>;
+    my constant ColorOps = set <CS SC SCN G RG K cs sc scn g rg k>;
     my constant MarkedContentOps = set <MP DP BMC BDC EMC>;
     my constant CompatOps = set <BX EX>;
     my constant FontOps = set <d0 d1>;

@@ -195,7 +195,7 @@ method stringwidth(Str $str, $pointsize = 0, Bool :$kern=False --> Numeric) {
     $!metrics.stringwidth( $str, $pointsize, :$kern);
 }
 
-#| Core font base encoding: WinAsni, MacRoman or MacExpert
+#| Core font base encoding: WinAnsi, MacRoman or MacExpert
 method encoding returns Str {
     my Str %enc-name = :win<WinAnsi>, :mac<MacRoman>, :mac-extra<MacExpert>;
     %enc-name{self.enc};

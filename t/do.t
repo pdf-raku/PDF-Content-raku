@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 3;
+plan 5;
 use lib 't';
 use PDF::Content::Color :rgb;
 use PDF::Content::FontObj;
@@ -39,6 +39,8 @@ $page.graphics: {
     .do($jpeg, :position(100, 50), :width(80), :height(30), :valign<center>);
     .do($form, :position(10, 70), :width(80), :height(30), :valign<bottom>);
     .do($jpeg, :position(100, 70), :width(80), :height(30), :valign<bottom>);
+    is $page.resource-key($form), 'Fm1';
+    is $page.resource-key($jpeg), 'Im1';
 }
 
 # ensure consistant document ID generation
