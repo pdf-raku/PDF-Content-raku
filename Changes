@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.8.8  2024-09-22T10:10:22+12:00
+    - Add Page-Tree global-resources-scope() rw accessor #24
+
 0.8.7  2024-09-17T07:31:52+12:00
     - Allow canvas resource-key() method to be used as a setter. See t/do.t
 
