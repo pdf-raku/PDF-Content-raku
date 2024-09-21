@@ -1,11 +1,14 @@
 use v6;
 use Test;
-plan 5;
+plan 7;
 
 use lib 't';
 use PDFTiny;
 use PDF::Content::PageTree;
 my PDFTiny $pdf .= new;
+nok $pdf.Pages<Resources>.defined, 'global resources scoping';
+$pdf.Pages.global-resources-scope = True;
+ok $pdf.Pages<Resources>.defined, 'global resources scoping';
 # check support for reading of PDF files with multi-level
 # page nodes; including fetching by page number, update and iteration.
 my $page-number;

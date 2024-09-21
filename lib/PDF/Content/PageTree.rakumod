@@ -61,6 +61,20 @@ method page-fragment returns PDF::Content::Page { PDF::COS::Dict.COERCE: %( :Typ
 #| produce a page-tree fragment, not attached to any PDF
 method pages-fragment returns PDF::Content::PageNode { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
 
+method global-resources-scope(::?ROLE:D:) is rw {
+    sub FETCH($) { self<Resources>.defined },
+    sub STORE($, $_) {
+        if (.so) {
+            self.Resources //= {};
+        }
+        else {
+            fail "Resources are already globally scoped."
+                if self<Resources>.defined
+        }
+      }
+      Proxy.new: :&FETCH, :&STORE;
+}
+
 #| add new last page
 method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment --> PDF::Content::Page) {
 

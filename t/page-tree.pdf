@@ -5,17 +5,16 @@
 endobj
 
 2 0 obj
-<< /Type /Pages /Count 10 /Kids [ 3 0 R 6 0 R 20 0 R 22 0 R 24 0 R ] >>
+<<
+  /Type /Pages
+  /Count 10
+  /Kids [ 3 0 R 5 0 R 20 0 R 22 0 R 24 0 R ]
+  /Resources << /Font << /F1 8 0 R >> >>
+>>
 endobj
 
 3 0 obj
-<<
-  /Type /Page
-  /Contents 4 0 R
-  /MediaBox [ 0 0 612 792 ]
-  /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
->>
+<< /Type /Page /Contents 4 0 R /MediaBox [ 0 0 612 792 ] /Parent 2 0 R >>
 endobj
 
 4 0 obj
@@ -34,33 +33,24 @@ endobj
 
 5 0 obj
 <<
-  /Type /Font
-  /Subtype /Type1
-  /BaseFont /Courier
-  /Encoding /WinAnsiEncoding
+  /Type /Pages
+  /Count 6
+  /Kids [ 6 0 R 9 0 R 11 0 R 13 0 R ]
+  /Parent 2 0 R
 >>
 endobj
 
 6 0 obj
 <<
-  /Type /Pages
-  /Count 6
-  /Kids [ 7 0 R 9 0 R 11 0 R 13 0 R ]
-  /Parent 2 0 R
+  /Type /Page
+  /Contents 7 0 R
+  /MediaBox [ 0 0 612 792 ]
+  /Parent 5 0 R
+  /Resources << /Font << /F1 8 0 R >> >>
 >>
 endobj
 
 7 0 obj
-<<
-  /Type /Page
-  /Contents 8 0 R
-  /MediaBox [ 0 0 612 792 ]
-  /Parent 6 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
->>
-endobj
-
-8 0 obj
 << /Length 84 >> stream
 q
   BT
@@ -74,13 +64,22 @@ Q
 endstream
 endobj
 
+8 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Courier
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
 9 0 obj
 <<
   /Type /Page
   /Contents 10 0 R
   /MediaBox [ 0 0 612 792 ]
-  /Parent 6 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
+  /Parent 5 0 R
+  /Resources << /Font << /F1 8 0 R >> >>
 >>
 endobj
 
@@ -103,8 +102,8 @@ endobj
   /Type /Page
   /Contents 12 0 R
   /MediaBox [ 0 0 612 792 ]
-  /Parent 6 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
+  /Parent 5 0 R
+  /Resources << /Font << /F1 8 0 R >> >>
 >>
 endobj
 
@@ -123,7 +122,7 @@ endstream
 endobj
 
 13 0 obj
-<< /Type /Pages /Count 3 /Kids [ 14 0 R 16 0 R 18 0 R ] /Parent 6 0 R >>
+<< /Type /Pages /Count 3 /Kids [ 14 0 R 16 0 R 18 0 R ] /Parent 5 0 R >>
 endobj
 
 14 0 obj
@@ -132,7 +131,6 @@ endobj
   /Contents 15 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 13 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
 >>
 endobj
 
@@ -156,7 +154,6 @@ endobj
   /Contents 17 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 13 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
 >>
 endobj
 
@@ -180,7 +177,6 @@ endobj
   /Contents 19 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 13 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
 >>
 endobj
 
@@ -204,7 +200,6 @@ endobj
   /Contents 21 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
 >>
 endobj
 
@@ -228,7 +223,6 @@ endobj
   /Contents 23 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
 >>
 endobj
 
@@ -252,7 +246,6 @@ endobj
   /Contents 25 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
 >>
 endobj
 
@@ -275,31 +268,31 @@ xref
 0000000000 65535 f 
 0000000015 00000 n 
 0000000065 00000 n 
-0000000153 00000 n 
-0000000292 00000 n 
-0000000427 00000 n 
-0000000531 00000 n 
-0000000633 00000 n 
-0000000772 00000 n 
-0000000907 00000 n 
-0000001047 00000 n 
-0000001183 00000 n 
-0000001324 00000 n 
-0000001460 00000 n 
-0000001550 00000 n 
-0000001692 00000 n 
-0000001828 00000 n 
-0000001970 00000 n 
-0000002106 00000 n 
-0000002248 00000 n 
-0000002384 00000 n 
-0000002525 00000 n 
-0000002661 00000 n 
-0000002802 00000 n 
-0000002938 00000 n 
-0000003079 00000 n 
+0000000200 00000 n 
+0000000290 00000 n 
+0000000425 00000 n 
+0000000527 00000 n 
+0000000666 00000 n 
+0000000801 00000 n 
+0000000905 00000 n 
+0000001045 00000 n 
+0000001181 00000 n 
+0000001322 00000 n 
+0000001458 00000 n 
+0000001548 00000 n 
+0000001649 00000 n 
+0000001785 00000 n 
+0000001886 00000 n 
+0000002022 00000 n 
+0000002123 00000 n 
+0000002259 00000 n 
+0000002359 00000 n 
+0000002495 00000 n 
+0000002595 00000 n 
+0000002731 00000 n 
+0000002831 00000 n 
 trailer
 << /ID [ (t/page-tree.t   ) (t/page-tree.t   ) ] /Root 1 0 R /Size 26 >>
 startxref
-3216
+2968
 %%EOF
