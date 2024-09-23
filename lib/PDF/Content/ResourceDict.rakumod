@@ -11,24 +11,23 @@ has Int %!counter;
 
 #| key for the resource, .e.g. /F1 or /Im2
 method resource-key(PDF::COS:D $object is raw, |c --> Str:D) is rw {
-    Proxy.new(
-        FETCH => -> $ {
-            self!require-resource($object, |c)
-                unless %!resource-key{$object}:exists;
-            %!resource-key{$object};
-        },
-        STORE => -> $, Str:D() $key {
-            my $type = self!resource-type($object);
-            with %!resource-key{$object} {
-                fail "unable to change existing $type resource key: $_"
-                    unless $_ eq $key;
-            }
-            else { 
-                self{$type}{$key} = $object;
-                %!resource-key{$object} = $key;
-            }
+    sub FETCH($) {
+        self!require-resource($object, |c)
+            unless %!resource-key{$object}:exists;
+        %!resource-key{$object};
+    }
+    sub STORE($, Str:D() $key) {
+        my $type = self!resource-type($object);
+        with %!resource-key{$object} {
+            fail "unable to change existing $type resource key: $_"
+                unless $_ eq $key;
         }
-    );
+        else { 
+            self{$type}{$key} = $object;
+            %!resource-key{$object} = $key;
+        }
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 method !resource-type(PDF::COS:D $_ ) {

@@ -364,18 +364,19 @@ say $gfx.Str;
         warn '$.text-position accessor used outside of a text-block'
             unless $.context == GraphicsContext::Text;
 
-        Proxy.new(
-            FETCH => {
-                my @tm = @.TextMatrix;
-                (@tm[4] + self.tf-x) / @tm[0], @tm[5] / @tm[3];
-            },
-            STORE => -> $, Vector \v {
-                my @tm = @.TextMatrix;
-                @tm[4] = $_ * @tm[0] with v[0];
-                @tm[5] = $_ * @tm[3] with v[1];
-                self.op(SetTextMatrix, @tm);
-            },
-        );
+        sub FETCH($) {
+            my @tm = @.TextMatrix;
+            (@tm[4] + self.tf-x) / @tm[0], @tm[5] / @tm[3];
+        }
+
+        sub STORE($, Vector \v) {
+            my @tm = @.TextMatrix;
+            @tm[4] = $_ * @tm[0] with v[0];
+            @tm[5] = $_ * @tm[3] with v[1];
+            self.op(SetTextMatrix, @tm);
+        }
+
+        Proxy.new: :&FETCH, :&STORE;
     }
 
     #| print a text block object
@@ -440,16 +441,13 @@ say $gfx.Str;
 
     #| Get or set the current font as ($font, $font-size)
     method font is rw returns Array {
-        Proxy.new(
-            FETCH => {
-                $.Font;
-            },
-            STORE => -> $, $v {
-                my @v = $v.isa(List) ?? @$v !! $v;
-                @v[0] = .use-font: @v[0] with $.canvas;
-                self.set-font: |@v;
-            },
-        );
+        sub FETCH($) { $.Font }
+        sub STORE($, $v) {
+            my @v = $v.isa(List) ?? @$v !! $v;
+            @v[0] = .use-font: @v[0] with $.canvas;
+            self.set-font: |@v;
+        }
+        Proxy.new: :&FETCH, :&STORE;
     }
 
     #| print text to the content stream

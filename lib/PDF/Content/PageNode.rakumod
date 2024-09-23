@@ -26,7 +26,7 @@ method bbox(BoxName $box-name = 'media') is rw {
         when 'media' { -> $ { from-origin(self.MediaBox) // [0, 0, 612, 792] } }
         when 'crop'  { -> $ { from-origin(self.CropBox) // self.bbox('media') } }
         default      { -> $ { from-origin(self!get-prop($box-name)) // self.bbox('crop') } }
-    };
+    }
 
     Proxy.new(
         :&FETCH,

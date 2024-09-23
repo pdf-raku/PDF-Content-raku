@@ -962,18 +962,17 @@ y | CurveToFinal | x1 y1 x3 y3 | Append curved segment to path (final point repl
     my subset Vector of List is export(:Vector) where {.elems == 2 && .&are ~~ Numeric}
     #| return current point
     method current-point is rw returns Vector {
-        Proxy.new(
-            FETCH => {
-                $!context == Path
-                    ?? ($!cur-x, $!cur-y)
-                    !! (Numeric, Numeric)
-            },
-            STORE => -> $,  Vector \v {
-                unless $!context == Path && $!cur-x =~= v[0] && $!cur-x =~= v[1] {
-                    self.op(MoveTo, |v);
-                }
+        sub FETCH($) {
+            $!context == Path
+                ?? ($!cur-x, $!cur-y)
+                !! (Numeric, Numeric)
+        }
+        sub STORE($,  Vector \v) {
+            unless $!context == Path && $!cur-x =~= v[0] && $!cur-x =~= v[1] {
+                self.op(MoveTo, |v);
             }
-        );
+        }
+        Proxy.new: :&FETCH, :&STORE;
     }
     =para This method is only valid in a path context
 

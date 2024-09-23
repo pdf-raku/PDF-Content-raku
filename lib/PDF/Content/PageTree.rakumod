@@ -13,7 +13,8 @@ nodes in a PDF.
 This class includes the methods:
 
 =item `page-fragment` - create a detached page
-`pages-fragment` - create a detached page sub-tree
+=item `pages-fragment` - create a detached page sub-tree
+=item `global-resources-scope - get or set shared resources across pages
 
 These stand-alone fragments aim to be thread-safe to support parallel construction of pages. The final PDF assembly needs to be synchronous.
 
@@ -61,7 +62,8 @@ method page-fragment returns PDF::Content::Page { PDF::COS::Dict.COERCE: %( :Typ
 #| produce a page-tree fragment, not attached to any PDF
 method pages-fragment returns PDF::Content::PageNode { PDF::COS::Dict.COERCE: %( :Type( name 'Pages' ), :Count(0), :Kids[], ) }
 
-method global-resources-scope(::?ROLE:D:) is rw {
+#| get or set global-resources-scope
+method global-resources-scope(::?ROLE:D:) is rw returns Bool {
     sub FETCH($) { self<Resources>.defined },
     sub STORE($, $_) {
         if (.so) {
@@ -74,6 +76,18 @@ method global-resources-scope(::?ROLE:D:) is rw {
       }
       Proxy.new: :&FETCH, :&STORE;
 }
+=begin para
+
+This is an advanced setting that sets up a global resource dictionary. Any
+pages that are then directly created via `add-page` will use the global
+resources dictionary for fonts and XObjects, etc.
+
+This may be of use in certain specialized cases,
+such as when the PDF is being used as a resource library. The resources
+will be able to be accessed later by opening the PDF, but without needing
+to go to any particular page.
+
+=end para
 
 #| add new last page
 method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment --> PDF::Content::Page) {

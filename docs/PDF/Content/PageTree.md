@@ -16,7 +16,11 @@ This role contains methods for querying and manipulating page tree nodes in a PD
 
 This class includes the methods:
 
-  * `page-fragment` - create a detached page `pages-fragment` - create a detached page sub-tree
+  * `page-fragment` - create a detached page
+
+  * `pages-fragment` - create a detached page sub-tree
+
+  * `global-resources-scope - get or set shared resources across pages
 
 These stand-alone fragments aim to be thread-safe to support parallel construction of pages. The final PDF assembly needs to be synchronous.
 
@@ -60,6 +64,16 @@ method pages-fragment() returns PDF::Content::PageNode
 ```
 
 produce a page-tree fragment, not attached to any PDF
+
+### method global-resources-scope
+
+```raku
+method global-resources-scope() returns Bool
+```
+
+get or set global-resources-scope
+
+This is an advanced setting that sets up a global resource dictionary. Any pages that are then directly created via `add-page` will use the global resources dictionary for fonts and XObjects, etc. This may be of use in certain specialized cases, such as when the PDF is being used as a resource library. The resources will be able to be accessed later by opening the PDF, but without needing to go to any particular page.
 
 ### method add-page
 

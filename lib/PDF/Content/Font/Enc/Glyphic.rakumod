@@ -41,8 +41,22 @@ method cid-map-glyph($glyph-name, $cid) {
 
 #| set or get the Type1 differences table
 method differences is rw {
-    Proxy.new(
-        STORE => -> $, @diffs {
+
+    sub FETCH($) {
+        my $cid := -2;
+        my @diffs;
+        %!diffs.pairs.sort.map: {
+            unless .value eq '.notdef' {
+                push @diffs: .key
+                    unless .key == $cid + 1;
+                push @diffs: .value;
+                $cid := .key;
+            }
+        }
+        @diffs;
+    }
+
+    sub STORE($, @diffs) {
             my %glyph-map := self.glyph-map;
             my uint32 $cid = 0;
 
@@ -62,19 +76,7 @@ method differences is rw {
             }
 
             add-diff($_) for @diffs;
-        },
-        FETCH => {
-            my $cid := -2;
-            my @diffs;
-            %!diffs.pairs.sort.map: {
-                unless .value eq '.notdef' {
-                    push @diffs: .key
-                        unless .key == $cid + 1;
-                    push @diffs: .value;
-                    $cid := .key;
-                }
-            }
-            @diffs;
-        },
-    )
+        }
+
+    Proxy.new: :&FETCH, :&STORE;
 }
