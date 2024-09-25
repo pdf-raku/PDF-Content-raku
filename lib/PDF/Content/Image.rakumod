@@ -131,4 +131,6 @@ This class currently supports image formats: PNG, GIF and JPEG.
     method open(|c) is DEPRECATED<PDF::Content::XObject.open> {
         PDF::COS.required('PDF::Content::XObject').open(|c);
     }
+
+    method read(|) {...}
 }
