@@ -129,7 +129,7 @@ role PDF::Content::XObject['Image']
 
         [ (BeginImage) => [ ],
           (ImageData)  => [ :%dict, :$.encoded ],
-          (EndImage)   => [ ],
+          (EndImage)   => [],
         ]
     }
 }

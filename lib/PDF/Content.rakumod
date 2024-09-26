@@ -442,12 +442,10 @@ say $gfx.Str;
     #| Get or set the current font as ($font, $font-size)
     method font is rw returns Array {
         sub FETCH($) { $.Font }
-        multi sub STORE($, @v is copy) {
+        sub STORE($, $v) {
+            my @v = $v.isa(List) ?? @$v !! $v;
             @v[0] = .use-font: @v[0] with $.canvas;
             self.set-font: |@v;
-        }
-        multi sub STORE($p is raw, $font) {
-            STORE($p, [$font]);
         }
         Proxy.new: :&FETCH, :&STORE;
     }
