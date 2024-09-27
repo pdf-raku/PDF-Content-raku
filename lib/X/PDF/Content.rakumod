@@ -1,4 +1,6 @@
-class X::PDF::Content is Exception {
+class X::PDF::Content {
+    use X::PDF;
+    also is X::PDF;
 }
 
 class X::PDF::Content::OP is X::PDF::Content {
