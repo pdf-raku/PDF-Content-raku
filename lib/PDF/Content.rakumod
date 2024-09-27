@@ -83,7 +83,7 @@ say $gfx.Str;
             $.canvas.use-mcid($_);
         }
         elsif $mark {
-            die "illegal nesting of marked content tags"
+            die X::PDF::Content::OP::BadNesting::MarkedContent.new: :op<BDC>
                 if self.open-tags.first(*.mcid.defined);
             %props<MCID> = $.canvas.next-mcid()
         }

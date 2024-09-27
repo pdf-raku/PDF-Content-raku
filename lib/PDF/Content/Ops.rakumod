@@ -22,6 +22,11 @@ class X::PDF::Content::OP::BadNesting
     }
  }
 
+class X::PDF::Content::OP::BadNesting::MarkedContent
+    is X::PDF::Content::OP::BadNesting {
+        method message { "Illegal nesting of marked content tags" }
+}
+
 class X::PDF::Content::OP::Error
     is X::PDF::Content::OP {
     has Exception $.error is required;

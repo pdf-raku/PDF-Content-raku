@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 9;
+plan 10;
 
 use lib 't';
 use PDFTiny;
@@ -47,6 +47,12 @@ $page.graphics: -> $gfx {
         .tag: ReversedChars, {
             .say: 'Hi';
         }
+
+        throws-like {
+            .mark: Span, {
+                .say: 'Whoops';
+            }
+        }, X::PDF::Content::OP::BadNesting::MarkedContent;
 
     }
 
