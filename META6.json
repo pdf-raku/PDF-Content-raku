@@ -51,7 +51,8 @@
     "PDF::Content::Text::Box": "lib/PDF/Content/Text/Box.rakumod",
     "PDF::Content::Text::Line": "lib/PDF/Content/Text/Line.rakumod",
     "PDF::Content::Text::Style": "lib/PDF/Content/Text/Style.rakumod",
-    "PDF::Content::XObject": "lib/PDF/Content/XObject.rakumod"
+    "PDF::Content::XObject": "lib/PDF/Content/XObject.rakumod",
+    "X::PDF::Content": "lib/X/PDF/Content.rakumod"
   },
   "resources": [
   ],

@@ -1,6 +1,7 @@
 {{$NEXT}}
     - Add replace ad-hoc "Illegal nesting of marked content" with
       specific X::PDF::Content::OP::BadNesting::MarkedContent exception
+    - Create a compilation unit for X::PDF::Content exceptions
 
 0.8.8  2024-09-22T10:10:22+12:00
     - Add Page-Tree global-resources-scope() rw accessor #24
