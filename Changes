@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.8.9  2024-09-29T06:36:58+13:00
     - Add replace ad-hoc "Illegal nesting of marked content" with
       specific X::PDF::Content::OP::BadNesting::MarkedContent exception
     - Rename exceptions X::PDF::Image:: to X::PDF::Content::Image::
