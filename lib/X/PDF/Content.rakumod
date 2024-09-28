@@ -87,7 +87,9 @@ class X::PDF::Content::UnknownResource
     method message { "Unknown $!type resource: /$!key" }
 }
 
-class X::PDF::Content::Image::WrongHeader is Exception {
+class  X::PDF::Content::Image is X::PDF::Content { }
+
+class X::PDF::Content::Image::WrongHeader is X::PDF::Content::Image {
     has Str $.type is required;
     has Str $.header is required;
     has $.path is required;
@@ -96,14 +98,14 @@ class X::PDF::Content::Image::WrongHeader is Exception {
     }
 }
 
-class X::PDF::Content::Image::UnknownType is X::PDF::Content {
+class X::PDF::Content::Image::UnknownType is X::PDF::Content::Image {
     has $.path is required;
     method message {
         "Unable to open as an image: $!path";
     }
 }
 
-class X::PDF::Content::Image::UnknownMimeType is X::PDF::Content {
+class X::PDF::Content::Image::UnknownMimeType is X::PDF::Content::Image {
     has $.path is required;
     has $.mime-type is required;
     method message {
