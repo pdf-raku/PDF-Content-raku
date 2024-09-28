@@ -5,6 +5,8 @@ unit class PDF::Content::Image::JPEG;
 use PDF::Content::Image;
 also is PDF::Content::Image;
 
+use X::PDF::Content;
+
 use Native::Packing :Endian;
 class Atts is repr('CStruct') does Native::Packing[Network] {
     has uint8 $.bit-depth;
@@ -28,7 +30,7 @@ sub u16(uint16 $v) { $v }
 method read($fh = $.source) {
     $fh.seek(0, SeekFromBeginning);
     my Str $header = $fh.read(2).decode: 'latin-1';
-    die X::PDF::Image::WrongHeader.new( :type<JPEG>, :$header, :path($fh.path) )
+    die X::PDF::Content::Image::WrongHeader.new( :type<JPEG>, :$header, :path($fh.path) )
         unless $header ~~ "\xFF\xD8";
 
     loop {

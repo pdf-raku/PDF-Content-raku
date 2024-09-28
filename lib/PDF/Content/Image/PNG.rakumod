@@ -4,6 +4,8 @@ unit class PDF::Content::Image::PNG;
 use PDF::Content::Image;
 also is PDF::Content::Image;
 
+use X::PDF::Content;
+
 use PDF::COS;
 use PDF::COS::Name;
 use PDF::COS::Stream;
@@ -50,7 +52,7 @@ method !crc($hdr, $buf) {
 
 method read($fh = $.source) {
     my Magic $magic .= read($fh);
-    die X::PDF::Image::WrongHeader.new( :type<PNG>, :header($magic.Str), :path($fh.path) )
+    die X::PDF::Content::Image::WrongHeader.new( :type<PNG>, :header($magic.Str), :path($fh.path) )
         unless $magic.is-png;
 
     $!stream  = Nil;

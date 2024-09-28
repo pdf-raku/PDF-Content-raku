@@ -86,3 +86,28 @@ class X::PDF::Content::UnknownResource
     has Str $.key is required;
     method message { "Unknown $!type resource: /$!key" }
 }
+
+class X::PDF::Content::Image::WrongHeader is Exception {
+    has Str $.type is required;
+    has Str $.header is required;
+    has $.path is required;
+    method message {
+        "$!path image doesn't have a $!type header: {$.header.raku}"
+    }
+}
+
+class X::PDF::Content::Image::UnknownType is X::PDF::Content {
+    has $.path is required;
+    method message {
+        "Unable to open as an image: $!path";
+    }
+}
+
+class X::PDF::Content::Image::UnknownMimeType is X::PDF::Content {
+    has $.path is required;
+    has $.mime-type is required;
+    method message {
+        "Expected mime-type 'image/*' or 'application/pdf', got '$!mime-type': $!path"
+    }
+}
+

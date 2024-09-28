@@ -3,6 +3,7 @@ unit class PDF::Content::Image::GIF;
 
 use PDF::Content::Image;
 also is PDF::Content::Image;
+use X::PDF::Content;
 
 use Native::Packing :Endian;
 
@@ -103,7 +104,7 @@ method read($fh = $.source) {
     my Str $encoded = '';
 
     my $header = $fh.read(6).decode: 'latin-1';
-    die X::PDF::Image::WrongHeader.new( :type<GIF>, :$header, :path($fh.path) )
+    die X::PDF::Content::Image::WrongHeader.new( :type<GIF>, :$header, :path($fh.path) )
         unless $header ~~ /^GIF <[0..9]>**2 [a|b]/;
 
     $!descr .= read: $fh;
