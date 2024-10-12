@@ -79,6 +79,7 @@ my class Loader is PDF::COS::Loader {
     multi method load-delegate(Hash :$dict! where { from-ast($_) == 1 with .<PatternType> }) {
 	Tiling-Pattern
     }
+    method target-class { 'PDFTiny' }
 }
 PDF::COS.loader = Loader;
 
