@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 61;
+plan 64;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -15,6 +15,9 @@ is-deeply PDF::Content::Font::CoreFont.core-font-name('Blah'), Nil, 'core-font-n
 
 my PDF::Content::Font::CoreFont $tr-bold .= load-font( :family<Times-Roman>, :weight<bold>);
 is $tr-bold.font-name, 'Times-Bold', 'font-name';
+is-deeply $tr-bold.is-embedded, False, 'is-embedded';
+is-deeply $tr-bold.is-subset, False, 'is-subset';
+is-deeply $tr-bold.is-core-font, True, 'is-core-font';
 
 my PDF::Content::Font::CoreFont $tsym .= load-font( :family<Symbol>, :weight<bold>);
 is $tsym.font-name, 'Symbol', 'font-name';
