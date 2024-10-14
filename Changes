@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.8.10  2024-10-15T07:18:16+13:00
+    - Fix X::PDF::Content::Image subclassing
+    - Implement core-font-name(), is-embedded(), is-subset() and
+      is-core-font() methods in PDF::Content::FontObj role
+    - Add target-class() to PDFTiny::Loader
+
 0.8.9  2024-09-29T06:36:58+13:00
     - Add replace ad-hoc "Illegal nesting of marked content" with
       specific X::PDF::Content::OP::BadNesting::MarkedContent exception
