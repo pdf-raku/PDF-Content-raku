@@ -41,7 +41,6 @@ say $gfx.Str;
 use PDF::COS;
 use PDF::COS::Stream;
 use PDF::Content::Text::Box;
-use PDF::Content::Text::Block; # deprecated
 use PDF::Content::XObject;
 use PDF::Content::Tag :ParagraphTags;
 use PDF::Content::Font;
@@ -329,7 +328,7 @@ multi method print(
 # deprecated in favour of text-box()
 method text-block(::?CLASS:D $gfx: $font = self!current-font[0], *%opt) is DEPRECATED('text-box') {
     my Numeric $font-size = $.font-size // self!current-font[1];
-    PDF::Content::Text::Block.new(
+    PDF::COS.required("PDF::Content::Text::Block").new(
         :$gfx, :$font, :$font-size, |%opt,
     );
 }
