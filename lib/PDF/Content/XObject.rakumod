@@ -119,10 +119,9 @@ role PDF::Content::XObject['Image']
     method inline-content {
         # for serialization to content stream ops: BI dict ID data EI
         use PDF::Content::Ops :OpCode;
-        use PDF::COS::Util :ast-coerce;
+        use PDF::COS::Util :&ast-coerce;
         # serialize to content ops
         my %xo-dict = ast-coerce(self).value.list;
-        %xo-dict<Length>:delete;
         my %dict = self.inline-to-xobject(%xo-dict, :invert );
         %dict<L> = $.encoded.codes; # Length is mandatory in PDF 2.0
 
