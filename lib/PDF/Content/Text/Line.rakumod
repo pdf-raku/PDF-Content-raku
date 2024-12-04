@@ -8,7 +8,7 @@ has Str @.decoded;
 has List @.encoded;
 has Numeric $.height is rw is required;
 has Numeric $.word-width is rw = 0; #| sum of word widths
-has Numeric $.word-gap = 0;
+has Numeric $.word-gap is rw = 0;
 has Numeric $.indent is rw = 0;
 has Numeric $.align = 0;
 has UInt @.spaces;
@@ -17,13 +17,14 @@ method content-width returns Numeric {
     $!indent  +  $!word-width  +  @!spaces.sum * $!word-gap;
 }
 
-multi method align('justify', Numeric :$width! ) {
+multi method align('justify', Numeric :$width!, Numeric:D :$max-word-gap! ) {
     my Numeric \content-width = $.content-width;
     my Numeric \wb = +@!spaces.sum;
-    my Numeric \stretch = $width / content-width;
 
-    if content-width && wb && 1.0 < stretch < 2.0 {
+    if content-width && wb && $width >= content-width {
         $!word-gap += ($width - content-width) / wb;
+        $!word-gap = $max-word-gap / 2
+            if $!word-gap > $max-word-gap;
         $!align = 0;
     }
 }

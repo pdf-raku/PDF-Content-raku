@@ -19,12 +19,12 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 5216 >> stream
+<< /Length 5335 >> stream
 BT
   /F1 10 Tf
   1 0 0 1 110 700 Tm
   -7.18 Ts
-  [ 1000 (*** text-indent:-10 left***) ] TJ
+  [ 1000 (*** text-indent:-10 left ***) ] TJ
   11 TL
   T*
   (Lorem ipsum dolor sit) Tj
@@ -42,60 +42,60 @@ BT
   0 Ts
   1 0 0 1 110 530 Tm
   -7.18 Ts
-  [ 4419 (*** text-indent:-10) ] TJ
+  [ 5947 (*** text-indent:-10 center) ] TJ
   T*
-  [ 3529 (center*** Lorem) ] TJ
+  [ 4863 (*** Lorem ipsum dolor) ] TJ
   T*
-  [ 4613 (ipsum dolor sit amet,) ] TJ
+  [ 4613 (sit amet, consectetur) ] TJ
   T*
-  [ 4947 (consectetur adipiscing) ] TJ
+  [ 4780 (adipiscing elit, sed do) ] TJ
   T*
-  [ 4447 (elit, sed do eiusmod) ] TJ
+  [ 3585 (eiusmod tempor) ] TJ
   T*
-  [ 4363 (tempor incididunt ut) ] TJ
+  [ 4753 (incididunt ut labore et) ] TJ
   T*
-  [ 3474 (labore et dolore) ] TJ
+  [ 4669 (dolore magna aliqua.) ] TJ
   T*
   0 Ts
   1 0 0 1 110 360 Tm
   -7.18 Ts
-  [ 7837 (*** text-indent:-10) ] TJ
+  [ 10060 (*** text-indent:-10 right) ] TJ
   T*
-  [ 9169 (right*** Lorem ipsum) ] TJ
+  [ 9725 (*** Lorem ipsum dolor) ] TJ
   T*
-  [ 6280 (dolor sit amet,) ] TJ
+  [ 9226 (sit amet, consectetur) ] TJ
   T*
-  [ 9893 (consectetur adipiscing) ] TJ
+  [ 9560 (adipiscing elit, sed do) ] TJ
   T*
-  [ 8893 (elit, sed do eiusmod) ] TJ
+  [ 7169 (eiusmod tempor) ] TJ
   T*
-  [ 8726 (tempor incididunt ut) ] TJ
+  [ 9505 (incididunt ut labore et) ] TJ
   T*
-  [ 6948 (labore et dolore) ] TJ
+  [ 9338 (dolore magna aliqua.) ] TJ
   T*
   0 Ts
   1 0 0 1 110 190 Tm
   -7.18 Ts
-  [ 1000 (*** ) -3163 (text-indent:-10) ] TJ
+  [ 1000 (*** ) -164 (text-indent:-10 ) -164 (justify) ] TJ
   T*
-  [ (justify*** ) -110 (Lorem ) -110 (ipsum) ] TJ
+  [ (*** ) -91 (Lorem ) -91 (ipsum ) -91 (dolor) ] TJ
   T*
-  [ (dolor ) -1860 (sit ) -1860 (amet,) ] TJ
+  [ (sit ) -387 (amet, ) -387 (consectetur) ] TJ
   T*
-  [ (consectetur ) -107 (adipiscing) ] TJ
+  [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
   T*
-  [ (elit, ) -369 (sed ) -369 (do ) -369 (eiusmod) ] TJ
+  [ (eiusmod ) -1112 (tempor) ] TJ
   T*
-  [ (tempor ) -637 (incididunt ) -637 (ut) ] TJ
+  [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
   T*
-  [ (labore ) -1526 (et ) -1526 (dolore) ] TJ
+  [ (dolore ) -331 (magna ) -331 (aliqua.) ] TJ
   T*
   0 Ts
   1 0 0 1 235 700 Tm
   -7.18 Ts
   [ -1500 (*** text-indent:15) ] TJ
   T*
-  (left*** Lorem ipsum) Tj
+  (left *** Lorem ipsum) Tj
   T*
   (dolor sit amet,) Tj
   T*
@@ -112,7 +112,7 @@ BT
   -7.18 Ts
   [ 3002 (*** text-indent:15) ] TJ
   T*
-  [ 3529 (center*** Lorem) ] TJ
+  [ 3668 (center *** Lorem) ] TJ
   T*
   [ 4613 (ipsum dolor sit amet,) ] TJ
   T*
@@ -129,7 +129,7 @@ BT
   -7.18 Ts
   [ 7504 (*** text-indent:15) ] TJ
   T*
-  [ 9169 (right*** Lorem ipsum) ] TJ
+  [ 9447 (right *** Lorem ipsum) ] TJ
   T*
   [ 6280 (dolor sit amet,) ] TJ
   T*
@@ -146,9 +146,9 @@ BT
   -7.18 Ts
   [ -1500 (*** ) -996 (text-indent:15) ] TJ
   T*
-  [ (justify*** ) -110 (Lorem ) -110 (ipsum) ] TJ
+  [ (justify ) -1443 (*** ) -1443 (Lorem) ] TJ
   T*
-  [ (dolor ) -1860 (sit ) -1860 (amet,) ] TJ
+  [ (ipsum ) -258 (dolor ) -258 (sit ) -258 (amet,) ] TJ
   T*
   [ (consectetur ) -107 (adipiscing) ] TJ
   T*
@@ -163,7 +163,7 @@ BT
   -7.18 Ts
   [ -3000 (*** text-) ] TJ
   T*
-  (indent:30 left***) Tj
+  (indent:30 left ***) Tj
   T*
   (Lorem ipsum dolor sit) Tj
   T*
@@ -180,7 +180,7 @@ BT
   -7.18 Ts
   [ 195 (*** text-) ] TJ
   T*
-  [ 4169 (indent:30 center***) ] TJ
+  [ 4308 (indent:30 center ***) ] TJ
   T*
   [ 4779 (Lorem ipsum dolor sit) ] TJ
   T*
@@ -197,7 +197,7 @@ BT
   -7.18 Ts
   [ 3390 (*** text-) ] TJ
   T*
-  [ 7504 (indent:30 right***) ] TJ
+  [ 7782 (indent:30 right ***) ] TJ
   T*
   [ 9558 (Lorem ipsum dolor sit) ] TJ
   T*
@@ -212,9 +212,9 @@ BT
   0 Ts
   1 0 0 1 360 190 Tm
   -7.18 Ts
-  [ -3000 (*** ) -3610 (text-) ] TJ
+  [ -3000 (*** ) -1112 (text-) ] TJ
   T*
-  [ (indent:30 ) -1885 (justify***) ] TJ
+  [ (indent:30 ) -803 (justify ) -803 (***) ] TJ
   T*
   [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
   T*
@@ -222,7 +222,7 @@ BT
   T*
   [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
   T*
-  [ (eiusmod ) -2831 (tempor) ] TJ
+  [ (eiusmod ) -1112 (tempor) ] TJ
   T*
   [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
   T*
@@ -231,17 +231,17 @@ BT
   -7.18 Ts
   [ -9700 ] TJ
   T*
-  (*** text-indent:97) Tj
+  (*** text-indent:97 left) Tj
   T*
-  (left*** Lorem ipsum) Tj
+  (*** Lorem ipsum dolor) Tj
   T*
-  (dolor sit amet,) Tj
+  (sit amet, consectetur) Tj
   T*
-  (consectetur adipiscing) Tj
+  (adipiscing elit, sed do) Tj
   T*
-  (elit, sed do eiusmod) Tj
+  (eiusmod tempor) Tj
   T*
-  (tempor incididunt ut) Tj
+  (incididunt ut labore et) Tj
   T*
   0 Ts
   1 0 0 1 485 530 Tm
@@ -250,7 +250,7 @@ BT
   T*
   [ 3752 (*** text-indent:97) ] TJ
   T*
-  [ 3529 (center*** Lorem) ] TJ
+  [ 3668 (center *** Lorem) ] TJ
   T*
   [ 4613 (ipsum dolor sit amet,) ] TJ
   T*
@@ -265,17 +265,17 @@ BT
   -7.18 Ts
   [ ] TJ
   T*
-  [ 7504 (*** text-indent:97) ] TJ
+  [ 9727 (*** text-indent:97 right) ] TJ
   T*
-  [ 9169 (right*** Lorem ipsum) ] TJ
+  [ 9725 (*** Lorem ipsum dolor) ] TJ
   T*
-  [ 6280 (dolor sit amet,) ] TJ
+  [ 9226 (sit amet, consectetur) ] TJ
   T*
-  [ 9893 (consectetur adipiscing) ] TJ
+  [ 9560 (adipiscing elit, sed do) ] TJ
   T*
-  [ 8893 (elit, sed do eiusmod) ] TJ
+  [ 7169 (eiusmod tempor) ] TJ
   T*
-  [ 8726 (tempor incididunt ut) ] TJ
+  [ 9505 (incididunt ut labore et) ] TJ
   T*
   0 Ts
   1 0 0 1 485 190 Tm
@@ -284,9 +284,9 @@ BT
   T*
   [ (*** ) -2496 (text-indent:97) ] TJ
   T*
-  [ (justify*** ) -110 (Lorem ) -110 (ipsum) ] TJ
+  [ (justify ) -1443 (*** ) -1443 (Lorem) ] TJ
   T*
-  [ (dolor ) -1860 (sit ) -1860 (amet,) ] TJ
+  [ (ipsum ) -258 (dolor ) -258 (sit ) -258 (amet,) ] TJ
   T*
   [ (consectetur ) -107 (adipiscing) ] TJ
   T*
@@ -315,9 +315,9 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000264 00000 n 
-0000005533 00000 n 
+0000005652 00000 n 
 trailer
 << /ID [ (t/pdf-text-inden) (t/pdf-text-inden) ] /Root 1 0 R /Size 6 >>
 startxref
-5639
+5758
 %%EOF

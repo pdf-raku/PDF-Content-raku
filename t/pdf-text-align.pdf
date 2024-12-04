@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 7740 >> stream
+<< /Length 7778 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -41,7 +41,7 @@ q
   BT
     1 0 0 1 110 700 Tm
     -7.18 Ts
-    (*** top left*** Lorem) Tj
+    (*** top left *** Lorem) Tj
     11 TL
     T*
     (ipsum dolor sit amet,) Tj
@@ -82,7 +82,7 @@ q
   BT
     1 0 0 1 110 530 Tm
     -7.18 Ts
-    [ 3530 (*** top center***) ] TJ
+    [ 3669 (*** top center ***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
     T*
@@ -122,7 +122,7 @@ q
   BT
     1 0 0 1 110 360 Tm
     -7.18 Ts
-    [ 9337 (*** top right*** Lorem) ] TJ
+    [ 9615 (*** top right *** Lorem) ] TJ
     T*
     [ 9225 (ipsum dolor sit amet,) ] TJ
     T*
@@ -162,19 +162,19 @@ q
   BT
     1 0 0 1 110 190 Tm
     -7.18 Ts
-    [ (*** ) -17 (top ) -17 (justify*** ) -17 (Lorem) ] TJ
+    [ (*** ) -962 (top ) -962 (justify ) -962 (***) ] TJ
     T*
-    [ (ipsum ) -258 (dolor ) -258 (sit ) -258 (amet,) ] TJ
+    [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
     T*
-    [ (consectetur ) -107 (adipiscing) ] TJ
+    [ (amet, ) -2052 (consectetur) ] TJ
     T*
-    [ (elit, ) -369 (sed ) -369 (do ) -369 (eiusmod) ] TJ
+    [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
     T*
-    [ (tempor ) -637 (incididunt ) -637 (ut) ] TJ
+    [ (eiusmod ) -1112 (tempor) ] TJ
     T*
-    [ (labore ) -1526 (et ) -1526 (dolore) ] TJ
+    [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
     T*
-    [ (magna ) -3719 (aliqua.) ] TJ
+    [ (dolore ) -331 (magna ) -331 (aliqua.) ] TJ
     0 Ts
   ET
   /Artifact BMC
@@ -203,7 +203,7 @@ q
     1 0 0 1 235 700 Tm
     -2.555 Ts
     0 33 Td
-    (*** center left***) Tj
+    (*** center left ***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
     T*
@@ -244,7 +244,7 @@ q
     1 0 0 1 235 530 Tm
     -2.555 Ts
     0 33 Td
-    [ 4224 (*** center center***) ] TJ
+    [ 4363 (*** center center ***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
     T*
@@ -285,7 +285,7 @@ q
     1 0 0 1 235 360 Tm
     -2.555 Ts
     0 33 Td
-    [ 7614 (*** center right***) ] TJ
+    [ 7892 (*** center right ***) ] TJ
     T*
     [ 9558 (Lorem ipsum dolor sit) ] TJ
     T*
@@ -326,7 +326,7 @@ q
     1 0 0 1 235 190 Tm
     -2.555 Ts
     0 33 Td
-    [ (*** ) -887 (center ) -887 (justify***) ] TJ
+    [ (*** ) -499 (center ) -499 (justify ) -499 (***) ] TJ
     T*
     [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
     T*
@@ -334,7 +334,7 @@ q
     T*
     [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
     T*
-    [ (eiusmod ) -2831 (tempor) ] TJ
+    [ (eiusmod ) -1112 (tempor) ] TJ
     T*
     [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
     T*
@@ -367,7 +367,7 @@ q
     1 0 0 1 360 700 Tm
     2.07 Ts
     0 66 Td
-    (*** bottom left***) Tj
+    (*** bottom left ***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
     T*
@@ -408,7 +408,7 @@ q
     1 0 0 1 360 530 Tm
     2.07 Ts
     0 66 Td
-    [ 4363 (*** bottom center***) ] TJ
+    [ 4502 (*** bottom center ***) ] TJ
     T*
     [ 4779 (Lorem ipsum dolor sit) ] TJ
     T*
@@ -449,7 +449,7 @@ q
     1 0 0 1 360 360 Tm
     2.07 Ts
     0 66 Td
-    [ 7892 (*** bottom right***) ] TJ
+    [ 8170 (*** bottom right ***) ] TJ
     T*
     [ 9558 (Lorem ipsum dolor sit) ] TJ
     T*
@@ -490,7 +490,7 @@ q
     1 0 0 1 360 190 Tm
     2.07 Ts
     0 66 Td
-    [ (*** ) -748 (bottom ) -748 (justify***) ] TJ
+    [ (*** ) -406 (bottom ) -406 (justify ) -406 (***) ] TJ
     T*
     [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
     T*
@@ -498,7 +498,7 @@ q
     T*
     [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
     T*
-    [ (eiusmod ) -2831 (tempor) ] TJ
+    [ (eiusmod ) -1112 (tempor) ] TJ
     T*
     [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
     T*
@@ -853,15 +853,15 @@ xref
 0000000065 00000 n 
 0000000131 00000 n 
 0000000309 00000 n 
-0000008102 00000 n 
-0000008149 00000 n 
-0000008197 00000 n 
-0000008303 00000 n 
-0000008472 00000 n 
-0000012052 00000 n 
-0000012100 00000 n 
+0000008140 00000 n 
+0000008187 00000 n 
+0000008235 00000 n 
+0000008341 00000 n 
+0000008510 00000 n 
+0000012090 00000 n 
+0000012138 00000 n 
 trailer
 << /ID [ (t/pdf-text-align) (t/pdf-text-align) ] /Root 1 0 R /Size 12 >>
 startxref
-12205
+12243
 %%EOF

@@ -55,7 +55,7 @@ for <top center bottom> -> $valign {
         $gfx.&draw-cross($x, $y);
         $gfx.text: {
             .text-position = ($x, $y);
-            @rect = .print: "*** $valign $align*** " ~ $sample, :$width, :$valign, :$align;
+            @rect = .print: "*** $valign $align *** " ~ $sample, :$width, :$valign, :$align;
         }
         draw-rect $gfx, @rect;
 

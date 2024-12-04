@@ -1,4 +1,8 @@
 {{$NEXT}}
+    - Tweak justification of partial lines. Add `:max-word-gap`
+      option. Perform text block alignment early to facilitate
+      introspection. Make line word-gap() into a read/write
+      assessor to allow adjustments.
 
 0.8.10  2024-10-15T07:18:16+13:00
     - Fix X::PDF::Content::Image subclassing

@@ -106,6 +106,7 @@ has Str $.text is built;
 has Bool $.squish = False;
 has Bool $.verbatim;
 has Bool $.bidi;
+has Numeric $.max-word-gap;
 
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
@@ -165,6 +166,7 @@ method !build-style(:$baseline = $!valign // 'alphabetic', |c) {
         when 'end'   { $_ = $.direction eq 'rtl' ?? 'left' !! 'right' }
     }
     $!valign //= 'top';
+    $!max-word-gap //= 10 * self!word-gap;
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
@@ -312,6 +314,13 @@ method !layup(@atoms is copy) {
             warn "Text::FriBidi v0.0.4+ is required for :bidi processing";
         }
     }
+
+    my $width = $.width
+        if $!align eq 'justify';
+
+    .align($!align, :$width, :$!max-word-gap )
+        for @!lines;
+
 }
 
 method !height-exceeded {
@@ -377,12 +386,6 @@ method render(
 
     $gfx.font = [$_, $!style.font-size // 12]
        with $!style.font;
-
-    my $width = $.width
-        if $!align eq 'justify';
-
-    .align($!align, :$width )
-        for @!lines;
 
     my @content;
     @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join(' ').subst(/(<-[\0..\xFF]>)/, { '\u%04d'.sprintf($0.ord)}, :g)

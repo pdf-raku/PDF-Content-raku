@@ -36,7 +36,7 @@ for -10, 15, 30, $width - 3 -> $indent {
 
     for <left center right justify> -> $align {
         $gfx.text-position = ($x, $y);
-        $gfx.say( "*** text-indent:$indent $align*** " ~ $sample, :$width, :$height, :$indent, :$align, :$baseline );
+        $gfx.say( "*** text-indent:$indent $align *** " ~ $sample, :$width, :$height, :$indent, :$align, :$baseline );
         $y -= 170;
     }
 

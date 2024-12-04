@@ -1,9 +1,10 @@
 use v6;
 use Test;
-plan 18;
+plan 13;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
+use PDF::Content::Text::Line;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::Color :color, :ColorName;
 use PDFTiny;
@@ -12,19 +13,32 @@ my \nbsp = "\c[NO-BREAK SPACE]";
 my @chunks =  PDF::Content::Text::Box.comb: "z80 a-b. -3   {nbsp}A{nbsp}bc{nbsp} 42";
 is-deeply @chunks, ["z80", " ", "a-", "b.", " ", "-", "3", "   ", "{nbsp}A{nbsp}bc{nbsp}", " ", "42"], 'text-box comb';
 
-my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
-my $font-size = 16;
-my $height = 20;
+my PDF::Content::Text::Box $text-box;
 my $text = "Hello.  Ting, ting-ting. Attention! … ATTENTION! ";
+my $font-size = 16;
+my PDF::Content::Font::CoreFont $font .= load-font( :family<helvetica>, :weight<bold> );
+my $height = 20;
 my PDFTiny $pdf .= new;
-my PDF::Content::Text::Box $text-box .= new( :$text, :$font, :$font-size, :$height );
-is $text-box.text, $text;
-is $text-box.font-size, 16;
-is $text-box.height, 20;
-is-approx $text-box.space-width, 4.448, 'space-width';
-is-approx $text-box.content-width, 369.776, '$.content-width';
-is-approx $text-box.content-height, 17.6, '$.content-height';
-is +$text-box.lines, 1;
+
+subtest 'text box basic', {
+    $text-box .= new( :$text, :$font, :$font-size, :$height );
+    is $text-box.text, $text;
+    is $text-box.font-size, 16;
+    is $text-box.height, 20;
+    is-approx $text-box.space-width, 4.448, 'space-width';
+    is-approx $text-box.content-width, 369.776, '$.content-width';
+    is-approx $text-box.content-height, 17.6, '$.content-height';
+}
+
+subtest 'text box line', {
+    is +$text-box.lines, 1;
+    my PDF::Content::Text::Line:D $line = $text-box.lines.head;
+    is-approx $line.word-gap, 4.448;
+    is-approx $text-box.content-width, 369.776;
+    lives-ok { $line.word-gap = 10.0 }
+    is-approx $line.word-gap, 10.0;
+    is-approx $text-box.content-width, 408.64;
+}
 
 subtest 'text box cloning', {
     $text-box .= clone;
