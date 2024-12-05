@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 6218 >> stream
+<< /Length 6114 >> stream
 BT
   /F1 10 Tf
   1 0 0 1 110 700 Tm
@@ -94,9 +94,9 @@ BT
   T*
   [ (First   ) -887 (Line   ) -887 (Line2,) ] TJ
   T*
-  [ (leading ) -1112 (spaces) ] TJ
+  (leading spaces) Tj
   T*
-  [ (Wrapping ) -1112 (text) ] TJ
+  (Wrapping text) Tj
   T*
   [ (follows... ) -26 (Lorem ) -26 (ipsum) ] TJ
   T*
@@ -178,9 +178,9 @@ BT
   T*
   [ (First ) -1443 (Line ) -1443 (Line2,) ] TJ
   T*
-  [ (leading ) -1112 (spaces) ] TJ
+  (leading spaces) Tj
   T*
-  [ (Wrapping ) -1112 (text) ] TJ
+  (Wrapping text) Tj
   T*
   [ (follows... ) -26 (Lorem ) -26 (ipsum) ] TJ
   T*
@@ -262,11 +262,11 @@ BT
   T*
   [ (First   ) -5332 (Line) ] TJ
   T*
-  [ (  Line2, ) -1112 (leading) ] TJ
+  (  Line2, leading) Tj
   T*
   (spaces) Tj
   T*
-  [ (Wrapping ) -1112 (text) ] TJ
+  (Wrapping text) Tj
   T*
   (follows...) Tj
   T*
@@ -344,11 +344,11 @@ BT
   T*
   [ (squish:True ) -248 (justify ) -248 (***) ] TJ
   T*
-  [ (First ) -1112 (Line) ] TJ
+  (First Line) Tj
   T*
   [ (Line2, ) -164 (leading ) -164 (spaces) ] TJ
   T*
-  [ (Wrapping ) -1112 (text) ] TJ
+  (Wrapping text) Tj
   T*
   (follows...) Tj
   T*
@@ -379,9 +379,9 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000264 00000 n 
-0000006535 00000 n 
+0000006431 00000 n 
 trailer
 << /ID [ (t/pdf-text-verba) (t/pdf-text-verba) ] /Root 1 0 R /Size 6 >>
 startxref
-6641
+6537
 %%EOF

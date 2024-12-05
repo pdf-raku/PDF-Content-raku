@@ -98,7 +98,7 @@ has Numeric $.indent = 0;
 
 has Alignment $.align = 'start';
 has VerticalAlignment $.valign;
-has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness font-height shape direction>;
+has PDF::Content::Text::Style $.style is rw handles <font font-size leading kern WordSpacing CharSpacing HorizScaling TextRender TextRise baseline-shift space-width underline-position underline-thickness font-height shape direction script lang>;
 has PDF::Content::Text::Line @.lines is built;
 has @.overflow is rw is built;
 has @.images is built;
@@ -132,8 +132,8 @@ method content-height returns Numeric { @!lines».height.sum * $.leading; }
 
 my grammar Text {
     token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
-    token space { [\s <!after <nbsp> >]+ }
-    token word  { [ <![ - ]> <!before <space>> . ]+ '-'? | '-' }
+    token space { [\s <!after <nbsp> >]+  }
+    token word  { [ <![ - \c[HYPHENATION POINT] ]> <!before <space>> . ]+ '-'? | <[ - \c[HYPHENATION POINT] ]> }
 }
 
 #| break a text string into word and whitespace fragments
@@ -179,6 +179,36 @@ multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
     self!layup: @chunks;
 }
 
+method !encode(Str:D $atom) {
+    my List $encoded;
+    my Numeric $width;
+    my Bool $shape := $!style.shape;
+    my Bool $kern = $!style.kern;
+    $kern //= True if $shape;
+    if $shape || $.script || $.lang {
+        given $.font.shape($atom, :$kern, :$.script, :$.lang) {
+            $encoded := .[0];
+            $width = .[1];
+        }
+    }
+    elsif $kern {
+        given $.font.kern($atom) {
+            $encoded := .List given .[0].list.map: {
+                .does(Numeric) ?? -$_ !! $.font.encode($_);
+            }
+            $width = .[1];
+        }
+    }
+    else {
+        $encoded := ( $.font.encode($atom), );
+        $width = $.font.stringwidth($atom);
+    }
+    $width *= $!style.font-size * $.HorizScaling / 100000;
+    $width += ($atom.chars - 1) * $.CharSpacing
+        if $.CharSpacing > -$!style.font-size;
+    ($encoded, $width);
+}
+
 method !layup(@atoms is copy) {
     my Int $i = 0;
     my Int $line-start = 0;
@@ -186,12 +216,7 @@ method !layup(@atoms is copy) {
     my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;
-    my $font := $!style.font;
-    my Bool $shape := $!style.shape;
-    my Str $script := $!style.script;
-    my Str $lang := $!style.lang;
-    my Bool $kern = $!style.kern;
-    $kern //= True if $shape;
+    my Numeric $soft-hyphen-width = 0;
 
     my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
     @!lines = $line;
@@ -204,37 +229,25 @@ method !layup(@atoms is copy) {
         my List $word;
         my Numeric $word-width = 0;
         my Numeric $word-pad = $preceding-spaces * $word-gap;
+        my Bool $soft-hyphen;
 
         given $atom {
             when Str {
-                if $!verbatim && +.match("\n", :g) -> $nl {
+                if $atom eq "\c[HYPHENATION POINT]" {
+                    $atom = '-';
+                    $soft-hyphen = True;
+                }
+                elsif $!verbatim && +.match("\n", :g) -> UInt $nl {
                     # todo: handle tabs
                     $line-breaks = $nl;
                     $atom = ' ' x $preceding-spaces;
                     $word-pad = 0;
                 }
 
-                if $shape || $script || $lang {
-                    given $font.shape($atom, :$kern, :$script, :$lang) {
-                        $word = .[0];
-                        $word-width = .[1];
-                    }
+                given self!encode($atom) {
+                    $word = .[0];
+                    $word-width = .[1];
                 }
-                elsif $kern {
-                    given $!style.font.kern($atom) {
-                        $word = .List given .[0].list.map: {
-                            .does(Numeric) ?? -$_ !! $font.encode($_);
-                        }
-                        $word-width = .[1];
-                    }
-                }
-                else {
-                    $word = [ $font.encode($atom), ];
-                    $word-width = $font.stringwidth($atom);
-                }
-                $word-width *= $!style.font-size * $.HorizScaling / 100000;
-                $word-width += ($atom.chars - 1) * $.CharSpacing
-                    if $.CharSpacing > -$!style.font-size;
             }
             when PDF::Content::XObject {
                 $xobject = True;
@@ -243,10 +256,16 @@ method !layup(@atoms is copy) {
             }
         }
 
-        $line-breaks ||= ($line.encoded || $line.indent) && $line.content-width + $word-pad + $word-width > $!width
-            if $!width;
+        if $!width {
+            my $test-width = $line.content-width + $word-pad + $word-width;
+            if @atoms[$i] ~~ "\c[HYPHENATION POINT]" {
+                $test-width += self!encode('-')[1];
+            }
+            $line-breaks ||= ($line.encoded || $line.indent ) && $test-width > $!width
+        }
 
         while $line-breaks-- {
+            $soft-hyphen-width = 0;
             $line-start = $i;
             $line .= new: :$word-gap, :$height;
             @!lines.push: $line;
@@ -274,9 +293,14 @@ method !layup(@atoms is copy) {
             my $Ty = @!lines.head.height * $.leading  -  self.content-height;
             @!images.push( { :$Tx, :$Ty, :xobject($atom) } )
         }
-        else {
-        }
 
+
+        if $soft-hyphen-width {
+            # back out uneeded line-break hyphen
+            $line.decoded.pop;
+            $line.encoded.pop;
+            $line.word-width -= $soft-hyphen-width;
+        }
         $line.spaces[+$line.encoded] = $preceding-spaces;
         $line.decoded.push: $xobject ?? '' !! $atom;
         $line.encoded.push: $word;
@@ -284,6 +308,7 @@ method !layup(@atoms is copy) {
         $line.height = $height
             if $height > $line.height;
 
+        $soft-hyphen-width = $soft-hyphen ?? $word-width !! 0;
         $preceding-spaces = self!flush-spaces(@atoms, $i);
     }
 

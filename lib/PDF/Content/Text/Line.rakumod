@@ -22,9 +22,10 @@ multi method align('justify', Numeric :$width!, Numeric:D :$max-word-gap! ) {
     my Numeric \wb = +@!spaces.sum;
 
     if content-width && wb && $width >= content-width {
-        $!word-gap += ($width - content-width) / wb;
-        $!word-gap = $max-word-gap / 2
-            if $!word-gap > $max-word-gap;
+        given $!word-gap + ($width - content-width) / wb {
+            $!word-gap = $_
+                unless $_ > $max-word-gap;
+        }
         $!align = 0;
     }
 }

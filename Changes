@@ -1,4 +1,7 @@
 {{$NEXT}}
+    - Handle "\c[HYPHENATION POINT]" characters in input text. They
+      may converted to actual hyphens to facilitate line-breaking,
+      but are otherwise ignored.
     - Tweak justification of partial lines. Add `:max-word-gap`
       option. Perform text block alignment early to facilitate
       introspection. Make line word-gap() into a read/write

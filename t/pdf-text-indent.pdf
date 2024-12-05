@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 5335 >> stream
+<< /Length 5300 >> stream
 BT
   /F1 10 Tf
   1 0 0 1 110 700 Tm
@@ -84,7 +84,7 @@ BT
   T*
   [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
   T*
-  [ (eiusmod ) -1112 (tempor) ] TJ
+  (eiusmod tempor) Tj
   T*
   [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
   T*
@@ -212,7 +212,7 @@ BT
   0 Ts
   1 0 0 1 360 190 Tm
   -7.18 Ts
-  [ -3000 (*** ) -1112 (text-) ] TJ
+  [ -3000 (*** text-) ] TJ
   T*
   [ (indent:30 ) -803 (justify ) -803 (***) ] TJ
   T*
@@ -222,7 +222,7 @@ BT
   T*
   [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
   T*
-  [ (eiusmod ) -1112 (tempor) ] TJ
+  (eiusmod tempor) Tj
   T*
   [ (incididunt ) -165 (ut ) -165 (labore ) -165 (et) ] TJ
   T*
@@ -315,9 +315,9 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000264 00000 n 
-0000005652 00000 n 
+0000005617 00000 n 
 trailer
 << /ID [ (t/pdf-text-inden) (t/pdf-text-inden) ] /Root 1 0 R /Size 6 >>
 startxref
-5758
+5723
 %%EOF
