@@ -1,0 +1,867 @@
+%PDF-1.4
+%¥±ë¼
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [ 3 0 R 8 0 R ] >>
+endobj
+
+3 0 obj
+<<
+  /Type /Page
+  /Contents 4 0 R
+  /MediaBox [ 0 0 612 792 ]
+  /Parent 2 0 R
+  /Resources << /ExtGState << /GS1 5 0 R /GS2 6 0 R >> /Font << /F1 7 0 R >> >>
+>>
+endobj
+
+4 0 obj
+<< /Length 7982 >> stream
+q
+  /GS1 gs
+  0.5 0.01 0.01 RG
+  /F1 10 Tf
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 700 m
+      115 700 l
+      S
+    Q
+    q
+      110 695 m
+      110 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 110 700 Tm
+    -7.18 Ts
+    (*** top left *** Lorem) Tj
+    11 TL
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipisc-) Tj
+    T*
+    (ing elit, sed do eius-) Tj
+    T*
+    (mod tempor incidi-) Tj
+    T*
+    (dunt ut labore et do-) Tj
+    T*
+    (lore magna aliqua) Tj
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      110 625.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 530 m
+      115 530 l
+      S
+    Q
+    q
+      110 525 m
+      110 535 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 110 530 Tm
+    -7.18 Ts
+    [ 4530 (*** top center *** Lo-) ] TJ
+    T*
+    [ 4807 (rem ipsum dolor sit a-) ] TJ
+    T*
+    [ 4558 (met, consectetur ad-) ] TJ
+    T*
+    [ 4919 (ipiscing elit, sed do ei-) ] TJ
+    T*
+    [ 4640 (usmod tempor incidi-) ] TJ
+    T*
+    [ 4475 (dunt ut labore et do-) ] TJ
+    T*
+    [ 3974 (lore magna aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      60 455.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 360 m
+      115 360 l
+      S
+    Q
+    q
+      110 355 m
+      110 365 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 110 360 Tm
+    -7.18 Ts
+    [ 9615 (*** top right *** Lorem) ] TJ
+    T*
+    [ 9225 (ipsum dolor sit amet,) ] TJ
+    T*
+    [ 8892 (consectetur adipisc-) ] TJ
+    T*
+    [ 8893 (ing elit, sed do eius-) ] TJ
+    T*
+    [ 8224 (mod tempor incidi-) ] TJ
+    T*
+    [ 8950 (dunt ut labore et do-) ] TJ
+    T*
+    [ 7948 (lore magna aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      10 285.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      105 190 m
+      115 190 l
+      S
+    Q
+    q
+      110 185 m
+      110 195 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 110 190 Tm
+    -7.18 Ts
+    [ (*** ) -290 (top ) -290 (justify ) -290 (*** ) -290 (Lo-) ] TJ
+    T*
+    [ (rem ) -96 (ipsum ) -96 (dolor ) -96 (sit ) -96 (a-) ] TJ
+    T*
+    [ (met, ) -442 (consectetur ) -442 (ad-) ] TJ
+    T*
+    [ (ipiscing ) -40 (elit, ) -40 (sed ) -40 (do ) -40 (ei-) ] TJ
+    T*
+    [ (usmod ) -360 (tempor ) -360 (incidi-) ] TJ
+    T*
+    [ (dunt ) -262 (ut ) -262 (labore ) -262 (et ) -262 (do-) ] TJ
+    T*
+    [ (lore ) -1026 (magna ) -1026 (aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      110 115.82 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 700 m
+      240 700 l
+      S
+    Q
+    q
+      235 695 m
+      235 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 235 700 Tm
+    -2.555 Ts
+    0 33 Td
+    (*** center left *** Lo-) Tj
+    T*
+    (rem ipsum dolor sit a-) Tj
+    T*
+    (met, consectetur ad-) Tj
+    T*
+    (ipiscing elit, sed do ei-) Tj
+    T*
+    (usmod tempor incidi-) Tj
+    T*
+    (dunt ut labore et do-) Tj
+    T*
+    (lore magna aliqua) Tj
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      235 663.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 530 m
+      240 530 l
+      S
+    Q
+    q
+      235 525 m
+      235 535 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 235 530 Tm
+    -2.555 Ts
+    0 33 Td
+    [ 4363 (*** center center ***) ] TJ
+    T*
+    [ 4779 (Lorem ipsum dolor sit) ] TJ
+    T*
+    [ 4836 (amet, consectetur ad-) ] TJ
+    T*
+    [ 4919 (ipiscing elit, sed do ei-) ] TJ
+    T*
+    [ 4640 (usmod tempor incidi-) ] TJ
+    T*
+    [ 4475 (dunt ut labore et do-) ] TJ
+    T*
+    [ 3974 (lore magna aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      185 493.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 360 m
+      240 360 l
+      S
+    Q
+    q
+      235 355 m
+      235 365 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 235 360 Tm
+    -2.555 Ts
+    0 33 Td
+    [ 9615 (*** center right *** Lo-) ] TJ
+    T*
+    [ 9613 (rem ipsum dolor sit a-) ] TJ
+    T*
+    [ 9115 (met, consectetur ad-) ] TJ
+    T*
+    [ 9837 (ipiscing elit, sed do ei-) ] TJ
+    T*
+    [ 9280 (usmod tempor incidi-) ] TJ
+    T*
+    [ 8950 (dunt ut labore et do-) ] TJ
+    T*
+    [ 7948 (lore magna aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      135 323.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      230 190 m
+      240 190 l
+      S
+    Q
+    q
+      235 185 m
+      235 195 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 235 190 Tm
+    -2.555 Ts
+    0 33 Td
+    [ (*** ) -499 (center ) -499 (justify ) -499 (***) ] TJ
+    T*
+    [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
+    T*
+    [ (amet, ) -164 (consectetur ) -164 (ad-) ] TJ
+    T*
+    [ (ipiscing ) -40 (elit, ) -40 (sed ) -40 (do ) -40 (ei-) ] TJ
+    T*
+    [ (usmod ) -360 (tempor ) -360 (incidi-) ] TJ
+    T*
+    [ (dunt ) -262 (ut ) -262 (labore ) -262 (et ) -262 (do-) ] TJ
+    T*
+    [ (lore ) -1026 (magna ) -1026 (aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      235 153.445 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 700 m
+      365 700 l
+      S
+    Q
+    q
+      360 695 m
+      360 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 360 700 Tm
+    2.07 Ts
+    0 66 Td
+    (*** bottom left *** Lo-) Tj
+    T*
+    (rem ipsum dolor sit a-) Tj
+    T*
+    (met, consectetur ad-) Tj
+    T*
+    (ipiscing elit, sed do ei-) Tj
+    T*
+    (usmod tempor incidi-) Tj
+    T*
+    (dunt ut labore et do-) Tj
+    T*
+    (lore magna aliqua) Tj
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      360 701.07 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 530 m
+      365 530 l
+      S
+    Q
+    q
+      360 525 m
+      360 535 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 360 530 Tm
+    2.07 Ts
+    0 66 Td
+    [ 4502 (*** bottom center ***) ] TJ
+    T*
+    [ 4779 (Lorem ipsum dolor sit) ] TJ
+    T*
+    [ 4836 (amet, consectetur ad-) ] TJ
+    T*
+    [ 4919 (ipiscing elit, sed do ei-) ] TJ
+    T*
+    [ 4640 (usmod tempor incidi-) ] TJ
+    T*
+    [ 4475 (dunt ut labore et do-) ] TJ
+    T*
+    [ 3974 (lore magna aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      310 531.07 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 360 m
+      365 360 l
+      S
+    Q
+    q
+      360 355 m
+      360 365 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 360 360 Tm
+    2.07 Ts
+    0 66 Td
+    [ 9893 (*** bottom right *** Lo-) ] TJ
+    T*
+    [ 9613 (rem ipsum dolor sit a-) ] TJ
+    T*
+    [ 9115 (met, consectetur ad-) ] TJ
+    T*
+    [ 9837 (ipiscing elit, sed do ei-) ] TJ
+    T*
+    [ 9280 (usmod tempor incidi-) ] TJ
+    T*
+    [ 8950 (dunt ut labore et do-) ] TJ
+    T*
+    [ 7948 (lore magna aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      260 361.07 100 77 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      355 190 m
+      365 190 l
+      S
+    Q
+    q
+      360 185 m
+      360 195 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 360 190 Tm
+    2.07 Ts
+    0 66 Td
+    [ (*** ) -406 (bottom ) -406 (justify ) -406 (***) ] TJ
+    T*
+    [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
+    T*
+    [ (amet, ) -164 (consectetur ) -164 (ad-) ] TJ
+    T*
+    [ (ipiscing ) -40 (elit, ) -40 (sed ) -40 (do ) -40 (ei-) ] TJ
+    T*
+    [ (usmod ) -360 (tempor ) -360 (incidi-) ] TJ
+    T*
+    [ (dunt ) -262 (ut ) -262 (labore ) -262 (et ) -262 (do-) ] TJ
+    T*
+    [ (lore ) -1026 (magna ) -1026 (aliqua) ] TJ
+    0 Ts
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      360 191.07 100 77 re
+      S
+    Q
+  EMC
+Q
+endstream
+endobj
+
+5 0 obj
+<< /Type /ExtGState /CA 0.5 >>
+endobj
+
+6 0 obj
+<< /Type /ExtGState /CA 0.75 >>
+endobj
+
+7 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
+8 0 obj
+<<
+  /Type /Page
+  /Contents 9 0 R
+  /MediaBox [ 0 0 612 792 ]
+  /Parent 2 0 R
+  /Resources << /ExtGState << /GS1 10 0 R >> /Font << /F1 11 0 R >> >>
+>>
+endobj
+
+9 0 obj
+<< /Length 3527 >> stream
+BT
+  1 0 0 1 10 750 Tm
+  /F1 16 Tf
+  (Text Flow Tests:) Tj
+  17.6 TL
+  T*
+  [ ] TJ
+  T*
+  (Baseline: ) Tj
+  (alphabetic) Tj
+  -10.064 Ts
+  (top) Tj
+  0 Ts
+  2.512 Ts
+  (bottom) Tj
+  0 Ts
+  -3.776 Ts
+  (middle) Tj
+  0 Ts
+  5.936 Ts
+  (ideographic) Tj
+  0 Ts
+  -10.064 Ts
+  (hanging) Tj
+  0 Ts
+  1 0 0 1 10 620 Tm
+  (Valign: ) Tj
+  -10.064 Ts
+  (top) Tj
+  0 Ts
+  -3.776 Ts
+  (center) Tj
+  0 Ts
+  2.512 Ts
+  (bottom) Tj
+  0 Ts
+  -10.064 Ts
+  (top) Tj
+  0 Ts
+  1 0 0 1 10 510 Tm
+  (Valign wrapping: ) Tj
+  1 0 0 1 215 510 Tm
+  -10.064 Ts
+  (multi) Tj
+  T*
+  (top) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 280 510 Tm
+  -3.776 Ts
+  0 17.6 Td
+  (multi) Tj
+  T*
+  (center) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 345 510 Tm
+  2.512 Ts
+  0 35.2 Td
+  (multi) Tj
+  T*
+  (bottom) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 410 510 Tm
+  -10.064 Ts
+  (multi) Tj
+  T*
+  (top) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 10 350 Tm
+  (Valign fixed height: ) Tj
+  1 0 0 1 215 350 Tm
+  -10.064 Ts
+  (top) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 280 350 Tm
+  -3.776 Ts
+  0 8.8 Td
+  (center) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 345 350 Tm
+  2.512 Ts
+  0 17.6 Td
+  (bottom) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 410 350 Tm
+  -10.064 Ts
+  (top) Tj
+  T*
+  (lines) Tj
+  0 Ts
+  1 0 0 1 10 250 Tm
+  (align: ) Tj
+  1 0 0 1 260 250 Tm
+  [ 3000 (right) ] TJ
+  1 0 0 1 340 250 Tm
+  [ 1800 (center) ] TJ
+  1 0 0 1 420 250 Tm
+  (left) Tj
+  1 0 0 1 500 250 Tm
+  (justify) Tj
+  1 0 0 1 10 210 Tm
+  (align fixed width: ) Tj
+  1 0 0 1 260 210 Tm
+  [ 3000 (right) ] TJ
+  1 0 0 1 340 210 Tm
+  [ 1800 (center) ] TJ
+  1 0 0 1 420 210 Tm
+  (left) Tj
+  1 0 0 1 500 210 Tm
+  (justify) Tj
+ET
+q
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      106 713.2 96 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      202 703.136 28.8 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      230.8 715.712 57.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      288.4 709.424 57.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      346 719.136 105.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      451.6 703.136 67.2 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      86.8 608.336 28.8 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      115.6 614.624 57.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      173.2 620.912 57.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      230.8 608.336 28.8 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      215 463.136 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      280 487.024 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      345 510.912 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      410 463.136 60 52.8 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      215 275.936 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      280 313.424 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      345 350.912 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      410 275.936 60 80 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      212 248.4 48 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      311.2 248.4 57.6 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      420 248.4 38.4 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      500 248.4 67.2 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      190 208.4 70 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      305 208.4 70 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      420 208.4 70 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      500 208.4 70 17.6 re
+      S
+    Q
+  EMC
+Q
+endstream
+endobj
+
+10 0 obj
+<< /Type /ExtGState /CA 0.5 >>
+endobj
+
+11 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Courier
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
+xref
+0 12
+0000000000 65535 f 
+0000000015 00000 n 
+0000000065 00000 n 
+0000000131 00000 n 
+0000000309 00000 n 
+0000008344 00000 n 
+0000008391 00000 n 
+0000008439 00000 n 
+0000008545 00000 n 
+0000008714 00000 n 
+0000012294 00000 n 
+0000012342 00000 n 
+trailer
+<< /ID [ (t/pdf-text-hyphe) (t/pdf-text-hyphe) ] /Root 1 0 R /Size 12 >>
+startxref
+12447
+%%EOF
