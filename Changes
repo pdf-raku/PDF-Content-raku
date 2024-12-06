@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.8.11  2024-12-06T17:19:32+13:00
     - Handle "\c[HYPHENATION POINT]" characters in input text. They
       may converted to actual hyphens to facilitate line-breaking,
       but are otherwise ignored.
