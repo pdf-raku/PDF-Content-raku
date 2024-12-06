@@ -216,7 +216,8 @@ method !layup(@atoms is copy) {
     my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;
-    my Numeric $soft-hyphen-width = 0;
+    my Numeric $hyphen-width = self!encode('-')[1];
+    my Bool $prev-soft-hyphen;
 
     my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
     @!lines = $line;
@@ -259,13 +260,13 @@ method !layup(@atoms is copy) {
         if $!width {
             my $test-width = $line.content-width + $word-pad + $word-width;
             if @atoms[$i] ~~ "\c[HYPHENATION POINT]" {
-                $test-width += self!encode('-')[1];
+                $test-width += $hyphen-width;
             }
             $line-breaks ||= ($line.encoded || $line.indent ) && $test-width > $!width
         }
 
         while $line-breaks-- {
-            $soft-hyphen-width = 0;
+            $prev-soft-hyphen = False;
             $line-start = $i;
             $line .= new: :$word-gap, :$height;
             @!lines.push: $line;
@@ -295,11 +296,11 @@ method !layup(@atoms is copy) {
         }
 
 
-        if $soft-hyphen-width {
-            # back out uneeded line-break hyphen
+        if $prev-soft-hyphen {
+            # Drop soft hyphen when line is continued
             $line.decoded.pop;
             $line.encoded.pop;
-            $line.word-width -= $soft-hyphen-width;
+            $line.word-width -= $hyphen-width;
         }
         $line.spaces[+$line.encoded] = $preceding-spaces;
         $line.decoded.push: $xobject ?? '' !! $atom;
@@ -308,7 +309,7 @@ method !layup(@atoms is copy) {
         $line.height = $height
             if $height > $line.height;
 
-        $soft-hyphen-width = $soft-hyphen ?? $word-width !! 0;
+        $prev-soft-hyphen = $soft-hyphen;
         $preceding-spaces = self!flush-spaces(@atoms, $i);
     }
 
