@@ -41,7 +41,3 @@ indentation offset.
 
 Alignment offset
 
-### has Numeric $.word-gap
-
-sum of word widths
-

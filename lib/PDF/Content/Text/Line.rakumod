@@ -37,7 +37,7 @@ use Method::Also;
 has Str @.decoded;
 has List @.encoded;
 has Numeric $.height is rw is required;
-has Numeric $.word-width is rw = 0; #| sum of word widths
+has Numeric $.word-width is rw = 0;
 has Numeric $.word-gap is rw = 0;
 has Numeric $.indent is rw = 0;
 has Numeric $.align = 0;
