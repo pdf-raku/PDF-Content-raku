@@ -23,18 +23,6 @@ say $font.stringwidth("RVX", :kern); # 2111
 Methods
 -------
 
-### method core-font-name
-
-```raku
-method core-font-name(
-    Str:D $family,
-    Str :$weight,
-    Str :$style
-) returns Str
-```
-
-get a core font name for the given family, weight and style
-
 ### multi method height
 
 ```raku

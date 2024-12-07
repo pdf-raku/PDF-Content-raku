@@ -84,6 +84,10 @@ be used to replace the text contained in a text box.
 
 =para See also the :baseline` option for vertical displacememnt of the first line of text.
 
+=head3 method lines
+
+=para An array of L<PDF::Content::Text::Line> objects.
+
 use PDF::Content::Text::Style;
 use PDF::Content::Text::Line;
 use PDF::Content::Ops :OpCode, :TextMode;

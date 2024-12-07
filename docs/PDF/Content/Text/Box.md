@@ -94,6 +94,10 @@ Vertical alignment of mutiple-line text boxes: `top`, `center`, or `bottom`.
 
 See also the :baseline` option for vertical displacememnt of the first line of text.
 
+### method lines
+
+An array of [PDF::Content::Text::Line](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Line) objects.
+
 style
 -----
 

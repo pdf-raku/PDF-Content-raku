@@ -1,6 +1,36 @@
 #| A single line of a text box
 unit class PDF::Content::Text::Line;
 
+=head2 Description
+
+=para This class represents a single line of output in a L<PDF::Content::Text::Box>.
+
+=head2 Methods
+
+=head3 method decoded
+
+=para An input list of text atoms
+
+=head3 method encoded
+
+=para An list of font encodings
+
+=head3 method height
+
+=para Height of the line.
+
+=head3 method word-gap
+
+=para Spacing between words.
+
+=head3 method indent
+
+=para indentation offset.
+
+=head3 method align
+
+=para Alignment offset
+
 use PDF::Content::Ops :OpCode;
 use Method::Also;
 
