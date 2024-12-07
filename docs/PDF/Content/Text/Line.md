@@ -17,9 +17,13 @@ This class represents a single line of output in a [PDF::Content::Text::Box](htt
 Methods
 -------
 
+### method text
+
+Return the input text for the line.
+
 ### method decoded
 
-An input list of text atoms
+Return a list of input text atoms
 
 ### method encoded
 
@@ -39,5 +43,9 @@ indentation offset.
 
 ### method align
 
-Alignment offset
+Alignment offset.
+
+### method content-width
+
+Return the width of rendered content.
 

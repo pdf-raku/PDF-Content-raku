@@ -299,7 +299,6 @@ method !layup(@atoms is copy) {
             @!images.push( { :$Tx, :$Ty, :xobject($atom) } )
         }
 
-
         if $prev-soft-hyphen {
             # Drop soft hyphen when line is continued
             $line.decoded.pop;

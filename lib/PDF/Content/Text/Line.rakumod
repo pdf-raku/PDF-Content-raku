@@ -7,9 +7,13 @@ unit class PDF::Content::Text::Line;
 
 =head2 Methods
 
+=head3 method text
+
+=para Return the input text for the line.
+
 =head3 method decoded
 
-=para An input list of text atoms
+=para Return a list of input text atoms
 
 =head3 method encoded
 
@@ -29,7 +33,11 @@ unit class PDF::Content::Text::Line;
 
 =head3 method align
 
-=para Alignment offset
+=para Alignment offset.
+
+=head3 method content-width
+
+=para Return the width of rendered content.
 
 use PDF::Content::Ops :OpCode;
 use Method::Also;
