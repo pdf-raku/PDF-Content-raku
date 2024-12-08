@@ -92,7 +92,7 @@ method current-point() returns List
 
 return current point
 
-This method returns the x,y position of current point in a path context, or an empty list otherwise
+This method returns the x,y position of current point in a path context, or an undefined list otherwise.
 
 ### multi method op
 

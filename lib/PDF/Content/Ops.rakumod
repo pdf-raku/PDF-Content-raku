@@ -885,7 +885,7 @@ method current-point is rw returns List {
     sub FETCH($) {
         $!context == Path
             ?? ($!cur-x, $!cur-y)
-            !! ()
+            !! List
     }
     sub STORE($,  Vector \v) {
         unless $!context == Path && $!cur-x =~= v[0] && $!cur-x =~= v[1] {
@@ -894,7 +894,7 @@ method current-point is rw returns List {
     }
     Proxy.new: :&FETCH, :&STORE;
 }
-=para This method returns the x,y position of current point in a path context, or an empty list otherwise
+=para This method returns the x,y position of current point in a path context, or an undefined list otherwise.
 
 #| process operator quarantined by PDF::Grammar::Content / PDF::Native::COS as either an
 #| unknown operator or having an incorrect argument list
