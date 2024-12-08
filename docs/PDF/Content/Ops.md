@@ -87,12 +87,12 @@ return all current graphics state variables
 ### method current-point
 
 ```raku
-method current-point() returns PDF::Content::Ops::Vector
+method current-point() returns List
 ```
 
 return current point
 
-This method is only valid in a path context
+This method returns the x,y position of current point in a path context, or an empty list otherwise
 
 ### multi method op
 

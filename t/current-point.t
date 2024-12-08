@@ -1,6 +1,6 @@
 use Test;
 use PDF::Grammar::Test :&is-json-equiv;
-plan 8;
+plan 10;
 
 use lib 't';
 use PDFTiny;
@@ -26,9 +26,11 @@ given $pdf.add-page.gfx {
 
     .ClosePath;
     is-deeply .current-point, (40, 42);
+    ok .current-point;
 
     .Stroke;
-    is-deeply .current-point, (Numeric, Numeric);
+    is-deeply .current-point, List;
+    nok .current-point;
 }
 
 done-testing;

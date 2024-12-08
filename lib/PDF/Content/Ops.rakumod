@@ -881,11 +881,11 @@ method is-graphics-op($op-name) {
 
 my subset Vector of List is export(:Vector) where {.elems == 2 && .&are ~~ Numeric}
 #| return current point
-method current-point is rw returns Vector {
+method current-point is rw returns List {
     sub FETCH($) {
         $!context == Path
             ?? ($!cur-x, $!cur-y)
-            !! (Numeric, Numeric)
+            !! ()
     }
     sub STORE($,  Vector \v) {
         unless $!context == Path && $!cur-x =~= v[0] && $!cur-x =~= v[1] {
@@ -894,7 +894,7 @@ method current-point is rw returns Vector {
     }
     Proxy.new: :&FETCH, :&STORE;
 }
-=para This method is only valid in a path context
+=para This method returns the x,y position of current point in a path context, or an empty list otherwise
 
 #| process operator quarantined by PDF::Grammar::Content / PDF::Native::COS as either an
 #| unknown operator or having an incorrect argument list
