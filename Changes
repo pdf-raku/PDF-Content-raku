@@ -1,9 +1,9 @@
 {{$NEXT}}
 
 0.8.12  2024-12-09T07:07:11+13:00
-    - Tweak current-point() to more faithfully for #28 and also to
-      more faithfully follow the spec. Return and undefined list, if
-      there's no current point, rather than (undef, undef).
+    - Tweak current-point() for #28 and also to more faithfully follow
+      the spec. Return and undefined list, if there's no current point,
+      rather than (undef, undef).
 
 0.8.11  2024-12-06T17:19:32+13:00
     - Handle "\c[HYPHENATION POINT]" characters in input text. They
