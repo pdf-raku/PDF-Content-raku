@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 13;
+plan 14;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -114,7 +114,7 @@ subtest 'overflow', {
         my $width = 200;
         $height = 50;
         $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
-        .text-position = 100, 500;
+        .text-position = 100, 650;
         .say: $text-box;
         is $text-box.lines[0].text, 'Lorem ipsum dolor sit';
         is $text-box.lines[1].text, 'amet, consectetur';
@@ -128,6 +128,29 @@ subtest 'overflow', {
     }
 }
 
+subtest 'zero width spaces', {
+    $gfx.text: {
+        $text = q:to<END>.chomp;
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        END
+        $text ~~ s:g/' '/\c[ZERO WIDTH SPACE]/;
+        my $width = 200;
+        $height = 50;
+        $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
+        .text-position = 100, 500;
+        .say: $text-box;
+        is $text-box.lines[0].text, 'Loremipsumdolorsitamet,';
+        is $text-box.lines[1].text, 'consecteturadipiscingelit,';
+        is-deeply  $text-box.Str.lines, ('Loremipsumdolorsitamet,', 'consecteturadipiscingelit,');
+        todo "fix tests", 2;
+        is-deeply $text-box.overflow.join, qw<do eiusmod tempor incididunt ut labore et dolore magna aliqua.>.join: "\c[ZERO WIDTH SPACE]";
+        $text = '...' ~ $text-box.overflow.join;
+        $text-box .= clone: :$text;
+        .say: $text-box;
+        is $text-box.overflow.join, "magna\c[ZERO WIDTH SPACE]aliqua.";
+        .say: '...' ~ $text-box.overflow.join;
+    }
+}
 
 subtest 'font loading from content stream', {
     if (try require PDF::Font::Loader) === Nil {

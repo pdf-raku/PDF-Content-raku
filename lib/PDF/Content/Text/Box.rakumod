@@ -136,7 +136,7 @@ method content-height returns Numeric { @!lines».height.sum * $.leading; }
 
 my grammar Text {
     token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
-    token space { [\s <!after <nbsp> >]+  }
+    token space { [\s <!after <nbsp> > | "\c[ZERO WIDTH SPACE]"]+ }
     token word  { [ <![ - \c[HYPHENATION POINT] ]> <!before <space>> . ]+ '-'? | <[ - \c[HYPHENATION POINT] ]> }
 }
 
@@ -369,6 +369,7 @@ method !flush-spaces(@words is raw, $i is rw) returns UInt {
             else {
                 $i++;
                 $n = 1 if $!squish;
+                $n = 0 if $_ eq "\c[ZERO WIDTH SPACE]";
             }
         }
     }
