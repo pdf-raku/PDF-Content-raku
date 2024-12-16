@@ -135,9 +135,10 @@ method content-height returns Numeric { @!lines».height.sum * $.leading; }
 =para Calculated from the number of lines in the text box.
 
 my grammar Text {
-    token nbsp  { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
-    token space { [\s <!after <nbsp> > | "\c[ZERO WIDTH SPACE]"]+ }
-    token word  { [ <![ - \c[HYPHENATION POINT] ]> <!before <space>> . ]+ '-'? | <[ - \c[HYPHENATION POINT] ]> }
+    token nbsp   { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
+    token space  { [\s <!after <nbsp> > | "\c[ZERO WIDTH SPACE]"]+ }
+    token hyphen { <[ - \c[HYPHENATION POINT] ]> }
+    token word   { [ <!hyphen> <!space> . ]+ '-'? | <.hyphen> }
 }
 
 #| break a text string into word and whitespace fragments
