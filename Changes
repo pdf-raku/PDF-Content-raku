@@ -1,5 +1,9 @@
 {{$NEXT}}
+
+0.8.13  2024-12-23T07:09:50+13:00
     - Handle zero width spaces.
+    - Accept both \c[HYPEN] and \c[HYPHEN-MINUS] as a continuation
+      hyphen in input text and for font rendering.
 
 0.8.12  2024-12-09T07:07:11+13:00
     - Tweak current-point() for #28 and also to more faithfully follow
