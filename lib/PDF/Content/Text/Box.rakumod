@@ -137,8 +137,8 @@ method content-height returns Numeric { @!lines».height.sum * $.leading; }
 my grammar Text {
     token nbsp   { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
     token space  { [\s <!after <nbsp> > | "\c[ZERO WIDTH SPACE]"]+ }
-    token hyphen { <[ - \c[HYPHENATION POINT] ]> }
-    token word   { [ <!hyphen> <!space> . ]+ '-'? | <.hyphen> }
+    token hyphen { <[ \c[HYPHEN] \c[HYPHEN-MINUS] \c[HYPHENATION POINT] ]> }
+    token word   { [ <!hyphen> <!space> . ]+ <[ \c[HYPHEN] \c[HYPHEN-MINUS] ]>? | <.hyphen> }
 }
 
 #| break a text string into word and whitespace fragments
@@ -221,11 +221,15 @@ method !layup(@atoms is copy) {
     my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;
-    my Numeric $hyphen-width = self!encode('-')[1];
+    my Numeric $hyphen-width;
     my Bool $prev-soft-hyphen;
 
     my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
     @!lines = $line;
+
+    sub hyphen-width {
+        $hyphen-width //= self!encode("\c[HYPHEN]")[1] || self!encode("\c[HYPHEN-MINUS]")[1];
+    }
 
     LAYUP: while $i < $n {
         my subset StrOrImage where Str | PDF::Content::XObject;
@@ -262,12 +266,12 @@ method !layup(@atoms is copy) {
             }
         }
 
-        if $!width {
+        if $!width && !$line-breaks && ($line.encoded || $line.indent) {
             my $test-width = $line.content-width + $word-pad + $word-width;
-            if @atoms[$i] ~~ "\c[HYPHENATION POINT]" {
-                $test-width += $hyphen-width;
-            }
-            $line-breaks ||= ($line.encoded || $line.indent ) && $test-width > $!width
+            $test-width += hyphen-width()
+                if @atoms[$i] ~~ "\c[HYPHENATION POINT]";
+
+            $line-breaks = $test-width > $!width
         }
 
         while $line-breaks-- {
@@ -302,9 +306,8 @@ method !layup(@atoms is copy) {
 
         if $prev-soft-hyphen {
             # Drop soft hyphen when line is continued
-            $line.decoded.pop;
             $line.encoded.pop;
-            $line.word-width -= $hyphen-width;
+            $line.word-width -= hyphen-width();
         }
         $line.spaces[+$line.encoded] = $preceding-spaces;
         $line.decoded.push: $xobject ?? '' !! $atom;
@@ -370,7 +373,7 @@ method !flush-spaces(@words is raw, $i is rw) returns UInt {
             else {
                 $i++;
                 $n = 1 if $!squish;
-                $n = 0 if $_ eq "\c[ZERO WIDTH SPACE]";
+                $n = 0 if .contains("\c[ZERO WIDTH SPACE]");
             }
         }
     }
