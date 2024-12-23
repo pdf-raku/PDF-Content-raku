@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+0.8.14  2024-12-24T07:43:50+13:00
+    - Handle partial and multiple space characters:
+    \c[EN SPACE] \c[EM SPACE] \c[THIN SPACE] \c[HAIR SPACE]
+    \c[THREE-PER-EM SPACE] \c[FOUR-PER-EM SPACE] \c[SIX-PER-EM SPACE]
+
 0.8.13  2024-12-23T07:09:50+13:00
     - Handle zero width spaces.
     - Accept both \c[HYPEN] and \c[HYPHEN-MINUS] as a continuation
