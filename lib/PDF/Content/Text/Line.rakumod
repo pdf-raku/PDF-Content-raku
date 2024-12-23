@@ -154,6 +154,10 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0, :$TextRise = 0.0)
         if @!spaces[$i] -> $spaces {
             my UInt $whole-spaces = $spaces.floor;
             my $part-spaces = $spaces - $whole-spaces;
+            unless $whole-spaces {
+                $whole-spaces++;
+                $part-spaces--;
+            }
             @line.push: $font.encode(Space x $whole-spaces);
             my Int $pad = round($space-pad * $spaces + -1000 * $part-spaces * $!word-gap / $font-size);
             @line.push: $pad
