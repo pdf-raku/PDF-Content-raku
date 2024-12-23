@@ -78,11 +78,11 @@ BT
   -7.18 Ts
   [ 1000 (*** ) -164 (text-indent:-10 ) -164 (justify) ] TJ
   T*
-  [ (*** ) -91 (Lorem ) -91 (ipsum ) -91 (dolor) ] TJ
+  [ (*** ) -92 (Lorem ) -92 (ipsum ) -92 (dolor) ] TJ
   T*
   [ (sit ) -387 (amet, ) -387 (consectetur) ] TJ
   T*
-  [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
+  [ (adipiscing ) -147 (elit, ) -147 (sed ) -147 (do) ] TJ
   T*
   (eiusmod tempor) Tj
   T*
@@ -220,7 +220,7 @@ BT
   T*
   [ (amet, ) -2052 (consectetur) ] TJ
   T*
-  [ (adipiscing ) -146 (elit, ) -146 (sed ) -146 (do) ] TJ
+  [ (adipiscing ) -147 (elit, ) -147 (sed ) -147 (do) ] TJ
   T*
   (eiusmod tempor) Tj
   T*

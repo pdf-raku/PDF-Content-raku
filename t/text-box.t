@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 14;
+plan 15;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -149,6 +149,17 @@ subtest 'zero width spaces', {
         .say: $text-box;
         is $text-box.overflow.join, "magna\c[ZERO WIDTH SPACE]aliqua.";
         .say: '...' ~ $text-box.overflow.join;
+    }
+}
+
+subtest 'variable spaces', {
+    $gfx.text: {
+        $text = "Spaces:en-space\c[EN SPACE]space tab\tem-space\c[EM SPACE]em-quad\c[EM QUAD]three\c[THREE-PER-EM SPACE]four\c[FOUR-PER-EM SPACE]six\c[SIX-PER-EM SPACE]thin\c[THIN SPACE]hair\c[HAIR SPACE]zero\c[ZERO WIDTH SPACE]. " x 2;
+        my $width = 400;
+        $height = 100;
+        $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
+        .text-position = 100, 250;
+        .say: $text-box;
     }
 }
 

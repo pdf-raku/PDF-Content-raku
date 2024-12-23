@@ -49,7 +49,7 @@ has Numeric $.word-width is rw = 0;
 has Numeric $.word-gap is rw = 0;
 has Numeric $.indent is rw = 0;
 has Numeric $.align = 0;
-has UInt @.spaces;
+has Numeric @.spaces;
 
 method content-width returns Numeric {
     $!indent  +  $!word-width  +  @!spaces.sum * $!word-gap;
@@ -153,9 +153,12 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0, :$TextRise = 0.0)
     for ^+@!encoded -> $i {
         my $spaces := @!spaces[$i];
         if $spaces {
-            @line.push: $font.encode(Space x $spaces);
-            @line.push: $space-pad * $spaces
-                unless $space-pad =~= 0;
+            my UInt $whole-spaces = $spaces.floor;
+            my $part-spaces = $spaces - $whole-spaces;
+            @line.push: $font.encode(Space x $whole-spaces);
+            my Int $pad = round($space-pad * $spaces + -1000 * $part-spaces * $!word-gap / $font-size);
+            @line.push: $pad
+                if $pad;
         }
         @line.append: @!encoded[$i].list;
     }

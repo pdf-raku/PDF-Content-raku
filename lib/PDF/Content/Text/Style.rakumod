@@ -70,19 +70,19 @@ multi method baseline-shift(Baseline $_ --> Numeric) {
 #| get/set a numeric font vertical alignment offset
 multi method baseline-shift is rw { $!TextRise }
 
+method scale($v) { $v * $!font-size / $!units-per-EM; }
+
 #| return the scaled width of spaces
-method space-width {
-    $!space-width * $!font-size / $!units-per-EM;
-}
+method space-width { self.scale: $!space-width; }
 
 #| return the scaled underline position
 method underline-position {
-    ($!font.underline-position // -100) * $!font-size / $!units-per-EM;
+    self.scale: ($!font.underline-position // -100)
 }
 
 #| return the scaled underline thickness
 method underline-thickness {
-    ($!font.underline-thickness // 50) * $!font-size / $!units-per-EM;
+    self.scale: ($!font.underline-thickness // 50)
 }
 
 #| return the scaled font height

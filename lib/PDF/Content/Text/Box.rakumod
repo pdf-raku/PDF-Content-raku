@@ -136,7 +136,7 @@ method content-height returns Numeric { @!lines».height.sum * $.leading; }
 
 my grammar Text {
     token nbsp   { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
-    token space  { [\s <!after <nbsp> > | "\c[ZERO WIDTH SPACE]"]+ }
+    token space  { [\s <!after <nbsp> > | \c[ZERO WIDTH SPACE] ]+ }
     token hyphen { <[ \c[HYPHEN] \c[HYPHEN-MINUS] \c[HYPHENATION POINT] ]> }
     token word   { [ <!hyphen> <!space> . ]+ <[ \c[HYPHEN] \c[HYPHEN-MINUS] ]>? | <.hyphen> }
 }
@@ -218,7 +218,8 @@ method !layup(@atoms is copy) {
     my Int $i = 0;
     my Int $line-start = 0;
     my Int $n = +@atoms;
-    my UInt $preceding-spaces = self!flush-spaces: @atoms, $i;
+    my $em-spaces = self!word-gap($!style.scale: 1000) / self!word-gap;
+    my Numeric $preceding-spaces = self!flush-spaces: $em-spaces, @atoms, $i;
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;
     my Numeric $hyphen-width;
@@ -317,7 +318,7 @@ method !layup(@atoms is copy) {
             if $height > $line.height;
 
         $prev-soft-hyphen = $soft-hyphen;
-        $preceding-spaces = self!flush-spaces(@atoms, $i);
+        $preceding-spaces = self!flush-spaces($em-spaces, @atoms, $i);
     }
 
     if $preceding-spaces {
@@ -360,20 +361,31 @@ method !height-exceeded {
     $!height && self.content-height > $!height;
 }
 
-method !flush-spaces(@words is raw, $i is rw) returns UInt {
+my constant %SpaceWidth = %(
+    "\c[EN SPACE]"  => .5,
+    "\c[EM SPACE]"  => 1,
+    "\c[THREE-PER-EM SPACE]" => 3,
+    "\c[FOUR-PER-EM SPACE]" => 4,
+    "\c[SIX-PER-EM SPACE]" => 6,
+    "\c[THIN SPACE]" => .2,
+    "\c[HAIR SPACE]" => .1,
+    "\c[ZERO WIDTH SPACE]" => 0,
+);
+
+method !flush-spaces($em-spaces is rw, @words is raw, $i is rw) returns Numeric:D {
     my $n = 0; # space count for padding purposes
     with  @words[$i] {
         when /<Text::space>/ {
-            $n = .chars;
             if $!verbatim && (my $last-nl = .rindex("\n")).defined {
                 # count spaces after last new-line
-                $n -= $last-nl + 1;
-                $n = 0 if $!squish;
+                $n = .substr($last-nl+1).comb.map({do with %SpaceWidth{$_} { $_ * $em-spaces } // 1}).sum
+                    unless $!squish;
             }
             else {
                 $i++;
-                $n = 1 if $!squish;
-                $n = 0 if .contains("\c[ZERO WIDTH SPACE]");
+                $n = .comb.map({do with %SpaceWidth{$_} { $_ * $em-spaces } // 1}).sum;
+                $n = 1 if $n > 1 && $!squish;
+dd [.uniname, :$n, :$i];
             }
         }
     }
@@ -381,8 +393,8 @@ method !flush-spaces(@words is raw, $i is rw) returns UInt {
 }
 
 # calculates actual spacing between words
-method !word-gap returns Numeric {
-    my $word-gap = $.space-width + $.WordSpacing + $.CharSpacing;
+method !word-gap($space = $.space-width) returns Numeric {
+    my $word-gap = $space + $.WordSpacing + $.CharSpacing;
     $word-gap * $.HorizScaling / 100;
 }
 
