@@ -385,7 +385,6 @@ method !flush-spaces($em-spaces is rw, @words is raw, $i is rw) returns Numeric:
                 $i++;
                 $n = .comb.map({do with %SpaceWidth{$_} { $_ * $em-spaces } // 1}).sum;
                 $n = 1 if $n > 1 && $!squish;
-dd [.uniname, :$n, :$i];
             }
         }
     }

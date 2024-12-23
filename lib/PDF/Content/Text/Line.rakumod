@@ -151,8 +151,7 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0, :$TextRise = 0.0)
     # flatten words. insert spaces and space adjustments.
     # Ensure we add spaces - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
     for ^+@!encoded -> $i {
-        my $spaces := @!spaces[$i];
-        if $spaces {
+        if @!spaces[$i] -> $spaces {
             my UInt $whole-spaces = $spaces.floor;
             my $part-spaces = $spaces - $whole-spaces;
             @line.push: $font.encode(Space x $whole-spaces);
