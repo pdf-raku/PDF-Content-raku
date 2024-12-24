@@ -184,36 +184,6 @@ multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
     self!layup: @chunks;
 }
 
-method !encode(Str:D $atom) {
-    my List $encoded;
-    my Numeric $width;
-    my Bool $shape := $!style.shape;
-    my Bool $kern = $!style.kern;
-    $kern //= True if $shape;
-    if $shape || $.script || $.lang {
-        given $.font.shape($atom, :$kern, :$.script, :$.lang) {
-            $encoded := .[0];
-            $width = .[1];
-        }
-    }
-    elsif $kern {
-        given $.font.kern($atom) {
-            $encoded := .List given .[0].list.map: {
-                .does(Numeric) ?? -$_ !! $.font.encode($_);
-            }
-            $width = .[1];
-        }
-    }
-    else {
-        $encoded := ( $.font.encode($atom), );
-        $width = $.font.stringwidth($atom);
-    }
-    $width *= $!style.font-size * $.HorizScaling / 100000;
-    $width += ($atom.chars - 1) * $.CharSpacing
-        if $.CharSpacing > -$!style.font-size;
-    ($encoded, $width);
-}
-
 method !layup(@atoms is copy) {
     my Int $i = 0;
     my Int $line-start = 0;
@@ -222,15 +192,10 @@ method !layup(@atoms is copy) {
     my Numeric $preceding-spaces = self!flush-spaces: $em-spaces, @atoms, $i;
     my $word-gap := self!word-gap;
     my $height := $!style.font-size;
-    my Numeric $hyphen-width;
     my Bool $prev-soft-hyphen;
 
     my PDF::Content::Text::Line $line .= new: :$word-gap, :$height, :$!indent;
     @!lines = $line;
-
-    sub hyphen-width {
-        $hyphen-width //= self!encode("\c[HYPHEN]")[1] || self!encode("\c[HYPHEN-MINUS]")[1];
-    }
 
     LAYUP: while $i < $n {
         my subset StrOrImage where Str | PDF::Content::XObject;
@@ -244,21 +209,24 @@ method !layup(@atoms is copy) {
 
         given $atom {
             when Str {
+                my $enc;
                 if $atom eq "\c[HYPHENATION POINT]" {
-                    $atom = '-';
+                    $atom = $!style.hyphen;
+                    $enc  = $!style.hyphen-encoding;
+                    $word-width = $!style.hyphen-width;
                     $soft-hyphen = True;
                 }
-                elsif $!verbatim && +.match("\n", :g) -> UInt $nl {
-                    # todo: handle tabs
-                    $line-breaks = $nl;
-                    $atom = ' ' x $preceding-spaces;
-                    $word-pad = 0;
+                else {
+                    if $!verbatim && +.match("\n", :g) -> UInt $nl {
+                        # todo: handle tabs
+                        $line-breaks = $nl;
+                        $atom = ' ' x $preceding-spaces;
+                        $word-pad = 0;
+                    }
+                    $enc = $!style.encode: $atom;
                 }
-
-                given self!encode($atom) {
-                    $word = .[0];
-                    $word-width = .[1];
-                }
+                $word = $enc[0];
+                $word-width = $enc[1];
             }
             when PDF::Content::XObject {
                 $xobject = True;
@@ -269,7 +237,7 @@ method !layup(@atoms is copy) {
 
         if $!width && !$line-breaks && ($line.encoded || $line.indent) {
             my $test-width = $line.content-width + $word-pad + $word-width;
-            $test-width += hyphen-width()
+            $test-width += $!style.hyphen-width
                 if @atoms[$i] ~~ "\c[HYPHENATION POINT]";
 
             $line-breaks = $test-width > $!width
@@ -308,7 +276,7 @@ method !layup(@atoms is copy) {
         if $prev-soft-hyphen {
             # Drop soft hyphen when line is continued
             $line.encoded.pop;
-            $line.word-width -= hyphen-width();
+            $line.word-width -= $!style.hyphen-width;
         }
         $line.spaces[+$line.encoded] = $preceding-spaces;
         $line.decoded.push: $xobject ?? '' !! $atom;

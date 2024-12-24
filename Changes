@@ -1,4 +1,6 @@
 {{$NEXT}}
+    - Delegate font encoding and hyphen processing from
+      text boxes to text style.
 
 0.8.14  2024-12-24T07:43:50+13:00
     - Handle partial and multiple space characters:
