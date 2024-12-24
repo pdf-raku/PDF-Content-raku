@@ -213,7 +213,6 @@ method !layup(@atoms is copy) {
                 if $atom eq "\c[HYPHENATION POINT]" {
                     $atom = $!style.hyphen;
                     $enc  = $!style.hyphen-encoding;
-                    $word-width = $!style.hyphen-width;
                     $soft-hyphen = True;
                 }
                 else {

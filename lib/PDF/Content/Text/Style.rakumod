@@ -95,14 +95,14 @@ method font-height(|c) {
 method encode(Str:D $atom) {
     my List $encoded;
     my Numeric $width;
-    if $.shape || $.script || $.lang {
-        my Bool $kern = $.kern || $.shape;
-        given $!font.shape($atom, :$kern, :$.script, :$.lang) {
+    if $!shape || $!script || $!lang {
+        my Bool $kern = $!kern || $!shape;
+        given $!font.shape($atom, :$kern, :$!script, :$!lang) {
             $encoded := .[0];
             $width = .[1];
         }
     }
-    elsif $.kern {
+    elsif $!kern {
         given $!font.kern($atom) {
             $encoded := .List given .[0].list.map: {
                 .does(Numeric) ?? -$_ !! $!font.encode($_);
@@ -114,8 +114,8 @@ method encode(Str:D $atom) {
         $encoded := ( $!font.encode($atom), );
         $width = $!font.stringwidth($atom);
     }
-    $width *= $!font-size * $.HorizScaling / 100000;
-    $width += ($atom.chars - 1) * $.CharSpacing
+    $width *= $!font-size * $!HorizScaling / 100000;
+    $width += ($atom.chars - 1) * $!CharSpacing
         if $.CharSpacing > -$!font-size;
     ($encoded, $width);
 }
