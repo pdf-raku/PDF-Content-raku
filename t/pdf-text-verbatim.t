@@ -23,11 +23,11 @@ my $x = 110;
 $gfx.BeginText;
 $gfx.set-font( $font, 10);
 
-my $sample = q:to"--ENOUGH!!--";
+my $sample = qq:to"--ENOUGH!!--";
 First   Line
   Line2, leading spaces
 Wrapping text follows...
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+Lorem ipsum dolor\c[EM SPACE]sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
 last line
 --ENOUGH!!--
 

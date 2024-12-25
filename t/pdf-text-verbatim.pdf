@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 6114 >> stream
+<< /Length 6148 >> stream
 BT
   /F1 10 Tf
   1 0 0 1 110 700 Tm
@@ -37,7 +37,7 @@ BT
   T*
   (follows... Lorem ipsum) Tj
   T*
-  (dolor sit amet,) Tj
+  [ (dolor   ) -166 (sit amet,) ] TJ
   T*
   (consectetur adipiscing) Tj
   T*
@@ -58,7 +58,7 @@ BT
   T*
   [ 4974 (follows... Lorem ipsum) ] TJ
   T*
-  [ 3140 (dolor sit amet,) ] TJ
+  [ 3501 (dolor   ) -166 (sit amet,) ] TJ
   T*
   [ 4947 (consectetur adipiscing) ] TJ
   T*
@@ -79,7 +79,7 @@ BT
   T*
   [ 9947 (follows... Lorem ipsum) ] TJ
   T*
-  [ 6280 (dolor sit amet,) ] TJ
+  [ 7002 (dolor   ) -166 (sit amet,) ] TJ
   T*
   [ 9893 (consectetur adipiscing) ] TJ
   T*
@@ -100,7 +100,7 @@ BT
   T*
   [ (follows... ) -26 (Lorem ) -26 (ipsum) ] TJ
   T*
-  [ (dolor ) -1860 (sit ) -1860 (amet,) ] TJ
+  [ (dolor   ) -2901 (sit ) -652 (amet,) ] TJ
   T*
   [ (consectetur ) -107 (adipiscing) ] TJ
   T*
@@ -207,9 +207,9 @@ BT
   T*
   (follows...) Tj
   T*
-  (Lorem ipsum dolor sit) Tj
+  (Lorem ipsum dolor) Tj
   T*
-  (amet, consectetur) Tj
+  (sit amet, consectetur) Tj
   T*
   0 Ts
   1 0 0 1 360 575 Tm
@@ -228,9 +228,9 @@ BT
   T*
   [ 1945 (follows...) ] TJ
   T*
-  [ 4779 (Lorem ipsum dolor sit) ] TJ
+  [ 4140 (Lorem ipsum dolor) ] TJ
   T*
-  [ 3974 (amet, consectetur) ] TJ
+  [ 4613 (sit amet, consectetur) ] TJ
   T*
   0 Ts
   1 0 0 1 360 450 Tm
@@ -249,9 +249,9 @@ BT
   T*
   [ 3890 (follows...) ] TJ
   T*
-  [ 9558 (Lorem ipsum dolor sit) ] TJ
+  [ 8280 (Lorem ipsum dolor) ] TJ
   T*
-  [ 7948 (amet, consectetur) ] TJ
+  [ 9226 (sit amet, consectetur) ] TJ
   T*
   0 Ts
   1 0 0 1 360 325 Tm
@@ -270,9 +270,9 @@ BT
   T*
   (follows...) Tj
   T*
-  [ (Lorem ) -147 (ipsum ) -147 (dolor ) -147 (sit) ] TJ
+  [ (Lorem ) -860 (ipsum ) -860 (dolor) ] TJ
   T*
-  [ (amet, ) -2052 (consectetur) ] TJ
+  [ (sit ) -387 (amet, ) -387 (consectetur) ] TJ
   T*
   0 Ts
   1 0 0 1 485 700 Tm
@@ -379,9 +379,9 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000264 00000 n 
-0000006431 00000 n 
+0000006465 00000 n 
 trailer
 << /ID [ (t/pdf-text-verba) (t/pdf-text-verba) ] /Root 1 0 R /Size 6 >>
 startxref
-6537
+6571
 %%EOF

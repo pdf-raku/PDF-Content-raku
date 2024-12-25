@@ -152,12 +152,8 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0, :$TextRise = 0.0)
     # Ensure we add spaces - as recommended in [PDF-32000 14.8.2.5 - Identifying Word Breaks]
     for ^+@!encoded -> $i {
         if @!spaces[$i] -> $spaces {
-            my UInt $whole-spaces = $spaces.floor;
+            my UInt $whole-spaces = $spaces.floor || 1;
             my $part-spaces = $spaces - $whole-spaces;
-            unless $whole-spaces {
-                $whole-spaces++;
-                $part-spaces--;
-            }
             @line.push: $font.encode(Space x $whole-spaces);
             my Int $pad = round($space-pad * $spaces + -1000 * $part-spaces * $!word-gap / $font-size);
             @line.push: $pad
