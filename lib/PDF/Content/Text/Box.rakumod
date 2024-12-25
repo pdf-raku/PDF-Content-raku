@@ -384,7 +384,6 @@ method render(
     --> List
     ) {
     my %saved;
-    my Bool $gsave;
 
     for :$.CharSpacing, :$.HorizScaling, :$.TextRise, :$.TextRender {
         my $gval = $gfx."{.key}"();
