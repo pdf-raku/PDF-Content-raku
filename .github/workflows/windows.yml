@@ -25,7 +25,4 @@ jobs:
       - name: Install Dependencies
         run: zef install --/test --test-depends --deps-only .
       - name: Run Tests
-        run: |
-            raku -I. t/1-basic.t
-            raku -I. t/2-module-list.t
-            raku -I. t/3-os-info.t
+        run: zef --verbose test .
