@@ -47,7 +47,6 @@ use PDF::Content::Font;
 use PDF::Content::Font::CoreFont;
 use PDF::Content::FontObj;
 use X::PDF::Content;
-use are;
 
 has Str $.actual-text is rw;
 
@@ -56,7 +55,7 @@ my subset Valign of Str where 'top'  | 'center' | 'bottom';
 my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
 my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
 my subset Position of List where { .elems <= 2 }
-my subset Vector of Position  where { .&are ~~ Numeric }
+my subset Vector of Position  where { .are ~~ Numeric }
 
 #| Add a graphics block
 method graphics( &meth! ) {
