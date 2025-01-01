@@ -244,30 +244,20 @@ method use-pattern(Pattern $pat!) {
     :Pattern(self.resource-key($pat));
 }
 
-#| fill and stroke the current path
-multi method paint(
-    Bool :$fill,  Bool :$even-odd,
-    Bool :$close, Bool :$stroke,
-) {
-    my @paint-ops = do {
-        if $fill {
-            if $even-odd {
-                if $close { $stroke ?? <CloseEOFillStroke> !! <ClosePath EOFill> }
-                else      { $stroke ?? <EOFillStroke>      !! <EOFill>       }
-            }
-            else {
-                if $close { $stroke ?? <CloseFillStroke>   !! <ClosePath Fill>   }
-                else      { $stroke ?? <FillStroke>        !! <Fill>         }
-            }
-        }
-        else {
-            if $stroke    { $close ?? <CloseStroke> !! <Stroke> }
-            else          { <EndPath> }
-        }
-    }
-
-    self."$_"()
-        for @paint-ops;
+multi sub paint-ops(:fill($)! where .so, :even-odd($)! where .so, :$close , :$stroke) {
+    $close
+        ?? ($stroke ?? <CloseEOFillStroke> !! <ClosePath EOFill>)
+        !! ($stroke ?? <EOFillStroke>      !! <EOFill>);
+}
+multi sub paint-ops(:fill($)! where .so, :$close, :$stroke) {
+    $close
+        ?? ($stroke ?? <CloseFillStroke>   !! <ClosePath Fill>)
+        !! ($stroke ?? <FillStroke>        !! <Fill>);
+}
+multi sub paint-ops(:$close , :$stroke) {
+    $stroke
+        ?? ( $close ?? <CloseStroke> !! <Stroke> )
+        !! <EndPath>
 }
 
 #| build a path, then fill and stroke it
@@ -277,6 +267,11 @@ multi method paint(&meth, *%o) {
     my \rv = self.paint: |%o;
     self.Restore;
     rv;
+}
+
+multi method paint(|c) {
+    self."$_"()
+        for paint-ops |c;
 }
 
 my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
