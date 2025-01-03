@@ -170,7 +170,7 @@ method content(:$font!, Numeric :$font-size!, :$space-pad = 0, :$TextRise = 0.0)
 
 method text is also<Str> {
     join '', @!decoded.kv.map: -> $i, $w {
-        ((' ' x @!spaces[$i]).Slip, $w)
+        (' ' x @!spaces[$i].round) ~ $w
     }
 }
 
