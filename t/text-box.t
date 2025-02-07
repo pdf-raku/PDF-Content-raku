@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 15;
+plan 18;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -78,8 +78,14 @@ given $text-box.content-width {
     ok $_ <= 250, '$.clone content-width'
         or diag "content-width: $_ !<= 250"
 }
-is-approx $text-box.height, 35.2;
+is-approx $text-box.height, 35.2, 'text-box height';
 is +$text-box.lines, 2, '$.clone with width constraint';
+given $text-box.lines[1] -> $line {
+    is-approx $line.height, 16, 'first line height';
+    is-approx $text-box.height, 35.2, 'text-box height';
+    $line.height -= 2;
+    is-approx $text-box.height, 33, 'text-box height - adjusted';
+}
 
 subtest 'text updated', {
     $text-box.text = 'Hello!';

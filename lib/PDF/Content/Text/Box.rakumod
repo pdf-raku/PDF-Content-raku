@@ -149,7 +149,7 @@ method comb(Str $_ --> Seq) {
 #| clone a text box
 method clone(::?CLASS:D: :$text = $!text ~ @!overflow.join, |c --> ::?CLASS:D) {
     given callwith(|c) {
-        .TWEAK: :$text;
+        .TWEAK: :$text, |c;
         $_;
     }
 }
@@ -308,8 +308,11 @@ method !layup(@atoms is copy) {
                 !! FRIBIDI_PAR_LTR;
             my $bidi-lines = ::('Text::FriBidi::Lines').new: :@lines, :$direction;
             my Str() $text = $bidi-lines;
+            dd :@lines;
+            dd :$text;
             my ::?CLASS:D $proxy = self.clone: :$text, :verbatim;
             @!lines = $proxy.lines;
+            dd :@lines;
         }
         else {
             warn "Text::FriBidi v0.0.4+ is required for :bidi processing";
@@ -414,7 +417,8 @@ method render(
         # work out and move to the text starting position
         my $y-pad = self!dy * ($.height - $.content-height);
         my $tx := $x-shift + $gfx.tf-x;
-        my $ty := $y-shift + $tf-y - $y-pad;
+        my $ty = $y-shift + $tf-y - $y-pad;
+        $ty -= .height - $.font-size with @!lines.head;
         @content.push( OpCode::TextMove => [$tx, $ty] )
             unless $x-shift =~= 0 && $ty =~= 0.0;
         # offset text positions of images content

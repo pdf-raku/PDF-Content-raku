@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 64;
+plan 65;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -128,6 +128,7 @@ my PDFTiny $pdf1 .= new;
 my PDFTiny $pdf2 .= new;
 
 my $tr1 = $pdf1.core-font('times-roman');
+is $pdf1.Pages.resource-key($tr.to-dict), 'F1';
 my $tr2 = $pdf2.core-font('times-roman');
 is $tr1.font-name, 'Times-Roman';
 ok $tr1 === $pdf1.core-font('times-roman'), 'PDF font caching';
