@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.8.16  2025-02-08T08:45:59+13:00
+    - Fix text-box rendering bug with changing the height of
+      the first line.
+
 0.8.15  2024-12-25T07:56:04+13:00
     - Delegate font encoding and hyphen processing from
       text box to text style.
