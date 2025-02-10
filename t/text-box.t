@@ -176,8 +176,9 @@ subtest 'text box padding', {
     is $text-box.height, $height;
     is-deeply $text-box.pad-left, 0;
     is-deeply $text-box.pad-bottom, 2;
-    is-deeply $text-box.bbox, [0, -2, 250, $height];
-    $text-box.bbox = [-2, 1, 253, $height + 4];
+    is-deeply $text-box.bbox, (0, -2, 250, $height);
+    is-deeply $text-box.bbox(1,2), (1, 0, 251, $height+2);
+    $text-box.bbox = (-2, 1, 253, $height + 4);
     is-deeply $text-box.pad-left, 2;
     is-deeply $text-box.pad-bottom, -1;
     is-deeply $text-box.pad-right, 3;

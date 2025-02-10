@@ -409,11 +409,8 @@ multi method print(PDF::Content::Text::Box $text-box,
 
     my \x0 = $x + $dx;
     my \y0 = $y + $dy + $text-box.TextRise;
-    my \x1 = x0 + $text-box.width;
-    my \y1 = y0 + $text-box.height;
 
-    (x0 - $text-box.pad-left,  y0 - $text-box.pad-bottom,
-     x1 + $text-box.pad-right, y1 + $text-box.pad-top);
+    $text-box.bbox(x0, y0);
 }
 
 #| output text; move the text position down one line

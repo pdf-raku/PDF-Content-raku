@@ -393,9 +393,10 @@ method height returns Numeric { $!height || self.content-height }
 method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
 method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
 
-method bbox is rw {
+#| bounding box from the origin
+multi method bbox is rw {
     sub FETCH($_) {
-        [-$!pad-left, -$!pad-bottom, self.width + $!pad-right, self.height + $!pad-top]
+        (-$!pad-left, -$!pad-bottom, self.width + $!pad-right, self.height + $!pad-top)
     }
     sub STORE($, @bbox where .elems >= 4) {
         $!pad-left   = -@bbox[0];
@@ -404,6 +405,12 @@ method bbox is rw {
         $!pad-top    =  @bbox[3] - self.height;
     }
     Proxy.new: :&FETCH, :&STORE;
+}
+
+#| bounding box from a fixed point
+multi method bbox(Numeric:D $x, Numeric:D $y) {
+    ($x - $!pad-left, $y - $!pad-bottom,
+     $x + self.width + $!pad-right, $y + self.height + $!pad-top)
 }
 
 #| render a text box to a content stream at current or given text position
