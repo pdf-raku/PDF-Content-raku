@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 10233 >> stream
+<< /Length 10321 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -81,6 +81,7 @@ q
   EMC
   BT
     1 0 0 1 50 600 Tm
+    -5 0 Td
     (*** pad-top:0 pad-left:-) Tj
     T*
     (5 *** Lorem ipsum) Tj
@@ -101,7 +102,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      50 522 100 88 re
+      50 522 95 88 re
       S
     Q
   EMC
@@ -121,6 +122,7 @@ q
   EMC
   BT
     1 0 0 1 50 500 Tm
+    5 0 Td
     (*** pad-top:0 pad-) Tj
     T*
     (left:5 *** Lorem ipsum) Tj
@@ -141,7 +143,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      50 422 100 88 re
+      50 422 105 88 re
       S
     Q
   EMC
@@ -161,6 +163,7 @@ q
   EMC
   BT
     1 0 0 1 175 700 Tm
+    0 5 Td
     (*** pad-top:-5 pad-) Tj
     T*
     (left:0 *** Lorem ipsum) Tj
@@ -181,7 +184,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 622 100 88 re
+      175 627 100 83 re
       S
     Q
   EMC
@@ -201,6 +204,7 @@ q
   EMC
   BT
     1 0 0 1 175 600 Tm
+    -5 5 Td
     (*** pad-top:-5 pad-) Tj
     T*
     (left:-5 *** Lorem) Tj
@@ -221,7 +225,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 522 100 88 re
+      175 527 95 83 re
       S
     Q
   EMC
@@ -241,6 +245,7 @@ q
   EMC
   BT
     1 0 0 1 175 500 Tm
+    5 5 Td
     (*** pad-top:-5 pad-) Tj
     T*
     (left:5 *** Lorem ipsum) Tj
@@ -261,7 +266,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 422 100 88 re
+      175 427 105 83 re
       S
     Q
   EMC
@@ -281,6 +286,7 @@ q
   EMC
   BT
     1 0 0 1 300 700 Tm
+    0 -5 Td
     (*** pad-top:5 pad-) Tj
     T*
     (left:0 *** Lorem ipsum) Tj
@@ -301,7 +307,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 622 100 88 re
+      300 617 100 93 re
       S
     Q
   EMC
@@ -321,6 +327,7 @@ q
   EMC
   BT
     1 0 0 1 300 600 Tm
+    -5 -5 Td
     (*** pad-top:5 pad-left:-) Tj
     T*
     (5 *** Lorem ipsum) Tj
@@ -341,7 +348,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 522 100 88 re
+      300 517 95 93 re
       S
     Q
   EMC
@@ -361,6 +368,7 @@ q
   EMC
   BT
     1 0 0 1 300 500 Tm
+    5 -5 Td
     (*** pad-top:5 pad-) Tj
     T*
     (left:5 *** Lorem ipsum) Tj
@@ -381,7 +389,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 422 100 88 re
+      300 417 105 93 re
       S
     Q
   EMC
@@ -461,7 +469,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      50 172 100 88 re
+      50 172 95 88 re
       S
     Q
   EMC
@@ -501,7 +509,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      50 72 100 88 re
+      50 72 105 88 re
       S
     Q
   EMC
@@ -541,7 +549,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 272 100 88 re
+      175 277 100 83 re
       S
     Q
   EMC
@@ -581,7 +589,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 172 100 88 re
+      175 177 95 83 re
       S
     Q
   EMC
@@ -621,7 +629,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 72 100 88 re
+      175 77 105 83 re
       S
     Q
   EMC
@@ -661,7 +669,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 272 100 88 re
+      300 267 100 93 re
       S
     Q
   EMC
@@ -701,7 +709,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 172 100 88 re
+      300 167 95 93 re
       S
     Q
   EMC
@@ -741,7 +749,7 @@ q
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 72 100 88 re
+      300 67 105 93 re
       S
     Q
   EMC
@@ -773,11 +781,11 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000303 00000 n 
-0000010590 00000 n 
-0000010637 00000 n 
-0000010685 00000 n 
+0000010678 00000 n 
+0000010725 00000 n 
+0000010773 00000 n 
 trailer
 << /ID [ (t/pdf-text-pad.t) (t/pdf-text-pad.t) ] /Root 1 0 R /Size 8 >>
 startxref
-10791
+10879
 %%EOF

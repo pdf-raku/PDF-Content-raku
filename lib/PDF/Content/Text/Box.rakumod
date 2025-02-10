@@ -434,19 +434,22 @@ method render(
     @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join(' ').subst(/(<-[\0..\xFF]>)/, { '\u%04d'.sprintf($0.ord)}, :g)
         if $gfx.comment;
 
+    my @bbox := @.bbox;
+    my $width  := @bbox[2] - @bbox[0];
+    my $height := @bbox[3] - @bbox[1];
     my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
-    my Numeric:D $top-pad := self!dy * ($.height - $.content-height);
-    my Numeric:D $y-shift := $top ?? - $top-pad !! self!dy * ($.height - $lh * $.leading);
-    my $tf-y = $gfx.tf-y;
+    my Numeric:D $y-start := self!dy * ($height - $lh * $.leading);
+    my Numeric:D $y-end   := self!dy * ($.content-height - $height);
+    my Numeric:D $y-shift := $top ?? $y-end + $!pad-bottom !! $y-start - $!pad-top;
     my Numeric:D $dx := self!dx * $.width;
-    my $x-shift = $left ?? $dx !! 0.0;
+    my $x-shift = $left ?? $dx - $!pad-right !! $!pad-left;
     my $leading = $gfx.TextLeading;
-    my Numeric \scale = -1000 / $.font-size;
+    my $tf-y = $gfx.tf-y;
 
     {
         # work out and move to the text starting position
         my $tx := $x-shift + $gfx.tf-x;
-        my $ty = $y-shift + $tf-y - $top-pad;
+        my $ty = $y-shift  + $gfx.tf-y + $y-end;
         $ty += $.font-size - $lh if @!lines;
         @content.push( OpCode::TextMove => [$tx, $ty] )
             unless $x-shift =~= 0 && $ty =~= 0.0;
@@ -459,6 +462,7 @@ method render(
         }
     }
 
+    my Numeric \scale = -1000 / $.font-size;
     for @!lines.pairs {
         my \line = .value;
 
