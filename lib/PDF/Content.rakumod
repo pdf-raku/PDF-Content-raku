@@ -412,8 +412,7 @@ multi method print(PDF::Content::Text::Box $text-box,
     my \x1 = x0 + $text-box.width;
     my \y1 = y0 + $text-box.height;
 
-    (x0 - $text-box.border-left,   y0 - $text-box.border-bottom,
-     x1 + $text-box.border-right,  y1 + $text-box.border-top);
+    (x0, y0, x1, y1);
 }
 
 #| output text; move the text position down one line

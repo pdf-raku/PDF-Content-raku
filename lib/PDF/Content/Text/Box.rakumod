@@ -111,10 +111,6 @@ has Bool $.squish = False;
 has Bool $.verbatim;
 has Bool $.bidi;
 has Numeric $.max-word-gap;
-has Numeric $.border-left   is rw;
-has Numeric $.border-bottom is rw;
-has Numeric $.border-top    is rw;
-has Numeric $.border-right  is rw;
 
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
@@ -168,11 +164,7 @@ method text(::?CLASS:D $obj:) is rw {
     );
 }
 
-method !build-style(
-    :$baseline = $!valign // 'alphabetic',
-    Numeric :$border = 0,
-    :@bbox,
-    |c) is hidden-from-backtrace  {
+method !build-style(:$baseline = $!valign // 'alphabetic', |c) {
     $_ .= new(:$baseline, |c) without $!style;
     given $!align {
         when 'start' { $_ = $.direction eq 'ltr' ?? 'left' !! 'right' }
@@ -180,11 +172,6 @@ method !build-style(
     }
     $!valign //= 'top';
     $!max-word-gap //= 10 * self!word-gap;
-    $!border-left   //= $border;
-    $!border-bottom //= $border;
-    $!border-right  //= $border;
-    $!border-top    //= $border;
-    self.bbox = @bbox if @bbox;
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
@@ -321,8 +308,11 @@ method !layup(@atoms is copy) {
                 !! FRIBIDI_PAR_LTR;
             my $bidi-lines = ::('Text::FriBidi::Lines').new: :@lines, :$direction;
             my Str() $text = $bidi-lines;
+            dd :@lines;
+            dd :$text;
             my ::?CLASS:D $proxy = self.clone: :$text, :verbatim;
             @!lines = $proxy.lines;
+            dd :@lines;
         }
         else {
             warn "Text::FriBidi v0.0.4+ is required for :bidi processing";
@@ -385,19 +375,6 @@ method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
 method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
 method !top-offset {
     self!dy * ($.height - $.content-height);
-}
-
-method bbox is rw {
-    sub FETCH($_) {
-        [-$!border-left, -$!border-bottom, self.width + $!border-right, self.height + $!border-top]
-    }
-    sub STORE($, @bbox where .elems >= 4) {
-        $!border-left   = -@bbox[0];
-        $!border-bottom = -@bbox[1];
-        $!border-right  =  @bbox[2] - self.width;
-        $!border-top    =  @bbox[3] - self.height;
-    }
-    Proxy.new: :&FETCH, :&STORE;
 }
 
 #| render a text box to a content stream at current or given text position
@@ -490,8 +467,7 @@ method render(
     # restore original graphics values
     $gfx."{.key}"() = .value for %saved.pairs;
 
-    ($x-shift - $dx,
-     $y-shift - $.height + $h + $tf-y);
+    ($x-shift - $dx, $y-shift - $.height + $h + $tf-y);
 }
 
 #| flow any xobject images. This needs to be done
