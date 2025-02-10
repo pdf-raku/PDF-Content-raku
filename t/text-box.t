@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 18;
+plan 19;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -167,6 +167,21 @@ subtest 'variable spaces', {
         .text-position = 100, 250;
         .say: $text-box;
     }
+}
+
+subtest 'text box padding', {
+    $text-box .= new( :$text, :$font, :$font-size, :width(250), :$height, :pad-bottom(2) );
+    is $text-box.text, $text;
+    is $text-box.font-size, 16;
+    is $text-box.height, $height;
+    is-deeply $text-box.pad-left, 0;
+    is-deeply $text-box.pad-bottom, 2;
+    is-deeply $text-box.bbox, [0, -2, 250, $height];
+    $text-box.bbox = [-2, 1, 253, $height + 4];
+    is-deeply $text-box.pad-left, 2;
+    is-deeply $text-box.pad-bottom, -1;
+    is-deeply $text-box.pad-right, 3;
+    is-deeply $text-box.pad-top, 4;
 }
 
 subtest 'font loading from content stream', {

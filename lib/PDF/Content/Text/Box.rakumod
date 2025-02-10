@@ -88,6 +88,15 @@ be used to replace the text contained in a text box.
 
 =para An array of L<PDF::Content::Text::Line> objects.
 
+=head3 methods pad-left, pad-bottom, pad-right, pad-top, bbox
+
+=para These methods allow extra padding to be placed around a text box.
+
+=para They have no direct affect on rendering, except that the L<PDF::Content> C<print()> and <say()> methods, which return padded values.
+
+=para the C<bbox()> method is defined as C<[-$tb.pad-left, -$tb.pad-bottom, $tb.width + $tb.pad-right, $tb.height + $tb.pad-top]>,
+for a given paragraph.
+
 use PDF::Content::Text::Style;
 use PDF::Content::Text::Line;
 use PDF::Content::Ops :OpCode, :TextMode;
@@ -111,6 +120,10 @@ has Bool $.squish = False;
 has Bool $.verbatim;
 has Bool $.bidi;
 has Numeric $.max-word-gap;
+has Numeric $.pad-left   is rw;
+has Numeric $.pad-bottom is rw;
+has Numeric $.pad-top    is rw;
+has Numeric $.pad-right  is rw;
 
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
@@ -164,7 +177,11 @@ method text(::?CLASS:D $obj:) is rw {
     );
 }
 
-method !build-style(:$baseline = $!valign // 'alphabetic', |c) {
+method !build-style(
+    :$baseline = $!valign // 'alphabetic',
+    Numeric :$pad = 0,
+    :@bbox,
+    |c) is hidden-from-backtrace  {
     $_ .= new(:$baseline, |c) without $!style;
     given $!align {
         when 'start' { $_ = $.direction eq 'ltr' ?? 'left' !! 'right' }
@@ -172,6 +189,11 @@ method !build-style(:$baseline = $!valign // 'alphabetic', |c) {
     }
     $!valign //= 'top';
     $!max-word-gap //= 10 * self!word-gap;
+    $!pad-left   //= $pad;
+    $!pad-bottom //= $pad;
+    $!pad-right  //= $pad;
+    $!pad-top    //= $pad;
+    self.bbox = @bbox if @bbox;
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
@@ -308,11 +330,8 @@ method !layup(@atoms is copy) {
                 !! FRIBIDI_PAR_LTR;
             my $bidi-lines = ::('Text::FriBidi::Lines').new: :@lines, :$direction;
             my Str() $text = $bidi-lines;
-            dd :@lines;
-            dd :$text;
             my ::?CLASS:D $proxy = self.clone: :$text, :verbatim;
             @!lines = $proxy.lines;
-            dd :@lines;
         }
         else {
             warn "Text::FriBidi v0.0.4+ is required for :bidi processing";
@@ -373,8 +392,18 @@ method width returns Numeric  { $!width  || self.content-width }
 method height returns Numeric { $!height || self.content-height }
 method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
 method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
-method !top-offset {
-    self!dy * ($.height - $.content-height);
+
+method bbox is rw {
+    sub FETCH($_) {
+        [-$!pad-left, -$!pad-bottom, self.width + $!pad-right, self.height + $!pad-top]
+    }
+    sub STORE($, @bbox where .elems >= 4) {
+        $!pad-left   = -@bbox[0];
+        $!pad-bottom = -@bbox[1];
+        $!pad-right  =  @bbox[2] - self.width;
+        $!pad-top    =  @bbox[3] - self.height;
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 #| render a text box to a content stream at current or given text position
@@ -405,20 +434,20 @@ method render(
     @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join(' ').subst(/(<-[\0..\xFF]>)/, { '\u%04d'.sprintf($0.ord)}, :g)
         if $gfx.comment;
 
-    my $h = @!lines ?? @!lines.head.height !! 0;
-    my Numeric:D $y-shift = $top ?? - self!top-offset !! self!dy * ($.height - $h * $.leading);
+    my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
+    my Numeric:D $top-pad := self!dy * ($.height - $.content-height);
+    my Numeric:D $y-shift := $top ?? - $top-pad !! self!dy * ($.height - $lh * $.leading);
     my $tf-y = $gfx.tf-y;
-    my Numeric:D $dx = self!dx * $.width;
+    my Numeric:D $dx := self!dx * $.width;
     my $x-shift = $left ?? $dx !! 0.0;
     my $leading = $gfx.TextLeading;
     my Numeric \scale = -1000 / $.font-size;
 
     {
         # work out and move to the text starting position
-        my $y-pad = self!dy * ($.height - $.content-height);
         my $tx := $x-shift + $gfx.tf-x;
-        my $ty = $y-shift + $tf-y - $y-pad;
-        $ty -= .height - $.font-size with @!lines.head;
+        my $ty = $y-shift + $tf-y - $top-pad;
+        $ty += $.font-size - $lh if @!lines;
         @content.push( OpCode::TextMove => [$tx, $ty] )
             unless $x-shift =~= 0 && $ty =~= 0.0;
         # offset text positions of images content
@@ -460,14 +489,13 @@ method render(
     }
 
     $gfx.ops: @content;
-    unless $gfx.TextRender == InvisableText {
-        $gfx.tf-x += $tf-dx; # add to text-flow;
-        $gfx.tf-y = - $y-shift;
-    }
+    $gfx.tf-x += $tf-dx; # add to text-flow;
+    $gfx.tf-y = - $y-shift;
+
     # restore original graphics values
     $gfx."{.key}"() = .value for %saved.pairs;
 
-    ($x-shift - $dx, $y-shift - $.height + $h + $tf-y);
+    ($x-shift - $dx, $y-shift - $.height + $lh + $tf-y);
 }
 
 #| flow any xobject images. This needs to be done
