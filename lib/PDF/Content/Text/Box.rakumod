@@ -447,7 +447,7 @@ method render(
     my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
     my Numeric:D $y-start := self!dy * ($height - $lh * $.leading);
     my Numeric:D $y-end   := self!dy * ($.content-height - $height);
-    my Numeric:D $y-shift := $top ?? $y-end + $!pad-bottom !! $y-start - $!pad-top;
+    my Numeric:D $y-shift := $top ?? -$!pad-top - $lh !! $y-start - $!pad-top;
     my Numeric:D $dx := self!dx * $.width;
     my $x-shift = $left ?? $dx - $!pad-right !! $!pad-left;
     my $leading = $gfx.TextLeading;

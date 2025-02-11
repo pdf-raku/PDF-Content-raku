@@ -87,6 +87,36 @@ for 0, -5, 5 -> $pad-bottom {
 
 $gfx.Restore;
 
+$page = $pdf.add-page;
+$gfx = $page.gfx;
+
+$gfx.Save;
+$gfx.StrokeAlpha = .5;
+$gfx.StrokeColor = color .5, .01, .01;
+$gfx.set-font( $font, 10);
+
+$x = 150;
+
+for <right center left> -> $xpos {
+
+    my $y = 600;
+    my $pad = 8;
+    for <bottom center top> -> $ypos {
+        my @rect[4];
+        $gfx.&draw-cross($x, $y);
+        $gfx.text: {
+            @rect = .say: "*** pad:$pad position[$xpos => $x,$ypos => $y] *** " ~ $sample, :$width, :$pad, :position[$xpos => $x, $ypos => $y];
+        }
+        draw-rect $gfx, @rect;
+
+        $y -= 100;
+    }
+
+   $x += 125;
+}
+
+$gfx.Restore;
+
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 

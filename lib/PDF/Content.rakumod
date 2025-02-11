@@ -332,12 +332,14 @@ method !set-position(
     Bool :$left! is rw,
     Bool :$top! is rw) {
     my Numeric $x;
+
     with $position[0] {
         when Numeric {$x = $_}
         when XPos-Pair {
-            my constant Dx = %( :left(0.0), :justify(0.0), :center(0.5), :right(1.0) );
-            $x = .value  +  Dx{.key} * $text-block.width;
-            $left = True; # position from left
+            my constant Dx = %( :left(0.0), :justify(0.0), :center(-0.5), :right(-1.0) );
+            my $w := .width + .pad-left + .pad-right given $text-block;
+            $x = .value  +  Dx{.key} * $w;
+        ##    $left = True; # position from left
         }
     }
     my Numeric $y;
@@ -345,11 +347,11 @@ method !set-position(
         when Numeric {$y = $_}
         when YPos-Pair {
             my constant Dy = %( :top(0.0), :center(0.5), :bottom(1.0) );
-            $y = .value  -  Dy{.key} * $text-block.height;
+            my $h := .height + .pad-top + .pad-bottom given $text-block;
+            $y = .value  +  Dy{.key} * $h;
             $top = True; # position from top
         }
     }
-
     self.text-position = [$x, $y];
 }
 
