@@ -92,16 +92,15 @@ be used to replace the text contained in a text box.
 
 =para These methods adjust the margin placed around a text box.
 
-=para They have no direct affect on rendering, except that the L<PDF::Content> C<print()> and <say()> methods, which returns the bbox around the rendered text. Note that margins can be negative, to trim text boxes.
+=para They have no direct affect on rendering, except that the L<PDF::Content> C<print()> and C<say()> methods, which returns the bbox around the rendered text. Note that margins can be negative, to trim text boxes.
 
 =head3 method origin
 
-=para A two member array giving the C<x,y> displacement of the text, by default C<[0, 0]>. These can be 
-set to fine-tune the positioning of the text.
+=para A two member array giving the C<x,y> displacement of the text, by default C<[0, 0]>. These can be set to fine-tune the positioning of the text.
 
 =head2 method bbox
 
-=para The text-boxes bounding box, including margin and origin adjustments. 
+=para The text-boxes bounding box, including margin and origin adjustments.
 
 =begin para
 The C<bbox()> method is defined as
@@ -417,7 +416,6 @@ method height returns Numeric { $!height || self.content-height }
 method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
 method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
 
-#| bounding box from a fixed point
 method bbox(Numeric:D $x = @!origin[0], Numeric:D $y = @!origin[1]) {
     ($x - $!margin-left, $y - $!margin-bottom,
      $x + self.width + $!margin-right, $y + self.height + $!margin-top)
@@ -438,7 +436,7 @@ method render(
         unless $gval =~= .value {
             %saved{.key} = $gval
                 if $preserve;
-            $gfx."{.key}"() = .value; 
+            $gfx."{.key}"() = .value;
         }
     }
 
