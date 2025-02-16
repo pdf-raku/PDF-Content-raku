@@ -1,0 +1,552 @@
+%PDF-1.4
+%¥±ë¼
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [ 3 0 R ] >>
+endobj
+
+3 0 obj
+<<
+  /Type /Page
+  /Contents 4 0 R
+  /MediaBox [ 0 0 612 792 ]
+  /Parent 2 0 R
+  /Resources << /ExtGState << /GS1 5 0 R /GS2 6 0 R >> /Font << /F1 7 0 R >> >>
+>>
+endobj
+
+4 0 obj
+<< /Length 6956 >> stream
+q
+  /GS1 gs
+  0.5 0.01 0.01 RG
+  /F1 10 Tf
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      45 700 m
+      55 700 l
+      S
+    Q
+    q
+      50 695 m
+      50 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 50 700 Tm
+    (*** margin:0) Tj
+    11 TL
+    T*
+    (origin:\(0,0\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      50 622 100 88 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      45 600 m
+      55 600 l
+      S
+    Q
+    q
+      50 595 m
+      50 605 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 50 600 Tm
+    (*** margin:-5) Tj
+    T*
+    (origin:\(0,0\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      55 527 90 78 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      45 500 m
+      55 500 l
+      S
+    Q
+    q
+      50 495 m
+      50 505 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 50 500 Tm
+    (*** margin:5) Tj
+    T*
+    (origin:\(0,0\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      45 417 110 98 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      170 700 m
+      180 700 l
+      S
+    Q
+    q
+      175 695 m
+      175 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 175 700 Tm
+    0 -5 Td
+    (*** margin:0 origin:\(0,-) Tj
+    T*
+    (5\) *** Lorem ipsum) Tj
+    T*
+    (dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      175 617 100 88 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      170 600 m
+      180 600 l
+      S
+    Q
+    q
+      175 595 m
+      175 605 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 175 600 Tm
+    0 -5 Td
+    (*** margin:-5) Tj
+    T*
+    (origin:\(0,-5\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      180 522 90 78 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      170 500 m
+      180 500 l
+      S
+    Q
+    q
+      175 495 m
+      175 505 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 175 500 Tm
+    0 -5 Td
+    (*** margin:5 origin:\(0,-) Tj
+    T*
+    (5\) *** Lorem ipsum) Tj
+    T*
+    (dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      170 412 110 98 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      295 700 m
+      305 700 l
+      S
+    Q
+    q
+      300 695 m
+      300 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 300 700 Tm
+    -5 0 Td
+    (*** margin:0 origin:\(-) Tj
+    T*
+    (5,0\) *** Lorem ipsum) Tj
+    T*
+    (dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      295 622 100 88 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      295 600 m
+      305 600 l
+      S
+    Q
+    q
+      300 595 m
+      300 605 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 300 600 Tm
+    -5 0 Td
+    (*** margin:-5 origin:\(-) Tj
+    T*
+    (5,0\) *** Lorem ipsum) Tj
+    T*
+    (dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      300 527 90 78 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      295 500 m
+      305 500 l
+      S
+    Q
+    q
+      300 495 m
+      300 505 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 300 500 Tm
+    -5 0 Td
+    (*** margin:5 origin:\(-) Tj
+    T*
+    (5,0\) *** Lorem ipsum) Tj
+    T*
+    (dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      290 417 110 98 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      420 700 m
+      430 700 l
+      S
+    Q
+    q
+      425 695 m
+      425 705 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 425 700 Tm
+    5 5 Td
+    (*** margin:0) Tj
+    T*
+    (origin:\(5,5\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      430 627 100 88 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      420 600 m
+      430 600 l
+      S
+    Q
+    q
+      425 595 m
+      425 605 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 425 600 Tm
+    5 5 Td
+    (*** margin:-5) Tj
+    T*
+    (origin:\(5,5\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      435 532 90 78 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    /GS2 gs
+    0.01 0.7 0.1 RG
+    q
+      420 500 m
+      430 500 l
+      S
+    Q
+    q
+      425 495 m
+      425 505 l
+      S
+    Q
+  EMC
+  BT
+    1 0 0 1 425 500 Tm
+    5 5 Td
+    (*** margin:5) Tj
+    T*
+    (origin:\(5,5\) *** Lorem) Tj
+    T*
+    (ipsum dolor sit amet,) Tj
+    T*
+    (consectetur adipiscing) Tj
+    T*
+    (elit, sed do eiusmod) Tj
+    T*
+    (tempor incididunt ut) Tj
+    T*
+    (labore et dolore) Tj
+    T*
+    (magna aliqua.) Tj
+  ET
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      425 422 110 98 re
+      S
+    Q
+  EMC
+Q
+endstream
+endobj
+
+5 0 obj
+<< /Type /ExtGState /CA 0.5 >>
+endobj
+
+6 0 obj
+<< /Type /ExtGState /CA 0.75 >>
+endobj
+
+7 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
+xref
+0 8
+0000000000 65535 f 
+0000000015 00000 n 
+0000000065 00000 n 
+0000000125 00000 n 
+0000000303 00000 n 
+0000007312 00000 n 
+0000007359 00000 n 
+0000007407 00000 n 
+trailer
+<< /ID [ (t/pdf-text-origi) (t/pdf-text-origi) ] /Root 1 0 R /Size 8 >>
+startxref
+7513
+%%EOF

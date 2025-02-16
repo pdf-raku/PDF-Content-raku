@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 10321 >> stream
+<< /Length 10317 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -40,22 +40,22 @@ q
   EMC
   BT
     1 0 0 1 50 700 Tm
-    (*** pad-top:0 pad-) Tj
+    (*** margin-top:0) Tj
     11 TL
     T*
-    (left:0 *** Lorem ipsum) Tj
+    (margin-left:0 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -81,28 +81,27 @@ q
   EMC
   BT
     1 0 0 1 50 600 Tm
-    -5 0 Td
-    (*** pad-top:0 pad-left:-) Tj
+    (*** margin-top:0) Tj
     T*
-    (5 *** Lorem ipsum) Tj
+    (margin-left:-5 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      50 522 95 88 re
+      55 522 95 88 re
       S
     Q
   EMC
@@ -122,28 +121,27 @@ q
   EMC
   BT
     1 0 0 1 50 500 Tm
-    5 0 Td
-    (*** pad-top:0 pad-) Tj
+    (*** margin-top:0) Tj
     T*
-    (left:5 *** Lorem ipsum) Tj
+    (margin-left:5 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      50 422 105 88 re
+      45 422 105 88 re
       S
     Q
   EMC
@@ -163,28 +161,27 @@ q
   EMC
   BT
     1 0 0 1 175 700 Tm
-    0 5 Td
-    (*** pad-top:-5 pad-) Tj
+    (*** margin-top:-5) Tj
     T*
-    (left:0 *** Lorem ipsum) Tj
+    (margin-left:0 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 627 100 83 re
+      175 622 100 83 re
       S
     Q
   EMC
@@ -204,28 +201,27 @@ q
   EMC
   BT
     1 0 0 1 175 600 Tm
-    -5 5 Td
-    (*** pad-top:-5 pad-) Tj
+    (*** margin-top:-5) Tj
     T*
-    (left:-5 *** Lorem) Tj
+    (margin-left:-5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 527 95 83 re
+      180 522 95 83 re
       S
     Q
   EMC
@@ -245,28 +241,27 @@ q
   EMC
   BT
     1 0 0 1 175 500 Tm
-    5 5 Td
-    (*** pad-top:-5 pad-) Tj
+    (*** margin-top:-5) Tj
     T*
-    (left:5 *** Lorem ipsum) Tj
+    (margin-left:5 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      175 427 105 83 re
+      170 422 105 83 re
       S
     Q
   EMC
@@ -286,28 +281,27 @@ q
   EMC
   BT
     1 0 0 1 300 700 Tm
-    0 -5 Td
-    (*** pad-top:5 pad-) Tj
+    (*** margin-top:5) Tj
     T*
-    (left:0 *** Lorem ipsum) Tj
+    (margin-left:0 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 617 100 93 re
+      300 622 100 93 re
       S
     Q
   EMC
@@ -327,28 +321,27 @@ q
   EMC
   BT
     1 0 0 1 300 600 Tm
-    -5 -5 Td
-    (*** pad-top:5 pad-left:-) Tj
+    (*** margin-top:5) Tj
     T*
-    (5 *** Lorem ipsum) Tj
+    (margin-left:-5 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 517 95 93 re
+      305 522 95 93 re
       S
     Q
   EMC
@@ -368,28 +361,27 @@ q
   EMC
   BT
     1 0 0 1 300 500 Tm
-    5 -5 Td
-    (*** pad-top:5 pad-) Tj
+    (*** margin-top:5) Tj
     T*
-    (left:5 *** Lorem ipsum) Tj
+    (margin-left:5 ***) Tj
     T*
-    (dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      300 417 105 93 re
+      295 422 105 93 re
       S
     Q
   EMC
@@ -409,21 +401,21 @@ q
   EMC
   BT
     1 0 0 1 50 350 Tm
-    (*** pad-bottom:0 pad-) Tj
+    (*** margin-bottom:0) Tj
     T*
-    (right:0 *** Lorem) Tj
+    (margin-right:0 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -449,21 +441,21 @@ q
   EMC
   BT
     1 0 0 1 50 250 Tm
-    (*** pad-bottom:0 pad-) Tj
+    (*** margin-bottom:0) Tj
     T*
-    (right:-5 *** Lorem) Tj
+    (margin-right:-5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -489,21 +481,21 @@ q
   EMC
   BT
     1 0 0 1 50 150 Tm
-    (*** pad-bottom:0 pad-) Tj
+    (*** margin-bottom:0) Tj
     T*
-    (right:5 *** Lorem) Tj
+    (margin-right:5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -529,21 +521,21 @@ q
   EMC
   BT
     1 0 0 1 175 350 Tm
-    (*** pad-bottom:-5 pad-) Tj
+    (*** margin-bottom:-5) Tj
     T*
-    (right:0 *** Lorem) Tj
+    (margin-right:0 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -569,21 +561,21 @@ q
   EMC
   BT
     1 0 0 1 175 250 Tm
-    (*** pad-bottom:-5 pad-) Tj
+    (*** margin-bottom:-5) Tj
     T*
-    (right:-5 *** Lorem) Tj
+    (margin-right:-5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -609,21 +601,21 @@ q
   EMC
   BT
     1 0 0 1 175 150 Tm
-    (*** pad-bottom:-5 pad-) Tj
+    (*** margin-bottom:-5) Tj
     T*
-    (right:5 *** Lorem) Tj
+    (margin-right:5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -649,21 +641,21 @@ q
   EMC
   BT
     1 0 0 1 300 350 Tm
-    (*** pad-bottom:5 pad-) Tj
+    (*** margin-bottom:5) Tj
     T*
-    (right:0 *** Lorem) Tj
+    (margin-right:0 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -689,21 +681,21 @@ q
   EMC
   BT
     1 0 0 1 300 250 Tm
-    (*** pad-bottom:5 pad-) Tj
+    (*** margin-bottom:5) Tj
     T*
-    (right:-5 *** Lorem) Tj
+    (margin-right:-5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -729,21 +721,21 @@ q
   EMC
   BT
     1 0 0 1 300 150 Tm
-    (*** pad-bottom:5 pad-) Tj
+    (*** margin-bottom:5) Tj
     T*
-    (right:5 *** Lorem) Tj
+    (margin-right:5 ***) Tj
     T*
-    (ipsum dolor sit amet,) Tj
+    (Lorem ipsum dolor sit) Tj
     T*
-    (consectetur adipiscing) Tj
+    (amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
   ET
   /Artifact BMC
     /GS1 gs
@@ -785,7 +777,7 @@ endobj
 endobj
 
 9 0 obj
-<< /Length 5586 >> stream
+<< /Length 6345 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -805,33 +797,35 @@ q
     Q
   EMC
   BT
-    1 0 0 1 34 715 Tm
-    8 -18 Td
-    (*** pad:8 position[right) Tj
+    1 0 0 1 150 600 Tm
+    2.07 Ts
+    0 88 Td
+    [ 5335 (*** margin:8) ] TJ
     11 TL
     T*
-    (=> 150,bottom =>) Tj
+    [ 7115 (position[right =>) ] TJ
     T*
-    (600] *** Lorem ipsum) Tj
+    [ 8673 (150,bottom => 600]) ] TJ
     T*
-    (dolor sit amet,) Tj
+    [ 9725 (*** Lorem ipsum dolor) ] TJ
     T*
-    (consectetur adipiscing) Tj
+    [ 9226 (sit amet, consectetur) ] TJ
     T*
-    (elit, sed do eiusmod) Tj
+    [ 9560 (adipiscing elit, sed do) ] TJ
     T*
-    (tempor incididunt ut) Tj
+    [ 7169 (eiusmod tempor) ] TJ
     T*
-    (labore et dolore) Tj
+    [ 9505 (incididunt ut labore et) ] TJ
     T*
-    (magna aliqua.) Tj
+    [ 9338 (dolore magna aliqua.) ] TJ
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      34 600 116 115 re
+      42 593.07 116 115 re
       S
     Q
   EMC
@@ -850,30 +844,34 @@ q
     Q
   EMC
   BT
-    1 0 0 1 34 552 Tm
-    8 -18 Td
-    (*** pad:8 position[right) Tj
+    1 0 0 1 150 500 Tm
+    -2.555 Ts
+    0 44 Td
+    [ 5335 (*** margin:8) ] TJ
     T*
-    (=> 150,center => 500]) Tj
+    [ 7115 (position[right =>) ] TJ
     T*
-    (*** Lorem ipsum dolor) Tj
+    [ 9840 (150,center => 500] ***) ] TJ
     T*
-    (sit amet, consectetur) Tj
+    [ 9558 (Lorem ipsum dolor sit) ] TJ
     T*
-    (adipiscing elit, sed do) Tj
+    [ 7948 (amet, consectetur) ] TJ
     T*
-    (eiusmod tempor) Tj
+    [ 9560 (adipiscing elit, sed do) ] TJ
     T*
-    (incididunt ut labore et) Tj
+    [ 7169 (eiusmod tempor) ] TJ
     T*
-    (dolore magna aliqua.) Tj
+    [ 9505 (incididunt ut labore et) ] TJ
     T*
+    [ 9338 (dolore magna aliqua.) ] TJ
+    T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      34 448 116 104 re
+      42 444.445 116 115 re
       S
     Q
   EMC
@@ -892,30 +890,33 @@ q
     Q
   EMC
   BT
-    1 0 0 1 34 400 Tm
-    8 -18 Td
-    (*** pad:8 position[right) Tj
+    1 0 0 1 150 400 Tm
+    -7.18 Ts
+    [ 5335 (*** margin:8) ] TJ
     T*
-    (=> 150,top => 400] ***) Tj
+    [ 7115 (position[right =>) ] TJ
     T*
-    (Lorem ipsum dolor sit) Tj
+    [ 8451 (150,top => 400] ***) ] TJ
     T*
-    (amet, consectetur) Tj
+    [ 9558 (Lorem ipsum dolor sit) ] TJ
     T*
-    (adipiscing elit, sed do) Tj
+    [ 7948 (amet, consectetur) ] TJ
     T*
-    (eiusmod tempor) Tj
+    [ 9560 (adipiscing elit, sed do) ] TJ
     T*
-    (incididunt ut labore et) Tj
+    [ 7169 (eiusmod tempor) ] TJ
     T*
-    (dolore magna aliqua.) Tj
+    [ 9505 (incididunt ut labore et) ] TJ
     T*
+    [ 9338 (dolore magna aliqua.) ] TJ
+    T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      34 296 116 104 re
+      42 295.82 116 115 re
       S
     Q
   EMC
@@ -934,32 +935,34 @@ q
     Q
   EMC
   BT
-    1 0 0 1 217 715 Tm
-    8 -18 Td
-    (*** pad:8) Tj
+    1 0 0 1 275 600 Tm
+    2.07 Ts
+    0 88 Td
+    [ 2668 (*** margin:8) ] TJ
     T*
-    (position[center =>) Tj
+    [ 3975 (position[center =>) ] TJ
     T*
-    (275,bottom => 600]) Tj
+    [ 4337 (275,bottom => 600]) ] TJ
     T*
-    (*** Lorem ipsum dolor) Tj
+    [ 4863 (*** Lorem ipsum dolor) ] TJ
     T*
-    (sit amet, consectetur) Tj
+    [ 4613 (sit amet, consectetur) ] TJ
     T*
-    (adipiscing elit, sed do) Tj
+    [ 4780 (adipiscing elit, sed do) ] TJ
     T*
-    (eiusmod tempor) Tj
+    [ 3585 (eiusmod tempor) ] TJ
     T*
-    (incididunt ut labore et) Tj
+    [ 4753 (incididunt ut labore et) ] TJ
     T*
-    (dolore magna aliqua.) Tj
+    [ 4669 (dolore magna aliqua.) ] TJ
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      217 600 116 115 re
+      217 593.07 116 115 re
       S
     Q
   EMC
@@ -978,32 +981,34 @@ q
     Q
   EMC
   BT
-    1 0 0 1 217 557.5 Tm
-    8 -18 Td
-    (*** pad:8) Tj
+    1 0 0 1 275 500 Tm
+    -2.555 Ts
+    0 44 Td
+    [ 2668 (*** margin:8) ] TJ
     T*
-    (position[center =>) Tj
+    [ 3975 (position[center =>) ] TJ
     T*
-    (275,center => 500] ***) Tj
+    [ 4920 (275,center => 500] ***) ] TJ
     T*
-    (Lorem ipsum dolor sit) Tj
+    [ 4779 (Lorem ipsum dolor sit) ] TJ
     T*
-    (amet, consectetur) Tj
+    [ 3974 (amet, consectetur) ] TJ
     T*
-    (adipiscing elit, sed do) Tj
+    [ 4780 (adipiscing elit, sed do) ] TJ
     T*
-    (eiusmod tempor) Tj
+    [ 3585 (eiusmod tempor) ] TJ
     T*
-    (incididunt ut labore et) Tj
+    [ 4753 (incididunt ut labore et) ] TJ
     T*
-    (dolore magna aliqua.) Tj
+    [ 4669 (dolore magna aliqua.) ] TJ
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      217 442.5 116 115 re
+      217 444.445 116 115 re
       S
     Q
   EMC
@@ -1022,32 +1027,33 @@ q
     Q
   EMC
   BT
-    1 0 0 1 217 400 Tm
-    8 -18 Td
-    (*** pad:8) Tj
+    1 0 0 1 275 400 Tm
+    -7.18 Ts
+    [ 2668 (*** margin:8) ] TJ
     T*
-    (position[center =>) Tj
+    [ 3975 (position[center =>) ] TJ
     T*
-    (275,top => 400] ***) Tj
+    [ 4226 (275,top => 400] ***) ] TJ
     T*
-    (Lorem ipsum dolor sit) Tj
+    [ 4779 (Lorem ipsum dolor sit) ] TJ
     T*
-    (amet, consectetur) Tj
+    [ 3974 (amet, consectetur) ] TJ
     T*
-    (adipiscing elit, sed do) Tj
+    [ 4780 (adipiscing elit, sed do) ] TJ
     T*
-    (eiusmod tempor) Tj
+    [ 3585 (eiusmod tempor) ] TJ
     T*
-    (incididunt ut labore et) Tj
+    [ 4753 (incididunt ut labore et) ] TJ
     T*
-    (dolore magna aliqua.) Tj
+    [ 4669 (dolore magna aliqua.) ] TJ
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      217 285 116 115 re
+      217 295.82 116 115 re
       S
     Q
   EMC
@@ -1066,32 +1072,34 @@ q
     Q
   EMC
   BT
-    1 0 0 1 400 715 Tm
-    8 -18 Td
-    (*** pad:8 position[left) Tj
+    1 0 0 1 400 600 Tm
+    2.07 Ts
+    0 88 Td
+    (*** margin:8) Tj
     T*
-    (=> 400,bottom =>) Tj
+    (position[left =>) Tj
     T*
-    (600] *** Lorem ipsum) Tj
+    (400,bottom => 600]) Tj
     T*
-    (dolor sit amet,) Tj
+    (*** Lorem ipsum dolor) Tj
     T*
-    (consectetur adipiscing) Tj
+    (sit amet, consectetur) Tj
     T*
-    (elit, sed do eiusmod) Tj
+    (adipiscing elit, sed do) Tj
     T*
-    (tempor incididunt ut) Tj
+    (eiusmod tempor) Tj
     T*
-    (labore et dolore) Tj
+    (incididunt ut labore et) Tj
     T*
-    (magna aliqua.) Tj
+    (dolore magna aliqua.) Tj
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      400 600 116 115 re
+      392 593.07 116 115 re
       S
     Q
   EMC
@@ -1110,15 +1118,18 @@ q
     Q
   EMC
   BT
-    1 0 0 1 400 552 Tm
-    8 -18 Td
-    (*** pad:8 position[left) Tj
+    1 0 0 1 400 500 Tm
+    -2.555 Ts
+    0 44 Td
+    (*** margin:8) Tj
     T*
-    (=> 400,center => 500]) Tj
+    (position[left =>) Tj
     T*
-    (*** Lorem ipsum dolor) Tj
+    (400,center => 500] ***) Tj
     T*
-    (sit amet, consectetur) Tj
+    (Lorem ipsum dolor sit) Tj
+    T*
+    (amet, consectetur) Tj
     T*
     (adipiscing elit, sed do) Tj
     T*
@@ -1128,12 +1139,13 @@ q
     T*
     (dolore magna aliqua.) Tj
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      400 448 116 104 re
+      392 444.445 116 115 re
       S
     Q
   EMC
@@ -1153,10 +1165,12 @@ q
   EMC
   BT
     1 0 0 1 400 400 Tm
-    8 -18 Td
-    (*** pad:8 position[left) Tj
+    -7.18 Ts
+    (*** margin:8) Tj
     T*
-    (=> 400,top => 400] ***) Tj
+    (position[left =>) Tj
+    T*
+    (400,top => 400] ***) Tj
     T*
     (Lorem ipsum dolor sit) Tj
     T*
@@ -1170,12 +1184,13 @@ q
     T*
     (dolore magna aliqua.) Tj
     T*
+    0 Ts
   ET
   /Artifact BMC
     /GS1 gs
     0.5 0.01 0.01 RG
     q
-      400 296 116 104 re
+      392 295.82 116 115 re
       S
     Q
   EMC
@@ -1198,15 +1213,15 @@ xref
 0000000065 00000 n 
 0000000131 00000 n 
 0000000309 00000 n 
-0000010684 00000 n 
-0000010731 00000 n 
-0000010779 00000 n 
-0000010885 00000 n 
-0000011065 00000 n 
-0000016704 00000 n 
-0000016752 00000 n 
+0000010680 00000 n 
+0000010727 00000 n 
+0000010775 00000 n 
+0000010881 00000 n 
+0000011061 00000 n 
+0000017459 00000 n 
+0000017507 00000 n 
 trailer
-<< /ID [ (t/pdf-text-pad.t) (t/pdf-text-pad.t) ] /Root 1 0 R /Size 12 >>
+<< /ID [ (t/pdf-text-margi) (t/pdf-text-margi) ] /Root 1 0 R /Size 12 >>
 startxref
-16801
+17556
 %%EOF

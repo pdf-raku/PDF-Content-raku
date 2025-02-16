@@ -47,15 +47,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 ut labore et dolore magna aliqua.
 --ENOUGH!!--
 
-for 0, -5, 5 -> $pad-top {
+for 0, -5, 5 -> $margin-top {
 
     my $y = 700;
-    for 0, -5, 5 -> $pad-left {
+    for 0, -5, 5 -> $margin-left {
         my @rect[4];
         $gfx.&draw-cross($x, $y);
         $gfx.text: {
             .text-position = ($x, $y);
-            @rect = .print: "*** pad-top:$pad-top pad-left:$pad-left *** " ~ $sample, :$width, :$pad-left, :$pad-top;
+            @rect = .print: "*** margin-top:$margin-top margin-left:$margin-left *** " ~ $sample, :$width, :$margin-left, :$margin-top;
         }
         draw-rect $gfx, @rect;
 
@@ -67,15 +67,15 @@ for 0, -5, 5 -> $pad-top {
 
 $x = 50;
 
-for 0, -5, 5 -> $pad-bottom {
+for 0, -5, 5 -> $margin-bottom {
 
     my $y = 350;
-    for 0, -5, 5 -> $pad-right {
+    for 0, -5, 5 -> $margin-right {
         my @rect[4];
         $gfx.&draw-cross($x, $y);
         $gfx.text: {
             .text-position = ($x, $y);
-            @rect = .print: "*** pad-bottom:$pad-bottom pad-right:$pad-right *** " ~ $sample, :$width, :$pad-right, :$pad-bottom;
+            @rect = .print: "*** margin-bottom:$margin-bottom margin-right:$margin-right *** " ~ $sample, :$width, :$margin-right, :$margin-bottom;
         }
         draw-rect $gfx, @rect;
 
@@ -97,15 +97,15 @@ $gfx.set-font( $font, 10);
 
 $x = 150;
 
-for <right center left> -> $xpos {
+for <right center left> -> $align {
 
     my $y = 600;
-    my $pad = 8;
-    for <bottom center top> -> $ypos {
+    my $margin = 8;
+    for <bottom center top> -> $valign {
         my @rect[4];
         $gfx.&draw-cross($x, $y);
         $gfx.text: {
-            @rect = .say: "*** pad:$pad position[$xpos => $x,$ypos => $y] *** " ~ $sample, :$width, :$pad, :position[$xpos => $x, $ypos => $y];
+            @rect = .say: "*** margin:$margin position[$align => $x,$valign => $y] *** " ~ $sample, :$width, :$margin, :$align, :$valign, :position[$x, $y];
         }
         draw-rect $gfx, @rect;
 
@@ -120,6 +120,6 @@ $gfx.Restore;
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 
-lives-ok {$pdf.save-as('t/pdf-text-pad.pdf')};
+lives-ok {$pdf.save-as('t/pdf-text-margin.pdf')};
 
 done-testing;

@@ -88,14 +88,32 @@ be used to replace the text contained in a text box.
 
 =para An array of L<PDF::Content::Text::Line> objects.
 
-=head3 methods pad-left, pad-bottom, pad-right, pad-top, bbox
+=head3 methods margin-left, margin-bottom, margin-right, margin-top, bbox
 
-=para These methods allow extra padding to be placed around a text box.
+=para These methods adjust the margin placed around a text box.
 
-=para They have no direct affect on rendering, except that the L<PDF::Content> C<print()> and <say()> methods, which return padded values.
+=para They have no direct affect on rendering, except that the L<PDF::Content> C<print()> and <say()> methods, which returns the bbox around the rendered text. Note that margins can be negative, to trim text boxes.
 
-=para the C<bbox()> method is defined as C<[-$tb.pad-left, -$tb.pad-bottom, $tb.width + $tb.pad-right, $tb.height + $tb.pad-top]>,
+=head3 method origin
+
+=para A two member array giving the C<x,y> displacement of the text, by default C<[0, 0]>. These can be 
+set to fine-tune the positioning of the text.
+
+=head2 method bbox
+
+=para The text-boxes bounding box, including margin and origin adjustments. 
+
+=begin para
+The C<bbox()> method is defined as
+=begin code :lang<raku>
+[ $tb.origin[0] - $tb.margin-left,
+  $tb.origin[1] - $tb.margin-bottom,
+  $tb.origin[0] + $tb.width + $tb.margin-right,
+  $tb.origin[1] + $tb.height + $tb.margin-top
+]
+=end code
 for a given paragraph.
+=end para
 
 use PDF::Content::Text::Style;
 use PDF::Content::Text::Line;
@@ -120,10 +138,11 @@ has Bool $.squish = False;
 has Bool $.verbatim;
 has Bool $.bidi;
 has Numeric $.max-word-gap;
-has Numeric $.pad-left   is rw;
-has Numeric $.pad-bottom is rw;
-has Numeric $.pad-top    is rw;
-has Numeric $.pad-right  is rw;
+has Numeric @.origin[2];
+has Numeric $.margin-left   is rw;
+has Numeric $.margin-bottom is rw;
+has Numeric $.margin-top    is rw;
+has Numeric $.margin-right  is rw;
 
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
@@ -160,7 +179,10 @@ method comb(Str $_ --> Seq) {
 }
 
 #| clone a text box
-method clone(::?CLASS:D: :$text = $!text ~ @!overflow.join, |c --> ::?CLASS:D) {
+method clone(
+    ::?CLASS:D:
+    :$text = $!text ~ @!overflow.join,
+    |c --> ::?CLASS:D) {
     given callwith(|c) {
         .TWEAK: :$text, |c;
         $_;
@@ -179,7 +201,7 @@ method text(::?CLASS:D $obj:) is rw {
 
 method !build-style(
     :$baseline = $!valign // 'alphabetic',
-    Numeric :$pad = 0,
+    Numeric :$margin = 0,
     :@bbox,
     |c) is hidden-from-backtrace  {
     $_ .= new(:$baseline, |c) without $!style;
@@ -189,10 +211,12 @@ method !build-style(
     }
     $!valign //= 'top';
     $!max-word-gap //= 10 * self!word-gap;
-    $!pad-left   //= $pad;
-    $!pad-bottom //= $pad;
-    $!pad-right  //= $pad;
-    $!pad-top    //= $pad;
+    @!origin[0] //= 0;
+    @!origin[1] //= 0;
+    $!margin-left   //= $margin;
+    $!margin-bottom //= $margin;
+    $!margin-right  //= $margin;
+    $!margin-top    //= $margin;
     self.bbox = @bbox if @bbox;
 }
 
@@ -393,32 +417,16 @@ method height returns Numeric { $!height || self.content-height }
 method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
 method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
 
-#| bounding box from the origin
-multi method bbox is rw {
-    sub FETCH($_) {
-        (-$!pad-left, -$!pad-bottom, self.width + $!pad-right, self.height + $!pad-top)
-    }
-    sub STORE($, @bbox where .elems >= 4) {
-        $!pad-left   = -@bbox[0];
-        $!pad-bottom = -@bbox[1];
-        $!pad-right  =  @bbox[2] - self.width;
-        $!pad-top    =  @bbox[3] - self.height;
-    }
-    Proxy.new: :&FETCH, :&STORE;
-}
-
 #| bounding box from a fixed point
-multi method bbox(Numeric:D $x, Numeric:D $y) {
-    ($x - $!pad-left, $y - $!pad-bottom,
-     $x + self.width + $!pad-right, $y + self.height + $!pad-top)
+method bbox(Numeric:D $x = @!origin[0], Numeric:D $y = @!origin[1]) {
+    ($x - $!margin-left, $y - $!margin-bottom,
+     $x + self.width + $!margin-right, $y + self.height + $!margin-top)
 }
 
 #| render a text box to a content stream at current or given text position
 method render(
     PDF::Content::Ops:D $gfx,
     Bool :$nl,   # add trailing line
-    Bool :$top,  # position from top
-    Bool :$left, # position from left
     Bool :$preserve = True, # restore text state
     --> List
     ) {
@@ -441,25 +449,18 @@ method render(
     @content.push: 'comment' => 'text: ' ~ @!lines>>.text.join(' ').subst(/(<-[\0..\xFF]>)/, { '\u%04d'.sprintf($0.ord)}, :g)
         if $gfx.comment;
 
-    my @bbox := @.bbox;
-    my $width  := @bbox[2] - @bbox[0];
-    my $height := @bbox[3] - @bbox[1];
     my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
-    my Numeric:D $y-start := self!dy * ($height - $lh * $.leading);
-    my Numeric:D $y-end   := self!dy * ($.content-height - $height);
-    my Numeric:D $y-shift := $top ?? -$!pad-top - $lh !! $y-start - $!pad-top;
-    my Numeric:D $dx := self!dx * $.width;
-    my $x-shift = $left ?? $dx - $!pad-right !! $!pad-left;
+    my Numeric:D $dy := @!origin[1] + self!dy * ($.height - $lh * $.leading);
     my $leading = $gfx.TextLeading;
     my $tf-y = $gfx.tf-y;
 
     {
         # work out and move to the text starting position
-        my $tx := $x-shift + $gfx.tf-x;
-        my $ty = $y-shift  + $gfx.tf-y + $y-end;
+        my $tx := $gfx.tf-x + @!origin[0];
+        my $ty = $dy + $gfx.tf-y + self!dy * ($.content-height - $.height);
         $ty += $.font-size - $lh if @!lines;
         @content.push( OpCode::TextMove => [$tx, $ty] )
-            unless $x-shift =~= 0 && $ty =~= 0.0;
+            unless $tx =~= 0.0 && $ty =~= 0.0;
         # offset text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
@@ -501,12 +502,13 @@ method render(
 
     $gfx.ops: @content;
     $gfx.tf-x += $tf-dx; # add to text-flow;
-    $gfx.tf-y = - $y-shift;
+    $gfx.tf-y = - $dy;
 
     # restore original graphics values
     $gfx."{.key}"() = .value for %saved.pairs;
 
-    ($x-shift - $dx, $y-shift - $.height + $lh + $tf-y);
+    my Numeric:D $dx := self!dx * $.width - @!origin[0];
+    (- $dx , $dy - $.height + $lh + $tf-y);
 }
 
 #| flow any xobject images. This needs to be done

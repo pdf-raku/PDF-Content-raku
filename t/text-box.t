@@ -169,20 +169,17 @@ subtest 'variable spaces', {
     }
 }
 
-subtest 'text box padding', {
-    $text-box .= new( :$text, :$font, :$font-size, :width(250), :$height, :pad-bottom(2) );
+subtest 'text box margins', {
+    $text-box .= new( :$text, :$font, :$font-size, :width(250), :$height, :margin-bottom(2) );
     is $text-box.text, $text;
     is $text-box.font-size, 16;
     is $text-box.height, $height;
-    is-deeply $text-box.pad-left, 0;
-    is-deeply $text-box.pad-bottom, 2;
+    is-deeply $text-box.margin-left, 0;
+    is-deeply $text-box.margin-bottom, 2;
     is-deeply $text-box.bbox, (0, -2, 250, $height);
     is-deeply $text-box.bbox(1,2), (1, 0, 251, $height+2);
-    $text-box.bbox = (-2, 1, 253, $height + 4);
-    is-deeply $text-box.pad-left, 2;
-    is-deeply $text-box.pad-bottom, -1;
-    is-deeply $text-box.pad-right, 3;
-    is-deeply $text-box.pad-top, 4;
+    $text-box.origin = [-2, 3];
+    is-deeply $text-box.bbox, (-2, 1, 248, $height+3);
 }
 
 subtest 'font loading from content stream', {

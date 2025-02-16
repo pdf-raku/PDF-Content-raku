@@ -98,6 +98,24 @@ See also the :baseline` option for vertical displacememnt of the first line of t
 
 An array of [PDF::Content::Text::Line](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Line) objects.
 
+### methods margin-left, margin-bottom, margin-right, margin-top, bbox
+
+These methods adjust the margin placed around a text box.
+
+They have no direct affect on rendering, except that the [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content) `print()` and <say()> methods, which returns the bbox around the rendered text. Note that margins can be negative, to trim text boxes.
+
+### method origin
+
+A two member array giving the `x,y` displacement of the text, by default `[0, 0]`. These can be set to fine-tune the positioning of the text.
+
+The `bbox()` method is defined as ```raku
+[ $tb.origin[0] - $tb.margin-left,
+  $tb.origin[1] - $tb.margin-bottom,
+  $tb.origin[0] + $tb.width + $tb.margin-right,
+  $tb.origin[1] + $tb.height + $tb.margin-top
+]
+``` for a given paragraph.
+
 style
 -----
 
@@ -166,14 +184,23 @@ method height() returns Numeric
 
 return displacement height of a text box
 
+### method bbox
+
+```raku
+method bbox(
+    Numeric:D $x = Code.new,
+    Numeric:D $y = Code.new
+) returns Mu
+```
+
+bounding box from a fixed point
+
 ### method render
 
 ```raku
 method render(
     PDF::Content::Ops:D $gfx,
     Bool :$nl,
-    Bool :$top,
-    Bool :$left,
     Bool :$preserve = Bool::True
 ) returns List
 ```

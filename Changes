@@ -1,4 +1,5 @@
 {{$NEXT}}
+    - Add margins and origin to text boxes.
 
 0.8.16  2025-02-08T08:45:59+13:00
     - Fix text-box rendering bug with changing the height of

@@ -165,19 +165,6 @@ ensure pattern is declared as a resource
 
 ```raku
 multi method paint(
-    Bool :$fill,
-    Bool :$even-odd,
-    Bool :$close,
-    Bool :$stroke
-) returns Mu
-```
-
-fill and stroke the current path
-
-### multi method paint
-
-```raku
-multi method paint(
     &meth,
     *%o
 ) returns Mu

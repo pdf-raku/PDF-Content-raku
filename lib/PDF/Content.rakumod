@@ -54,8 +54,7 @@ my subset Align of Str where 'left' | 'center' | 'right';
 my subset Valign of Str where 'top'  | 'center' | 'bottom';
 my subset XPos-Pair of Pair where {.key ~~ Align && .value ~~ Numeric}
 my subset YPos-Pair of Pair where {.key ~~ Valign && .value ~~ Numeric}
-my subset Position of List where { .elems <= 2 }
-my subset Vector of Position  where { .are ~~ Numeric }
+my subset Vector of List where { !.defined or .elems == 2 && .are ~~ Numeric }
 
 #| Add a graphics block
 method graphics( &meth! ) {
@@ -170,7 +169,7 @@ method text-transform( |c ) {
 
 #| place an image, or form object
 multi method do(PDF::Content::XObject $obj!,
-          Position :$position = [0, 0],
+          Vector   :$position = [0, 0],
           Align    :$align is copy  = 'left',
           Valign   :$valign is copy = 'bottom',
           Numeric  :$width is copy,
@@ -327,34 +326,6 @@ method text-block(::?CLASS:D $gfx: $font = self!current-font[0], *%opt) is DEPRE
     );
 }
 
-method !set-position(
-    $text-block, $position,
-    Bool :$left! is rw,
-    Bool :$top! is rw) {
-    my Numeric $x;
-
-    with $position[0] {
-        when Numeric {$x = $_}
-        when XPos-Pair {
-            my constant Dx = %( :left(0.0), :justify(0.0), :center(-0.5), :right(-1.0) );
-            my $w := .width + .pad-left + .pad-right given $text-block;
-            $x = .value  +  Dx{.key} * $w;
-        ##    $left = True; # position from left
-        }
-    }
-    my Numeric $y;
-    with $position[1] {
-        when Numeric {$y = $_}
-        when YPos-Pair {
-            my constant Dy = %( :top(0.0), :center(0.5), :bottom(1.0) );
-            my $h := .height + .pad-top + .pad-bottom given $text-block;
-            $y = .value  +  Dy{.key} * $h;
-            $top = True; # position from top
-        }
-    }
-    self.text-position = [$x, $y];
-}
-
 #| get or set the current text position
 method text-position is rw returns Vector {
     warn '$.text-position accessor used outside of a text-block'
@@ -377,22 +348,19 @@ method text-position is rw returns Vector {
 
 #| print a text block object
 multi method print(PDF::Content::Text::Box $text-box,
-                   Position :$position,
+                   Vector :$position,
                    Bool :$nl = False,
                    Bool :$preserve = True,
                    --> List
     ) {
 
-    my Bool $left = False;
-    my Bool $top = False;
     my Bool \in-text = $.context == GraphicsContext::Text;
 
     self.BeginText unless in-text;
 
-    self!set-position($text-box, $_, :$left, :$top)
-        with $position;
+    $.text-position = $_ with $position;
     my ($x, $y) = $.text-position;
-    my ($dx, $dy) = $text-box.render(self, :$nl, :$top, :$left, :$preserve);
+    my ($dx, $dy) = $text-box.render(self, :$nl, :$preserve);
 
     self.EndText() unless in-text;
 
