@@ -358,7 +358,7 @@ multi method print(PDF::Content::Text::Box $text-box,
 
     self.BeginText unless in-text;
 
-    $.text-position = $_ with $position;
+    self.text-position = $_ with $position;
     my ($x, $y) = $.text-position;
     my ($dx, $dy) = $text-box.render(self, :$nl, :$preserve);
 
