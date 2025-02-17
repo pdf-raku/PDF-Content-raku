@@ -105,10 +105,10 @@ be used to replace the text contained in a text box.
 =begin para
 The C<bbox()> method is defined as
 =begin code :lang<raku>
-[ $tb.offset[0] - $tb.margin-left,
-  $tb.offset[1] - $tb.margin-bottom,
-  $tb.offset[0] + $tb.width + $tb.margin-right,
-  $tb.offset[1] + $tb.height + $tb.margin-top
+[ $tb.offset[0] - $tb.margin-left,   # x0
+  $tb.offset[1] - $tb.margin-bottom, # y0
+  $tb.offset[0] + $tb.width + $tb.margin-right, #x1
+  $tb.offset[1] + $tb.height + $tb.margin-top   #y1
 ]
 =end code
 for a given paragraph.
@@ -447,16 +447,18 @@ method render(
 
     my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
     my Numeric:D $dy := @!offset[1] + self!dy * ($.height - $lh * $.leading);
+    my Numeric:D $y-shift = self!dy * ($.height - $lh * $.leading);
     my $leading = $gfx.TextLeading;
     my $tf-y = $gfx.tf-y;
 
     {
         # work out and move to the text starting position
+        my $y-pad = self!dy * ($.height - $.content-height);
         my $tx := $gfx.tf-x + @!offset[0];
-        my $ty = $dy + $gfx.tf-y + self!dy * ($.content-height - $.height);
+        my $ty = $y-shift + $tf-y - $y-pad;
         $ty += $.font-size - $lh if @!lines;
         @content.push( OpCode::TextMove => [$tx, $ty] )
-            unless $tx =~= 0.0 && $ty =~= 0.0;
+            unless $ty =~= 0.0;
         # offset text positions of images content
         for @!images {
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
@@ -498,7 +500,7 @@ method render(
 
     $gfx.ops: @content;
     $gfx.tf-x += $tf-dx; # add to text-flow;
-    $gfx.tf-y = - $dy;
+    $gfx.tf-y = - $y-shift;
 
     # restore original graphics values
     $gfx."{.key}"() = .value for %saved.pairs;

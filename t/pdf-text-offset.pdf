@@ -19,7 +19,7 @@ endobj
 endobj
 
 4 0 obj
-<< /Length 6956 >> stream
+<< /Length 6851 >> stream
 q
   /GS1 gs
   0.5 0.01 0.01 RG
@@ -161,7 +161,6 @@ q
   EMC
   BT
     1 0 0 1 175 700 Tm
-    0 -5 Td
     (*** margin:0 offset:\(0,-) Tj
     T*
     (5\) *** Lorem ipsum) Tj
@@ -202,7 +201,6 @@ q
   EMC
   BT
     1 0 0 1 175 600 Tm
-    0 -5 Td
     (*** margin:-5) Tj
     T*
     (offset:\(0,-5\) *** Lorem) Tj
@@ -243,7 +241,6 @@ q
   EMC
   BT
     1 0 0 1 175 500 Tm
-    0 -5 Td
     (*** margin:5 offset:\(0,-) Tj
     T*
     (5\) *** Lorem ipsum) Tj
@@ -284,7 +281,6 @@ q
   EMC
   BT
     1 0 0 1 300 700 Tm
-    -5 0 Td
     (*** margin:0 offset:\(-) Tj
     T*
     (5,0\) *** Lorem ipsum) Tj
@@ -325,7 +321,6 @@ q
   EMC
   BT
     1 0 0 1 300 600 Tm
-    -5 0 Td
     (*** margin:-5 offset:\(-) Tj
     T*
     (5,0\) *** Lorem ipsum) Tj
@@ -366,7 +361,6 @@ q
   EMC
   BT
     1 0 0 1 300 500 Tm
-    -5 0 Td
     (*** margin:5 offset:\(-) Tj
     T*
     (5,0\) *** Lorem ipsum) Tj
@@ -407,7 +401,6 @@ q
   EMC
   BT
     1 0 0 1 425 700 Tm
-    5 5 Td
     (*** margin:0) Tj
     T*
     (offset:\(5,5\) *** Lorem) Tj
@@ -448,7 +441,6 @@ q
   EMC
   BT
     1 0 0 1 425 600 Tm
-    5 5 Td
     (*** margin:-5) Tj
     T*
     (offset:\(5,5\) *** Lorem) Tj
@@ -489,7 +481,6 @@ q
   EMC
   BT
     1 0 0 1 425 500 Tm
-    5 5 Td
     (*** margin:5) Tj
     T*
     (offset:\(5,5\) *** Lorem) Tj
@@ -542,11 +533,11 @@ xref
 0000000065 00000 n 
 0000000125 00000 n 
 0000000303 00000 n 
-0000007312 00000 n 
-0000007359 00000 n 
-0000007407 00000 n 
+0000007207 00000 n 
+0000007254 00000 n 
+0000007302 00000 n 
 trailer
 << /ID [ (t/pdf-text-offse) (t/pdf-text-offse) ] /Root 1 0 R /Size 8 >>
 startxref
-7513
+7408
 %%EOF

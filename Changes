@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.9.1  2025-02-18T08:55:20+13:00
+    - Fix text-flow regression. Noticed in PDF-API6/t/colors.t
+      rendering.
+
 0.9.0  2025-02-18T06:23:36+13:00
     - Add margins (top left bottom right) and offset[dx,dy] to
       text boxes.
