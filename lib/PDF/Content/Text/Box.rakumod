@@ -201,7 +201,6 @@ method text(::?CLASS:D $obj:) is rw {
 method !build-style(
     :$baseline = $!valign // 'alphabetic',
     Numeric :$margin = 0,
-    :@bbox,
     |c) is hidden-from-backtrace  {
     $_ .= new(:$baseline, |c) without $!style;
     given $!align {
@@ -216,7 +215,6 @@ method !build-style(
     $!margin-bottom //= $margin;
     $!margin-right  //= $margin;
     $!margin-top    //= $margin;
-    self.bbox = @bbox if @bbox;
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
