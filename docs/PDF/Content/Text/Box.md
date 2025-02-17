@@ -104,25 +104,23 @@ These methods adjust the margin placed around a text box.
 
 They have no direct affect on rendering, except that the [PDF::Content](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content) `print()` and `say()` methods, which returns the bbox around the rendered text. Note that margins can be negative, to trim text boxes.
 
-### method origin
+### method offset
 
 A two member array giving the `x,y` displacement of the text, by default `[0, 0]`. These can be set to fine-tune the positioning of the text.
 
-method bbox
------------
+### method bbox
 
-The text-boxes bounding box, including margin and origin adjustments.
+The text-boxes bounding box, including margin and offset adjustments.
 
 The `bbox()` method is defined as ```raku
-[ $tb.origin[0] - $tb.margin-left,
-  $tb.origin[1] - $tb.margin-bottom,
-  $tb.origin[0] + $tb.width + $tb.margin-right,
-  $tb.origin[1] + $tb.height + $tb.margin-top
+[ $tb.offset[0] - $tb.margin-left,
+  $tb.offset[1] - $tb.margin-bottom,
+  $tb.offset[0] + $tb.width + $tb.margin-right,
+  $tb.offset[1] + $tb.height + $tb.margin-top
 ]
 ``` for a given paragraph.
 
-style
------
+### method style
 
 ```raku
 method style() returns PDF::Content::Text::Style

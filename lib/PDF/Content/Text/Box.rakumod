@@ -94,21 +94,21 @@ be used to replace the text contained in a text box.
 
 =para They have no direct affect on rendering, except that the L<PDF::Content> C<print()> and C<say()> methods, which returns the bbox around the rendered text. Note that margins can be negative, to trim text boxes.
 
-=head3 method origin
+=head3 method offset
 
 =para A two member array giving the C<x,y> displacement of the text, by default C<[0, 0]>. These can be set to fine-tune the positioning of the text.
 
-=head2 method bbox
+=head3 method bbox
 
-=para The text-boxes bounding box, including margin and origin adjustments.
+=para The text-boxes bounding box, including margin and offset adjustments.
 
 =begin para
 The C<bbox()> method is defined as
 =begin code :lang<raku>
-[ $tb.origin[0] - $tb.margin-left,
-  $tb.origin[1] - $tb.margin-bottom,
-  $tb.origin[0] + $tb.width + $tb.margin-right,
-  $tb.origin[1] + $tb.height + $tb.margin-top
+[ $tb.offset[0] - $tb.margin-left,
+  $tb.offset[1] - $tb.margin-bottom,
+  $tb.offset[0] + $tb.width + $tb.margin-right,
+  $tb.offset[1] + $tb.height + $tb.margin-top
 ]
 =end code
 for a given paragraph.
@@ -137,7 +137,7 @@ has Bool $.squish = False;
 has Bool $.verbatim;
 has Bool $.bidi;
 has Numeric $.max-word-gap;
-has Numeric @.origin[2];
+has Numeric @.offset[2];
 has Numeric $.margin-left   is rw;
 has Numeric $.margin-bottom is rw;
 has Numeric $.margin-top    is rw;
@@ -149,7 +149,7 @@ multi sub has-bidi-controls(Str:D $_) {
     .contains(/<[ \x2066..\x2069 \x202A..\x202E ]>/)
 }
 
-=head2 style
+=head3 method style
 =for code :lang<raku>
 method style() returns PDF::Content::Text::Style
 
@@ -210,8 +210,8 @@ method !build-style(
     }
     $!valign //= 'top';
     $!max-word-gap //= 10 * self!word-gap;
-    @!origin[0] //= 0;
-    @!origin[1] //= 0;
+    @!offset[0] //= 0;
+    @!offset[1] //= 0;
     $!margin-left   //= $margin;
     $!margin-bottom //= $margin;
     $!margin-right  //= $margin;
@@ -416,7 +416,7 @@ method height returns Numeric { $!height || self.content-height }
 method !dx { %(:left(0), :justify(0), :center(0.5), :right(1.0) ){$!align} }
 method !dy { %(:top(0.0), :center(0.5), :bottom(1.0) ){$!valign} // 0; }
 
-method bbox(Numeric:D $x = @!origin[0], Numeric:D $y = @!origin[1]) {
+method bbox(Numeric:D $x = @!offset[0], Numeric:D $y = @!offset[1]) {
     ($x - $!margin-left, $y - $!margin-bottom,
      $x + self.width + $!margin-right, $y + self.height + $!margin-top)
 }
@@ -448,13 +448,13 @@ method render(
         if $gfx.comment;
 
     my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
-    my Numeric:D $dy := @!origin[1] + self!dy * ($.height - $lh * $.leading);
+    my Numeric:D $dy := @!offset[1] + self!dy * ($.height - $lh * $.leading);
     my $leading = $gfx.TextLeading;
     my $tf-y = $gfx.tf-y;
 
     {
         # work out and move to the text starting position
-        my $tx := $gfx.tf-x + @!origin[0];
+        my $tx := $gfx.tf-x + @!offset[0];
         my $ty = $dy + $gfx.tf-y + self!dy * ($.content-height - $.height);
         $ty += $.font-size - $lh if @!lines;
         @content.push( OpCode::TextMove => [$tx, $ty] )
@@ -505,7 +505,7 @@ method render(
     # restore original graphics values
     $gfx."{.key}"() = .value for %saved.pairs;
 
-    my Numeric:D $dx := self!dx * $.width - @!origin[0];
+    my Numeric:D $dx := self!dx * $.width - @!offset[0];
     (- $dx , $dy - $.height + $lh + $tf-y);
 }
 

@@ -178,7 +178,7 @@ subtest 'text box margins', {
     is-deeply $text-box.margin-bottom, 2;
     is-deeply $text-box.bbox, (0, -2, 250, $height);
     is-deeply $text-box.bbox(1,2), (1, 0, 251, $height+2);
-    $text-box.origin = [-2, 3];
+    $text-box.offset = [-2, 3];
     is-deeply $text-box.bbox, (-2, 1, 248, $height+3);
 }
 

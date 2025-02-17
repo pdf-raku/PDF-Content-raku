@@ -47,7 +47,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 ut labore et dolore magna aliqua.
 --ENOUGH!!--
 
-    for [0, 0], [0, -5], [-5, 0], [5, 5] -> @origin {
+    for [0, 0], [0, -5], [-5, 0], [5, 5] -> @offset {
 
     my $y = 700;
 for 0, -5, 5 -> $margin {
@@ -55,7 +55,7 @@ for 0, -5, 5 -> $margin {
         $gfx.&draw-cross($x, $y);
         $gfx.text: {
             .text-position = ($x, $y);
-            @rect = .print: "*** margin:$margin origin:({@origin.join(',')}) *** " ~ $sample, :$width, :$margin, :@origin;
+            @rect = .print: "*** margin:$margin offset:({@offset.join(',')}) *** " ~ $sample, :$width, :$margin, :@offset;
         }
         draw-rect $gfx, @rect;
 
@@ -70,6 +70,6 @@ $gfx.Restore;
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
 
-lives-ok {$pdf.save-as('t/pdf-text-origin.pdf')};
+lives-ok {$pdf.save-as('t/pdf-text-offset.pdf')};
 
 done-testing;
