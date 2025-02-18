@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.9.2  2025-02-19T06:57:42+13:00
+    - Further fixes to Y offset placement.
+
 0.9.1  2025-02-18T08:55:20+13:00
     - Fix text-flow regression. Noticed in PDF-API6/t/colors.t
       rendering.

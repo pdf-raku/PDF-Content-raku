@@ -446,8 +446,7 @@ method render(
         if $gfx.comment;
 
     my Numeric:D $lh := @!lines ?? @!lines.head.height !! 0;
-    my Numeric:D $dy := @!offset[1] + self!dy * ($.height - $lh * $.leading);
-    my Numeric:D $y-shift = self!dy * ($.height - $lh * $.leading);
+    my Numeric:D $y-shift = @!offset[1] + self!dy * ($.height - $lh * $.leading);
     my $leading = $gfx.TextLeading;
     my $tf-y = $gfx.tf-y;
 
@@ -506,7 +505,8 @@ method render(
     $gfx."{.key}"() = .value for %saved.pairs;
 
     my Numeric:D $dx := self!dx * $.width - @!offset[0];
-    (- $dx , $dy - $.height + $lh + $tf-y);
+    my Numeric:D $dy := $y-shift - $.height + $lh + $tf-y;
+    (- $dx , $dy);
 }
 
 #| flow any xobject images. This needs to be done
