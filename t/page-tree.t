@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 7;
+plan 14;
 
 use lib 't';
 use PDFTiny;
@@ -22,6 +22,12 @@ sub add-page($node) {
 }
 
 my PDFTiny::Page $first-page = $pdf.&add-page;
+$first-page.width.&is(612);
+$first-page.height.&is(792);
+$first-page.bbox('trim').&is-deeply([0,0, 612,792]);
+$first-page.bbox('art').&is-deeply([0,0, 612,792]);
+$first-page.trim-box.&is-deeply([0,0, 612,792]);
+$first-page.to-landscape().&is-deeply([0,0, 792,612]);
 
 my PDF::Content::PageTree:D $child .= pages-fragment;
 my PDFTiny::Page:D @middle-pages = (^3).map: {$child.&add-page};
@@ -74,4 +80,10 @@ subtest 'iterate-pages', {
 }
 
 $pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
-lives-ok { $pdf.save-as: "t/page-tree.pdf" }
+lives-ok { $pdf.save-as: "t/page-tree.pdf"; $pdf .= open: "t/page-tree.pdf" }
+
+is-deeply $pdf.Pages.page-index, [
+    :ind-ref[3, 0], :ind-ref[6, 0], :ind-ref[9, 0], :ind-ref[11, 0],
+    :ind-ref[14, 0], :ind-ref[16, 0], :ind-ref[18, 0],
+    :ind-ref[20, 0], :ind-ref[22, 0], :ind-ref[24, 0]
+], 'serialized page-index';
