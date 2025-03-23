@@ -113,10 +113,10 @@ A two member array giving the `x,y` displacement of the text, by default `[0, 0]
 The text-boxes bounding box, including margin and offset adjustments.
 
 The `bbox()` method is defined as ```raku
-[ $tb.offset[0] - $tb.margin-left,
-  $tb.offset[1] - $tb.margin-bottom,
-  $tb.offset[0] + $tb.width + $tb.margin-right,
-  $tb.offset[1] + $tb.height + $tb.margin-top
+[ $tb.offset[0] - $tb.margin-left,   # x0
+  $tb.offset[1] - $tb.margin-bottom, # y0
+  $tb.offset[0] + $tb.width + $tb.margin-right, #x1
+  $tb.offset[1] + $tb.height + $tb.margin-top   #y1
 ]
 ``` for a given paragraph.
 

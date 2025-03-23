@@ -77,7 +77,7 @@ method contents returns Str {
 }
 
 #| reparse contents
-method contents-parse {
+method contents-parse returns List {
     PDF::Content.parse($.contents);
 }
 

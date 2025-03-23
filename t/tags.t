@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 10;
+plan 11;
 
 use lib 't';
 use PDFTiny;
@@ -58,6 +58,7 @@ $page.graphics: -> $gfx {
 
     is $tag.name, 'P', 'outer tag name';
     is $tag.kids[0].name, 'Figure', 'inner tag name';
+    is $tag.descendants>>.name.join(','), 'P,Figure,Span,ReversedChars';
     is-deeply $gfx.actual-text.lines, ('Header text', 'Paragraph that contains a figure', 'Hasta la vista', 'iH'), '$.actual-text';
 }
 

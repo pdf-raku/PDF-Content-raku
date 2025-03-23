@@ -46,7 +46,7 @@ return contents
 ### method contents-parse
 
 ```raku
-method contents-parse() returns Mu
+method contents-parse() returns List
 ```
 
 reparse contents

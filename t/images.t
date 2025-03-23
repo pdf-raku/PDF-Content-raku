@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 181;
+plan 194;
 use PDF::Grammar::Test :is-json-equiv;
 use lib 't';
 use PDF::Content::XObject;
@@ -23,6 +23,7 @@ is $jpeg.encoded.codes, $jpeg<Length>, 'jpeg encoded length';
 is $jpeg.width, 24, 'jpeg width';
 is $jpeg.height, 24, 'jpeg height';
 is-json-equiv $jpeg.inline-content[1]<ID>[0]<dict>, %( :BPC(8), :CS(:name("DeviceRGB")), :F(:name("DCTDecode")), :H(24), :L(18690), :W(24) );
+is-json-equiv $jpeg.bbox, [0,0, 24,24];
 
 my PDF::Content::XObject $gif;
 lives-ok {$gif .= open: "t/images/lightbulb.gif";}, "open gif - lives";
@@ -38,7 +39,6 @@ ok $gif<Length>, 'gif dict length';
 is $gif.encoded.codes, $gif<Length>, 'gif encoded length';
 
 is $gif.data-uri, 'data:image/gif;base64,R0lGODlhEwATAMQAAP/////78P/f/9Tf/8zM/8DcwKbK8P+Y////qv/fqtTfqtS/qtSfqqq/qqCgpKqfqoCAgH+fqv//Vf/fVdS/VdSfVaqfVYCAAKp/VapfVap/AH9fVVVfVSpfVVU/VQAAACH5BAkIAAcALAAAAAATABMAAAWsoFYcJLmcY0lqx5Kl7UJR1aNiy1gMR7EkAYSQwoDtSr5AcCJJICgYgar0QySaQuGJN10gmMKgUFGBYViWqxOhVJJt58LogWW3A4vagWuqICR2AAB4GA1TJBgTVm0AChsPMCoFGBRZARYbDpFTBRB+CBiPBVJTLH1CmSkXCyU4owcPHBAQHA9cCxgwBCkODgYOHoZImyQOEQa0wodTDrMdHjbLh7McmtLLcsQkIQA7', 'data-uri from file';
-PDFTiny.open("t/images/tiny.pdf").page(1).to-xobject;
 my PDF::Content::XObject $image1;
 if lives-ok({$image1 = PDFTiny.open("t/images/tiny.pdf").page(1).to-xobject;}, "open PDF as image - lives") {
     is $image1.width, 48, 'PDF image width';
@@ -165,6 +165,7 @@ for (
     is $png<ColorSpace>, $test<ColorSpace>, "$desc color-space";
     is $png<SMask>, $test<SMask>, "$desc SMask"
 	if $test<SMask>:exists;
+    is-json-equiv $png.bbox, [0,0, 32,32];
 
     my $decode = $png<DecodeParms>;
     is $decode<BitsPerComponent>, $test<BitsPerComponent>, "$desc decode bpc";
