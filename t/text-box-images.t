@@ -96,6 +96,6 @@ $page.graphics: -> $gfx {
 $text-box.place-images($page.gfx);
 
 # ensure consistant document ID generation
-$pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
+$pdf.id = $*PROGRAM.basename.fmt('%-16.16s');
 
 $pdf.save-as: "t/text-box-images.pdf";

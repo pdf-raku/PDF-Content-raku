@@ -79,7 +79,7 @@ subtest 'iterate-pages', {
     }
 }
 
-$pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
+$pdf.id = $*PROGRAM.basename.fmt('%-16.16s');
 lives-ok { $pdf.save-as: "t/page-tree.pdf"; $pdf .= open: "t/page-tree.pdf" }
 
 is-deeply $pdf.Pages.page-index, [

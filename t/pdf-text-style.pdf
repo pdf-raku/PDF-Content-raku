@@ -443,7 +443,7 @@ xref
 0000007826 00000 n 
 0000007937 00000 n 
 trailer
-<< /ID [ (t/pdf-text-style) (t/pdf-text-style) ] /Root 1 0 R /Size 7 >>
+<< /ID [ (pdf-text-style.t) (pdf-text-style.t) ] /Root 1 0 R /Size 7 >>
 startxref
 8043
 %%EOF

@@ -45,7 +45,7 @@ for -10, 15, 30, $width - 3 -> $indent {
 $gfx.EndText;
 
 # ensure consistant document ID generation
-$pdf.id = $*PROGRAM-NAME.fmt('%-16.16s');
+$pdf.id = $*PROGRAM.basename.fmt('%-16.16s');
 
 lives-ok {$pdf.save-as('t/pdf-text-indent.pdf')};
 
