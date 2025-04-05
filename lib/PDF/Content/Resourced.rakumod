@@ -45,9 +45,9 @@ method find-resource(|c ) {
         with self.Resources;
 }
 
-method images(Bool :$inline = True) {
-    my %forms = self.resources: 'XObject';
-    my @images = %forms.values.grep( *.<Subtype> eq 'Image');
+method images(Bool :$inline = True, Bool :$forms) {
+    my %xobject = self.resources: 'XObject';
+    my @images = %xobject.values.grep( $forms ?? *.<Subtype> ne 'PS' !! *.<Subtype> eq 'Image');
     @images.append: self.gfx.inline-images
         if $inline;
     @images;

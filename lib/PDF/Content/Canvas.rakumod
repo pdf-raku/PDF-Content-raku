@@ -1,4 +1,3 @@
-
 #| A graphical content container such as a page, xobject form, or pattern
 unit role PDF::Content::Canvas;
 =para this role is applied to L<PDF::Content::Page> and L<PDF::Content::XObject>C<['Form']>.

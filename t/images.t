@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 194;
+plan 196;
 use PDF::Grammar::Test :is-json-equiv;
 use lib 't';
 use PDF::Content::XObject;
@@ -208,7 +208,9 @@ sub save-images(@images) {
 	    }
 	}
     }
-    
+
+    is +$page.images, +@images - 1;
+    is +$page.images(:forms), +@images;
     # ensure consistant document ID generation
     $pdf.id = $*PROGRAM.basename.fmt('%-16.16s');
 

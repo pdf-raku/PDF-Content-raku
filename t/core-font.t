@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 65;
+plan 67;
 use lib 't/lib';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Font;
@@ -15,6 +15,7 @@ is-deeply PDF::Content::Font::CoreFont.core-font-name('Blah'), Nil, 'core-font-n
 
 my PDF::Content::Font::CoreFont $tr-bold .= load-font( :family<Times-Roman>, :weight<bold>);
 is $tr-bold.font-name, 'Times-Bold', 'font-name';
+is $tr-bold.type, 'Type1';
 is-deeply $tr-bold.is-embedded, False, 'is-embedded';
 is-deeply $tr-bold.is-subset, False, 'is-subset';
 is-deeply $tr-bold.is-core-font, True, 'is-core-font';
@@ -32,6 +33,7 @@ isa-ok $hb-afm.metrics, 'Font::AFM';
 is $hb-afm.font-name, 'Helvetica-Bold', 'font-name';
 is $hb-afm.enc, 'win', '.enc';
 is $hb-afm.height, 1190, 'font height';
+is $hb-afm.height(500), 1190 div 2;
 is $hb-afm.height(:hanging), 925, 'font height hanging';
 is-approx $hb-afm.height(12), 14.28, 'font height @ 12pt';
 is-approx $hb-afm.height(12, :from-baseline), 11.544, 'font base-height @ 12pt';

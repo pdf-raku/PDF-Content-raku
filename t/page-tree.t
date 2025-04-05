@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 14;
+plan 18;
 
 use lib 't';
 use PDFTiny;
@@ -27,6 +27,8 @@ $first-page.height.&is(792);
 $first-page.bbox('trim').&is-deeply([0,0, 612,792]);
 $first-page.bbox('art').&is-deeply([0,0, 612,792]);
 $first-page.trim-box.&is-deeply([0,0, 612,792]);
+$first-page.crop-box.&is-deeply([0,0, 612,792]);
+$first-page.art-box.&is-deeply([0,0, 612,792]);
 $first-page.to-landscape().&is-deeply([0,0, 792,612]);
 
 my PDF::Content::PageTree:D $child .= pages-fragment;
@@ -87,3 +89,7 @@ is-deeply $pdf.Pages.page-index, [
     :ind-ref[14, 0], :ind-ref[16, 0], :ind-ref[18, 0],
     :ind-ref[20, 0], :ind-ref[22, 0], :ind-ref[24, 0]
 ], 'serialized page-index';
+
+is +$pdf.Pages.pages, 10;
+$pdf.Pages.delete-page(9);
+is +$pdf.Pages.pages, 9;
