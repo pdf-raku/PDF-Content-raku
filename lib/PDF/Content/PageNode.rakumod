@@ -41,23 +41,25 @@ method bbox(BoxName $box-name = 'media') is rw {
 
 method bleed is rw {
     my enum <lx ly ux uy>;
-    Proxy.new(
-        FETCH => {
-            my @t[4] = $.bbox('trim');
-            my @b[4] = $.bbox('bleed');
-            @t[lx]-@b[lx], @t[ly]-@b[ly], @b[ux]-@t[ux], @b[uy]-@t[uy]; 
-        },
-        STORE => -> $, Array() $b is copy {
-            my @t[4] = $.bbox('trim');
 
-            $b[lx] //= 8.5;
-            $b[ly] //= $b[lx];
-            $b[ux] //= $b[lx];
-            $b[uy] //= $b[ly];
+    sub FETCH($) {
+        my @t[4] = self.bbox('trim');
+        my @b[4] = self.bbox('bleed');
+        @t[lx]-@b[lx], @t[ly]-@b[ly], @b[ux]-@t[ux], @b[uy]-@t[uy];
+    };
 
-            self.BleedBox = @t[lx]-$b[lx], @t[ly]-$b[ly], @t[ux]+$b[ux], @t[uy]+$b[uy];
-        },
-    );
+    sub STORE($, Array() $b is copy) {
+        my @t[4] = self.bbox('trim');
+
+        $b[lx] //= 8.5;
+        $b[ly] //= $b[lx];
+        $b[ux] //= $b[lx];
+        $b[uy] //= $b[ly];
+
+        self.BleedBox = @t[lx]-$b[lx], @t[ly]-$b[ly], @t[ux]+$b[ux], @t[uy]+$b[uy];
+    };
+
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 method media-box(|c) is rw { self.bbox('media', |c) }

@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 18;
+plan 20;
 
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
@@ -55,15 +55,15 @@ $g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
 is-json-equiv $g.ops, [
     :q[],
     :cm[10, 1, 15, 2, 3, 4],
-], '.ops)_';
-is PDF::IO::Writer.write-content($g.ops).lines, ('q', '10 1 15 2 3 4 cm'), 'PDF write content';
+], '.ops';
+is-deeply PDF::IO::Writer.write-content($g.ops).lines, ('q', '10 1 15 2 3 4 cm'), 'PDF write content';
 is-deeply $g.content-dump, ('q', '10 1 15 2 3 4 cm'), 'content-dump';
-$g.ConcatMatrix( 10, 1, 15, 2, 3, 4);
+is-deeply $g.ConcatMatrix( 10, 1, 15, 2, 3, 4), (:cm[10, 1, 15, 2, 3, 4]);
 
 $g.BeginText;
 my $font = $pdf.core-font( :family<Helvetica> );
 $g.use-font($font); # define resource /F1
-$g.SetFont('F1', 16);
+is-deeply $g.SetFont('F1', 16), (:Tf[:name<F1>, 16]);
 
 is-json-equiv $g.gsaves(:delta), [ {:CTM[115, 12, 180, 19, 93, 15], :Font[$font.to-dict, 16]}, ], 'gsave saved :delta';
 is-json-equiv $g.graphics-state(:delta), {:CTM[115, 12, 180, 19, 93, 15], :Font[$font.to-dict, 16]}, 'graphics-state :delta';

@@ -212,37 +212,36 @@ multi method new(:parent($canvas)!, |c) is DEPRECATED('new: :$canvas') {
 }
 
 method graphics-accessor(Attribute $att, $setter) is rw {
-    Proxy.new(
-        FETCH => { $att.get_value(self) },
-        STORE => -> $, *@v {
-            self."$setter"(|@v)
-                unless [$att.get_value(self).list] eqv @v;
-        });
+    sub FETCH($) { $att.get_value(self) }
+    sub STORE($, *@v) {
+        self."$setter"(|@v)
+        unless $att.get_value(self).Array eqv @v;
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 method ext-graphics-accessor(Attribute $att, $key) is rw {
-    Proxy.new(
-        FETCH => { $att.get_value(self) },
-        STORE => -> $, \v {
-            unless $att.get_value(self) eqv v {
-                given $!canvas {
-                    # Match any reusable GS entry; otherwise create a new entry
-                    my Str $gs-entry;
-                    with $!canvas<Resources> {
-                        with .<ExtGState> -> $ext {
-
-                            $gs-entry = $ext.keys.first: {
-                                given $ext{$_} {
-                                    +.keys - (.<Type>:exists) == 1 && .{$key} eqv v;
-                                }
+    sub FETCH($) { $att.get_value(self) }
+    sub STORE($, \v) {
+        unless $att.get_value(self) eqv v {
+            given $!canvas {
+                # Match any reusable GS entry; otherwise create a new entry
+                my Str $gs-entry;
+                with $!canvas<Resources> {
+                    with .<ExtGState> -> $ext {
+                        $gs-entry = $ext.keys.first: {
+                            given $ext{$_} {
+                                +.keys - (.<Type>:exists) == 1 && .{$key} eqv v;
                             }
                         }
                     }
-                    $gs-entry //= $!canvas.resource-key: PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
-                    self.SetGraphicsState($gs-entry);
                 }
+                $gs-entry //= $!canvas.resource-key: PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
+                self.SetGraphicsState($gs-entry);
             }
-        });
+        }
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 my Attribute %GraphicVars;
@@ -474,16 +473,15 @@ method font-size returns Numeric {$!Font[1] // Numeric}
 # *** Graphics STATE ***
 has Numeric @.CTM is graphics = [ 1, 0, 0, 1, 0, 0, ];      # graphics matrix;
 method CTM is rw {
-    Proxy.new(
-        FETCH => { @!CTM },
-        STORE => -> $, List $lval {
-            # matrices are usually concatonated, but allow assignment. Work backwards
-            # finding a @diff matrix that concatonates to @!CTM to produce $lval
-            my @diff = $lval.&multiply: @!CTM.&inverse();
-            self.ConcatMatrix: |@diff
-                unless @diff.&is-identity();
-            @!CTM;
-        });
+    sub FETCH($) { @!CTM }
+    sub STORE($, List $lval) {
+        # matrices are usually concatonated, but allow assignment. Work backwards
+        # finding a @diff matrix that concatonates to @!CTM to produce $lval
+        my @diff = $lval.&multiply: @!CTM.&inverse();
+        self.ConcatMatrix: |@diff
+            unless @diff.&is-identity();
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 has Numeric $.LineWidth   is graphics is stored(method ($!LineWidth) {}) is rw = 1.0;
 has UInt    $.LineCap     is graphics is stored(method ($!LineCap) {}) is rw = ButtCaps;
@@ -502,43 +500,41 @@ sub device-colorspace(Str $_) {
 has Str $.StrokeColorSpace is graphics is stored(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
 has @!StrokeColor is graphics = [0.0];
 method StrokeColor is rw {
-    Proxy.new(
-        FETCH => -> $ { $!StrokeColorSpace => @!StrokeColor },
-        STORE => -> $, Pair $_ {
-            my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
-            unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
-                my $cs := device-colorspace($key);
-                if $cs {
-                    self."SetStroke$cs"(|.value.clone);
-                }
-                else {
-                    self.SetStrokeColorSpace($key);
-                    self.SetStrokeColorN(|.value.clone);
-                }
+    sub FETCH($) { $!StrokeColorSpace => @!StrokeColor }
+    sub STORE($, Pair $_) {
+        my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
+        unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
+            my $cs := device-colorspace($key);
+            if $cs {
+                self."SetStroke$cs"(|.value.clone);
+            }
+            else {
+                self.SetStrokeColorSpace($key);
+                self.SetStrokeColorN(|.value.clone);
             }
         }
-    );
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 has Str $.FillColorSpace is graphics is stored(method ($!FillColorSpace) { }) is rw = 'DeviceGray';
 has @!FillColor is graphics = [0.0];
 method FillColor is rw {
-    Proxy.new(
-        FETCH => -> $ {$!FillColorSpace => @!FillColor},
-        STORE => -> $, Pair $_ {
-            my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
-            unless $key eq $!FillColorSpace && .value eqv @!FillColor {
-                my $cs := device-colorspace($key);
-                if $cs {
-                    self."SetFill$cs"(|.value.clone);
-                }
-                else {
-                    self.SetFillColorSpace($key);
-                    self.SetFillColorN(|.value.clone);
-                }
+    sub FETCH($) {$!FillColorSpace => @!FillColor}
+    sub STORE($, Pair $_) {
+        my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
+        unless $key eq $!FillColorSpace && .value eqv @!FillColor {
+            my $cs := device-colorspace($key);
+            if $cs {
+                self."SetFill$cs"(|.value.clone);
+            }
+            else {
+                self.SetFillColorSpace($key);
+                self.SetFillColorN(|.value.clone);
             }
         }
-    );
+    }
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 my subset RenderingIntention of Str where 'AbsoluteColorimetric'|'RelativeColorimetric'|'Saturation'|'Perceptual';
@@ -577,7 +573,7 @@ has @.gsaves;
 multi method gsaves(:$delta! where .so --> Array) {
     my @gs = @!gsaves;
     @gs.push: $.graphics-state;
-    delta(@gs);
+    @gs.&delta();
 }
 #| return graphics gsave stack, including all graphics variables
 multi method gsaves returns Array { @!gsaves }
@@ -588,7 +584,7 @@ method gsave is DEPRECATED('gsaves') { @!gsaves }
 #| return locally updated graphics state variables
 multi method graphics-state(:$delta! --> Hash) {
     with @!gsaves.tail {
-        delta([$_, $.graphics-state]).tail;
+        [$_, $.graphics-state].&delta().tail;
     }
     else {
         Nil;
