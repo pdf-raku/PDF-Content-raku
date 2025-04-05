@@ -67,10 +67,12 @@ warns-like {$g.ShowText('there')}, X::PDF::Content::OP::Unexpected;
 
 warns-like {$g.SetLineWidth(2)}, X::PDF::Content::OP::Unexpected;
 
+throws-like {$g.SetLineWidth("Fat") }, X::PDF::Content::OP::Error, :message(q{Error processing 'w' (SetLineWidth) operator: Type check failed in binding to parameter '$val'; expected Numeric but got Str ("Fat")});
+
 $g.BeginText;
-todo "PDF::Grammar v0.2.4+ needed for bad-args test"
-    unless PDF::Grammar.^ver >= v0.2.4;
 throws-like {$g.ops("(extra-arg) 10 20 Td");}, X::PDF::Content::OP::BadArgs, :message(q{Bad 'Td' (TextMove) argument list: "extra-arg", 10, 20});
+throws-like {$g.SetStrokeColor;}, X::PDF::Content::OP::TooFewArgs, :message(q{Too few arguments to 'SC' (SetStrokeColor)});
+throws-like {$g.SetStrokeColor(42, 'Foo', );}, X::PDF::Content::OP::BadArg, :message(q{Bad 'SC' (SetStrokeColor) argument: "Foo"});
 $g.EndText;
 
 $g.Save;

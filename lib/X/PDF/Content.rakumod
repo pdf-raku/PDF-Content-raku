@@ -22,7 +22,7 @@ class X::PDF::Content::OP::BadNesting
     method message {
         "Bad nesting; '$.op' ($.mnemonic) operator not matched by preceeding $!opener"
     }
- }
+}
 
 class X::PDF::Content::OP::BadNesting::MarkedContent
     is X::PDF::Content::OP::BadNesting {
@@ -59,7 +59,7 @@ class X::PDF::Content::OP::BadArgs
 }
 
 class X::PDF::Content::OP::TooFewArgs
-    is X::PDF::Content {
+    is X::PDF::Content::OP {
     method message { "Too few arguments to '$.op' ($.mnemonic)" }
 }
 
