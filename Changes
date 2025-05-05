@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.9.3  2025-05-06T08:22:37+12:00
     - Fix Op::TooFewArgs exception
     - Fix loss of leading atom in text-box overflow.
 
