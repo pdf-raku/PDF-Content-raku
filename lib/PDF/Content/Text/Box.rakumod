@@ -294,6 +294,7 @@ method !layup(@atoms is copy) {
             $word-pad = 0;
             if self!height-exceeded {
                 @!lines.pop;
+                $i--;
                 last LAYUP;
             }
         }

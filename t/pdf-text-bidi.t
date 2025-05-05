@@ -13,9 +13,9 @@ my PDF::Content::Page $page = $pdf.add-page;
 my PDF::Content $gfx = $page.gfx;
 my $width = 50;
 my $font-size = 18;
-constant $LRO = 0x202D.chr;
-constant $RLO = 0x202E.chr;
-constant $PDF = 0x202C.chr;
+constant $LRO = "\c[LEFT-TO-RIGHT OVERRIDE]";
+constant $RLO = "\c[RIGHT-TO-LEFT OVERRIDE]";
+constant $PDF = "\c[POP DIRECTIONAL FORMATTING]";
 
 if (try require ::('Text::FriBidi::Lines')) === Nil {
     skip-rest "Text::FriBidi v0.0.4+ is required for :bidi tests";

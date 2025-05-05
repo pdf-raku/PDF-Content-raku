@@ -1,4 +1,6 @@
 {{$NEXT}}
+    - Fix Op::TooFewArgs exception
+    - Fix loss of leading atom in text-box overflow.
 
 0.9.2  2025-02-19T06:57:42+13:00
     - Further fixes to Y offset placement.

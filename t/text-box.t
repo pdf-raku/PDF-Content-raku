@@ -125,11 +125,11 @@ subtest 'overflow', {
         is $text-box.lines[0].text, 'Lorem ipsum dolor sit';
         is $text-box.lines[1].text, 'amet, consectetur';
         is-deeply  $text-box.Str.lines, ('Lorem ipsum dolor sit', 'amet, consectetur');
-        is $text-box.overflow.join, " elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        is $text-box.overflow.join, "adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         $text = '...' ~ $text-box.overflow.join;
         $text-box .= clone: :$text;
         .say: $text-box;
-        is $text-box.overflow.join, ' et dolore magna aliqua.';
+        is $text-box.overflow.join, 'incididunt ut labore et dolore magna aliqua.';
         .say: '...' ~ $text-box.overflow.join;
     }
 }
