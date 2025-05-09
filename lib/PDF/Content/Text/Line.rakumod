@@ -55,7 +55,7 @@ method content-width returns Numeric {
     $!indent  +  $!word-width  +  @!spaces.sum * $!word-gap;
 }
 
-multi method align('justify', Numeric :$width!, Numeric:D :$max-word-gap! ) {
+multi method align('justify', Numeric:D :$width!, Numeric:D :$max-word-gap! ) {
     my Numeric \content-width = $.content-width;
     my Numeric \wb = +@!spaces.sum;
 

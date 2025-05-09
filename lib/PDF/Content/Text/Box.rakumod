@@ -245,35 +245,29 @@ method !layup(@atoms is copy) {
         my StrOrImage $atom = @atoms[$i++];
         my Bool $xobject = False;
         my Int $line-breaks = 0;
-        my List $word;
-        my Numeric $word-width = 0;
         my Numeric $word-pad = $preceding-spaces * $word-gap;
         my Bool $soft-hyphen;
+        my List $word;
+        my Numeric $word-width;
 
-        given $atom {
+        :($word, $word-width) := do given $atom {
+            when "\c[HYPHENATION POINT]" {
+                $soft-hyphen = True;
+                $atom = $!style.hyphen;
+                $!style.hyphen-encoding;
+            }
             when Str {
-                my $enc;
-                if $atom eq "\c[HYPHENATION POINT]" {
-                    $atom = $!style.hyphen;
-                    $enc  = $!style.hyphen-encoding;
-                    $soft-hyphen = True;
+                if $!verbatim && .match("\n", :g) -> UInt() $nl {
+                    # todo: handle tabs
+                    $line-breaks = $nl;
+                    $atom = ' ' x $preceding-spaces;
+                    $word-pad = 0;
                 }
-                else {
-                    if $!verbatim && +.match("\n", :g) -> UInt $nl {
-                        # todo: handle tabs
-                        $line-breaks = $nl;
-                        $atom = ' ' x $preceding-spaces;
-                        $word-pad = 0;
-                    }
-                    $enc = $!style.encode: $atom;
-                }
-                $word = $enc[0];
-                $word-width = $enc[1];
+                $!style.encode: $atom;
             }
             when PDF::Content::XObject {
                 $xobject = True;
-                $word = [-$atom.width * $.HorizScaling * 10 / $!style.font-size, ];
-                $word-width = $atom.width;
+                [-.width * $.HorizScaling * 10 / $!style.font-size, ], .width;
             }
         }
 
@@ -360,7 +354,7 @@ method !layup(@atoms is copy) {
         }
     }
 
-    my $width = $.width
+    my Numeric $width = $.width
         if $!align eq 'justify';
 
     .align($!align, :$width, :$!max-word-gap )
