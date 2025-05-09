@@ -91,6 +91,11 @@ $page.graphics: -> $gfx {
         @rect = $gfx.print($text-box, :position[100, 400]);
     }
    draw-rect($gfx,@rect);
+
+   @rect = $gfx.print($image, :position[100, 580]);
+   draw-rect($gfx,@rect);
+   @rect = $gfx.print($image, :position[125, 580]);
+   draw-rect($gfx,@rect);
 }
 
 $text-box.place-images($page.gfx);

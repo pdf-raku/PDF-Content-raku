@@ -458,6 +458,12 @@ method render(
             my Numeric @Tm[6] = $gfx.TextMatrix.list;
             @Tm[4] += .<Tx> + $tx;
             @Tm[5] += .<Ty> + $.TextRise + $ty;
+            given .<xobject> {
+                if .type eq 'image' {
+                    @Tm[0] *= .width;
+                    @Tm[3] *= .height;
+                }
+            }
             .<Tm> = @Tm;
         }
     }
@@ -510,7 +516,9 @@ method place-images($gfx) {
     for self.images {
         $gfx.Save;
         $gfx.ConcatMatrix: |.<Tm>;
-        .<xobject>.finish;
+        given .<xobject> {
+            .finish if .type eq 'form';
+        }
         $gfx.XObject: $gfx.resource-key(.<xobject>);
         $gfx.Restore;
     }

@@ -1,4 +1,7 @@
 {{$NEXT}}
+    - Fix placement of Image-XObjects in text blocks
+    - Allow print()/say() on XObjects, as an alternative
+      to do().
 
 0.9.3  2025-05-06T08:22:37+12:00
     - Fix Op::TooFewArgs exception
@@ -36,7 +39,7 @@
 
 0.8.12  2024-12-09T07:07:11+13:00
     - Tweak current-point() for #28 and also to more faithfully follow
-      the spec. Return and undefined list, if there's no current point,
+      the spec. Return an undefined list, if there's no current point,
       rather than (undef, undef).
 
 0.8.11  2024-12-06T17:19:32+13:00

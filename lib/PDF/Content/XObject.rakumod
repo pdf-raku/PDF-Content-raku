@@ -32,6 +32,8 @@ role PDF::Content::XObject['Form']
     has Numeric $.width;
     has Numeric $.height;
 
+    method type { 'form' }
+
     my proto sub from-origin($) is export(:from-origin) {*} 
 
     multi sub from-origin(List:D $_) {
@@ -63,6 +65,8 @@ role PDF::Content::XObject['Image']
     does PDF::Content::XObject {
 
     use PDF::COS::Name;
+
+    method type { 'image' }
 
     has Numeric $.width;
     has Numeric $.height;

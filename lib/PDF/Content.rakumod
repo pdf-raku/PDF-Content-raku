@@ -310,12 +310,25 @@ method text-box(
 
 #| output text leave the text position at the end of the current line
 multi method print(
-    Str $text,
+    Str:D $text,
     *%opt,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
     --> List
 ) {
     my $text-box = self.text-box( :$text, |%opt);
     @.print( $text-box, |%opt);
+}
+
+multi method print(
+    PDF::Content::XObject:D $xo, *%opt) {
+    my $text-box = self.text-box( :chunks[$xo,], |%opt);
+    my @rv := @.print( $text-box, |%opt);
+    if $.context == GraphicsContext::Text {
+        warn "xobjects cannot be printed from within a text box";
+    }
+    else {
+        $text-box.place-images(self);
+    }
+    @rv;
 }
 
 # deprecated in favour of text-box()
