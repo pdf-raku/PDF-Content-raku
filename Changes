@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.9.5  2025-05-11T11:14:46+12:00
+    - Remove PDF::Content::XObject type() method, added in 0.9.4
+      Causing regressions in PDF::API6
+
 0.9.4  2025-05-11T10:52:46+12:00
     - Fix text-box calculated position, for variable
       first-line height.

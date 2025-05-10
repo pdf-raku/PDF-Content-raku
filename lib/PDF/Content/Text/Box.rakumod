@@ -459,7 +459,7 @@ method render(
             @Tm[4] += .<Tx> + $tx;
             @Tm[5] += .<Ty> + $.TextRise + $ty;
             given .<xobject> {
-                if .type eq 'image' {
+                if .does(PDF::Content::XObject['Image']) {
                     @Tm[0] *= .width;
                     @Tm[3] *= .height;
                 }
@@ -517,7 +517,7 @@ method place-images($gfx) {
         $gfx.Save;
         $gfx.ConcatMatrix: |.<Tm>;
         given .<xobject> {
-            .finish if .type eq 'form';
+            .finish if .does(PDF::Content::XObject['Form']);
         }
         $gfx.XObject: $gfx.resource-key(.<xobject>);
         $gfx.Restore;
