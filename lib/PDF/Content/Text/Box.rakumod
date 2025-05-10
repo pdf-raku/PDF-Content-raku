@@ -506,7 +506,7 @@ method render(
     $gfx."{.key}"() = .value for %saved.pairs;
 
     my Numeric:D $dx := self!dx * $.width - @!offset[0];
-    my Numeric:D $dy := $y-shift - $.height + $lh + $tf-y;
+    my Numeric:D $dy := $y-shift - $.height + $.font-size + $tf-y + $.TextRise;
     (- $dx , $dy);
 }
 

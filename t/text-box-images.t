@@ -11,13 +11,12 @@ use PDF::Content::Color :&color;
 use PDFTiny;
 
 # experimental feature to flow text and images
-my $n = 0;
-sub draw-rect($gfx, @rect) {
+sub draw-rect($gfx, @rect, :@color = (.5, .01, .01)) {
     $gfx.tag: 'Artifact', {
         @rect[2] -= @rect[0];
         @rect[3] -= @rect[1];
         $gfx.StrokeAlpha = .5;
-        $gfx.StrokeColor = color .5, .01, .01;
+        $gfx.StrokeColor = color @color;
         $gfx.paint: :stroke, { .Rectangle(|@rect); }
     }
 }
@@ -25,14 +24,11 @@ sub draw-rect($gfx, @rect) {
 my PDFTiny $pdf .= new;
 my PDF::Content::Page $page = $pdf.add-page;
 
-my @chunks = PDF::Content::Text::Box.comb: 'I must go down to the seas';
-@chunks.append: ' ', 'aga','in';
 my PDF::Content::Font::CoreFont $font = $pdf.core-font( :family<helvetica>, :weight<bold> );
 my $font-size = 16;
 my PDF::Content::XObject $image .= open: "t/images/lightbulb.gif";
 
 my $image-padded = $page.xobject-form(:BBox[0, 0, $image.width + 1, $image.height + 4]);
-$image-padded.gfx;
 my @rect;
 $image-padded.graphics: {
     @rect = .do($image, :position[1,0]);
@@ -44,15 +40,19 @@ my $text-box;
 my (@rect2, @rect3);
 
 $page.text: -> $gfx {
-    $gfx.TextMove(100, 500);
-    $text-box = $gfx.text-box( :@chunks, :$font, :$font-size, :width(220) );
+    my @chunks = PDF::Content::Text::Box.comb: 'I must go down to the seas';
+    @chunks.append: ' ', 'aga','in';
+    $gfx.TextMove(100, 540);
+    $text-box = $gfx.text-box: :@chunks, :$font, :$font-size;
+    @rect = $gfx.say($text-box);
+    $text-box = $gfx.text-box: :@chunks, :$font, :$font-size, :width(220);
     @rect2 = $gfx.say($text-box);
     for @chunks.grep('the'|'aga') -> $source is rw {
         $source = $image-padded;
     }
-    $text-box = $gfx.text-box( :@chunks, :$font, :$font-size, :width(220) );
+    $text-box = $gfx.text-box: :@chunks, :$font, :$font-size, :width(220);
     @rect3 = $gfx.say($text-box).list;
-    is-deeply [@rect3.map(*.round)], [100, 437, 320, 488], '$gfx.say returned rectangle';
+    is-deeply [@rect3.map(*.round)], [100, 453, 320, 503], '$gfx.say returned rectangle';
     is-json-equiv [$text-box.images.map({[ .<Tx>, .<Ty> ]})], [
         [141.344, 0],
         [0.0, -25.3]
@@ -62,8 +62,9 @@ $page.text: -> $gfx {
 $text-box.place-images($page.gfx);
 
 $page.graphics: -> $gfx {
-    draw-rect($gfx,@rect2);
-    draw-rect($gfx,@rect3);
+    $gfx.&draw-rect(@rect);
+    $gfx.&draw-rect(@rect2, :color[.2, .6, .2]);
+    $gfx.&draw-rect(@rect3);
 }
 
 $page.graphics: -> $gfx {

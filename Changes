@@ -1,4 +1,6 @@
 {{$NEXT}}
+    - Fix text-box calculated position, for variable
+      first-line height.
     - Fix placement of Image-XObjects in text blocks
     - Allow print()/say() on XObjects, as an alternative
       to do().

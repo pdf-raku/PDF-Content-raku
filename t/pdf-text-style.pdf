@@ -14,12 +14,12 @@ endobj
   /Contents 4 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >>
+  /Resources << /ExtGState << /GS1 5 0 R >> /Font << /F1 6 0 R /F2 7 0 R >> >>
 >>
 endobj
 
 4 0 obj
-<< /Length 7499 >> stream
+<< /Length 8102 >> stream
 BT
   1 0 0 1 50 100 Tm
   /F1 18 Tf
@@ -144,11 +144,7 @@ BT
   T*
   [ (consequat.  ) 139 (Duis ) 70 (aute ) 70 (irure) ] TJ
   T*
-  [ (dolor ) 70 (in ) 70 (reprehenderit ) 70 (in) ] TJ
-  T*
-  [ (voluptate ) 70 (velit ) 70 (esse ) 70 (cillum) ] TJ
-  T*
-  [ (dolore ) 70 (eu ) 70 (fugiat ) 70 (nulla ) 70 (pariatur.) ] TJ
+  [ (dolor ) 70 (in ) 70 ] TJ
   T*
   100 Tz
   1 0 0 1 460 700 Tm
@@ -206,7 +202,7 @@ BT
   T*
   [ (consequat.  ) 150 (Duis ) 75 (aute) ] TJ
   T*
-  [ (irure ) 75 (dolor ) 75 (in ) 75 (reprehenderit) ] TJ
+  [ (irure ) 75 (dolor ) 75 (in ) 75 ] TJ
   T*
   0 Tc
   1 0 0 1 130 530 Tm
@@ -349,15 +345,7 @@ BT
   T*
   (consequat.  Duis aute) Tj
   T*
-  (irure dolor in) Tj
-  T*
-  (reprehenderit in) Tj
-  T*
-  (voluptate velit esse) Tj
-  T*
-  (cillum dolore eu fugiat) Tj
-  T*
-  (nulla pariatur.  ut) Tj
+  (irure dolor in ) Tj
   T*
   1 0 0 1 130 360 Tm
   (*** leading 1.5 ***) Tj
@@ -412,10 +400,96 @@ BT
   T*
   0 Ts
 ET
+q
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      20 560 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      130 563 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      240 557 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      350 560 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      460 560 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      20 390 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      130 390 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      240 390 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      350 390 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      460 390 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      20 220 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      130 220 100 150 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      240 212.82 100 150 re
+      S
+    Q
+  EMC
+Q
 endstream
 endobj
 
 5 0 obj
+<< /Type /ExtGState /CA 0.5 >>
+endobj
+
+6 0 obj
 <<
   /Type /Font
   /Subtype /Type1
@@ -424,7 +498,7 @@ endobj
 >>
 endobj
 
-6 0 obj
+7 0 obj
 <<
   /Type /Font
   /Subtype /Type1
@@ -434,16 +508,17 @@ endobj
 endobj
 
 xref
-0 7
+0 8
 0000000000 65535 f 
 0000000015 00000 n 
 0000000065 00000 n 
 0000000125 00000 n 
-0000000274 00000 n 
-0000007826 00000 n 
-0000007937 00000 n 
+0000000302 00000 n 
+0000008457 00000 n 
+0000008504 00000 n 
+0000008615 00000 n 
 trailer
-<< /ID [ (pdf-text-style.t) (pdf-text-style.t) ] /Root 1 0 R /Size 7 >>
+<< /ID [ (pdf-text-style.t) (pdf-text-style.t) ] /Root 1 0 R /Size 8 >>
 startxref
-8043
+8721
 %%EOF

@@ -391,7 +391,7 @@ multi method print(PDF::Content::Text::Box $text-box,
     }
 
     my \x0 = $x + $dx;
-    my \y0 = $y + $dy + $text-box.TextRise;
+    my \y0 = $y + $dy;
 
     $text-box.bbox(x0, y0);
 }

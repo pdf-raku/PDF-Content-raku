@@ -7,6 +7,17 @@ use PDF::Content;
 use PDF::Content::Page;
 use PDF::Content::Ops :OpCode;
 use PDF::Content::FontObj;
+use PDF::Content::Color :&color;
+
+sub draw-rect($gfx, @rect, :@color = (.5, .01, .01)) {
+    $gfx.tag: 'Artifact', {
+        @rect[2] -= @rect[0];
+        @rect[3] -= @rect[1];
+        $gfx.StrokeAlpha = .5;
+        $gfx.StrokeColor = color @color;
+        $gfx.paint: :stroke, { .Rectangle(|@rect); }
+    }
+}
 
 my PDFTiny $pdf .= new;
 my PDF::Content::Page $page = $pdf.add-page;
@@ -31,7 +42,7 @@ is-deeply $gfx.content-dump, $(
     "ET",
      ), "hello world (with kerning)";
 
-$gfx.say('RVX', :$width, :shape, :position[150, 100], :font($bold-font), :$font-size);
+$gfx.say('RVX', :shape, :position[150, 100], :font($bold-font), :$font-size);
 
 is-deeply $gfx.content-dump.tail(5), $(
     "BT",
@@ -51,13 +62,13 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
 minim veniam, quis nostrud exercitation ullamco laboris nisi ut
 aliquip ex ea commodo consequat.  Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur.  ut labore et dolore magna aliqua.
 --ENOUGH!!--
 
 $gfx.BeginText;
 $gfx.set-font($font, 10);
 my %default-settings = :TextRise(0), :HorizScaling(100), :CharSpacing(0), :WordSpacing(0);
+
+my Array @rects;
 
 for (
     :TextRise(0), :TextRise(3), :TextRise(-3),
@@ -82,7 +93,8 @@ for (
         }
     }
 
-    $gfx.say("*** {%opts} *** " ~ $sample, :$width, :$height, :position[$x, $y], |%opts);
+    my @rect = $gfx.say("*** {%opts} *** " ~ $sample, :$width, :$height, :position[$x, $y], |%opts);
+    @rects.push: @rect;
 
     if $x < 400 {
         $x += 110;
@@ -94,6 +106,10 @@ for (
 }
 
 $gfx.EndText;
+
+$gfx.Save;
+    $gfx.&draw-rect(@$_) for @rects;
+$gfx.Restore;
 
 # ensure consistant document ID generation
 $pdf.id = $*PROGRAM.basename.fmt('%-16.16s');
