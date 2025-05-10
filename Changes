@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.9.4  2025-05-11T10:52:46+12:00
     - Fix text-box calculated position, for variable
       first-line height.
     - Fix placement of Image-XObjects in text blocks
