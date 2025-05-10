@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 19;
+plan 20;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -55,19 +55,20 @@ subtest 'text box cloning', {
 }
 
 my $gfx = $pdf.add-page.gfx;
+my @rects;
 subtest 'text box rendering', {
     $gfx.Save;
     $gfx.BeginText;
     $gfx.text-position = [100, 350];
     $gfx.FillColor = color Blue;
     is-deeply $gfx.text-position, (100.0, 350.0), 'text position';
-    $gfx.say( $text-box );
+    @rects.push: $gfx.say( $text-box );
     is-deeply $gfx.text-position, (100.0, 350 - 17.6), 'text position';
     $text-box .= new( :$text, :$font, :$font-size, :squish );
     is-approx $text-box.content-width, 365.328, '$.content-width (squished)';
     is-approx $text-box.content-height, 17.6, '$.content-height (squished)';
     $text-box.TextRise = $text-box.baseline-shift('bottom');
-    $gfx.print( $text-box, :!preserve );
+    @rects.push: $gfx.print( $text-box, :!preserve );
     $gfx.EndText;
     $gfx.Restore;
 }
@@ -121,16 +122,16 @@ subtest 'overflow', {
         $height = 50;
         $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
         .text-position = 100, 650;
-        .say: $text-box;
+        @rects.push: .say: $text-box;
         is $text-box.lines[0].text, 'Lorem ipsum dolor sit';
         is $text-box.lines[1].text, 'amet, consectetur';
         is-deeply  $text-box.Str.lines, ('Lorem ipsum dolor sit', 'amet, consectetur');
         is $text-box.overflow.join, "adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         $text = '...' ~ $text-box.overflow.join;
         $text-box .= clone: :$text;
-        .say: $text-box;
+        @rects.push: .say: $text-box;
         is $text-box.overflow.join, 'incididunt ut labore et dolore magna aliqua.';
-        .say: '...' ~ $text-box.overflow.join;
+        @rects.push: .say: '...' ~ $text-box.overflow.join;
     }
 }
 
@@ -144,7 +145,7 @@ subtest 'zero width spaces', {
         $height = 50;
         $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
         .text-position = 100, 500;
-        .say: $text-box;
+        @rects.push: .say: $text-box;
         is $text-box.lines[0].text, 'Loremipsumdolorsitamet,';
         is $text-box.lines[1].text, 'consecteturadipiscingelit,';
         is-deeply  $text-box.Str.lines, ('Loremipsumdolorsitamet,', 'consecteturadipiscingelit,');
@@ -152,9 +153,9 @@ subtest 'zero width spaces', {
         is-deeply $text-box.overflow.join, qw<do eiusmod tempor incididunt ut labore et dolore magna aliqua.>.join: "\c[ZERO WIDTH SPACE]";
         $text = '...' ~ $text-box.overflow.join;
         $text-box .= clone: :$text;
-        .say: $text-box;
+        @rects.push: .say: $text-box;
         is $text-box.overflow.join, "magna\c[ZERO WIDTH SPACE]aliqua.";
-        .say: '...' ~ $text-box.overflow.join;
+        @rects.push: .say: '...' ~ $text-box.overflow.join;
     }
 }
 
@@ -164,8 +165,19 @@ subtest 'variable spaces', {
         my $width = 400;
         $height = 100;
         $text-box .= new( :$text, :$font, :$font-size, :$width, :$height );
-        .text-position = 100, 250;
-        .say: $text-box;
+        .text-position = 100, 300;
+        @rects.push: .say: $text-box;
+    }
+}
+
+subtest 'empty text box', {
+    $gfx.text: {
+        .text-position = 100, 150;
+        @rects.push: $gfx.print: "empty text follows..";
+        @rects.push: $gfx.say: "";
+        my ($r1, $r2) = @rects.tail(2);
+        is-deeply $r2, ($r1[2], $r1[1], $r1[2], $r1[3]);
+        @rects.push: $gfx.say: "next line";
     }
 }
 
@@ -180,6 +192,20 @@ subtest 'text box margins', {
     is-deeply $text-box.bbox(1,2), (1, 0, 251, $height+2);
     $text-box.offset = [-2, 3];
     is-deeply $text-box.bbox, (-2, 1, 248, $height+3);
+}
+
+$gfx.graphics: {
+    sub draw-rect(@rect, :@color = (.5, .01, .01)) {
+        $gfx.tag: 'Artifact', {
+            my @r = .[0], .[1], .[2] - .[0], .[3] - .[1]
+                given @rect;
+            $gfx.StrokeAlpha = .5;
+            $gfx.StrokeColor = color @color;
+            $gfx.paint: :stroke, { .Rectangle(|@r); }
+        }
+    }
+
+    draw-rect($_) for @rects;
 }
 
 subtest 'font loading from content stream', {

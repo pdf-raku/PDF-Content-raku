@@ -10,7 +10,6 @@ use PDF::Content::XObject;
 use PDF::Content::Color :&color;
 use PDFTiny;
 
-# experimental feature to flow text and images
 sub draw-rect($gfx, @rect, :@color = (.5, .01, .01)) {
     $gfx.tag: 'Artifact', {
         @rect[2] -= @rect[0];

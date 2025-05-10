@@ -5,7 +5,7 @@
 endobj
 
 2 0 obj
-<< /Type /Pages /Count 2 /Kids [ 3 0 R 6 0 R ] >>
+<< /Type /Pages /Count 2 /Kids [ 3 0 R 7 0 R ] >>
 endobj
 
 3 0 obj
@@ -14,12 +14,12 @@ endobj
   /Contents 4 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /Font << /F1 5 0 R >> >>
+  /Resources << /ExtGState << /GS1 5 0 R >> /Font << /F1 6 0 R >> >>
 >>
 endobj
 
 4 0 obj
-<< /Length 1102 >> stream
+<< /Length 2072 >> stream
 q
   BT
     1 0 0 1 100 350 Tm
@@ -61,7 +61,7 @@ BT
   T*
 ET
 BT
-  1 0 0 1 100 250 Tm
+  1 0 0 1 100 300 Tm
   [ (Spaces:en-space ) -222 (space tab em-space   ) -166 (em-quad) ] TJ
   T*
   [ (three          ) -220 (four              ) -108 (six                     ) -162 (thin ) 78 (hair ) 178 (zero) ] TJ
@@ -73,10 +73,98 @@ BT
   (. ) Tj
   T*
 ET
+BT
+  1 0 0 1 100 150 Tm
+  (empty text follows..) Tj
+  [ ] TJ
+  T*
+  (next line) Tj
+  T*
+ET
+q
+  /Artifact BMC
+    /GS1 gs
+    0.5 0.01 0.01 RG
+    q
+      100 346 369.776 20 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 334.112 365.328 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 616 200 50 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 580.8 200 50 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 578 344.976 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 466 200 50 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 430.8 200 50 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 428 164.496 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 216 400 100 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 148.4 148.48 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      248.48 148.4 0 17.6 re
+      S
+    Q
+  EMC
+  /Artifact BMC
+    q
+      100 130.8 64.912 17.6 re
+      S
+    Q
+  EMC
+Q
 endstream
 endobj
 
 5 0 obj
+<< /Type /ExtGState /CA 0.5 >>
+endobj
+
+6 0 obj
 <<
   /Type /Font
   /Subtype /Type1
@@ -85,17 +173,17 @@ endobj
 >>
 endobj
 
-6 0 obj
+7 0 obj
 <<
   /Type /Page
-  /Contents 7 0 R
+  /Contents 8 0 R
   /MediaBox [ 0 0 612 792 ]
   /Parent 2 0 R
-  /Resources << /Font << /F1 8 0 R >> /Procset [ /PDF /Text ] >>
+  /Resources << /Font << /F1 9 0 R >> /Procset [ /PDF /Text ] >>
 >>
 endobj
 
-7 0 obj
+8 0 obj
 << /Length 88 >> stream
 q
   BT
@@ -109,7 +197,7 @@ Q
 endstream
 endobj
 
-8 0 obj
+9 0 obj
 <<
   /Type /Font
   /Subtype /Type1
@@ -119,18 +207,19 @@ endobj
 endobj
 
 xref
-0 9
+0 10
 0000000000 65535 f 
 0000000015 00000 n 
 0000000065 00000 n 
 0000000131 00000 n 
-0000000270 00000 n 
-0000001425 00000 n 
-0000001536 00000 n 
-0000001699 00000 n 
-0000001838 00000 n 
+0000000298 00000 n 
+0000002423 00000 n 
+0000002470 00000 n 
+0000002581 00000 n 
+0000002744 00000 n 
+0000002883 00000 n 
 trailer
-<< /ID [ (text-box.t      ) (text-box.t      ) ] /Root 1 0 R /Size 9 >>
+<< /ID [ (text-box.t      ) (text-box.t      ) ] /Root 1 0 R /Size 10 >>
 startxref
-1945
+2990
 %%EOF
