@@ -96,7 +96,8 @@ my enum ParagraphTags is export(:ParagraphTags,:Tags) (
     :Title<Title>, :FENote<FENote>,
 );
 my enum ListElemTags is export(:ListElemTags,:Tags) (
-    :List<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
+    :List<L>, # Deprecated due to clash with Raku, will be removed
+    :LIST<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
 );
 my enum TableTags is export(:TableTags,:Tags) (
     :Table<Table>,     :TableHead<THead>, :TableBody<TBody>,
