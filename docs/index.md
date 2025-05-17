@@ -36,7 +36,7 @@ as listed in the [PDF::API6 Graphics Documentation](https://pdf-raku.github.io/P
 
 ## See Also
 
-- [PDF::Font::Loader](https://pdf-raku.github.io/PDF-Font-Loader-raku) provides the ability to load and embed Type-1 and True-Type fonts.
+- [PDF::Font::Loader](https://pdf-raku.github.io/PDF-Font-Loader-raku) provides the ability to load and embed Type-1, True-Type and Open-Type fonts.
 
 - [PDF::Lite](https://pdf-raku.github.io/PDF-Lite-raku) minimal creation and manipulation of PDF documents. Built directly from PDF and this module.
 

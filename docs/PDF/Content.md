@@ -198,7 +198,7 @@ create a text box object for use in graphics .print() or .say() methods
 
 ```raku
 multi method print(
-    Str $text,
+    Str:D $text,
     *%opt
 ) returns List
 ```
