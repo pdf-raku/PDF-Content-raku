@@ -127,7 +127,7 @@ my enum ContentTags is export(:ContentTags,:Tags) (
     :Clipped<Clip>, # [PDF 32000 14.6.3 Marked Content and Clipping
 );
 
-constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums, ContentTags.enums, :Code<Code>, :List<L> );
+constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums, ContentTags.enums, );
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
 #| Add a child tag
