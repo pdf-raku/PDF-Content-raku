@@ -96,7 +96,6 @@ my enum ParagraphTags is export(:ParagraphTags,:Tags) (
     :Title<Title>, :FENote<FENote>,
 );
 my enum ListElemTags is export(:ListElemTags,:Tags) (
-    :List<L>, # Deprecated due to clash with Raku, will be removed
     :LIST<L>, :ListItem<LI>, :Label<Lbl>, :ListBody<LBody>,
 );
 my enum TableTags is export(:TableTags,:Tags) (
@@ -128,7 +127,7 @@ my enum ContentTags is export(:ContentTags,:Tags) (
     :Clipped<Clip>, # [PDF 32000 14.6.3 Marked Content and Clipping
 );
 
-constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums, ContentTags.enums );
+constant %TagAliases is export(:TagAliases) = %( StructureTags.enums, ParagraphTags.enums, ListElemTags.enums, TableTags.enums, InlineElemTags.enums, IllustrationTags.enums, ContentTags.enums, :Code<Code>, :List<L> );
 constant TagSet is export(:TagSet) = %TagAliases.values.Set;
 
 #| Add a child tag
