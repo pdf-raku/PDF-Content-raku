@@ -94,6 +94,16 @@ Vertical alignment of mutiple-line text boxes: `top`, `center`, or `bottom`.
 
 See also the `:baseline` option for vertical displacement of the first line of text.
 
+Note that the baseline is implicitely set to the valign option. However the default for `valign` is `top`, and the default for baseline is `alphabetic`.
+
+### method baseline
+
+The font baseline to use. This is similar to the HTML::Canvas [textBaseline](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-textbaseline) property.
+
+### method baseline-shift
+
+Vertical displacement, in scaled font units, needed to postions the font to the baseline. `0` for `alphabetic` baseline.
+
 ### method lines
 
 An array of [PDF::Content::Text::Line](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Line) objects.
@@ -164,6 +174,7 @@ break a text string into word and whitespace fragments
 
 ```raku
 method clone(
+    :$style = Code.new,
     :$text = Code.new,
     |c
 ) returns PDF::Content::Text::Box
