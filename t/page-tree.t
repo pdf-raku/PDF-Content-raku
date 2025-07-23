@@ -4,7 +4,6 @@ plan 18;
 
 use lib 't';
 use PDFTiny;
-use PDF::Content::PageTree;
 my PDFTiny $pdf .= new;
 nok $pdf.Pages<Resources>.defined, 'global resources scoping';
 $pdf.Pages.global-resources-scope = True;
@@ -31,11 +30,11 @@ $first-page.crop-box.&is-deeply([0,0, 612,792]);
 $first-page.art-box.&is-deeply([0,0, 612,792]);
 $first-page.to-landscape().&is-deeply([0,0, 792,612]);
 
-my PDF::Content::PageTree:D $child .= pages-fragment;
+my PDFTiny::Pages:D $child .= pages-fragment;
 my PDFTiny::Page:D @middle-pages = (^3).map: {$child.&add-page};
 $pdf.Pages.add-pages: $child;
 
-my PDF::Content::PageTree:D $grand-child = $child.add-pages;
+my PDFTiny::Pages:D $grand-child = $child.add-pages;
 my PDFTiny::Page:D @bottom-pages = (^3).map: {$grand-child.&add-page};
 my PDFTiny::Page:D @top-pages    = (^3).map: {$pdf.&add-page};
 

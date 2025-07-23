@@ -1,4 +1,11 @@
 {{$NEXT}}
+    - Save the existing Text Box :baseline option as an attribute. Note:
+      1. This is a symbolic name for the baseline, taken from the HTML Canvas
+         specification https://html.spec.whatwg.org/multipage/canvas.html
+      2. The existing baseline-shift() method is the scaled horizontal shift
+         from the font's actual baseline.
+    - Fix the text-box clone method to take a deep copy of the style; this
+      avoid changes to the cloned fonts style from affecting the original.
 
 0.9.6  2025-05-18T07:31:44+12:00
     - Deprecate ListElemTags List enumeration in favour of

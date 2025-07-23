@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 20;
+plan 21;
 use lib 't';
 use PDF::Grammar::Test :is-json-equiv;
 use PDF::Content::Text::Box;
@@ -21,10 +21,14 @@ my $height = 20;
 my PDFTiny $pdf .= new;
 
 subtest 'text box basic', {
-    $text-box .= new( :$text, :$font, :$font-size, :$height );
+    $text-box .= new( :$text, :$font, :$font-size, :$height, );
     is $text-box.text, $text;
     is $text-box.font-size, 16;
     is $text-box.height, 20;
+    is $text-box.align, 'left', 'default align';
+    is $text-box.valign, 'top', 'default valign';
+    is $text-box.baseline, 'alphabetic';
+    is $text-box.baseline-shift, 0;
     is-approx $text-box.space-width, 4.448, 'space-width';
     is-approx $text-box.content-width, 369.776, '$.content-width';
     is-approx $text-box.content-height, 17.6, '$.content-height';
@@ -40,6 +44,15 @@ subtest 'text box line', {
     is-approx $text-box.content-width, 408.64;
 }
 
+subtest 'baseline adjustments',  {
+    temp $text-box .= clone( :baseline<hanging> );
+    is $text-box.baseline, 'hanging';
+    is-approx $text-box.baseline-shift, -11.488;
+    $text-box .= clone( :baseline<bottom> );
+    is $text-box.baseline, 'bottom';
+    is-approx $text-box.baseline-shift, 3.312;
+    
+}
 subtest 'text box cloning', {
     $text-box .= clone;
     is $text-box.text, $text, '$.text';
@@ -149,12 +162,11 @@ subtest 'zero width spaces', {
         is $text-box.lines[0].text, 'Loremipsumdolorsitamet,';
         is $text-box.lines[1].text, 'consecteturadipiscingelit,';
         is-deeply  $text-box.Str.lines, ('Loremipsumdolorsitamet,', 'consecteturadipiscingelit,');
-        todo "fix tests", 2;
-        is-deeply $text-box.overflow.join, qw<do eiusmod tempor incididunt ut labore et dolore magna aliqua.>.join: "\c[ZERO WIDTH SPACE]";
+        is-deeply $text-box.overflow.join.subst("\c[ZERO WIDTH SPACE]", '|', :g), 'sed|do|eiusmod|tempor|incididunt|ut|labore|et|dolore|magna|aliqua.';
         $text = '...' ~ $text-box.overflow.join;
         $text-box .= clone: :$text;
         @rects.push: .say: $text-box;
-        is $text-box.overflow.join, "magna\c[ZERO WIDTH SPACE]aliqua.";
+        is $text-box.overflow.join, "dolore\c[ZERO WIDTH SPACE]magna\c[ZERO WIDTH SPACE]aliqua.";
         @rects.push: .say: '...' ~ $text-box.overflow.join;
     }
 }

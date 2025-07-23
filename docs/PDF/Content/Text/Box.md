@@ -92,7 +92,7 @@ Horizontal alignment `left`, `center`, or `right`.
 
 Vertical alignment of mutiple-line text boxes: `top`, `center`, or `bottom`.
 
-See also the :baseline` option for vertical displacememnt of the first line of text.
+See also the `:baseline` option for vertical displacement of the first line of text.
 
 ### method lines
 

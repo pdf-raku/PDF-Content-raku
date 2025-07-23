@@ -39,6 +39,7 @@ method !build(
             $!space-width = $sw;
         }
     }
+    self
 }
 submethod TWEAK(*%o) {
     %o<TextRise> //= self.baseline-shift($_)
@@ -66,7 +67,7 @@ multi method baseline-shift(Baseline $_ --> Numeric) {
     when 'hanging'         { - h }
     default                { 0 }
 }
-=para This returns a positive or negative y-offset in units of points.  The default is C<alphabetic>, which is a zero offset.
+=para This returns a positive or negative y-offset in units of points. The default is C<alphabetic>, which is a zero offset.
 
 
 #| get/set a numeric font vertical alignment offset

@@ -3,17 +3,15 @@ use Test;
 plan 3;
 
 use lib 't';
-use PDF::Content::Page;
-use PDF::Content::PageTree;
 use PDFTiny;
 
 my PDFTiny $pdf .= new;
 my $cfont = $pdf.core-font('Courier');
 my @fonts = <Courier Times-Roman Helvetica Times-Italic>.map: { $pdf.core-font($_) }
-my PDF::Content::Page @pages;
+my PDFTiny::Page @pages;
 lives-ok {
     @pages = (1..20).hyper(:batch(1)).map: -> $page-num {
-        my PDF::Content::Page:D $page = PDF::Content::PageTree.page-fragment;
+        my PDFTiny::Page:D $page = PDFTiny::Pages.page-fragment;
         $page.graphics: {
             .font = $cfont;
             .say: "Page $page-num", :position[50, 700];

@@ -1,6 +1,6 @@
 use v6;
 use Test;
-plan 1;
+plan 9;
 use lib 't';
 use PDF::Content;
 use PDF::Content::Color :&color;
@@ -83,7 +83,10 @@ $gfx.text: {
     .text-position = 10, 620;
     .print: 'Valign: ';
     for <top center bottom top> -> $valign {
-        @rects.push: .print: $valign, :$valign;
+        my $tb = .text-box: :text($valign), :$valign;
+        is $tb.valign, $valign,   'valign';
+        is $tb.baseline, $valign, 'baseline';
+        @rects.push: .print: $tb;
     }
 
     my $x = 150;

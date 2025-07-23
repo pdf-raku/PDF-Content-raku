@@ -82,7 +82,18 @@ be used to replace the text contained in a text box.
 
 =para Vertical alignment of mutiple-line text boxes: C<top>, C<center>, or C<bottom>.
 
-=para See also the :baseline` option for vertical displacememnt of the first line of text.
+=para See also the C<:baseline> option for vertical displacement of the first line of text.
+
+=para Note that the baseline is implicitely set to the valign option. However the default for C<valign> is C<top>, and
+the default for baseline is C<alphabetic>.
+
+=head3 method baseline
+
+=para The font baseline to use. This is similar to the HTML::Canvas L<textBaseline|https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-textbaseline> property.
+
+=head3 method baseline-shift
+
+=para Vertical displacement, in scaled font units, needed to postions the font to the baseline. C<0> for C<alphabetic> baseline.
 
 =head3 method lines
 
@@ -142,6 +153,7 @@ has Numeric $.margin-left   is rw;
 has Numeric $.margin-bottom is rw;
 has Numeric $.margin-top    is rw;
 has Numeric $.margin-right  is rw;
+has Str:D   $.baseline = $!valign // 'alphabetic';
 
 method bidi { $!bidi //= $!text.&has-bidi-controls(); }
 multi sub has-bidi-controls(Str:U) { False }
@@ -180,9 +192,11 @@ method comb(Str $_ --> Seq) {
 #| clone a text box
 method clone(
     ::?CLASS:D:
+    :$style = $!style.clone,
     :$text = $!text ~ @!overflow.join,
     |c --> ::?CLASS:D) {
-    given callwith(|c) {
+    $style.TWEAK: |c;
+    given callwith(:$style, |c) {
         .TWEAK: :$text, |c;
         $_;
     }
@@ -198,11 +212,10 @@ method text(::?CLASS:D $obj:) is rw {
     );
 }
 
-method !build-style(
-    :$baseline = $!valign // 'alphabetic',
+method !build(
     Numeric :$margin = 0,
     |c) is hidden-from-backtrace  {
-    $_ .= new(:$baseline, |c) without $!style;
+    $_ .= new(:$!baseline, |c) without $!style;
     given $!align {
         when 'start' { $_ = $.direction eq 'ltr' ?? 'left' !! 'right' }
         when 'end'   { $_ = $.direction eq 'rtl' ?? 'left' !! 'right' }
@@ -218,12 +231,12 @@ method !build-style(
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
-    self!build-style: |c;
+    self!build: |c;
     self!layup: @chunks;
 }
 
 multi submethod TWEAK(:@chunks!, :$!text = @chunks».Str.join, |c) {
-    self!build-style: |c;
+    self!build: |c;
     self!layup: @chunks;
 }
 
