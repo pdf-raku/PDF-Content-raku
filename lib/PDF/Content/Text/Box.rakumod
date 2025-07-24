@@ -89,7 +89,7 @@ the default for baseline is C<alphabetic>.
 
 =head3 method baseline
 
-=para The font baseline to use. This is similar to the HTML::Canvas L<textBaseline|https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-textbaseline> property.
+=para The font baseline to use. This is similar to the HTML Canvas L<textBaseline|https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-textbaseline> property.
 
 =head3 method baseline-shift
 
@@ -99,7 +99,7 @@ the default for baseline is C<alphabetic>.
 
 =para An array of L<PDF::Content::Text::Line> objects.
 
-=head3 methods margin-left, margin-bottom, margin-right, margin-top, bbox
+=head3 methods margin-left, margin-bottom, margin-right, margin-top
 
 =para These methods adjust the margin placed around a text box.
 
@@ -165,7 +165,7 @@ multi sub has-bidi-controls(Str:D $_) {
 =for code :lang<raku>
 method style() returns PDF::Content::Text::Style
 
-=para Styling delegate for this text box. SeeL<PDF::Content::Text::Style>
+=para Styling delegate for this text box. See L<PDF::Content::Text::Style>
 
 =para This method also handles method C<font>, C<font-size>, C<leading>, C<kern>, C<WordSpacing>, C<CharSpacing>, C<HorizScaling>, C<TextRender>, C<TextRise>, C<baseline-shift>, C<space-width>, C<underline-position>, C<underline-thickness>, C<font-height>. For example C<$tb.font-height> is equivalent to C<$tb.style.font-height>.
 

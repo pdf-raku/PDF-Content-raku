@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.9.7  2025-07-24T13:31:25+12:00
     - Save the existing Text Box :baseline option as an attribute. Note:
       1. This is a symbolic name for the baseline, taken from the HTML Canvas
          specification https://html.spec.whatwg.org/multipage/canvas.html

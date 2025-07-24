@@ -98,7 +98,7 @@ Note that the baseline is implicitely set to the valign option. However the defa
 
 ### method baseline
 
-The font baseline to use. This is similar to the HTML::Canvas [textBaseline](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-textbaseline) property.
+The font baseline to use. This is similar to the HTML Canvas [textBaseline](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-textbaseline) property.
 
 ### method baseline-shift
 
@@ -108,7 +108,7 @@ Vertical displacement, in scaled font units, needed to postions the font to the 
 
 An array of [PDF::Content::Text::Line](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Line) objects.
 
-### methods margin-left, margin-bottom, margin-right, margin-top, bbox
+### methods margin-left, margin-bottom, margin-right, margin-top
 
 These methods adjust the margin placed around a text box.
 
@@ -136,7 +136,7 @@ The `bbox()` method is defined as ```raku
 method style() returns PDF::Content::Text::Style
 ```
 
-Styling delegate for this text box. See[PDF::Content::Text::Style](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Style)
+Styling delegate for this text box. See [PDF::Content::Text::Style](https://pdf-raku.github.io/PDF-Content-raku/PDF/Content/Text/Style)
 
 This method also handles method `font`, `font-size`, `leading`, `kern`, `WordSpacing`, `CharSpacing`, `HorizScaling`, `TextRender`, `TextRise`, `baseline-shift`, `space-width`, `underline-position`, `underline-thickness`, `font-height`. For example `$tb.font-height` is equivalent to `$tb.style.font-height`.
 
