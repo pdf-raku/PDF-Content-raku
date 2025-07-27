@@ -16,14 +16,14 @@ sub name($_) { PDF::COS::Name.COERCE: $_ }
 
 has PDF::Content $!gfx;     #| appended graphics
 #| return appended PDF content stream
-method gfx(::?ROLE:D $canvas: |c --> PDF::Content) handles<html-canvas graphics text> {
-    $!gfx //= PDF::Content.new: :$canvas, |c
+method gfx(::?ROLE:D $canvas: *%o --> PDF::Content) handles<html-canvas graphics text> {
+    $!gfx //= PDF::Content.new: :$canvas, |%o
 }
 
 has PDF::Content $!pre-gfx;
 method has-pre-gfx returns Bool { ? (.ops with $!pre-gfx) }
 #| return prepended graphics
-method pre-gfx returns PDF::Content { $!pre-gfx //= PDF::Content.new( :canvas(self) ) }
+method pre-gfx(::?ROLE:D $canvas:) returns PDF::Content { $!pre-gfx //= PDF::Content.new( :$canvas ) }
 method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
 has Bool $!rendered = False;
 has UInt $.mcid = 0;
@@ -85,8 +85,8 @@ method new-gfx(::?ROLE:D $canvas: |c) is DEPRECATED {
 }
 
 #| render graphics
-method render(Bool :$tidy = True, |c --> PDF::Content) {
-    my $gfx := $.gfx(|c);
+method render(Bool :$tidy = True, *%o --> PDF::Content) {
+    my $gfx := $.gfx(|%o);
     $!rendered ||= do {
         my Pair @ops = self.contents-parse;
         @ops = self!tidy(@ops)
