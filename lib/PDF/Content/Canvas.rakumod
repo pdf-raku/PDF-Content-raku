@@ -12,19 +12,24 @@ use PDF::Content::Tag;
 use PDF::COS::Stream;
 use PDF::COS::Name;
 use PDF::Content::XObject;
+use Method::Also;
+
 sub name($_) { PDF::COS::Name.COERCE: $_ }
 
 has PDF::Content $!gfx;     #| appended graphics
 #| return appended PDF content stream
-method gfx(::?ROLE:D $canvas: *%o --> PDF::Content) handles<html-canvas graphics text> {
+multi method gfx(::?ROLE:D $canvas: *%o --> PDF::Content) handles<html-canvas graphics text> {
     $!gfx //= PDF::Content.new: :$canvas, |%o
+}
+multi method gfx(&code, *%o) {
+    $.gfx(|%o).graphics(&code);
 }
 
 has PDF::Content $!pre-gfx;
 method has-pre-gfx returns Bool { ? (.ops with $!pre-gfx) }
 #| return prepended graphics
-method pre-gfx(::?ROLE:D $canvas:) returns PDF::Content { $!pre-gfx //= PDF::Content.new( :$canvas ) }
-method pre-graphics(&code) { self.pre-gfx.graphics( &code ) }
+multi method pre-gfx(::?ROLE:D $canvas:) returns PDF::Content { $!pre-gfx //= PDF::Content.new( :$canvas ) }
+multi method pre-gfx(&code) is also<pre-graphics> { self.pre-gfx.graphics( &code ) }
 has Bool $!rendered = False;
 has UInt $.mcid = 0;
 method use-mcid(UInt:D $_) {

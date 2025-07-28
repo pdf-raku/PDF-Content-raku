@@ -1,4 +1,6 @@
 {{$NEXT}}
+    - Allow gfx() method to take an optional code block; make
+      it behave similarly to the similarly named graphics methid
 
 0.9.7  2025-07-24T13:31:25+12:00
     - Save the existing Text Box :baseline option as an attribute. Note:
