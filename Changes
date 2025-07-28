@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.9.8  2025-07-28T14:20:26+12:00
     - Allow gfx() method to take an optional code block; make
       it behave similarly to the similarly named graphics methid
 
