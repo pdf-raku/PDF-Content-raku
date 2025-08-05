@@ -1,8 +1,9 @@
 {{$NEXT}}
+    - Better handle failure to load image
 
 0.9.8  2025-07-28T14:20:26+12:00
     - Allow gfx() method to take an optional code block; make
-      it behave similarly to the similarly named graphics methid
+      it behave similarly to the similarly named graphics method
 
 0.9.7  2025-07-24T13:31:25+12:00
     - Save the existing Text Box :baseline option as an attribute. Note:

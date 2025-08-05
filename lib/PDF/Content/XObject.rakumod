@@ -13,7 +13,7 @@ role PDF::Content::XObject {
     }
 
     #| load from a file or data-uri
-    multi method open(\fh = self, |c) {
+    multi method open(\fh = self, |c) is hidden-from-backtrace {
         my PDF::Content::Image $image-obj .= load(fh, |c);
         $image-obj.read;
         my PDF::COS::Stream $xobject = $image-obj.to-dict;

@@ -161,7 +161,7 @@ my constant FontOps = set <d0 d1>;
 my constant Openers = set <q BT BMC BDC BX>;
 my constant Closers = set <Q ET EMC EX>;
 # Extended Graphics States (Resource /ExtGState entries)
-# See [PDF 3200 Table 58 – Entries in a Graphics State Parameter Dictionary]
+# See [PDF 32000 Table 58 – Entries in a Graphics State Parameter Dictionary]
 # These match PDF::ExtGState from PDF::Class
 my enum ExtGState is export(:ExtGState) «
     :LineWidth<LW>
@@ -226,17 +226,15 @@ method ext-graphics-accessor(Attribute $att, $key) is rw {
         unless $att.get_value(self) eqv v {
             given $!canvas {
                 # Match any reusable GS entry; otherwise create a new entry
-                my Str $gs-entry;
-                with $!canvas<Resources> {
+                my Str $gs-entry = do with $!canvas<Resources> {
                     with .<ExtGState> -> $ext {
-                        $gs-entry = $ext.keys.first: {
+                        $ext.keys.first: {
                             given $ext{$_} {
                                 +.keys - (.<Type>:exists) == 1 && .{$key} eqv v;
                             }
                         }
                     }
-                }
-                $gs-entry //= $!canvas.resource-key: PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
+                } // $!canvas.resource-key: PDF::COS::Dict.COERCE: { :Type{ :name<ExtGState> }, $key => v };
                 self.SetGraphicsState($gs-entry);
             }
         }
@@ -813,9 +811,8 @@ my Routine %Ops = BEGIN %(
     },
 
     # c1, ..., cn [name]      scn | SCN
-    'scn'|'SCN' => sub (Str $op, *@_args) {
+    'scn'|'SCN' => sub (Str $op, *@args is copy) {
 
-        my @args = @_args.list;
         die X::PDF::Content::OP::TooFewArgs.new: :$op, :mnemonic(%OpName{$op})
             unless @args;
 
@@ -945,7 +942,7 @@ multi method op(*@args is copy) {
             @args .= map: {
                 when List { [ .map: { from-ast($_) } ] }
                 when Hash { %( .map: {.key => from-ast(.value)} ) }
-                default { $_ }
+                default   { $_ }
             }
         }
 

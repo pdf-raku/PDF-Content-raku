@@ -142,7 +142,7 @@ multi method tag {
 }
 
 #| Open an image from a file-spec or data-uri
-method load-image($spec --> PDF::Content::XObject) {
+method load-image($spec --> PDF::Content::XObject) is hidden-from-backtrace {
     PDF::Content::XObject.open($spec);
 }
 

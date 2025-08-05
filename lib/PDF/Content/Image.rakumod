@@ -64,8 +64,10 @@ multi method load(DataURI $data-uri where m/^('data:' [<t=.ident> '/' <s=.ident>
 }
 
 #| load an image from a path
-multi method load(IO::Path() $io-path --> ::?CLASS:D) {
-    self.load( $io-path.open( :r, :bin) );
+multi method load(IO::Path() $iop --> ::?CLASS:D) is hidden-from-backtrace {
+    my $ioh = $iop.open( :r, :bin);
+    $ioh.fail if $ioh ~~ Failure;
+    self.load: $ioh;
 }
 
 method !image-handler(Str :$image-type!) {

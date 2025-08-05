@@ -27,13 +27,11 @@ multi method resources('ProcSet') {
     @entries;
 }
 multi method resources(Str $type) {
-    my %entries;
-    with self.Resources {
+    do with self.Resources {
         with .{$type} -> Hash $r {
-            %entries = $r.keys.map: { $_ => $r{$_} };
+            $r.keys.map({ $_ => $r{$_} }).Hash;
         }
-    }
-    %entries;
+    } // %();
 }
 
 method resource-entry(|c) {
