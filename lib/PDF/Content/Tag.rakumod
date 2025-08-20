@@ -121,7 +121,7 @@ my enum IllustrationTags is export(:IllustrationTags,:Tags) (
 
 #| These tags are meaningful within content streams, as opposed to the structure-tree
 my enum ContentTags is export(:ContentTags,:Tags) (
-    :Artifact<Artifact>,
+    :Artifact<Artifact>,   # Can also be Structural Element (PDF 32000-2)
     :OptionalContent<OC>,  # [PDF 32000 8.11.3.2 Optional Content in Content Streams]
     :TagSuspect<TagSuspect>, :ReversedChars<ReversedChars>, # [PDF 32000 14.8.2 Tagged PDF and Page Content]
     :Clipped<Clip>, # [PDF 32000 14.6.3 Marked Content and Clipping
