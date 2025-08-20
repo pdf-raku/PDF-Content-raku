@@ -1,5 +1,8 @@
 {{$NEXT}}
+
+0.9.9  2025-08-21T06:50:07+12:00
     - Better handle failure to load image
+    - Unbreak canvas pre-graphics method
 
 0.9.8  2025-07-28T14:20:26+12:00
     - Allow gfx() method to take an optional code block; make
