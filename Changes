@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+0.9.10  2025-08-26T06:28:17+12:00
+    - Add PDF::Content::Tag dest-name() accessor. For use by PDF::Tags.
+
 0.9.9  2025-08-21T06:50:07+12:00
     - Better handle failure to load image
     - Unbreak canvas pre-graphics method

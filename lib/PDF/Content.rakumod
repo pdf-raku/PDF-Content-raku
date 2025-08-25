@@ -1,5 +1,5 @@
 #| PDF Content construction and manipulation
-unit class PDF::Content:ver<0.9.9>;
+unit class PDF::Content:ver<0.9.10>;
 
 use PDF::Content::Ops :OpCode, :GraphicsContext, :ExtGState;
 also is PDF::Content::Ops;
@@ -447,7 +447,7 @@ method draw(PDF::Content:D $gfx: $html-canvas, :$renderer, |c) {
 use PDF::Content::Matrix :&dot, :&inverse-dot;
 method base-coords(*@coords where .elems %% 2, :$user = True, :$text = !$user --> Array) {
     my @ = @coords.map: -> $x is copy, $y is copy {
-        ($x, $y) = $.TextMatrix.&dot($x, $y) if $text;
+        :($x, $y) := $.TextMatrix.&dot($x, $y) if $text;
         slip($user ?? $.CTM.&dot($x, $y) !! ($x, $y));
     }
 }

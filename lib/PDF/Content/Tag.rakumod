@@ -72,7 +72,8 @@ has $.canvas is required;
 method owner is DEPRECATED<canvas> { $!canvas }
 has UInt $.start is rw;
 has UInt $.end is rw;
-has UInt $.mcid is rw; # marked content identifer
+has UInt $.mcid is rw;      # marked content identifer
+has Str  $.dest-name is rw; # resolved named destination target
 has PDF::COS::Stream $.content;
 has PDF::Content::Tag $.parent is rw; # hierarchical parent
 has NodeSet $.kids handles<AT-POS list grep map tags children elems> .= new;
