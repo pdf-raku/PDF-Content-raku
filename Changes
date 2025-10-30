@@ -1,4 +1,5 @@
 {{$NEXT}}
+    - Add some PDF 2.0 definitions to PDF::StructTreeRoot standard structure types
 
 0.9.10  2025-08-26T06:28:17+12:00
     - Add PDF::Content::Tag dest-name() accessor. For use by PDF::Tags.

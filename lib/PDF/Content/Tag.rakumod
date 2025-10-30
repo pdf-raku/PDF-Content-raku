@@ -84,8 +84,12 @@ my enum StructureTags is export(:StructureTags,:Tags) (
     :Division<Div>, :BlockQuotation<BlockQuote>, :Caption<Caption>,
     :TableOfContents<TOC>, :TableOfContentsItem<TOCI>, :Index<Index>,
     :NonStructural<NonStruct>, :Private<Private>,
+    # + [[PDF 32000-2 Table 364 Document level structure types]
+    :DocumentFragment<DocumentFragment>,
     # + [PDF 32000-2 Table 365 — Grouping level structure types]
-    :DocumentFragment<DocumentFragment>, :Aside<Aside>, :Subdivision<Sub>,
+    :Aside<Aside>,
+    # + [PDF 32000-2 Table 367 — Sub-block level structure type]
+    :Subdivision<Sub>,
 );
 
 #| See [PDF 32000 Tables 334-337 - Block-level structure elements]
