@@ -277,20 +277,17 @@ my subset MadeFont where {.does(PDF::Content::FontObj) || .?font-obj.defined}
 multi sub make-font(PDF::Content::FontObj:D $_) { $_ }
 #| associate a font dictionary with a font object
 multi sub make-font(
-    PDF::COS::Dict:D() $dict where .<Type> ~~ 'Font'
-    --> PDF::COS::Dict
+    PDF::Content::Font:D() $dict --> PDF::COS::Dict
 ) {
-    $dict.^mixin: PDF::Content::Font
-        unless $dict.does(PDF::Content::Font);
-    unless $dict.font-obj.defined {
+    $dict.font-obj //= do {
         my $font-loader = try PDF::COS.required("PDF::Font::Loader");
         die "Content font loading is only supported if PDF::Font::Loader is installed"
             if $font-loader === Any;
 
         my Bool $core-font = $dict<Subtype> ~~ 'Type1'
-                         && ! $dict<FontDescriptor>.defined
-                         &&  PDF::Content::Font::CoreFont.core-font-name($dict<BaseFont>).defined;
-        $dict.make-font: $font-loader.load-font(:$dict, :$core-font);
+             && ! $dict<FontDescriptor>.defined
+             && PDF::Content::Font::CoreFont.core-font-name($dict<BaseFont>).defined;
+        $font-loader.load-font(:$dict, :$core-font);
     }
     $dict;
 }
@@ -309,12 +306,12 @@ method text-box(
 }
 
 #| output text leave the text position at the end of the current line
-multi method print(
-    Str:D $text,
-    *%opt,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font, :$font-size
+method !print(
+    Str:D $text, MadeFont :$font!,
+    *%opt,  # :$align, :$valign, :$kern, :$leading, :$width, :$height, :$baseline-shift, :$font-size
     --> List
 ) {
-    my $text-box = self.text-box( :$text, |%opt);
+    my $text-box = self.text-box( :$text, :$font, |%opt);
     @.print( $text-box, |%opt);
 }
 
@@ -426,8 +423,8 @@ method font is rw returns Array {
 }
 
 #| print text to the content stream
-multi method print(Str $text, :$font = self!current-font[0], |c --> List) {
-    nextwith( $text, :$font, |c);
+multi method print(Str $text, :$font = make-font(self!current-font[0]), |c --> List) {
+    self!print: $text, :$font, |c;
 }
 
 #| add graphics using HTML Canvas 2D API

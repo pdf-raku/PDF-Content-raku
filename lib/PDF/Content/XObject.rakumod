@@ -2,7 +2,7 @@
 role PDF::Content::XObject {
     use PDF::Content::Image :&make-data-uri;
     use PDF::COS::Stream;
-    my subset XObjectType of Str where 'Form'|'Image'|'PS';
+    my subset XObjectType of Str:D where 'Form'|'Image'|'PS';
 
     #| load from in-memory data
     multi method open(
@@ -16,14 +16,17 @@ role PDF::Content::XObject {
     multi method open(\fh = self, |c) is hidden-from-backtrace {
         my PDF::Content::Image $image-obj .= load(fh, |c);
         $image-obj.read;
-        my PDF::COS::Stream $xobject = $image-obj.to-dict;
-        my XObjectType $sub-type = $xobject<Subtype>;
-        $xobject does PDF::Content::XObject[$sub-type]
-            unless $xobject ~~ PDF::Content::XObject;
-        $xobject.image-obj = $image-obj;
-        $xobject;
+        given $image-obj.to-dict -> PDF::Content::XObject() $xo {
+            $xo.image-obj = $image-obj;
+            $xo;
+        }
     }
 
+    multi method COERCE(PDF::Content::XObject:D $_) { $_ }
+    multi method COERCE(PDF::COS::Stream:D $xobject where .<Subtype> ~~ XObjectType) {
+        my XObjectType $sub-type = $xobject<Subtype>;
+        $xobject does PDF::Content::XObject[$sub-type]
+    }
 }
 
 #| XObject form specific role
@@ -37,18 +40,18 @@ role PDF::Content::XObject['Form']
     multi sub from-origin(List:D $_) {
         enum <x0 y0 x1 y1>;
         when .[x1] < .[x0] {
-            from-origin([ .[x1], .[y0], .[x0], .[y1] ]);
+            from-origin [ .[x1], .[y0], .[x0], .[y1] ];
         }
         when .[y1] < .[y0] {
-            from-origin([ .[x0], .[y1], .[x1], .[y0] ]);
+            from-origin [ .[x0], .[y1], .[x1], .[y0] ];
         }
         default { $_ }
     }
 
     multi sub from-origin(Any:U) { Any }
 
-    method width  { with $!width  { $_ } else { self!size()[0] } }
-    method height { with $!height { $_ } else { self!size()[1] } }
+    method width  { $!width // self!size()[0] }
+    method height { $!height // self!size()[1] }
     method bbox { from-origin(self<BBox>) }
     method !size {
         my $bbox = self.bbox();
@@ -133,5 +136,5 @@ role PDF::Content::XObject['Image']
 }
 
 role PDF::Content::XObject['PS'] {
-    # stub
+    # deprecated PDF XObject type
 }
