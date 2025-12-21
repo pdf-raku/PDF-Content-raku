@@ -59,17 +59,19 @@ my subset Vector of List where { !.defined or .elems == 2 && .are ~~ Numeric }
 #| Add a graphics block
 method graphics( &meth! ) {
     $.op(Save);
-    my \rv = self.&meth();
-    $.op(Restore);
-    rv;
+    {
+        LEAVE $.op(Restore);
+        self.&meth();
+    }
 }
 
 #| Add a text block
 method text( &meth! ) {
     $.op(BeginText);
-    my \rv = self.&meth();
-    $.op(EndText);
-    return rv;
+    {
+        LEAVE $.op(EndText);
+        self.&meth();
+    }
 }
 
 method marked-content($tag, &code, :$props) is DEPRECATED<mark> {
@@ -113,8 +115,10 @@ multi method tag(Str $tag, &meth!, Bool :$mark, *%props --> PDF::Content::Tag) {
     %props
         ?? $.BeginMarkedContentDict($tag, $%props)
         !! $.BeginMarkedContent($tag);
-    self.&meth();
-    $.EndMarkedContent;
+    {
+        LEAVE $.EndMarkedContent;
+        self.&meth();
+    }
     $.closed-tag;
 }
 
@@ -262,10 +266,11 @@ multi sub paint-ops(:$close , :$stroke) {
 #| build a path, then fill and stroke it
 multi method paint(&meth, *%o) {
     self.Save;
-    self.&meth();
-    my \rv = self.paint: |%o;
-    self.Restore;
-    rv;
+    {
+        LEAVE self.Restore;
+        self.&meth();
+        self.paint: |%o;
+    }
 }
 
 multi method paint(|c) {
@@ -342,7 +347,7 @@ method text-position is rw returns Vector {
         unless $.context == GraphicsContext::Text;
 
     sub FETCH($) {
-        my @tm = @.TextMatrix;
+        my @tm := @.TextMatrix;
         (@tm[4] + self.tf-x) / @tm[0], @tm[5] / @tm[3];
     }
 
@@ -357,26 +362,27 @@ method text-position is rw returns Vector {
 }
 
 #| print a text block object
-multi method print(PDF::Content::Text::Box $text-box,
-                   Vector :$position,
-                   Bool :$nl = False,
-                   Bool :$preserve = True,
-                   --> List
-    ) {
+multi method print(
+    PDF::Content::Text::Box $text-box,
+    Vector :$position,
+    Bool :$nl = False,
+    Bool :$preserve = True,
+    --> List
+) {
 
     my Bool \in-text = $.context == GraphicsContext::Text;
 
     self.BeginText unless in-text;
 
     self.text-position = $_ with $position;
-    my ($x, $y) = $.text-position;
-    my ($dx, $dy) = $text-box.render(self, :$nl, :$preserve);
+    my :($x, $y) := $.text-position;
+    my :($dx, $dy) := $text-box.render(self, :$nl, :$preserve);
 
     self.EndText() unless in-text;
 
     unless $.artifact {
         with $!actual-text {
-            # Pass agregated text back to callee e.g. PDF::Tags::Elem.mark()
+            # Pass aggregated text back to callee e.g. PDF::Tags::Elem.mark()
             my $chunk = $text-box.text;
             $chunk .= flip if $.reversed-chars;
             $_ ~= ' '

@@ -390,7 +390,7 @@ my constant %SpaceWidth = %(
     "\c[ZERO WIDTH SPACE]" => 0,
 );
 
-method !flush-spaces($em-spaces is rw, @words is raw, $i is rw) returns Numeric:D {
+method !flush-spaces($em-spaces, @words is raw, $i is rw) returns Numeric:D {
     my $n = 0; # space count for padding purposes
     with  @words[$i] {
         when /<Text::space>/ {
