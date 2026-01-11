@@ -203,13 +203,13 @@ method clone(
 }
 
 method text(::?CLASS:D $obj:) is rw {
-    Proxy.new(
-        FETCH => { $!text },
-        STORE => -> $, $!text {
-            my @chunks = $obj.comb($!text);
-            $obj!layup: @chunks;
-        },
-    );
+    sub FETCH($) { $!text };
+    sub STORE($, $!text) {
+        my @chunks = $obj.comb($!text);
+        $obj!layup: @chunks;
+    }
+
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 method !build(
@@ -224,10 +224,10 @@ method !build(
     $!max-word-gap //= 10 * self!word-gap;
     @!offset[0] //= 0;
     @!offset[1] //= 0;
-    $!margin-left   //= $margin;
-    $!margin-bottom //= $margin;
-    $!margin-right  //= $margin;
     $!margin-top    //= $margin;
+    $!margin-right  //= $margin;
+    $!margin-bottom //= $!margin-top;
+    $!margin-left   //= $!margin-right;
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
