@@ -178,7 +178,7 @@ method content-height returns Numeric { @!lines».height.sum * $.leading; }
 =para Calculated from the number of lines in the text box.
 
 my grammar Text {
-    token nbsp   { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] ]> }
+    token nbsp   { <[ \c[NO-BREAK SPACE] \c[NARROW NO-BREAK SPACE] \c[WORD JOINER] \c[ZERO WIDTH NO-BREAK SPACE] \c[FIGURE SPACE] ]> }
     token space  { [\s <!after <nbsp> > | \c[ZERO WIDTH SPACE] ]+ }
     token hyphen { <[ \c[HYPHEN] \c[HYPHEN-MINUS] \c[HYPHENATION POINT] ]> }
     token word   { [ <!hyphen> <!space> . ]+ <[ \c[HYPHEN] \c[HYPHEN-MINUS] ]>? | <.hyphen> }
@@ -295,10 +295,10 @@ method !layup(@atoms is copy) {
         while $line-breaks-- {
             $prev-soft-hyphen = False;
             $line-start = $i;
-            $line .= new: :$word-gap, :$height;
-            @!lines.push: $line;
             $preceding-spaces = 0;
             $word-pad = 0;
+            $line .= new: :$word-gap, :$height;
+            @!lines.push: $line;
             if self!height-exceeded {
                 @!lines.pop;
                 $i--;
@@ -320,7 +320,7 @@ method !layup(@atoms is copy) {
 
             my $Tx = $line.content-width + $word-pad;
             my $Ty = @!lines.head.height * $.leading  -  self.content-height;
-            @!images.push( { :$Tx, :$Ty, :xobject($atom) } )
+            @!images.push: %( :$Tx, :$Ty, :xobject($atom) );
         }
 
         if $prev-soft-hyphen {
@@ -363,7 +363,7 @@ method !layup(@atoms is copy) {
             @!lines = $proxy.lines;
         }
         else {
-            warn "Text::FriBidi v0.0.4+ is required for :bidi processing";
+            warn "Text::FriBidi is required for :bidi processing";
         }
     }
 
@@ -472,7 +472,7 @@ method render(
             @Tm[4] += .<Tx> + $tx;
             @Tm[5] += .<Ty> + $.TextRise + $ty;
             given .<xobject> {
-                if .does(PDF::Content::XObject['Image']) {
+                when PDF::Content::XObject['Image'] {
                     @Tm[0] *= .width;
                     @Tm[3] *= .height;
                 }
@@ -530,7 +530,7 @@ method place-images($gfx) {
         $gfx.Save;
         $gfx.ConcatMatrix: |.<Tm>;
         given .<xobject> {
-            .finish if .does(PDF::Content::XObject['Form']);
+            when PDF::Content::XObject['Form'] { .finish }
         }
         $gfx.XObject: $gfx.resource-key(.<xobject>);
         $gfx.Restore;
