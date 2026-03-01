@@ -226,8 +226,8 @@ method !build(
     @!offset[1] //= 0;
     $!margin-top    //= $margin;
     $!margin-right  //= $margin;
-    $!margin-bottom //= $!margin-top;
-    $!margin-left   //= $!margin-right;
+    $!margin-bottom //= $margin;
+    $!margin-left   //= $margin;
 }
 
 multi submethod TWEAK(Str :$!text!, :@chunks = self.comb($!text), |c) {
