@@ -396,11 +396,11 @@ BEGIN %Store = (
 
 );
 
-multi trait_mod:<is>(Attribute $att, :stored(&meth)!) {
+multi trait_mod:<is>(Attribute $att, :&stored!) {
     my \setter = 'Set' ~ $att.accessor-name;
     my Str \op = %OpCode{setter}
         or die "No OpCode::{setter} entry for {$att.name}";
-    %Store{op} = &meth;
+    %Store{op} = &stored;
 }
 
 multi trait_mod:<is>(Attribute $att, Bool :$graphics! where .so) {
@@ -453,7 +453,7 @@ has Numeric $.HorizScaling  is graphics is stored(method ($!HorizScaling) {}) is
 has Numeric $.TextLeading   is graphics is stored(method ($!TextLeading)  {}) is rw = 0;
 has Numeric $.TextRender    is graphics is stored(method ($!TextRender)   {}) is rw = 0;
 has Numeric $.TextRise      is graphics is stored(method ($!TextRise)     {}) is rw = 0;
-has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {$!tf-x = 0; $!tf-y = 0;}) is rw = [ 1, 0, 0, 1, 0, 0, ];
+has Numeric @.TextMatrix    is graphics is stored(method (*@!TextMatrix)  {$!tf-x = 0; $!tf-y = 0;}) is rw = (1, 0, 0, 1, 0, 0, );
 has Array   $.Font          is graphics is stored(
     method (Str $key, Numeric $size!) {
         with $!canvas.resource-entry('Font', $key) -> \font-dict {
@@ -469,7 +469,7 @@ method font-face returns PDF::COS::Dict {$!Font[0] // PDF::COS::Dict}
 method font-size returns Numeric {$!Font[1] // Numeric}
 
 # *** Graphics STATE ***
-has Numeric @.CTM is graphics = [ 1, 0, 0, 1, 0, 0, ];      # graphics matrix;
+has Numeric @.CTM is graphics = ( 1, 0, 0, 1, 0, 0, );      # graphics matrix;
 method CTM is rw {
     sub FETCH($) { @!CTM }
     sub STORE($, List $lval) {
@@ -485,10 +485,10 @@ has Numeric $.LineWidth   is graphics is stored(method ($!LineWidth) {}) is rw =
 has UInt    $.LineCap     is graphics is stored(method ($!LineCap) {}) is rw = ButtCaps;
 has UInt    $.LineJoin    is graphics is stored(method ($!LineJoin) {}) is rw = MiterJoin;
 has         @.DashPattern is graphics is stored(
-    method (Array $a, Numeric $p ) {
-        @!DashPattern = [ $a.clone, $p];
+    method (List $a, Numeric $p ) {
+        @!DashPattern = ($a.clone, $p);
     }
-) is rw = [[], 0];
+) is rw = ([], 0);
 
 sub device-colorspace(Str $_) {
     my Str $cs := .substr(6) if .starts-with('Device');
@@ -496,7 +496,7 @@ sub device-colorspace(Str $_) {
 }
 
 has Str $.StrokeColorSpace is graphics is stored(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
-has @!StrokeColor is graphics = [0.0];
+has @!StrokeColor is graphics = 0.0;
 method StrokeColor is rw {
     sub FETCH($) { $!StrokeColorSpace => @!StrokeColor }
     sub STORE($, Pair $_) {
@@ -516,7 +516,7 @@ method StrokeColor is rw {
 }
 
 has Str $.FillColorSpace is graphics is stored(method ($!FillColorSpace) { }) is rw = 'DeviceGray';
-has @!FillColor is graphics = [0.0];
+has @!FillColor is graphics = 0.0;
 method FillColor is rw {
     sub FETCH($) {$!FillColorSpace => @!FillColor}
     sub STORE($, Pair $_) {
@@ -729,7 +729,7 @@ my Routine %Ops = BEGIN %(
     'BDC'|'DP' => sub (Str, Str $name!, $p! where Hash|Str|Pair) {
         my Pair $prop = do given $p {
             when Hash {
-                # bypass type coercements; create a plan dictionary object
+                # bypass type coercements; create a plain dictionary object
                 PDF::COS::Dict.new(:dict($_)).content
             }
             when Str  { :name($_) }
@@ -740,7 +740,7 @@ my Routine %Ops = BEGIN %(
     # dashArray dashPhase    d
     'd' => sub (Str $op, @array!, Numeric $phase!) {
         die X::PDF::Content::OP::BadArg.new: :$op, :mnemonic(%OpName{$op}), :arg($_)
-                                                                                         with @array.first: {$_ !~~ Numeric|Pair};
+            with @array.first: {$_ !~~ Numeric|Pair};
         [ :@array, $phase ];
     },
 
@@ -937,7 +937,7 @@ multi method op(*@args is copy) {
         note '% ' ~ opn if $!trace && ! $!comment;
     }
     else {
-        if $op ~~ 'BDC'|'DP'|'TJ'|'d'|'ID' {
+        if $op ~~ 'BDC'|'DP'|'TJ'|'d'|'ID'|'??' {
             # operation may have array or dict operands
             @args .= map: {
                 when List { [ .map: { from-ast($_) } ] }
@@ -1033,13 +1033,13 @@ multi method ops(Str $ops! --> Array) {
 }
 
 #| Parse and process a list of graphics operations
-multi method ops(List $ops? --> Array) {
-    with $ops {
-        self.op($_)
-            for .list
-    }
-    @!ops;
+multi method ops(@ops --> Array) {
+    self.op($_)
+        for @ops;
+    @.ops;
 }
+
+multi method ops { @!ops }
 
 #| Add a comment to the content stream
 method add-comment(Str $_) {

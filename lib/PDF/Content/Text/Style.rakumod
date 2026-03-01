@@ -94,31 +94,26 @@ method font-height(|c) {
 }
 
 method encode(Str:D $atom) {
-    my List $encoded;
-    my Numeric $width;
-    if $!shape || $!script || $!lang {
-        my Bool $kern = $!kern || $!shape;
-        given $!font.shape($atom, :$kern, :$!script, :$!lang) {
-            $encoded := .[0];
-            $width = .[1];
+    my @enc[2] = do {
+        when $!shape || $!script || $!lang {
+            my Bool $kern := $!kern || $!shape;
+            $!font.shape($atom, :$kern, :$!script, :$!lang);
         }
-    }
-    elsif $!kern {
-        given $!font.kern($atom) {
-            $encoded := .List given .[0].list.map: {
-                .does(Numeric) ?? -$_ !! $!font.encode($_);
+        when $!kern {
+            given $!font.kern($atom) {
+                my Seq $enc := .[0].list.map: {.does(Numeric) ?? -$_ !! $!font.encode($_)};
+                $enc.List, .[1];
             }
-            $width = .[1];
+        }
+        default {
+            .encode($atom).List, .stringwidth($atom)
+                given $!font;
         }
     }
-    else {
-        $encoded := ( $!font.encode($atom), );
-        $width = $!font.stringwidth($atom);
-    }
-    $width *= $!font-size * $!HorizScaling / 100000;
-    $width += ($atom.chars - 1) * $!CharSpacing
-        if $.CharSpacing > -$!font-size;
-    ($encoded, $width);
+    @enc[1] *= $!font-size * $!HorizScaling / 100000;
+    @enc[1] += ($atom.chars - 1) * $!CharSpacing
+        if $!CharSpacing && $!CharSpacing > -$!font-size;
+    @enc
 }
 
 has Str $!hyphen;

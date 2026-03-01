@@ -31,11 +31,11 @@ my Array enum PageSizes is export(:PageSizes) «
 my subset Box of List is export(:Box) where {.elems == 4}
 
 proto to-landscape($) is export(:to-landscape) {*}
-#| e.g. $.to-landscape(PagesSizes::A4)
+#| e.g. to-landscape(PagesSizes::A4)
 multi sub to-landscape(Box $p --> Box) {
     [ $p[1], $p[0], $p[3], $p[2] ]
 }
-#| e.g. $.to-landscape('A4')
+#| e.g. to-landscape('A4')
 multi sub to-landscape(Str $size --> Box) is hidden-from-backtrace {
     my Array $rect = PageSizes::{$size} // die "Unknown named page size '$size' (expected: {PageSizes::.keys.sort.join: ', '})";
     to-landscape($rect);
@@ -84,17 +84,17 @@ method to-xobject($page = self, Array :$BBox = $page.trim-box.clone) {
 
 #| rw accessor for page contents
 method decoded is rw {
-    Proxy.new(
-        FETCH => { self.contents },
-        STORE => -> $, $decoded {
-            if self<Contents> ~~ PDF::COS::Stream {
-                self<Contents>.decoded = $decoded;
-            }
-            else {
-                self<Contents> = PDF::COS::Stream.new: :$decoded;
-            }
-        },
-    );
+    sub FETCH($) { self.contents }
+    sub STORE($, $decoded) {
+        if self<Contents> ~~ PDF::COS::Stream:D {
+            self<Contents>.decoded = $decoded;
+        }
+        else {
+            self<Contents> = PDF::COS::Stream.new: :$decoded;
+        }
+    }
+
+    Proxy.new: :&FETCH, :&STORE;
 }
 
 method cb-finish {

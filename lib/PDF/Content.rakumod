@@ -393,10 +393,7 @@ multi method print(
         }
     }
 
-    my \x0 = $x + $dx;
-    my \y0 = $y + $dy;
-
-    $text-box.bbox(x0, y0);
+    $text-box.bbox($x + $dx, $y + $dy);
 }
 
 #| output text; move the text position down one line
@@ -421,7 +418,7 @@ method !current-font {
 method font is rw returns Array {
     sub FETCH($) { $.Font }
     sub STORE($, $v) {
-        my @v = $v.isa(List) ?? @$v !! $v;
+        my @v = $v.list;
         @v[0] = .use-font: @v[0] with $.canvas;
         self.set-font: |@v;
     }
