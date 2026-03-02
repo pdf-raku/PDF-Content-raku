@@ -70,14 +70,6 @@ be used to replace the text contained in a text box.
 
 =para The constraining height (C<:$height> option), or C<content-height>, for the text box.
 
-=head3 method content-width
-
-=para The actual width of the longest line in the text-box.
-
-=head3 method content-height
-
-=para The actual height of text-box content. This is calculated from the top of the first line to the baseline of the last line of text.
-
 =head3 method indent
 
 =para The indentation of the first line (points).
