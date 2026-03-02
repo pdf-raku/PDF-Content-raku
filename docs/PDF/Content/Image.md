@@ -43,7 +43,7 @@ load an image from a data URI string
 
 ```raku
 multi method load(
-    IO::Path(Any) $io-path
+    IO::Path(Any) $iop
 ) returns PDF::Content::Image
 ```
 

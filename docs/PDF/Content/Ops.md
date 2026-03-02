@@ -128,7 +128,7 @@ Parse and process graphics operations
 
 ```raku
 multi method ops(
-    List $ops?
+    @ops
 ) returns Array
 ```
 

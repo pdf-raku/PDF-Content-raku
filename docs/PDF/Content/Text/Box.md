@@ -74,11 +74,19 @@ The text contained in the text box. This is a `rw` accessor. It can also be used
 
 ### method width
 
-The constraining width for the text box.
+The constraining width (`:$width` option), or `content-width` for the text box.
 
 ### method height
 
-The constraining height for the text box.
+The constraining height (`:$height` option), or `content-height`, for the text box.
+
+### method content-width
+
+The actual width of the longest line in the text-box.
+
+### method content-height
+
+The actual height of text-box content. This is calculated from the top of the first line to the baseline of the last line of text.
 
 ### method indent
 

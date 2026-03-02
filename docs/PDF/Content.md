@@ -176,7 +176,7 @@ build a path, then fill and stroke it
 
 ```raku
 multi sub make-font(
-    PDF::COS::Dict:D(Any):D $dict where { ... }
+    PDF::Content::Font:D(Any):D $dict
 ) returns PDF::COS::Dict
 ```
 
@@ -194,11 +194,12 @@ method text-box(
 
 create a text box object for use in graphics .print() or .say() methods
 
-### multi method print
+### method print
 
 ```raku
-multi method print(
+method print(
     Str:D $text,
+    :$font! where { ... },
     *%opt
 ) returns List
 ```

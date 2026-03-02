@@ -108,18 +108,16 @@ multi sub render2D(@atoms, :$scale, :$TextRise!) {
             my $new-rise = $TextRise + .im.round / $scale;
             unless $new-rise =~= $text-rise {
                 $text-rise := $new-rise;
-                @segs.push: render(@$chunk) if $chunk;
+                @segs.push: render(@$chunk) if @$chunk;
                 @segs.push: 'Ts' => [$text-rise];
                 $chunk = [];
             }
-            $chunk.push: .re if .re;
+            $_ .= re;
         }
-        else {
-            $chunk.push: $_;
-        }
+        $chunk.push: $_ if $_;
     }
 
-    @segs.push: render(@$chunk) if $chunk;
+    @segs.push: render(@$chunk) if @$chunk;
 
     if ($text-rise !=~= $TextRise) {
         # restore

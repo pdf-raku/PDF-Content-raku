@@ -13,7 +13,7 @@ this role is applied to [PDF::Content::Page](https://pdf-raku.github.io/PDF-Cont
 
 ```raku
 method gfx(
-    |c
+    *%o
 ) returns PDF::Content
 ```
 
@@ -56,7 +56,7 @@ reparse contents
 ```raku
 method render(
     Bool :$tidy = Bool::True,
-    |c
+    *%o
 ) returns PDF::Content
 ```
 

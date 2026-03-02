@@ -64,11 +64,19 @@ be used to replace the text contained in a text box.
 
 =head3 method width
 
-=para The constraining width for the text box.
+=para The constraining width (C<:$width> option), or C<content-width> for the text box.
 
 =head3 method height
 
-=para The constraining height for the text box.
+=para The constraining height (C<:$height> option), or C<content-height>, for the text box.
+
+=head3 method content-width
+
+=para The actual width of the longest line in the text-box.
+
+=head3 method content-height
+
+=para The actual height of text-box content. This is calculated from the top of the first line to the baseline of the last line of text.
 
 =head3 method indent
 
@@ -266,17 +274,17 @@ method !layup(@atoms is copy) {
         :($word, $word-width) := do given $atom {
             when "\c[HYPHENATION POINT]" {
                 $soft-hyphen = True;
-                $atom = $!style.hyphen;
+                $_ = $!style.hyphen;
                 $!style.hyphen-encoding;
             }
             when Str {
                 if $!verbatim && .match("\n", :g) -> UInt() $nl {
                     # todo: handle tabs
                     $line-breaks = $nl;
-                    $atom = ' ' x $preceding-spaces;
+                    $_ = ' ' x $preceding-spaces;
                     $word-pad = 0;
                 }
-                $!style.encode: $atom;
+                $!style.encode: $_;
             }
             when PDF::Content::XObject {
                 $xobject = True;
