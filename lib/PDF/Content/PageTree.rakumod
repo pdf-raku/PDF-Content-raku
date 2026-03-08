@@ -89,20 +89,20 @@ to go to any particular page.
 
 =end para
 
+multi sub update-counts(Any:U $, $, $?) { }
+multi sub update-counts(::?ROLE:D, UInt:D, $ where * > 1000) {
+    die "maximum page tree depth exceeded"
+}
+multi sub update-counts(::?ROLE:D $node, UInt:D $count, $n = 0) is hidden-from-backtrace {
+    $node<Count> += $count;
+    $node<Parent>.&update-counts: $count, $n+1
+}
+
 #| add new last page
 method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment --> PDF::Content::Page) {
-
     self.Kids.push: $page;
     $page<Parent> = self.link;
-    my $node = self;
-    my $n = 0;
-    while $node.defined {
-        $node<Count>++;
-        $node = $node<Parent>;
-        die "maximum page tree depth exceeded"
-            if ++$n > 1000;
-    }
-
+    self.&update-counts: 1;
     $page
 }
 
@@ -110,17 +110,7 @@ method add-page(::?ROLE:D: PDF::Content::Page:D $page = $.page-fragment --> PDF:
 method add-pages(::?ROLE:D: ::?ROLE:D $pages = $.pages-fragment --> ::?ROLE:D) {
     self.Kids.push: $pages;
     $pages<Parent> = self.link;
-
-    if $pages<Count> -> $count {
-        my $node = self;
-        my $n = 0;
-        while $node.defined {
-            $node<Count> += $count;
-            $node = $node<Parent>;
-            die "maximum page tree depth exceeded"
-                if ++$n > 1000;
-        }
-    }
+    self.&update-counts: $_ with $pages<Count>;
     $pages;
 }
 
