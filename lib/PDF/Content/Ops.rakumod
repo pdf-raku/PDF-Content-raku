@@ -490,10 +490,10 @@ has         @.DashPattern is graphics is stored(
     }
 ) is rw = ([], 0);
 
-sub device-colorspace(Str $_) {
-    my Str $cs := .substr(6) if .starts-with('Device');
-    $cs ~~ 'RGB'|'Gray'|'CMYK' ?? $cs !! Str;
+multi sub device-colorspace(Str:D $_ where m/^Device('RGB'|'Gray'|'CMYK')$/) {
+    $0.Str
 }
+multi sub device-colorspace($) { Str }
 
 has Str $.StrokeColorSpace is graphics is stored(method ($!StrokeColorSpace) {}) is rw = 'DeviceGray';
 has @!StrokeColor is graphics = 0.0;
@@ -502,8 +502,7 @@ method StrokeColor is rw {
     sub STORE($, Pair $_) {
         my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
         unless $key eq $!StrokeColorSpace && .value eqv @!StrokeColor {
-            my $cs := device-colorspace($key);
-            if $cs {
+            if $key.&device-colorspace -> $cs {
                 self."SetStroke$cs"(|.value.clone);
             }
             else {
@@ -522,8 +521,7 @@ method FillColor is rw {
     sub STORE($, Pair $_) {
         my Str $key = .key ~~ Str ?? .key !! $.resource-key(.key);
         unless $key eq $!FillColorSpace && .value eqv @!FillColor {
-            my $cs := device-colorspace($key);
-            if $cs {
+            if $key.&device-colorspace -> $cs {
                 self."SetFill$cs"(|.value.clone);
             }
             else {

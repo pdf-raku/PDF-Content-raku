@@ -254,8 +254,8 @@ method !layup(@atoms is copy) {
     @!lines = $line;
 
     LAYUP: while $i < $n {
-        my subset StrOrImage where Str | PDF::Content::XObject;
-        my StrOrImage $atom = @atoms[$i++];
+        my subset TextOrImage where Str | PDF::Content::XObject;
+        my TextOrImage $atom = @atoms[$i++];
         my Bool $xobject = False;
         my Int $line-breaks = 0;
         my Numeric $word-pad = $preceding-spaces * $word-gap;
