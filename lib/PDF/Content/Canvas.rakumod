@@ -32,26 +32,29 @@ multi method pre-gfx(&code) { self.pre-gfx.graphics( &code ) }
 method pre-graphics(&code)  { self.pre-gfx(&code) }
 has Bool $!rendered = False;
 has UInt $.mcid = 0;
-method use-mcid(UInt:D $_) {
-    $!mcid = $_ unless $!mcid >= $_;
-}
+multi method use-mcid(UInt:D $ where $!mcid > *) { }
+multi method use-mcid($!mcid) { }
 #| Allocate the next MCID (Marked Content Identifier)
 method next-mcid returns UInt:D { $!mcid++ }
 
 method canvas(&code) is DEPRECATED<html-canvas> { self.html-canvas(&code) }
 
 # Fix nesting issues that aren't illegal, but could cause problems:
+# - close innner text block
 # - append any missing 'Q' (Restore) operators at end of stream
 # - wrap with 'q' (Save) and 'Q' (Restore) operators, if there
 #   are any top-level graphics, which may affect the state.
 method !tidy(@ops --> Array) {
     my int $nesting = 0;
     my $wrap = False;
+    my $text-block = False;
 
     for @ops {
         given .key {
-            when OpCode::Save {$nesting++}
-            when OpCode::Restore {$nesting--}
+            when OpCode::Save {$nesting++; $text-block = False;}
+            when OpCode::BeginText { $text-block = True }
+            when OpCode::EndText { $text-block = False }
+            when OpCode::Restore {$nesting--; $text-block = False;}
             default {
                 $wrap ||= $nesting <= 0
                     && PDF::Content::Ops.is-graphics-op: $_;
@@ -59,6 +62,8 @@ method !tidy(@ops --> Array) {
         }
     }
 
+    @ops.push: OpCode::EndText => []
+        if $text-block;
     @ops.push: OpCode::Restore => []
         while $nesting-- > 0;
 
@@ -106,20 +111,19 @@ method render(Bool :$tidy = True, *%o --> PDF::Content) {
 method finish is hidden-from-backtrace {
     if $!gfx.defined || $!pre-gfx.defined {
         # rebuild graphics, if they've been accessed
-        my $decoded = do with $!pre-gfx { .Str } else { '' };
+        my @content;
+        my $pre  = .Str with $!pre-gfx;
+        my $post = .Str with $!gfx;
+        @content.push: $pre if $pre;
         if !$!rendered && $.contents {
             # skipping rendering. copy raw content
-            $decoded ~= "\n" if $decoded;
-            $decoded ~= ~ OpCode::Save ~ "\n"
-                ~ $.contents
-                ~ "\n" ~ OpCode::Restore;
+            @content.push: ~OpCode::Save if $post;
+            @content.push: $.contents;
+            @content.push: ~OpCode::Restore if $post;
         }
-        with $!gfx {
-            $decoded ~= "\n" if $decoded;
-            $decoded ~= .Str;
-        }
+        @content.push: $post if $post;
         $!gfx = $!pre-gfx = Nil;
-        self.decoded = $decoded;
+        self.decoded = @content.join: "\n";
     }
 }
 
