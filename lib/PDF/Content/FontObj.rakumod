@@ -134,4 +134,10 @@ my subset CoreFontLike of ::?ROLE:D is export(:CoreFontLike) where { .type ~~ 'T
 method is-subset { so (self ~~ SubsetFontLike)  }
 method is-core-font { so (self ~~ CoreFontLike) }
 
-# todo: underline-position underline-thickness lock encoding encode-cids units-per-EM shape
+# Suggested position and thickness of underlining for the font.
+method underline-position {...}
+method underline-thickness {...}
+
+method encoding {...} # encoding name. e.g. WinAnsiEncoding
+method encode-cids {...} # encode an array of logical CIDs
+method shape {...} # shape and encode text
