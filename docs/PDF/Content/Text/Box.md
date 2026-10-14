@@ -177,7 +177,7 @@ method clone(
     :$style = Code.new,
     :$text = Code.new,
     |c
-) returns PDF::Content::Text::Box
+) returns PDF::Content::Text::Box:D
 ```
 
 clone a text box

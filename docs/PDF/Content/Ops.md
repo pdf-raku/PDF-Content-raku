@@ -19,10 +19,8 @@ The PDF::Content::Ops role implements methods and mnemonics for the full operato
 </tbody>
 </table>
 
-head
-====
-
 Methods
+-------
 
 ### method font-face
 

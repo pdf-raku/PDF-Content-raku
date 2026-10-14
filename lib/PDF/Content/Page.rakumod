@@ -46,7 +46,7 @@ method contents returns Str {
     with self<Contents> {
         my Array $streams = do {
             when List { $_ }
-            when Hash { [$_] }
+            when Hash { [$_, ] }
             default   { die "unexpected page content: {.raku}" }
         }
         $streams.keys.map({ $streams[$_].decoded }).join: '';
@@ -85,13 +85,11 @@ method to-xobject($page = self, Array :$BBox = $page.trim-box.clone) {
 #| rw accessor for page contents
 method decoded is rw {
     sub FETCH($) { self.contents }
-    sub STORE($, $decoded) {
-        if self<Contents> ~~ PDF::COS::Stream:D {
-            self<Contents>.decoded = $decoded;
-        }
-        else {
-            self<Contents> = PDF::COS::Stream.new: :$decoded;
-        }
+    multi sub STORE($, $decoded where self<Contents> ~~ PDF::COS::Stream:D) {
+        self<Contents>.decoded = $decoded;
+    }
+    multi sub STORE($, $decoded) {
+        self<Contents> = PDF::COS::Stream.new: :$decoded;
     }
 
     Proxy.new: :&FETCH, :&STORE;

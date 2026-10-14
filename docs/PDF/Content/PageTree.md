@@ -90,7 +90,7 @@ add new last page
 ```raku
 method add-pages(
     PDF::Content::PageTree:D $pages = Code.new
-) returns PDF::Content::PageTree
+) returns PDF::Content::PageTree:D
 ```
 
 append page subtree

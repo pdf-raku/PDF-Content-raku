@@ -176,7 +176,7 @@ build a path, then fill and stroke it
 
 ```raku
 multi sub make-font(
-    PDF::Content::Font:D(Any):D $dict
+    PDF::Content::Font:D(Any) $dict
 ) returns PDF::COS::Dict
 ```
 

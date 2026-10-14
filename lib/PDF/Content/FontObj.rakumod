@@ -138,6 +138,6 @@ method is-core-font { so (self ~~ CoreFontLike) }
 method underline-position {...}
 method underline-thickness {...}
 
-method encoding {...} # encoding name. e.g. WinAnsiEncoding
+method encoding {...}    # encoding name. e.g. WinAnsiEncoding
 method encode-cids {...} # encode an array of logical CIDs
-method shape {...} # shape and encode text
+method shape {...}       # shape and encode text
