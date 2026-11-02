@@ -280,7 +280,30 @@ method html-canvas(
 
 add graphics using HTML Canvas 2D API
 
-The HTML::Canvas::To::PDF Raku module must be installed to use this method
+The HTML::Canvas::To::PDF Raku module must be installed to use this method. A cache should be passed to ensure resources such as fonts and images are shared between pages.
+
+```raku
+my PDF::Lite $pdf .= open: "multipage.pdf";
+
+# use a cache for shared resources such as fonts and images.
+# for faster production and smaller multi-page PDF files
+my HTML::Canvas::To::PDF::Cache $cache .= new;
+my UInt $pages = $pdf.page-count;
+
+for 1 .. $pages -> $page-num {
+    my PDF::Content::Page $page = $pdf.page($page-num);
+    my PDF::Content $gfx = $page.pre-gfx;
+    $gfx.html-canvas: :$cache, -> \ctx {
+        ctx.fillStyle = "rgba(0, 0, 200, 0.2)";
+        ctx.fillRect(10, 25, $page.width - 20, $page.height - 45);
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "rgba(50, 50, 200, 0.8)";
+        ctx.fillText("Page $page-num/$pages", $page.width - 30, 15);
+    }
+}
+
+$pdf.update;
+```
 
 ### method draw
 
