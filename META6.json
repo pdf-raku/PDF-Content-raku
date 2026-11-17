@@ -8,7 +8,7 @@
   "depends": [
     "Base64::Native",
     "Color",
-    "Compress::Zlib::Raw",
+    "Compress::Zlib::Raw:ver<2.0.0+>:auth<zef:apogee>",
     "Font::AFM:ver<1.24.10+>",
     "Native::Packing",
     "Method::Also",
